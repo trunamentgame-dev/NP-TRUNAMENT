@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#c2185b">
+<title>NP TOURNAMENT BD | Support Center</title>
+
+<!-- PWA Manifest & App Icons -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase Compat SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<style>
+:root{
+  --pink:#e91e63;
+  --deep:#c2185b;
+  --pale:#fff0f6;
+  --bg:#f5f6fa;
+  --ink:#202436;
+  --muted:#7b8194;
+  --line:#e8eaf1;
+  --green:#18a968;
+  --blue:#168bd2;
+  --gold:#f59e0b;
+  --shadow:0 8px 28px rgba(25,30,55,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{
+  width:100%;height:100%;
+  font-family:"Hind Siliguri","Noto Sans Bengali","Segoe UI",Arial,sans-serif;
+  color:var(--ink);background:var(--bg);
+}
+body{overflow:hidden;}
+button,input,select,textarea{font:inherit;}
+button,a{-webkit-tap-highlight-color:transparent;}
+button{cursor:pointer;}
+button:disabled{opacity:.55;cursor:not-allowed;}
+
+.app{
+  height:100vh;height:100dvh;
+  max-width:620px;margin:0 auto;background:#fff;
+  display:flex;flex-direction:column;
+  overflow:hidden;box-shadow:var(--shadow);
+  position:relative;
+}
+
+/* স্থির Header এবং Officer Section (Sticky top) */
+.sticky-top{
+  flex:0 0 auto;position:relative;z-index:20;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+}
+.header{
+  min-height:72px;padding:12px 16px;
+  display:flex;align-items:center;gap:12px;
+  color:#fff;
+  background:linear-gradient(135deg,#f06292,#c2185b);
+}
+.logo{
+  width:42px;height:42px;flex-shrink:0;
+  display:grid;place-items:center;border-radius:12px;
+  background:rgba(255,255,255,.2);
+  border:1px solid rgba(255,255,255,.4);
+  font-size:14px;font-weight:900;
+  font-family:'Rajdhani', sans-serif;
+}
+.header-info{flex:1;min-width:0;}
+.header-info h1{font-size:15px;margin:0 0 3px;font-weight:800;letter-spacing:0.5px;}
+.header-info p{margin:0;font-size:11px;opacity:.94;}
+.header-tag{
+  font-size:9px;font-weight:800;
+  border:1px solid rgba(255,255,255,.5);
+  padding:5px 9px;border-radius:20px;white-space:nowrap;
+  background:rgba(0,0,0,0.12);
+}
+.officer{
+  padding:10px 16px;display:flex;
+  align-items:center;gap:11px;
+  border-bottom:1px solid var(--line);
+  background:#fff;
+}
+.avatar-wrap{position:relative;width:46px;height:46px;flex-shrink:0;}
+.avatar{
+  width:46px;height:46px;border-radius:50%;
+  object-fit:cover;border:2px solid #f3b4cc;
+  background:var(--pale);
+}
+.online-dot{
+  position:absolute;right:0;bottom:0;
+  width:12px;height:12px;background:var(--green);
+  border:2px solid #fff;border-radius:50%;
+}
+.officer-info{flex:1;min-width:0;}
+.officer-info h2{margin:0 0 2px;font-size:13px;display:flex;align-items:center;gap:4px;}
+.verified{color:var(--blue);font-weight:bold;}
+.officer-info p{color:var(--green);margin:0;font-size:11px;font-weight:600;}
+.officer-label{font-size:10px;color:var(--muted);text-align:right;}
+.officer-label strong{
+  display:block;font-size:11px;color:var(--ink);margin-bottom:2px;
+}
+.notice{
+  padding:8px 14px;background:#fff5f9;
+  border-bottom:1px solid #f5dfe8;
+  color:#963353;font-size:10.5px;line-height:1.6;
+  display:flex;align-items:center;gap:6px;
+}
+
+/* শুধু এই Chat Area স্ক্রল করবে */
+.chat{
+  flex:1;min-height:0;overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:16px 12px 20px;
+  background:radial-gradient(circle at 5% 5%,#fceaf1,transparent 32%),#fafbfe;
+  scrollbar-width:thin;
+  scrollbar-color:#e6b5c8 transparent;
+  display:flex;flex-direction:column;
+}
+.date-divider{text-align:center;margin:0 0 16px;}
+.date-divider span{
+  display:inline-block;padding:4px 12px;font-size:10px;
+  color:var(--muted);border:1px solid var(--line);
+  background:#fff;border-radius:20px;
+}
+.message{
+  display:flex;gap:8px;align-items:flex-end;
+  margin-bottom:12px;animation:appear .18s ease-out;
+}
+.message.user{justify-content:flex-end;}
+.message-avatar{
+  width:30px;height:30px;border-radius:50%;
+  object-fit:cover;flex-shrink:0;border:1px solid #f1c5d6;
+  background:var(--pale);
+}
+.bubble{
+  max-width:85%;padding:10px 14px;
+  border-radius:15px 15px 15px 4px;
+  background:#fff;border:1px solid var(--line);
+  font-size:12.5px;line-height:1.75;
+  overflow-wrap:anywhere;white-space:pre-wrap;
+  box-shadow:0 2px 6px rgba(0,0,0,0.04);
+}
+.user .bubble{
+  background:linear-gradient(135deg,#e91e63,#c2185b);color:#fff;
+  border-color:var(--pink);
+  border-radius:15px 15px 4px 15px;
+  box-shadow:0 3px 10px rgba(233,30,99,0.25);
+}
+.time{
+  display:block;text-align:right;font-size:9px;
+  opacity:.7;margin-top:4px;
+}
+
+/* Officer typing animation */
+.typing-bubble{min-width:68px;padding:12px 15px;}
+.typing-dots{display:flex;gap:4px;align-items:center;height:12px;}
+.typing-dots i{
+  width:6px;height:6px;border-radius:50%;
+  background:#bd6b8b;animation:typing 1s infinite ease-in-out;
+}
+.typing-dots i:nth-child(2){animation-delay:.15s;}
+.typing-dots i:nth-child(3){animation-delay:.3s;}
+@keyframes typing{
+  0%,60%,100%{transform:translateY(0);opacity:.45;}
+  30%{transform:translateY(-4px);opacity:1;}
+}
+@keyframes appear{
+  from{opacity:0;transform:translateY(5px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* Panels and Cards */
+.panel{
+  margin:10px 0 16px 36px;padding:15px;
+  background:#fff;border:1px solid var(--line);
+  border-radius:15px;
+  box-shadow:0 4px 18px rgba(25,30,55,.05);
+  animation:appear .2s ease-out;
+}
+.panel h3{font-size:14px;margin:0 0 6px;color:#1e293b;}
+.description{
+  color:var(--muted);font-size:11.5px;
+  line-height:1.8;margin:0 0 12px;
+}
+.label{display:block;font-size:12px;font-weight:700;margin:8px 0 4px;}
+.field{
+  display:block;width:100%;min-height:44px;
+  padding:10px 12px;margin-bottom:10px;
+  border:1px solid #dfe2eb;border-radius:10px;
+  background:#fff;color:var(--ink);
+  outline:none;font-size:12.5px;
+  transition:border-color 0.2s, box-shadow 0.2s;
+}
+textarea.field{min-height:85px;resize:vertical;}
+.field:focus{
+  border-color:var(--pink);
+  box-shadow:0 0 0 3px rgba(233,30,99,.08);
+}
+select.field{appearance:auto;-webkit-appearance:menulist;cursor:pointer;}
+.btn{
+  min-height:43px;border:0;border-radius:10px;
+  padding:10px 14px;font-size:12.5px;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  transition:all 0.15s ease;
+}
+.btn:active{transform:scale(0.98);}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--pink),var(--deep));color:#fff;box-shadow:0 3px 10px rgba(233,30,99,0.3);}
+.btn-primary:hover{background:var(--deep);}
+.btn-outline{background:#fff;color:var(--pink);border:1px solid #f0b4cb;}
+.btn-outline:hover{background:#fff5f9;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.error{display:none;color:#d32f2f;font-size:11px;margin:0 0 10px;}
+.hidden{display:none!important;}
+
+.answer-card{
+  padding:12px;margin:10px 0;border-radius:11px;
+  background:#f0fbf5;border:1px solid #d5f0e1;
+  color:#155724;font-size:12px;line-height:1.85;
+  white-space:pre-wrap;
+}
+.question-card{
+  padding:12px;margin:11px 0;
+  border:1px solid #f3d6e2;border-radius:11px;
+  background:#fff7fa;
+}
+.question-card strong{font-size:12px;display:block;margin-bottom:8px;color:#831843;}
+.question-card select{margin-bottom:0;}
+
+/* Contact options */
+.contact-list{display:grid;gap:8px;margin-top:11px;}
+.contact-option{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:10px;padding:12px 14px;background:#fff;
+  border:1px solid var(--line);border-radius:12px;
+  text-decoration:none;color:var(--ink);
+  font-size:12.5px;font-weight:700;text-align:left;width:100%;
+  cursor:pointer;transition:transform 0.15s, border-color 0.15s;
+}
+.contact-option:hover{border-color:var(--pink);transform:translateY(-1px);}
+.contact-option small{
+  display:block;margin-top:3px;font-size:10.5px;
+  color:var(--muted);font-weight:400;
+}
+.contact-option .arrow{color:var(--pink);font-size:20px;line-height:1;}
+.whatsapp{border-color:#b8e8cc;background:#f7fdf9;}
+.telegram{border-color:#b8dff6;background:#f7fbfe;}
+.live{border-color:#f1bad0;background:#fff8fa;}
+
+/* Firebase Live Chat Bottom Bar */
+.live-chat-input-area{
+  flex:0 0 auto;
+  background:#fff;
+  border-top:1px solid var(--line);
+  padding:10px 12px;
+  display:none; /* Shown when Live Chat is active */
+  flex-direction:column;gap:6px;
+  box-shadow:0 -4px 15px rgba(0,0,0,0.04);
+}
+.live-input-row{
+  display:flex;align-items:center;gap:8px;
+}
+.live-chat-input{
+  flex:1;min-height:44px;max-height:90px;
+  padding:10px 14px;border:1px solid #dfe2eb;
+  border-radius:12px;outline:none;font-size:13px;
+  resize:none;line-height:1.4;background:#fff;
+  color:var(--ink);
+}
+.live-chat-input:focus{
+  border-color:var(--pink);
+  box-shadow:0 0 0 3px rgba(233,30,99,0.1);
+}
+.btn-send-message{
+  width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,var(--pink),var(--deep));
+  border:none;color:#fff;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;
+  box-shadow:0 3px 10px rgba(233,30,99,0.35);
+  flex-shrink:0;
+}
+.btn-send-message svg{width:20px;height:20px;fill:currentColor;}
+
+/* Permanent Bottom Close Action Bar (Section 9) */
+.close-action-bar{
+  flex:0 0 auto;
+  padding:8px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  background:#fff;
+  border-top:1px solid var(--line);
+}
+.btn-close-center{
+  width:100%;min-height:44px;
+  background:#f8fafc;
+  border:1px solid #cbd5e1;
+  color:#1e293b;border-radius:12px;
+  font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;transition:all 0.15s ease;
+}
+.btn-close-center:hover{
+  background:#fee2e2;border-color:#fca5a5;color:#dc2626;
+}
+.btn-close-center svg{width:18px;height:18px;fill:currentColor;}
+
+.footer-copy{
+  text-align:center;font-size:9.5px;color:var(--muted);
+  margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- ==================== STICKY HEADER ==================== -->
+  <div class="sticky-top">
+    <header class="header">
+      <div class="logo">NP</div>
+      <div class="header-info">
+        <h1>NP TOURNAMENT BD</h1>
+        <p>Customer Support Center</p>
+      </div>
+      <span class="header-tag">HELP CENTER</span>
+    </header>
+
+    <section class="officer">
+      <div class="avatar-wrap">
+        <img class="avatar" id="officerAvatar"
+          src="https://i.postimg.cc/qRPfpDfq/Screenshot-2026-10-26-011822-cropped.jpg"
+          alt="CS Officer" onerror="this.src='icons/icon-192.png'">
+        <span class="online-dot"></span>
+      </div>
+      <div class="officer-info">
+        <h2>CS Officer <span class="verified">✓</span></h2>
+        <p id="officerStatusText">● Online Support</p>
+      </div>
+      <div class="officer-label">
+        <strong>Support Desk</strong>
+        আমরা পাশে আছি
+      </div>
+    </section>
+
+    <div class="notice">
+      <span>🔒</span>
+      <span>আপনার সমস্যার সমাধানে সঠিক তথ্য দিন। পাসওয়ার্ড, PIN বা OTP কাউকে দেবেন না।</span>
+    </div>
+  </div>
+
+  <!-- ==================== SCROLLABLE CHAT MESSAGES AREA ==================== -->
+  <main class="chat" id="chatArea" aria-live="polite">
+    <div class="date-divider">
+      <span>NP TOURNAMENT BD • SUPPORT</span>
+    </div>
+
+    <!-- Message Bubble Rows appended here -->
+    <div id="messages"></div>
+
+    <!-- Step 1: Welcome & Name Panel -->
+    <section class="panel" id="namePanel">
+      <h3>❤️ স্বাগতম NP TOURNAMENT BD Support Center-এ!</h3>
+      <p class="description">
+        NP TOURNAMENT BD Support Center-এ আপনাকে স্বাগতম। আমাদের সঙ্গে যোগাযোগ করার জন্য ধন্যবাদ। আপনাকে কীভাবে সাহায্য করতে পারি?
+        <br><br>সাপোর্ট শুরু করতে প্রথমে আপনার নামটি লিখুন।
+      </p>
+      <form id="nameForm">
+        <label class="label" for="userName">আপনার নাম</label>
+        <input class="field" id="userName" maxlength="60"
+          autocomplete="name" placeholder="আপনার সম্পূর্ণ নাম লিখুন" required>
+        <p class="error" id="nameError"></p>
+        <button class="btn btn-primary" type="submit">শুরু করুন →</button>
+      </form>
+    </section>
+
+    <!-- Step 2: Phone Number Panel -->
+    <section class="panel hidden" id="phonePanel">
+      <h3>📱 আপনার ফোন নম্বর দিন</h3>
+      <p class="description">ধন্যবাদ! এখন আপনার যোগাযোগের সচল ফোন নম্বরটি লিখুন।</p>
+      <form id="phoneForm">
+        <label class="label" for="userPhone">ফোন নম্বর (Mobile Number)</label>
+        <input class="field" id="userPhone" type="tel" maxlength="20"
+          autocomplete="tel" placeholder="যেমন: 017XXXXXXXX" required>
+        <p class="error" id="phoneError"></p>
+        <button class="btn btn-primary" type="submit">পরবর্তী ধাপ →</button>
+      </form>
+    </section>
+
+    <!-- Step 3: Contact Options Panel (Live Chat, WhatsApp, Telegram, Issues Dropdown) -->
+    <section class="panel hidden" id="contactOptionsPanel">
+      <h3>🎧 যোগাযোগের মাধ্যম নির্বাচন করুন</h3>
+      <p class="description">
+        নিচের অপশনগুলো থেকে বেছে নিন অথবা সরাসরি সমস্যার তালিকা থেকে সমাধান দেখুন।
+      </p>
+      
+      <div class="contact-list" style="margin-bottom:14px;">
+        <button class="contact-option live" id="btnChooseLiveChat" type="button" onclick="activateFirebaseLiveChat()">
+          <span>💬 Live Chat (রিয়েলটাইম চ্যাট)<small>অফিসার / অ্যাডমিনের সাথে সরাসরি চ্যাট করুন</small></span>
+          <span class="arrow">›</span>
+        </button>
+
+        <a class="contact-option whatsapp" id="whatsappLink" href="javascript:void(0)" onclick="handleOpenWhatsApp()">
+          <span>📱 WhatsApp Support<small>অফিসিয়াল হোয়াটসঅ্যাপে মেসেজ দিন</small></span>
+          <span class="arrow">›</span>
+        </a>
+
+        <a class="contact-option telegram" id="telegramLink" href="javascript:void(0)" onclick="handleOpenTelegram()">
+          <span>✈️ Telegram Support<small>টেলিগ্রাম চ্যানেলে সহায়তা নিন</small></span>
+          <span class="arrow">›</span>
+        </a>
+      </div>
+
+      <div style="border-top:1px dashed var(--line); padding-top:12px;">
+        <button class="btn btn-outline" style="width:100%;" type="button" onclick="showIssueDropdownStep()">
+          📋 সাধারণ সমস্যার সমাধান তালিকা দেখুন →
+        </button>
+      </div>
+    </section>
+
+    <!-- Step 4: Issue Dropdown Panel -->
+    <section class="panel hidden" id="issuePanel">
+      <h3>📋 আপনার সমস্যাটি নির্বাচন করুন</h3>
+      <p class="description">
+        Dropdown থেকে সমস্যার ধরন বেছে নিন। আপনার নির্বাচনের ভিত্তিতে সমাধান ও পরবর্তী করণীয় দেখানো হবে।
+      </p>
+      <form id="issueForm">
+        <label class="label" for="issueSelect">সমস্যার ক্যাটাগরি</label>
+        <select class="field" id="issueSelect" required>
+          <option value="">-- একটি সমস্যা নির্বাচন করুন --</option>
+          <option value="deposit">Deposit / টাকা জমা</option>
+          <option value="withdraw">Withdraw / টাকা উত্তোলন</option>
+          <option value="wallet">Wallet Balance</option>
+          <option value="payment">Payment Pending</option>
+          <option value="tournament">Tournament সমস্যা</option>
+          <option value="room">Room ID / Password</option>
+          <option value="result">Match Result / প্রাইজ</option>
+          <option value="login">Login / Signup</option>
+          <option value="account">Account Problem</option>
+          <option value="other">অন্যান্য সমস্যা</option>
+        </select>
+        <p class="error" id="issueError"></p>
+        <button class="btn btn-primary" type="submit">সমস্যার সমাধান দেখুন →</button>
+      </form>
+    </section>
+
+    <!-- Step 5: Answer Panel -->
+    <section class="panel hidden" id="answerPanel">
+      <h3 id="answerTitle">আপনার সমস্যার সমাধান</h3>
+      <p class="description" id="answerIntro">আপনার সমস্যার সম্ভাব্য সমাধান:</p>
+      <div class="answer-card" id="answerText"></div>
+
+      <div class="question-card">
+        <strong id="followupTitle">আপনার সমস্যাটি সম্পর্কে একটি প্রশ্ন</strong>
+        <select class="field" id="followupSelect">
+          <option value="">-- উত্তর নির্বাচন করুন --</option>
+        </select>
+      </div>
+
+      <div id="extraQuestionBox" class="hidden">
+        <label class="label" for="extraDetails">সমস্যার অতিরিক্ত বিবরণ</label>
+        <textarea class="field" id="extraDetails" maxlength="1000"
+          placeholder="সমস্যাটি বিস্তারিত লিখুন (পাসওয়ার্ড/PIN/OTP নয়)"></textarea>
+      </div>
+
+      <p class="error" id="answerError"></p>
+      <button class="btn btn-primary" id="continueBtn" type="button">
+        উত্তর জমা দিন →
+      </button>
+    </section>
+
+    <!-- Step 6: Resolution Status Panel -->
+    <section class="panel hidden" id="resolutionPanel">
+      <h3>সমস্যার সমাধান হয়েছে কি?</h3>
+      <p class="description">
+        উপরের নির্দেশনা অনুসরণ করার পর আপনার সমস্যার অবস্থা নির্বাচন করুন।
+      </p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="resolvedBtn" type="button">
+          হ্যাঁ, সমাধান হয়েছে
+        </button>
+        <button class="btn btn-outline" id="notResolvedBtn" type="button">
+          না, সমাধান হয়নি
+        </button>
+      </div>
+    </section>
+
+    <!-- Step 7: Success Panel -->
+    <section class="panel hidden" id="successPanel">
+      <h3>✅ ধন্যবাদ!</h3>
+      <p class="description">
+        NP TOURNAMENT BD Support ব্যবহার করার জন্য ধন্যবাদ। আপনার সমস্যা সমাধান হয়েছে জেনে আমরা আনন্দিত।
+      </p>
+      <button class="btn btn-primary" id="restartBtn" type="button" onclick="restartSupportFlow()">
+        নতুন সাপোর্ট অনুরোধ শুরু করুন
+      </button>
+    </section>
+  </main>
+
+  <!-- ==================== FIREBASE LIVE CHAT INPUT BAR ==================== -->
+  <div class="live-chat-input-area" id="liveChatInputArea">
+    <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--muted); padding:0 2px;">
+      <span style="display:flex; align-items:center; gap:4px; color:var(--green); font-weight:600;">
+        <span style="width:6px; height:6px; background:var(--green); border-radius:50%; display:inline-block;"></span>
+        লাইভ চ্যাট সংযুক্ত (Live with Officer)
+      </span>
+      <span style="font-size:10px;">Enter চেপে পাঠান</span>
+    </div>
+    <div class="live-input-row">
+      <textarea id="liveChatInput" class="live-chat-input" rows="1" placeholder="মেসেজ লিখুন (পাসওয়ার্ড/পিন নয়)..." onkeydown="handleLiveInputKey(event)"></textarea>
+      <button type="button" id="btnSendLiveMsg" class="btn-send-message" onclick="handleSendLiveMessage()" title="মেসেজ পাঠান">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== PROMINENT CLOSE BUTTON (Section 9) ==================== -->
+  <div class="close-action-bar">
+    <button type="button" id="btnCloseSupportCenter" class="btn-close-center" onclick="handleCloseSupportCenter()" title="সাপোর্ট সেন্টার বন্ধ করে ইউজার প্যানেলে ফিরে যান">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      <span>Close (সাপোর্ট সেন্টার বন্ধ করুন ও ফিরে যান)</span>
+    </button>
+    <div class="footer-copy">NP TOURNAMENT BD • Professional Customer Support Desk</div>
+  </div>
+
+</div>
+
+<!-- Firebase Config (Relative path for GitHub Pages compatibility) -->
+<script src="firebase-config.js"></script>
+
+<script>
+"use strict";
+
+/**
+ * NP TOURNAMENT BD - FULL SUPPORT CENTER ENGINE
+ * Automated problem solver + Real-time Firebase Live Support Chat with Admin.
+ */
+const OFFICER_IMAGE = "https://i.postimg.cc/qRPfpDfq/Screenshot-2026-10-26-011822-cropped.jpg";
+
+const $ = id => document.getElementById(id);
+
+const state = {
+  name: "",
+  phone: "",
+  issue: "",
+  uid: null,
+  isLiveChatActive: false,
+  isSending: false,
+  history: [],
+  settings: {
+    whatsapp: "",
+    telegram: "",
+    supportPhone: ""
+  }
+};
+
+const panelIds = [
+  "namePanel", "phonePanel", "contactOptionsPanel", "issuePanel", 
+  "answerPanel", "resolutionPanel", "successPanel"
+];
+
+// Firebase References
+let firebaseApp = null;
+let auth = null;
+let db = null;
+let chatMessagesRef = null;
+let chatListenerAttached = false;
+
+try {
+  const config = window.NP_FIREBASE_CONFIG || window.DEFAULT_FIREBASE_CONFIG;
+  if (typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(config);
+    }
+    firebaseApp = firebase.app();
+    auth = firebase.auth();
+    db = firebase.database();
+  }
+} catch (e) {
+  console.warn("Firebase Init Exception in Support Center:", e);
+}
+
+/* সমস্যার জ্ঞানভান্ডার (Knowledge Base) */
+const SUPPORT_KB = {
+  deposit: {
+    title: "Deposit / টাকা জমা",
+    answer: "আপনি টাকা জমা দিয়েছেন কিন্তু ব্যালেন্স না এলে প্রথমে পেমেন্ট অ্যাপ (bKash/Nagad/Rocket) থেকে Transaction Status পরীক্ষা করুন। পেমেন্ট Successful হলে Transaction ID সংরক্ষণ করুন। অ্যাডমিন অনুমোদনের পর ব্যালেন্স অ্যাকাউন্টে যুক্ত হবে।",
+    question: "আপনার Deposit-এর বর্তমান অবস্থা কী?",
+    options: [
+      ["success", "পেমেন্ট সফল, ব্যালেন্স আসেনি"],
+      ["pending", "পেমেন্ট Pending রয়েছে"],
+      ["failed", "পেমেন্ট Failed হয়েছে"],
+      ["other", "অন্য কোনো সমস্যা"]
+    ],
+    replies: {
+      success: "Transaction ID ও জমার পরিমাণ প্রস্তুত রাখুন। অ্যাডমিন প্যানেল থেকে আপনার ট্রানজেকশন দ্রুত ভেরিফাই করা হবে।",
+      pending: "পেমেন্ট অ্যাপে Pending থাকলে স্ট্যাটাস নিশ্চিত করুন। সফল না হওয়া পর্যন্ত একই পেমেন্ট বারবার করবেন না।",
+      failed: "পেমেন্ট Failed হলে আপনার ব্যাংক/পেমেন্ট অ্যাকাউন্টে টাকা কাটা হয়েছে কি না দেখুন। কাটা গেলে সংশ্লিষ্ট হেল্পলাইনে অভিযোগ করুন।",
+      other: "আপনার পেমেন্টের বিবরণ প্রস্তুত রাখুন। নিচে Live Chat-এ মেসেজ দিয়ে অ্যাডমিনের সাহায্য নিন।"
+    }
+  },
+  withdraw: {
+    title: "Withdraw / টাকা উত্তোলন",
+    answer: "Withdraw-এর অবস্থা জানতে Wallet-এ Withdraw History পরীক্ষা করুন। Pending থাকলে অ্যাডমিন ভেরিফিকেশন শেষ হওয়া পর্যন্ত অপেক্ষা করুন (সাধারণত ৩০-৬০ মিনিট)।",
+    question: "আপনার Withdraw-এর অবস্থা কী দেখাচ্ছে?",
+    options: [
+      ["pending", "Pending দেখাচ্ছে"],
+      ["approved", "Approved, কিন্তু টাকা আসেনি"],
+      ["rejected", "Rejected হয়েছে"],
+      ["other", "অন্য সমস্যা"]
+    ],
+    replies: {
+      pending: "অ্যাডমিন টিম দ্রুত পেমেন্ট পাঠিয়ে দিচ্ছেন। অল্প কিছুক্ষণ অপেক্ষা করুন।",
+      approved: "আপনার নম্বরে পেমেন্ট পাঠানো হয়েছে। মেসেজ না পেলে পেমেন্ট স্টেটমেন্ট চেক করুন।",
+      rejected: "নম্বর ভুল হলে রিকোয়েস্ট রিজেক্ট করে টাকা ওয়ালেটে রিফান্ড করা হয়। সঠিক নম্বর দিয়ে পুনরায় আবেদন করুন।",
+      other: "উইথড্র সংক্রান্ত বিবরণ লিখে Live Chat-এ মেসেজ দিন।"
+    }
+  },
+  wallet: {
+    title: "Wallet Balance",
+    answer: "Wallet Balance ভুল দেখালে পেজটি রিফ্রেশ করুন এবং Transaction History পরীক্ষা করুন। টুর্নামেন্ট জয়েনিং ফি ও প্রাইজ মানির হিসাব মিলিয়ে দেখুন।",
+    question: "Wallet-এ কী সমস্যা হচ্ছে?",
+    options: [
+      ["low", "ব্যালেন্স কম দেখাচ্ছে"],
+      ["missing", "টাকা কেটেছে কিন্তু টুর্নামেন্টে যোগ হয়নি"],
+      ["update", "ব্যালেন্স আপডেট হচ্ছে না"],
+      ["other", "অন্য সমস্যা"]
+    ],
+    replies: {
+      low: "সাম্প্রতিক জয়েনিং ফি ও ট্রানজেকশন লেজার চেক করুন। ভুল থাকলে ট্রানজেকশন আইডি নোট করুন।",
+      missing: "যদি ফি কাটার পরও স্লট বুক না হয়, তবে অ্যাডমিন তা ভেরিফাই করে রিফান্ড করে দেবেন।",
+      update: "ইন্টারনেট সংযোগ চেক করে ওয়ালেট রিফ্রেশ করুন।",
+      other: "ওয়ালেটের বিবরণ লিখে সরাসরি লাইভ চ্যাটে অ্যাডমিনকে জানান।"
+    }
+  },
+  payment: {
+    title: "Payment Pending",
+    answer: "পেমেন্ট পেন্ডিং থাকলে সাধারণত ১৫-৩০ মিনিটের মধ্যে অ্যাডমিন TrxID যাচাই করে তা অ্যাপ্রুভ করেন। অতিরিক্ত চাপ থাকলে কিছুটা বেশি সময় লাগতে পারে।",
+    question: "পেমেন্টের ধরন কী?",
+    options: [
+      ["deposit_pending", "ডিপোজিট রিকোয়েস্ট পেন্ডিং"],
+      ["withdraw_pending", "উইথড্র রিকোয়েস্ট পেন্ডিং"]
+    ],
+    replies: {
+      deposit_pending: "প্রেরক নম্বর ও TrxID সঠিক থাকলে শীঘ্রই ওয়ালেটে টাকা জমা হবে।",
+      withdraw_pending: "উইথড্র পেমেন্ট প্রসেসিংয়ে রয়েছে। কিছুক্ষণের মধ্যেই টাকা পৌঁছে যাবে।"
+    }
+  },
+  tournament: {
+    title: "Tournament সমস্যা",
+    answer: "টুর্নামেন্টে জয়েন করতে না পারলে পর্যাপ্ত ওয়ালেট ব্যালেন্স, টুর্নামেন্টের স্লট খালি আছে কি না এবং টুর্নামেন্ট শুরুর সময় পরীক্ষা করুন।",
+    question: "টুর্নামেন্টে কী সমস্যা হচ্ছে?",
+    options: [
+      ["join_failed", "স্লট ফুল বা জয়েন হচ্ছে না"],
+      ["fee_cut", "ফি কেটেছে কিন্তু জয়েন হয়নি"],
+      ["cancel_match", "ম্যাচ বাতিল হয়েছে কি না জানতে চাই"],
+      ["other", "অন্য সমস্যা"]
+    ],
+    replies: {
+      join_failed: "স্লট পূর্ণ হয়ে গেলে পরবর্তী ম্যাচের জন্য অপেক্ষা করুন।",
+      fee_cut: "সিস্টেম স্বয়ংক্রিয়ভাবে ব্যালেন্স ফেরত দেবে অথবা অ্যাডমিন তা রিফান্ড করবেন।",
+      cancel_match: "ম্যাচ বাতিল হলে অংশগ্রহণকারী সকলের ওয়ালেটে ১০০% এন্ট্রি ফি রিফান্ড হয়ে যায়।",
+      other: "ম্যাচের নাম বা আইডি উল্লেখ করে লাইভ চ্যাটে জানান।"
+    }
+  },
+  room: {
+    title: "Room ID / Password",
+    answer: "কাস্টম রুম আইডি ও পাসওয়ার্ড সাধারণত ম্যাচ শুরুর ১০-১৫ মিনিট পূর্বে ইউজার অ্যাপের 'আমার ম্যাচ' (My Matches) ট্যাবে স্বয়ংক্রিয়ভাবে প্রকাশ করা হয়।",
+    question: "রুম সংক্রান্ত কী তথ্য জানতে চান?",
+    options: [
+      ["not_published", "এখনো রুম আইডি দেওয়া হয়নি"],
+      ["wrong_pass", "পাসওয়ার্ড ভুল দেখাচ্ছে"],
+      ["other", "অন্য সমস্যা"]
+    ],
+    replies: {
+      not_published: "ম্যাচ শুরুর ১০ মিনিট পূর্বে অ্যাডমিন রুম আইডি ও পাসওয়ার্ড প্রকাশ করবেন। অনুগ্রহ করে অপেক্ষা করুন।",
+      wrong_pass: "কাস্টম রুম পাসওয়ার্ড সাবধানে কপি করুন। স্পেস যেন না থাকে তা নিশ্চিত করুন।",
+      other: "আপনার টুর্নামেন্টের নাম লিখে লাইভ চ্যাটে মেসেজ দিন।"
+    }
+  },
+  result: {
+    title: "Match Result / প্রাইজ",
+    answer: "খেলা শেষ হওয়ার পর স্ক্রিনশট ও ম্যাচ ডেটা যাচাই করে সর্বোচ্চ ৩০-৬০ মিনিটের মধ্যে বিজয়ীদের ওয়ালেটে স্বয়ংক্রিয়ভাবে প্রাইজ মানি যোগ করা হয়।",
+    question: "রেজাল্ট সংক্রান্ত কী অভিযোগ?",
+    options: [
+      ["prize_delay", "ম্যাচ শেষ কিন্তু প্রাইজ আসেনি"],
+      ["wrong_winner", "ভুল বিজয়ী ঘোষণা হয়েছে বলে মনে করি"],
+      ["other", "অন্য সমস্যা"]
+    ],
+    replies: {
+      prize_delay: "অ্যাডমিন ফলাফল প্রস্তুত করছেন। কিছুক্ষণের মধ্যে প্রাইজ ওয়ালেটে যুক্ত হবে।",
+      wrong_winner: "ম্যাচের প্রমাণ বা স্ক্রিনশট প্রস্তুত রাখুন এবং লাইভ চ্যাটে অ্যাডমিনের সাথে যোগাযোগ করুন।",
+      other: "ম্যাচের আইডি উল্লেখ করে লাইভ চ্যাটে বার্তা দিন।"
+    }
+  },
+  login: {
+    title: "Login / Signup",
+    answer: "লগইন বা সাইনআপে সমস্যা হলে সঠিক ইউজারনেম/ইমেইল ও পাসওয়ার্ড প্রদান করুন। পাসওয়ার্ড ভুলে গেলে 'পাসওয়ার্ড ভুলে গেছেন?' লিংকে ক্লিক করুন।",
+    question: "কী সমস্যা হচ্ছে?",
+    options: [
+      ["wrong_info", "ভুল পাসওয়ার্ড বা ইউজারনেম দেখাচ্ছে"],
+      ["signup_issue", "নতুন অ্যাকাউন্ট খুলতে পারছি না"]
+    ],
+    replies: {
+      wrong_info: "ইউজারনেম ও পাসওয়ার্ড বড়/ছোট হাতের অক্ষরের মিল রেখে লিখুন।",
+      signup_issue: "ইউনিক ইউজারনেম দিন যা অন্য কেউ ব্যবহার করেনি এবং কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড ব্যবহার করুন।"
+    }
+  },
+  account: {
+    title: "Account Problem",
+    answer: "অ্যাকাউন্ট সাসপেন্ড বা ব্যালেন্স সংক্রান্ত সমস্যার জন্য ফেয়ার-প্লে নীতিমালা দেখুন। কোনো চিটিং বা হ্যাকের কারণে একাউন্ট স্থগিত হতে পারে।",
+    question: "অ্যাকাউন্টের সমস্যা নির্বাচন করুন:",
+    options: [
+      ["suspended", "অ্যাকাউন্ট সাসপেন্ড দেখাচ্ছে"],
+      ["info_update", "প্রোফাইল তথ্য বা FF UID পরিবর্তন"]
+    ],
+    replies: {
+      suspended: "যদি আপনি কোনো নিয়ম ভঙ্গ না করে থাকেন, তবে লাইভ চ্যাটে আপনার UID দিয়ে অ্যাডমিনের রিভিউর আবেদন করুন।",
+      info_update: "ইউজার প্যানেলের প্রোফাইল ট্যাবে গিয়ে এডিট প্রোফাইল বাটন থেকে সহজেই তথ্য আপডেট করতে পারেন।"
+    }
+  },
+  other: {
+    title: "অন্যান্য সমস্যা",
+    answer: "অন্য যেকোনো সমস্যার জন্য আমাদের লাইভ চ্যাট অথবা অফিসিয়াল সোশ্যাল মিডিয়া মাধ্যমে সরাসরি যোগাযোগ করুন।",
+    question: "কী ধরনের সাহায্য প্রয়োজন?",
+    options: [
+      ["need_agent", "লাইভ অফিসারের সাথে কথা বলতে চাই"],
+      ["rules", "টুর্নামেন্টের নিয়মাবলী জানতে চাই"]
+    ],
+    replies: {
+      need_agent: "নিচে Live Chat অপশনে ক্লিক করে সরাসরি আপনার মেসেজ লিখুন।",
+      rules: "অ্যাপের রুলস সেকশনে বিস্তারিত ফেয়ার-প্লে নিয়মাবলী দেওয়া আছে।"
+    }
+  }
+};
+
+/* ইউটিলিটি ফাংশন */
+function hideAllPanels(){
+  panelIds.forEach(id => {
+    const el = $(id);
+    if (el) el.classList.add("hidden");
+  });
+}
+
+function showPanel(id){
+  const el = $(id);
+  if (el) {
+    el.classList.remove("hidden");
+    scrollChatToBottom();
+  }
+}
+
+function showError(id, message){
+  const el = $(id);
+  if (el) {
+    el.textContent = message;
+    el.style.display = "block";
+  }
+}
+
+function clearError(id){
+  const el = $(id);
+  if (el) {
+    el.textContent = "";
+    el.style.display = "none";
+  }
+}
+
+function scrollChatToBottom(){
+  const chat = $("chatArea");
+  if (!chat) return;
+  requestAnimationFrame(() => {
+    chat.scrollTop = chat.scrollHeight;
+  });
+}
+
+function formatTime(ts){
+  try {
+    const d = new Date(ts || Date.now());
+    return d.toLocaleTimeString("bn-BD", { hour: "2-digit", minute: "2-digit" });
+  } catch(e) {
+    return "এখন";
+  }
+}
+
+function escapeHtml(str){
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/* চ্যাটে মেসেজ যোগ করা */
+function addMessage(text, sender = "bot", timeStamp = Date.now()){
+  const container = $("messages");
+  if (!container) return;
+
+  const row = document.createElement("div");
+  row.className = "message " + (sender === "user" ? "user" : "bot");
+
+  if (sender !== "user"){
+    const avatar = document.createElement("img");
+    avatar.src = OFFICER_IMAGE;
+    avatar.alt = "CS Officer";
+    avatar.className = "message-avatar";
+    avatar.onerror = function(){ this.src = 'icons/icon-192.png'; };
+    row.appendChild(avatar);
+  }
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+
+  const content = document.createElement("div");
+  content.textContent = text;
+  bubble.appendChild(content);
+
+  const time = document.createElement("span");
+  time.className = "time";
+  time.textContent = formatTime(timeStamp);
+  bubble.appendChild(time);
+
+  row.appendChild(bubble);
+  container.appendChild(row);
+
+  state.history.push({ sender, text, timestamp: timeStamp });
+  scrollChatToBottom();
+  return row;
+}
+
+function wait(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/* অফিসারের টাইপিং ইন্ডিকেটর ও উত্তর */
+async function officerReply(text){
+  const container = $("messages");
+  if (!container) return;
+
+  const statusText = $("officerStatusText");
+  if (statusText) statusText.innerText = "✍️ Support Officer is typing...";
+
+  const row = document.createElement("div");
+  row.className = "message bot";
+
+  const avatar = document.createElement("img");
+  avatar.src = OFFICER_IMAGE;
+  avatar.alt = "CS Officer";
+  avatar.className = "message-avatar";
+  avatar.onerror = function(){ this.src = 'icons/icon-192.png'; };
+  row.appendChild(avatar);
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble typing-bubble";
+  bubble.setAttribute("aria-label", "Support Officer উত্তর লিখছেন");
+
+  const dots = document.createElement("span");
+  dots.className = "typing-dots";
+  dots.innerHTML = "<i></i><i></i><i></i>";
+  bubble.appendChild(dots);
+
+  row.appendChild(bubble);
+  container.appendChild(row);
+  scrollChatToBottom();
+
+  const delay = Math.max(800, Math.min(2200, 500 + String(text).length * 15));
+  await wait(delay);
+
+  if (statusText) statusText.innerText = "● Online Support";
+
+  const content = document.createElement("div");
+  content.textContent = text;
+
+  const time = document.createElement("span");
+  time.className = "time";
+  time.textContent = formatTime();
+
+  bubble.classList.remove("typing-bubble");
+  bubble.removeAttribute("aria-label");
+  bubble.replaceChildren(content, time);
+
+  state.history.push({ sender: "bot", text, timestamp: Date.now() });
+  scrollChatToBottom();
+}
+
+/* ধাপ ১: নাম ইনপুট সাবমিট */
+$("nameForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  clearError("nameError");
+
+  const nameInput = $("userName");
+  const name = nameInput.value.trim();
+
+  if (name.length < 2){
+    showError("nameError", "দয়া করে আপনার সঠিক নাম লিখুন (কমপক্ষে ২ অক্ষর)।");
+    return;
+  }
+
+  state.name = name;
+  addMessage("আমার নাম " + name, "user");
+  $("namePanel").classList.add("hidden");
+
+  await officerReply(
+    "ধন্যবাদ, " + name + "! NP TOURNAMENT BD Support-এ আপনাকে আন্তরিক স্বাগতম। আপনার সাথে যোগাযোগের জন্য সচল ফোন নম্বরটি লিখুন।"
+  );
+
+  showPanel("phonePanel");
+});
+
+/* ধাপ ২: ফোন নম্বর সাবমিট */
+$("phoneForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  clearError("phoneError");
+
+  const phoneInput = $("userPhone");
+  const phone = phoneInput.value.trim();
+  const digits = phone.replace(/\D/g, "");
+
+  if (digits.length < 7 || digits.length > 15){
+    showError("phoneError", "সঠিক ফোন নম্বর লিখুন (যেমন: 017XXXXXXXX)।");
+    return;
+  }
+
+  state.phone = phone;
+  addMessage("আমার ফোন নম্বর: " + phone, "user");
+  $("phonePanel").classList.add("hidden");
+
+  await officerReply(
+    "ধন্যবাদ! আপনার নাম ও নম্বর সংরক্ষিত হয়েছে। এখন কীভাবে যোগাযোগ করতে চান তা নির্বাচন করুন:"
+  );
+
+  showPanel("contactOptionsPanel");
+});
+
+/* যোগাযোগ অপশন: সাধারণ সমস্যা ড্রপডাউন দেখানো */
+function showIssueDropdownStep(){
+  $("contactOptionsPanel").classList.add("hidden");
+  showPanel("issuePanel");
+}
+
+/* ধাপ ৪: সমস্যা ড্রপডাউন সাবমিট */
+$("issueForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  clearError("issueError");
+
+  const key = $("issueSelect").value;
+  if (!key || !SUPPORT_KB[key]){
+    showError("issueError", "তালিকা থেকে একটি সমস্যা নির্বাচন করুন।");
+    return;
+  }
+
+  state.issue = key;
+  const kb = SUPPORT_KB[key];
+  const selectedText = $("issueSelect").selectedOptions[0].textContent;
+
+  addMessage("আমার সমস্যা: " + selectedText, "user");
+  $("issuePanel").classList.add("hidden");
+
+  await officerReply(
+    "আপনার সমস্যাটি বুঝতে পেরেছি। নিচে প্রাথমিক নির্দেশনা ও সম্ভাব্য সমাধান দেখুন:"
+  );
+
+  $("answerTitle").textContent = kb.title;
+  $("answerText").textContent = kb.answer;
+  $("followupTitle").textContent = kb.question;
+
+  const select = $("followupSelect");
+  select.replaceChildren();
+
+  const firstOpt = document.createElement("option");
+  firstOpt.value = "";
+  firstOpt.textContent = "-- উত্তর নির্বাচন করুন --";
+  select.appendChild(firstOpt);
+
+  kb.options.forEach(([val, lbl]) => {
+    const opt = document.createElement("option");
+    opt.value = val;
+    opt.textContent = lbl;
+    select.appendChild(opt);
+  });
+
+  $("extraDetails").value = "";
+  $("extraQuestionBox").classList.add("hidden");
+  select.value = "";
+
+  showPanel("answerPanel");
+});
+
+$("followupSelect").addEventListener("change", function(){
+  if (this.value === "other" || this.value === "more"){
+    $("extraQuestionBox").classList.remove("hidden");
+  } else {
+    $("extraQuestionBox").classList.add("hidden");
+  }
+});
+
+/* ধাপ ৫: ফলো-আপ সাবমিট */
+$("continueBtn").addEventListener("click", async () => {
+  clearError("answerError");
+
+  const kb = SUPPORT_KB[state.issue];
+  const selected = $("followupSelect").value;
+
+  if (!selected){
+    showError("answerError", "দয়া করে একটি উত্তর নির্বাচন করুন।");
+    return;
+  }
+
+  const extra = $("extraDetails").value.trim();
+  const opt = kb.options.find(x => x[0] === selected);
+
+  addMessage("আমার উত্তর: " + (opt ? opt[1] : selected), "user");
+  if (extra){
+    addMessage("বিবরণ: " + extra, "user");
+  }
+
+  $("answerPanel").classList.add("hidden");
+
+  await officerReply(
+    kb.replies[selected] || "আপনার সমস্যার তথ্য পেয়েছি। নিচের অপশন থেকে অবস্থা জানান:"
+  );
+
+  showPanel("resolutionPanel");
+});
+
+/* ধাপ ৬: সমাধান হয়েছে কি না */
+$("resolvedBtn").addEventListener("click", async () => {
+  addMessage("হ্যাঁ, আমার সমস্যার সমাধান হয়েছে।", "user");
+  $("resolutionPanel").classList.add("hidden");
+
+  await officerReply(
+    "চমৎকার! আপনার সমস্যার সমাধান করতে পেরে আমরা আনন্দিত। NP TOURNAMENT BD-এর সাথে থাকার জন্য ধন্যবাদ।"
+  );
+
+  showPanel("successPanel");
+});
+
+$("notResolvedBtn").addEventListener("click", async () => {
+  addMessage("না, আমার সমাধান হয়নি। আমি লাইভ অফিসারের সাহায্য চাই।", "user");
+  $("resolutionPanel").classList.add("hidden");
+
+  await officerReply(
+    "দুঃখিত যে সমস্যাটি এখনো মেটেনি। আমি এখনই আপনার জন্য লাইভ চ্যাট চালু করে দিচ্ছি। আপনি নিচের বক্সে মেসেজ লিখলে সরাসরি অ্যাডমিন বা অফিসার উত্তর দেবেন।"
+  );
+
+  activateFirebaseLiveChat();
+});
+
+/* ধাপ ৭: রিস্টার্ট */
+function restartSupportFlow(){
+  state.issue = "";
+  $("issueForm").reset();
+  $("answerText").textContent = "";
+  $("extraDetails").value = "";
+  hideAllPanels();
+  showPanel("contactOptionsPanel");
+}
+
+/* ==================== FIREBASE LIVE SUPPORT CHAT ENGINE ==================== */
+function activateFirebaseLiveChat(){
+  state.isLiveChatActive = true;
+  hideAllPanels();
+  $("liveChatInputArea").style.display = "flex";
+
+  // Check auth
+  if (auth && auth.currentUser) {
+    state.uid = auth.currentUser.uid;
+    connectFirebaseChatListener(state.uid);
+  } else if (auth) {
+    // If not authenticated, try anonymous or check state
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        state.uid = user.uid;
+        connectFirebaseChatListener(user.uid);
+      } else {
+        // Create an identified session
+        console.log("No auth user; chat will operate locally or await login");
+      }
+    });
+  }
+
+  scrollChatToBottom();
+  $("liveChatInput").focus();
+}
+
+function connectFirebaseChatListener(uid){
+  if (!db || !uid || chatListenerAttached) return;
+
+  chatMessagesRef = db.ref(`supportChats/${uid}/messages`);
+  chatListenerAttached = true;
+
+  chatMessagesRef.orderByChild('timestamp').limitToLast(50).on('value', snap => {
+    if (!snap.exists()) return;
+
+    // Filter incoming messages from admin that aren't already in history
+    snap.forEach(child => {
+      const msg = child.val();
+      const isAlreadyShown = state.history.some(h => h.timestamp === msg.timestamp && h.text === msg.text);
+      if (!isAlreadyShown) {
+        if (msg.senderRole === 'admin') {
+          addMessage(msg.text, 'bot', msg.timestamp);
+        }
+      }
+    });
+  }, err => {
+    console.warn("Live chat listener notice:", err);
+  });
+}
+
+async function handleSendLiveMessage(){
+  if (state.isSending) return;
+  const input = $("liveChatInput");
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  state.isSending = true;
+  const btn = $("btnSendLiveMsg");
+  if (btn) btn.disabled = true;
+
+  // Add to UI immediately
+  const now = Date.now();
+  addMessage(text, "user", now);
+  input.value = "";
+  input.style.height = "auto";
+
+  // Send to Firebase Realtime Database
+  if (db && state.uid) {
+    try {
+      const timestamp = firebase.database.ServerValue.TIMESTAMP;
+      const newMsgRef = db.ref(`supportChats/${state.uid}/messages`).push();
+
+      await newMsgRef.set({
+        senderId: state.uid,
+        senderRole: 'user',
+        senderName: state.name || 'User',
+        senderPhone: state.phone || '',
+        text: text,
+        timestamp: timestamp
+      });
+
+      await db.ref(`supportChats/${state.uid}`).update({
+        userUid: state.uid,
+        userName: state.name || 'User',
+        userPhone: state.phone || '',
+        lastMessage: text,
+        lastSender: 'user',
+        updatedAt: timestamp,
+        unreadAdmin: true
+      });
+    } catch(err) {
+      console.error("Firebase send error:", err);
+    }
+  } else {
+    // If Firebase offline, simulate prompt officer acknowledgement
+    setTimeout(() => {
+      officerReply("আপনার বার্তাটি প্রাপ্ত হয়েছে। অ্যাডমিন টিম দ্রুতই আপনার সাথে যোগাযোগ করবে।");
+    }, 1200);
+  }
+
+  state.isSending = false;
+  if (btn) btn.disabled = false;
+  scrollChatToBottom();
+  input.focus();
+}
+
+function handleLiveInputKey(e){
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleSendLiveMessage();
+  }
+}
+
+/* ==================== CONTACT LINKS (WhatsApp & Telegram) ==================== */
+function handleOpenWhatsApp(){
+  const wa = (state.settings.whatsapp || '').trim();
+  if (wa) {
+    const cleanNumber = wa.replace(/[^0-9]/g, '');
+    const textMsg = encodeURIComponent(`Hello NP Support. Name: ${state.name || 'User'}, Phone: ${state.phone || ''}`);
+    const url = wa.startsWith('http') ? wa : `https://wa.me/${cleanNumber}?text=${textMsg}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  } else {
+    alert("অফিসিয়াল হোয়াটসঅ্যাপ হেল্পলাইন নম্বর এখনো অ্যাডমিন প্যানেলে সেট করা হয়নি। অনুগ্রহ করে Live Chat ব্যবহার করুন।");
+  }
+}
+
+function handleOpenTelegram(){
+  const tg = (state.settings.telegram || '').trim();
+  if (tg) {
+    const cleanUser = tg.replace(/^@/, '');
+    const url = tg.startsWith('http') ? tg : `https://t.me/${cleanUser}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  } else {
+    alert("অফিসিয়াল টেলিগ্রাম চ্যানেল লিংক এখনো অ্যাডমিন প্যানেলে সেট করা হয়নি। অনুগ্রহ করে Live Chat ব্যবহার করুন।");
+  }
+}
+
+/* Firebase settings listener for real WhatsApp/Telegram/Phone */
+function loadContactSettings(){
+  if (!db) return;
+  db.ref('settings').on('value', snap => {
+    if (snap.exists()){
+      const val = snap.val();
+      state.settings.whatsapp = val.whatsapp || val.whatsappLink || "";
+      state.settings.telegram = val.telegram || val.telegramLink || "";
+      state.settings.supportPhone = val.supportPhone || "";
+    }
+  });
+}
+
+/* ==================== CLOSE BUTTON (Section 9) ==================== */
+function handleCloseSupportCenter(){
+  // 1. Detach chat listeners safely (prevent memory leak / duplicate messages)
+  if (chatMessagesRef && chatListenerAttached) {
+    chatMessagesRef.off('value');
+    chatListenerAttached = false;
+  }
+
+  // 2. Check if inside an iframe or modal in parent window
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ action: 'closeSupportCenter' }, '*');
+      return;
+    }
+  } catch(e) {}
+
+  // 3. Safe fallback navigation to index.html
+  // DO NOT use window.close() which can destroy the browser context
+  if (window.history.length > 1) {
+    window.location.href = 'index.html';
+  } else {
+    window.location.replace('index.html');
+  }
+}
+
+// Fallback image error handler
+$("officerAvatar").addEventListener("error", function(){
+  this.src = "icons/icon-192.png";
+});
+
+// Auto-fill user name and phone if already logged in Firebase Auth
+function autoDetectLoggedInUser(){
+  if (!auth) return;
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      state.uid = user.uid;
+      if (db) {
+        db.ref(`users/${user.uid}`).once('value').then(snap => {
+          if (snap.exists()){
+            const u = snap.val();
+            if (u.name && !state.name) {
+              state.name = u.name;
+              $("userName").value = u.name;
+            }
+            if (u.phone && !state.phone) {
+              state.phone = u.phone;
+              $("userPhone").value = u.phone;
+            }
+          }
+        }).catch(() => {});
+      }
+    }
+  });
+}
+
+/* Register Service Worker for PWA */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('Support SW Registered:', reg.scope))
+      .catch(err => console.warn('Support SW notice:', err));
+  });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadContactSettings();
+  autoDetectLoggedInUser();
+  scrollChatToBottom();
+});
+</script>
+</body>
+</html>
