@@ -1,0 +1,26 @@
+{
+  "name": "NP Tournament",
+  "short_name": "NP Tournament",
+  "description": "NP Tournament BD - Free Fire & Ludo Esports Platform",
+  "start_url": "./user-panel.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#070a13",
+  "background_color": "#070a13",
+  "lang": "bn",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
