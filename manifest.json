@@ -1,0 +1,40 @@
+{
+  "name": "NP TOURNAMENT BD",
+  "short_name": "NP Tournament",
+  "description": "বাংলাদেশের সবচেয়ে বিশ্বস্ত ও প্রফেশনাল ফ্রি ফায়ার টুর্নামেন্ট প্ল্যাটফর্ম - NP TOURNAMENT BD",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#07090e",
+  "theme_color": "#090d16",
+  "lang": "bn",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
