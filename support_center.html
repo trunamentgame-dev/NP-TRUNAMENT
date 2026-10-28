@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c2185b">
+<meta name="color-scheme" content="light">
+<meta name="description" content="NP TOURNAMENT BD Support Center">
+<title>NP TOURNAMENT BD | Support Center</title>
+
+<style>
+:root {
+  --pink:#e91e63;
+  --deep:#c2185b;
+  --pale:#fff0f6;
+  --bg:#f5f6fa;
+  --ink:#202436;
+  --muted:#7b8194;
+  --line:#e8eaf1;
+  --green:#18a968;
+  --blue:#168bd2;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;min-width:0}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{font-family:"Noto Sans Bengali","Hind Siliguri","Segoe UI",Arial,sans-serif;color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit}
+button,a,select{-webkit-tap-highlight-color:transparent}
+button{cursor:pointer}
+button:disabled{opacity:.6;cursor:not-allowed}
+.hidden{display:none!important}
+
+.app{
+  width:100%;max-width:620px;height:100vh;height:100dvh;
+  margin:0 auto;background:#fff;display:flex;flex-direction:column;
+  overflow:hidden;position:relative;isolation:isolate;
+}
+
+/* শুধু উপরের সম্পূর্ণ Pink Header স্থির */
+.header{
+  flex:0 0 auto;position:relative;z-index:5;min-height:78px;
+  padding:12px 16px;padding-top:max(12px,var(--safe-top));
+  display:flex;align-items:center;gap:12px;color:#fff;
+  background:linear-gradient(135deg,#f06292,#c2185b);
+}
+.logo{
+  width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;
+  border-radius:13px;background:rgba(255,255,255,.17);
+  border:1px solid rgba(255,255,255,.4);font-size:13px;font-weight:900;
+}
+.header-info{flex:1;min-width:0}
+.header-info h1{margin:0 0 5px;font-size:15px;line-height:1.5;font-weight:850;overflow-wrap:anywhere}
+.header-info p{margin:0;font-size:11px;line-height:1.5;opacity:.92}
+.header-tag{flex:0 0 auto;font-size:9px;font-weight:800;border:1px solid rgba(255,255,255,.5);padding:7px 8px;border-radius:20px;white-space:nowrap}
+
+.chat{
+  flex:1 1 0;min-height:0;min-width:0;
+  overflow-x:hidden;overflow-y:auto;
+  overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+  touch-action:pan-y;scrollbar-width:thin;
+  scrollbar-color:#e6b5c8 transparent;
+  padding:0 12px 22px;
+  background:radial-gradient(circle at 5% 5%,#fceaf1,transparent 32%),#fafbfe;
+  scroll-padding-top:8px;scroll-padding-bottom:18px;
+}
+.chat:focus{outline:none}
+
+.officer{
+  margin:0 -12px;padding:12px 16px;display:flex;
+  align-items:center;gap:11px;border-bottom:1px solid var(--line);background:#fff;
+}
+.avatar-wrap{position:relative;width:49px;height:49px;flex:0 0 49px}
+.avatar{display:block;width:49px;height:49px;border-radius:50%;object-fit:cover;object-position:center;border:2px solid #f3b4cc;background:var(--pale)}
+.online-dot{position:absolute;right:0;bottom:0;width:13px;height:13px;background:var(--green);border:2px solid #fff;border-radius:50%}
+.officer-info{flex:1;min-width:0}
+.officer-info h2{margin:0 0 4px;font-size:13px}
+.verified{color:var(--blue)}
+.officer-info p{color:var(--green);margin:0;font-size:11px}
+.officer-label{flex:0 0 auto;font-size:10px;line-height:1.7;color:var(--muted);text-align:right}
+.officer-label strong{display:block;font-size:11px;color:var(--ink);margin-bottom:3px}
+
+.notice{
+  margin:0 -12px;padding:8px 13px;background:#fff5f9;
+  border-bottom:1px solid #f5dfe8;color:#963353;
+  font-size:10px;line-height:1.8;overflow-wrap:anywhere;
+}
+.date-divider{text-align:center;margin:16px 0 18px}
+.date-divider span{display:inline-block;max-width:100%;padding:5px 12px;font-size:10px;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:20px}
+
+.message{display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;animation:appear .18s ease-out}
+.message.user{justify-content:flex-end}
+.message-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:center;flex:0 0 28px;border:1px solid #f1c5d6;background:var(--pale)}
+.bubble{min-width:0;max-width:86%;padding:10px 12px;border-radius:15px 15px 15px 4px;background:#fff;border:1px solid var(--line);font-size:12px;line-height:1.85;overflow-wrap:anywhere;white-space:pre-wrap}
+.user .bubble{color:#fff;background:var(--pink);border-color:var(--pink);border-radius:15px 15px 4px 15px}
+.time{display:block;text-align:right;font-size:9px;opacity:.62;margin-top:4px}
+.typing-bubble{min-width:68px;padding:12px 15px}
+.typing-dots{display:flex;gap:4px;align-items:center;height:12px}
+.typing-dots i{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#bd6b8b;animation:typing 1s infinite ease-in-out}
+.typing-dots i:nth-child(2){animation-delay:.15s}
+.typing-dots i:nth-child(3){animation-delay:.3s}
+@keyframes typing{0%,60%,100%{transform:translateY(0);opacity:.45}30%{transform:translateY(-4px);opacity:1}}
+@keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+.panel{
+  margin:12px 0 17px 35px;padding:14px;min-width:0;
+  background:#fff;border:1px solid var(--line);border-radius:15px;
+  box-shadow:0 4px 15px rgba(25,30,55,.035);overflow-wrap:anywhere;
+  animation:appear .2s ease-out;
+}
+.panel h3{font-size:14px;line-height:1.7;margin:0 0 7px}
+.description{color:var(--muted);font-size:11px;line-height:1.9;margin:0 0 12px;overflow-wrap:anywhere}
+.label{display:block;font-size:12px;font-weight:750;line-height:1.7;margin:8px 0}
+.field{
+  display:block;width:100%;max-width:100%;min-height:44px;
+  padding:11px 12px;margin:0 0 10px;border:1px solid #dfe2eb;
+  border-radius:10px;background:#fff;color:var(--ink);outline:none;
+  font-size:16px;line-height:1.5;
+}
+.field::placeholder{color:#9297a7;opacity:1}
+textarea.field{min-height:85px;resize:vertical}
+.field:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(233,30,99,.08)}
+select.field{cursor:pointer}
+.btn{min-height:44px;max-width:100%;border:0;border-radius:10px;padding:10px 13px;font-size:12px;line-height:1.7;font-weight:750;overflow-wrap:anywhere;touch-action:manipulation}
+.btn-primary{width:100%;background:var(--pink);color:#fff}
+.btn-primary:active{background:var(--deep)}
+.btn-outline{background:#fff;color:var(--pink);border:1px solid #f0b4cb}
+.btn-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px}
+.error{display:none;color:#d32f2f;font-size:11px;line-height:1.7;margin:0 0 10px;overflow-wrap:anywhere}
+.answer-card{padding:11px;margin:10px 0;border-radius:11px;background:#f0fbf5;border:1px solid #d5f0e1;color:#205f41;font-size:12px;line-height:1.9;white-space:pre-wrap;overflow-wrap:anywhere}
+.question-card{padding:11px;margin:11px 0;border:1px solid #f3d6e2;border-radius:11px;background:#fff7fa}
+.question-card strong{font-size:12px;line-height:1.8;display:block;margin-bottom:8px}
+
+.contact-list{display:grid;gap:8px;margin-top:11px}
+.contact-option{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  width:100%;padding:12px;background:#fff;border:1px solid var(--line);
+  border-radius:12px;text-decoration:none;color:var(--ink);
+  font-size:12px;font-weight:750;text-align:left;overflow-wrap:anywhere;
+}
+.contact-option small{display:block;margin-top:4px;font-size:10px;line-height:1.7;color:var(--muted);font-weight:400}
+.contact-option .arrow{color:var(--pink);font-size:19px;flex:0 0 auto}
+.whatsapp{border-color:#b8e8cc}
+.telegram{border-color:#b8dff6}
+.contact-option:focus-visible,.btn:focus-visible,.close-chat-btn:focus-visible{outline:2px solid var(--deep);outline-offset:2px}
+.contact-notice{padding:10px;border-radius:10px;background:#fff5f9;border:1px solid #f5dfe8;color:#963353;font-size:11px;line-height:1.9;overflow-wrap:anywhere}
+
+.footer{margin:0 -12px;padding:8px 12px;padding-bottom:max(8px,var(--safe-bottom));text-align:center;font-size:10px;line-height:1.7;color:var(--muted);border-top:1px solid var(--line);background:#fff}
+.footer strong{color:var(--pink)}
+.close-chat-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;margin:7px auto 0;padding:6px 13px;min-height:34px;border-radius:20px;border:1px solid #f0b4cb;background:#fff5f9;color:var(--deep);font-size:11px;font-weight:750}
+.close-chat-btn:active{background:#ffe5ef}
+
+@media(max-width:360px){
+  .header{padding-left:10px;padding-right:10px;gap:7px}
+  .logo{width:38px;height:38px;flex-basis:38px}
+  .header-info h1{font-size:12px}
+  .header-info p{font-size:10px}
+  .header-tag{font-size:8px;padding:6px}
+  .officer{padding:10px;gap:8px}
+  .officer-label{font-size:9px}
+  .officer-label strong{font-size:10px}
+  .chat{padding-left:9px;padding-right:9px}
+  .panel{margin-left:0;padding:12px}
+  .bubble{max-width:90%}
+  .btn-row{gap:6px}
+  .btn-row .btn{padding-left:6px;padding-right:6px;font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
+}
+@media(min-width:700px){
+  body{padding:18px 0}
+  .app{height:calc(100dvh - 36px);border-radius:18px;box-shadow:0 8px 28px rgba(25,30,55,.08)}
+}
+</style>
+</head>
+
+<body>
+<div class="app" id="app">
+
+<header class="header">
+  <div class="logo" aria-label="NP Logo">NP</div>
+  <div class="header-info">
+    <h1>NP TOURNAMENT BD</h1>
+    <p>Customer Support Center</p>
+  </div>
+  <span class="header-tag">HELP CENTER</span>
+</header>
+
+<main class="chat" id="chatArea" aria-live="polite" tabindex="0">
+
+<section class="officer" aria-label="Support Officer">
+  <div class="avatar-wrap">
+    <img class="avatar" id="officerAvatar"
+      src="https://i.postimg.cc/wMzTy1DT/portrait-of-a-woman-working-in-customer-service-at-a-call-center-white-backgroud-generative-ai-free.jpg"
+      alt="Customer Service Representative" width="49" height="49" decoding="async">
+    <span class="online-dot" aria-hidden="true"></span>
+  </div>
+  <div class="officer-info">
+    <h2>CS Officer <span class="verified">✓</span></h2>
+    <p>● Online Support</p>
+  </div>
+  <div class="officer-label">
+    <strong>Support Desk</strong>
+    আমরা পাশে আছি
+  </div>
+</section>
+
+<div class="notice">
+  🔒 আপনার সমস্যার সমাধানে সঠিক তথ্য দিন।
+  আপনার পাসওয়ার্ড, PIN বা OTP কাউকে দেবেন না।
+</div>
+
+<div class="date-divider"><span>NP TOURNAMENT BD • SUPPORT</span></div>
+<div id="messages"></div>
+
+<section class="panel" id="namePanel">
+  <h3>❤️ স্বাগতম NP TOURNAMENT BD-তে!</h3>
+  <p class="description">
+    আমাদের সঙ্গে যুক্ত হওয়ার জন্য আপনাকে আন্তরিক ধন্যবাদ।
+    আপনার যেকোনো সমস্যা বা প্রয়োজনে আমরা সহায়তা করার চেষ্টা করব।
+    <br><br>সাপোর্ট শুরু করতে প্রথমে আপনার নামটি লিখুন।
+  </p>
+  <form id="nameForm">
+    <label class="label" for="userName">আপনার নাম</label>
+    <input class="field" id="userName" name="name" maxlength="60"
+      autocomplete="name" placeholder="আপনার সম্পূর্ণ নাম লিখুন" required>
+    <p class="error" id="nameError" role="alert"></p>
+    <button class="btn btn-primary" type="submit">শুরু করুন →</button>
+  </form>
+</section>
+
+<section class="panel hidden" id="phonePanel">
+  <h3>📱 আপনার ফোন নম্বর দিন</h3>
+  <p class="description">ধন্যবাদ! এখন আপনার যোগাযোগের ফোন নম্বরটি লিখুন।</p>
+  <form id="phoneForm">
+    <label class="label" for="userPhone">ফোন নম্বর</label>
+    <input class="field" id="userPhone" name="phone" type="tel"
+      maxlength="20" autocomplete="tel" inputmode="tel"
+      placeholder="আপনার ফোন নম্বর লিখুন" required>
+    <p class="error" id="phoneError" role="alert"></p>
+    <button class="btn btn-primary" type="submit">পরবর্তী ধাপ →</button>
+  </form>
+</section>
+
+<section class="panel hidden" id="issuePanel">
+  <h3>📋 আপনার সমস্যাটি নির্বাচন করুন</h3>
+  <p class="description">Dropdown থেকে সমস্যার ধরন বেছে নিন। আপনার নির্বাচনের ভিত্তিতে সম্ভাব্য সমাধান দেখানো হবে।</p>
+  <form id="issueForm">
+    <label class="label" for="issueSelect">সমস্যার ক্যাটাগরি</label>
+    <select class="field" id="issueSelect" name="issue" required>
+      <option value="">-- একটি সমস্যা নির্বাচন করুন --</option>
+      <option value="deposit">Deposit / টাকা জমা</option>
+      <option value="withdraw">Withdraw / টাকা উত্তোলন</option>
+      <option value="wallet">Wallet Balance</option>
+      <option value="payment">Payment Pending</option>
+      <option value="tournament">Tournament সমস্যা</option>
+      <option value="room">Room ID / Password</option>
+      <option value="result">Match Result</option>
+      <option value="login">Login / Signup</option>
+      <option value="account">Account Problem</option>
+      <option value="other">অন্যান্য সমস্যা</option>
+    </select>
+    <p class="error" id="issueError" role="alert"></p>
+    <button class="btn btn-primary" type="submit">সমস্যা দেখুন →</button>
+  </form>
+</section>
+
+<section class="panel hidden" id="answerPanel">
+  <h3 id="answerTitle">আপনার সমস্যার সমাধান</h3>
+  <p class="description" id="answerIntro"></p>
+  <div class="answer-card" id="answerText"></div>
+  <div class="question-card">
+    <strong id="followupTitle">আপনার সমস্যাটি সম্পর্কে একটি প্রশ্ন</strong>
+    <label class="hidden" for="followupSelect">আপনার উত্তর</label>
+    <select class="field" id="followupSelect" required>
+      <option value="">-- উত্তর নির্বাচন করুন --</option>
+    </select>
+  </div>
+  <div id="extraQuestionBox" class="hidden">
+    <label class="label" for="extraDetails">সমস্যার অতিরিক্ত বিবরণ</label>
+    <textarea class="field" id="extraDetails" maxlength="1000"
+      placeholder="সমস্যাটি বিস্তারিত লিখুন (পাসওয়ার্ড/PIN/OTP নয়)"></textarea>
+  </div>
+  <p class="error" id="answerError" role="alert"></p>
+  <button class="btn btn-primary" id="continueBtn" type="button">উত্তর জমা দিন →</button>
+</section>
+
+<section class="panel hidden" id="resolutionPanel">
+  <h3>সমস্যার সমাধান হয়েছে কি?</h3>
+  <p class="description">উপরের নির্দেশনা অনুসরণ করার পর আপনার সমস্যার অবস্থা নির্বাচন করুন।</p>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="resolvedAgainBtn" type="button">হ্যাঁ, সমাধান হয়েছে</button>
+    <button class="btn btn-outline" id="notResolvedAgainBtn" type="button">না, হয়নি</button>
+  </div>
+</section>
+
+<section class="panel hidden" id="contactPanel">
+  <h3>🎧 Live Chat Support</h3>
+  <p class="description">
+    স্বয়ংক্রিয় নির্দেশনায় আপনার সমস্যার সমাধান না হলে
+    নিচের Live Chat বাটন থেকে সরাসরি যোগাযোগ করুন।
+  </p>
+
+  <div class="contact-list">
+    <a class="contact-option whatsapp"
+       id="whatsappLink"
+       href="https://wa.me/966566774326"
+       target="_blank"
+       rel="noopener noreferrer"
+       referrerpolicy="no-referrer">
+      <span>
+        🟢 Live Chat on WhatsApp
+        <small>Message Chaudhary on WhatsApp</small>
+      </span>
+      <span class="arrow" aria-hidden="true">›</span>
+    </a>
+
+    <a class="contact-option telegram"
+       id="telegramLink"
+       href="https://t.me/Np_HelpCenter_bot"
+       target="_blank"
+       rel="noopener noreferrer"
+       referrerpolicy="no-referrer">
+      <span>
+        🔵 Live Chat on Telegram
+        <small>NP Help Center Bot-এ সরাসরি যোগাযোগ করুন</small>
+      </span>
+      <span class="arrow" aria-hidden="true">›</span>
+    </a>
+  </div>
+
+  <p class="contact-notice" style="margin-top:12px">
+    🔒 আপনার পাসওয়ার্ড, PIN বা OTP কখনো শেয়ার করবেন না।
+    যোগাযোগের সময় সমস্যার বিবরণ দিন।
+  </p>
+</section>
+
+<section class="panel hidden" id="successPanel">
+  <h3>✅ ধন্যবাদ!</h3>
+  <p class="description">
+    NP TOURNAMENT BD Support ব্যবহার করার জন্য ধন্যবাদ।
+    আপনার সমস্যা সমাধান হয়েছে জেনে আমরা আনন্দিত।
+  </p>
+  <button class="btn btn-primary" id="restartBtn" type="button">
+    নতুন সাপোর্ট চ্যাট শুরু করুন
+  </button>
+</section>
+
+<footer class="footer">
+  <strong>NP TOURNAMENT BD</strong><br>
+  Professional Customer Support Center<br>
+  আপনার নিরাপত্তা আমাদের কাছে গুরুত্বপূর্ণ।
+  <br>
+  <button class="close-chat-btn" id="closeChatBtn" type="button">
+    ✕ চ্যাট বন্ধ করুন
+  </button>
+</footer>
+
+</main>
+</div>
+
+<script>
+"use strict";
+
+/* WhatsApp এবং Telegram যোগাযোগের সেটিংস */
+const SUPPORT_CONFIG = Object.freeze({
+  whatsappUrl: "https://wa.me/966566774326",
+  telegramUrl: "https://t.me/Np_HelpCenter_bot"
+});
+
+/* Customer Service Officer-এর প্রতিনিধিত্বকারী ছবিগুলোর তালিকা (Rotation-এর জন্য) */
+const OFFICER_IMAGES = [
+  "https://i.postimg.cc/wMzTy1DT/portrait-of-a-woman-working-in-customer-service-at-a-call-center-white-backgroud-generative-ai-free.jpg",
+  "https://i.postimg.cc/qRPfpDfq/Screenshot-2026-10-26-011822-cropped.jpg"
+  /* দ্বিতীয় পেজ (https://postimg.cc/30dHh5V9) থেকে যাচাইকৃত ডিরেক্ট ইমেজ URL পাওয়া গেলে এখানে যুক্ত করা যাবে */
+];
+
+const $ = id => document.getElementById(id);
+
+/* নতুন চ্যাট সেশনে অফিসারের ছবি পরিবর্তন (রোটেশন) করার ফাংশন */
+function getNextOfficerImage() {
+  let index = 0;
+  try {
+    const saved = localStorage.getItem("np_officer_image_idx");
+    if (saved !== null) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed) && parsed >= 0) {
+        index = (parsed + 1) % OFFICER_IMAGES.length;
+      }
+    }
+    localStorage.setItem("np_officer_image_idx", index.toString());
+  } catch (e) {
+    index = (window._npOfficerFallbackIndex || 0) % OFFICER_IMAGES.length;
+    window._npOfficerFallbackIndex = index + 1;
+  }
+  return OFFICER_IMAGES[index] || OFFICER_IMAGES[0];
+}
+
+const state = {
+  name: "",
+  phone: "",
+  issue: "",
+  history: [],
+  busy: false,
+  runId: 0,
+  officerImage: getNextOfficerImage()
+};
+
+const panelIds = [
+  "namePanel", "phonePanel", "issuePanel",
+  "answerPanel", "resolutionPanel",
+  "contactPanel", "successPanel"
+];
+
+const SUPPORT_KB = {
+  deposit: {
+    title:"Deposit / টাকা জমা",
+    answer:"আপনি টাকা জমা দিয়েছেন কিন্তু ব্যালেন্স না এলে প্রথমে পেমেন্ট অ্যাপ থেকে Transaction Status পরীক্ষা করুন। পেমেন্ট Successful হলে কিছুক্ষণ অপেক্ষা করে Wallet রিফ্রেশ করুন। টাকা কেটে গেলে Transaction ID সংরক্ষণ করুন। একই পেমেন্ট আবার করবেন না।",
+    question:"আপনার Deposit-এর বর্তমান অবস্থা কী?",
+    options:[
+      ["success","পেমেন্ট সফল, ব্যালেন্স আসেনি"],
+      ["pending","পেমেন্ট Pending"],
+      ["failed","পেমেন্ট Failed"],
+      ["other","অন্য সমস্যা"]
+    ],
+    replies:{
+      success:"Transaction ID ও জমার পরিমাণ প্রস্তুত রাখুন। ব্যালেন্স আপডেট না হলে লেনদেনের রেকর্ড যাচাই করা প্রয়োজন।",
+      pending:"পেমেন্ট অ্যাপে Pending থাকলে স্ট্যাটাস নিশ্চিত করুন। সফল না হওয়া পর্যন্ত পুনরায় পেমেন্ট করবেন না।",
+      failed:"পেমেন্ট Failed হলে টাকা কাটা হয়েছে কি না পরীক্ষা করুন। টাকা কাটা গেলে Transaction ID-সহ পেমেন্ট সার্ভিসে অভিযোগ জানান।",
+      other:"আপনার পেমেন্টের বিবরণ লিখুন। প্রয়োজনে লেনদেনের তথ্য যাচাই করতে হবে।"
+    }
+  },
+  withdraw: {
+    title:"Withdraw / টাকা উত্তোলন",
+    answer:"Withdraw-এর অবস্থা জানতে Withdraw History পরীক্ষা করুন। Pending থাকলে যাচাই শেষ হওয়া পর্যন্ত অপেক্ষা করুন। Rejected হলে প্রদর্শিত কারণ দেখুন। আপনার PIN বা OTP কাউকে দেবেন না।",
+    question:"আপনার Withdraw-এর অবস্থা কী?",
+    options:[
+      ["pending","Pending"],
+      ["approved","Approved, কিন্তু টাকা পাইনি"],
+      ["rejected","Rejected"],
+      ["other","অন্য সমস্যা"]
+    ],
+    replies:{
+      pending:"Withdraw Request ID ও অনুরোধের সময় নোট করুন। প্রকৃত অবস্থা অ্যাডমিন প্যানেল থেকে যাচাই করতে হবে।",
+      approved:"পেমেন্ট মাধ্যমের Transaction Status পরীক্ষা করুন। টাকা না এলে Withdraw Request ID দিয়ে জানান।",
+      rejected:"Rejected-এর কারণ ও Wallet Balance পরীক্ষা করুন। কারণ পরিষ্কার না হলে অনুরোধের ID দিয়ে অ্যাডমিনের সাহায্য নিন।",
+      other:"সমস্যার বিবরণ লিখুন। লেনদেনের তথ্য যাচাই করা প্রয়োজন হতে পারে।"
+    }
+  },
+  wallet: {
+    title:"Wallet Balance",
+    answer:"Wallet Balance ভুল দেখালে পেজ রিফ্রেশ করে আবার লগইন করুন এবং Transaction History পরীক্ষা করুন। Deposit, Withdraw, Join Fee ও পুরস্কারের হিসাব মিলিয়ে দেখুন।",
+    question:"Wallet-এ কী সমস্যা হচ্ছে?",
+    options:[
+      ["low","ব্যালেন্স কম দেখাচ্ছে"],
+      ["missing","টাকা হারিয়ে গেছে বলে মনে হচ্ছে"],
+      ["update","ব্যালেন্স আপডেট হচ্ছে না"],
+      ["other","অন্য সমস্যা"]
+    ],
+    replies:{
+      low:"সাম্প্রতিক লেনদেন এবং Join Fee পরীক্ষা করুন। ভুল থাকলে লেনদেনের তারিখ ও পরিমাণ জানান।",
+      missing:"Transaction History-তে সংশ্লিষ্ট লেনদেন খুঁজুন। প্রকৃত ব্যালেন্স নিশ্চিত করতে সার্ভারের রেকর্ড পরীক্ষা করতে হবে।",
+      update:"ইন্টারনেট সংযোগ পরীক্ষা করে পেজ রিফ্রেশ করুন। সমস্যা থাকলে Wallet Record যাচাইয়ের অনুরোধ করুন।",
+      other:"Wallet সমস্যার বিবরণ লিখুন।"
+    }
+  },
+  payment: {
+    title:"Payment Pending",
+    answer:"পেমেন্ট Pending থাকলে প্রথমে সংশ্লিষ্ট পেমেন্ট অ্যাপে লেনদেনের অবস্থা দেখুন। পেমেন্ট সফল হয়েছে কি না নিশ্চিত না হয়ে একই পেমেন্ট বারবার করবেন না।",
+    question:"পেমেন্টের অবস্থা কী দেখাচ্ছে?",
+    options:[
+      ["pending","Pending দেখাচ্ছে"],
+      ["success","Successful দেখাচ্ছে"],
+      ["unknown","অবস্থা বুঝতে পারছি না"]
+    ],
+    replies:{
+      pending:"পেমেন্ট সার্ভিসের আপডেটের জন্য অপেক্ষা করুন। টাকা কেটে গেলে Transaction ID সংরক্ষণ করুন।",
+      success:"Transaction ID ও পেমেন্টের পরিমাণ দিয়ে Wallet Record যাচাই করতে হবে।",
+      unknown:"পেমেন্ট অ্যাপের Transaction Details খুলে Status পরীক্ষা করুন।"
+    }
+  },
+  tournament: {
+    title:"Tournament সমস্যা",
+    answer:"Tournament-এ Join করতে না পারলে আসন খালি আছে কি না, Join Fee, Wallet Balance, ম্যাচের সময় এবং Tournament Rules পরীক্ষা করুন।",
+    question:"Tournament-এ কী সমস্যা হচ্ছে?",
+    options:[
+      ["join","Join করতে পারছি না"],
+      ["fee","Join Fee কেটে গেছে"],
+      ["cancel","ম্যাচ বাতিল হয়েছে"],
+      ["other","অন্য সমস্যা"]
+    ],
+    replies:{
+      join:"Tournament ID, ম্যাচের সময় এবং প্রদর্শিত Error Message নোট করুন।",
+      fee:"Transaction History ও Tournament Participants তালিকা পরীক্ষা করুন। ফি কেটে গেলে কিন্তু Join না হলে যাচাই দরকার।",
+      cancel:"Tournament Notice ও Refund Rules পরীক্ষা করুন। রিফান্ডের অবস্থা নিশ্চিত করতে Tournament ID দিন।",
+      other:"Tournament-এর নাম বা ID-সহ সমস্যাটি লিখুন।"
+    }
+  },
+  room: {
+    title:"Room ID / Password",
+    answer:"Room ID ও Password সাধারণত ম্যাচের নির্ধারিত সময় অনুযায়ী প্রকাশ করা হয়। Joined Matches এবং Tournament Notice পরীক্ষা করুন। আপনার অ্যাকাউন্টের গোপন পাসওয়ার্ড এখানে লিখবেন না।",
+    question:"Room-এর কী সমস্যা হচ্ছে?",
+    options:[
+      ["missing","Room ID পাওয়া যায়নি"],
+      ["wrong","Room Password কাজ করছে না"],
+      ["late","Room Details দেরিতে এসেছে"],
+      ["other","অন্য সমস্যা"]
+    ],
+    replies:{
+      missing:"ম্যাচের সময় ও Joined Matches পরীক্ষা করুন। Room ID প্রকাশের সময় পেরিয়ে গেলে Match ID দিয়ে জানান।",
+      wrong:"Room ID, Password এবং সঠিক ম্যাচ নিশ্চিত করুন। গেমের Room Password আর অ্যাকাউন্টের Password এক জিনিস নয়।",
+      late:"Tournament Notice পরীক্ষা করুন। ম্যাচ শুরু হওয়ার সময় পেরিয়ে গেলে Room Details যাচাইয়ের অনুরোধ করুন।",
+      other:"Match ID ও সমস্যার বিবরণ লিখুন।"
+    }
+  },
+  result: {
+    title:"Match Result",
+    answer:"Match Result সমস্যা হলে ম্যাচের নিয়ম, ফলাফল প্রকাশের সময় এবং প্রকাশিত স্কোর পরীক্ষা করুন। প্রয়োজনে ম্যাচের প্রাসঙ্গিক প্রমাণ রাখুন।",
+    question:"Result-এ কী সমস্যা হচ্ছে?",
+    options:[
+      ["wrong","ফলাফল ভুল"],
+      ["pending","ফলাফল প্রকাশ হয়নি"],
+      ["reward","পুরস্কার পাইনি"],
+      ["other","অন্য সমস্যা"]
+    ],
+    replies:{
+      wrong:"Match ID ও স্কোরের প্রাসঙ্গিক প্রমাণ দিন। অ্যাডমিনের যাচাই ছাড়া ফলাফল পরিবর্তনের নিশ্চয়তা দেওয়া যায় না।",
+      pending:"Tournament Notice-এ ফলাফল প্রকাশের সময় পরীক্ষা করুন। দেরি হলে Match ID দিয়ে জানান।",
+      reward:"Result, Winner List এবং Transaction History পরীক্ষা করুন। পুরস্কার না এলে যাচাই করতে হবে।",
+      other:"Match ID-সহ সমস্যার বিবরণ লিখুন।"
+    }
+  },
+  login: {
+    title:"Login / Signup",
+    answer:"Login বা Signup সমস্যা হলে ইন্টারনেট সংযোগ, ফোন নম্বর এবং প্রয়োজনীয় তথ্য পরীক্ষা করুন। Forgot Password সুবিধা থাকলে ব্যবহার করুন। কখনো OTP, PIN বা পাসওয়ার্ড চ্যাটে দেবেন না।",
+    question:"কোন সমস্যাটি হচ্ছে?",
+    options:[
+      ["login","Login হচ্ছে না"],
+      ["signup","Signup হচ্ছে না"],
+      ["forgot","পাসওয়ার্ড ভুলে গেছি"],
+      ["verify","Verification সমস্যা"],
+      ["other","অন্য সমস্যা"]
+    ],
+    replies:{
+      login:"Error Message পরীক্ষা করুন এবং সঠিক লগইন তথ্য ব্যবহার করুন। প্রয়োজন হলে অ্যাকাউন্ট পুনরুদ্ধারের ব্যবস্থা ব্যবহার করুন।",
+      signup:"ফোন নম্বর, প্রয়োজনীয় তথ্য ও ইন্টারনেট সংযোগ পরীক্ষা করুন। একই অ্যাকাউন্ট আগে তৈরি করা হয়েছে কি না দেখুন।",
+      forgot:"অ্যাপে উপলভ্য Forgot Password প্রক্রিয়া অনুসরণ করুন। OTP বা Reset Link অন্য কারও সঙ্গে শেয়ার করবেন না।",
+      verify:"ফোন নম্বর ও Verification প্রক্রিয়া পরীক্ষা করুন। OTP দেবেন না; সমস্যা থাকলে Error Message লিখুন।",
+      other:"Login বা Signup-এর সময় যে Error Message দেখাচ্ছে সেটি লিখুন।"
+    }
+  },
+  account: {
+    title:"Account Problem",
+    answer:"অ্যাকাউন্টের সমস্যা হলে প্রোফাইলের তথ্য, লগইন অবস্থা এবং অ্যাপে দেখানো Notice পরীক্ষা করুন। গোপন তথ্য শেয়ার করবেন না।",
+    question:"অ্যাকাউন্টে কী সমস্যা হচ্ছে?",
+    options:[
+      ["profile","Profile সমস্যা"],
+      ["locked","অ্যাকাউন্টে প্রবেশ করতে পারছি না"],
+      ["change","তথ্য পরিবর্তন করতে চাই"],
+      ["other","অন্যান্য"]
+    ],
+    replies:{
+      profile:"প্রোফাইলের তথ্য পরীক্ষা করুন এবং কোন তথ্য ভুল তা জানান।",
+      locked:"অ্যাপে দেখানো Error বা Notice পড়ুন। অ্যাডমিনের যাচাই প্রয়োজন হতে পারে।",
+      change:"কোন তথ্য পরিবর্তন করতে চান তা লিখুন। সংবেদনশীল তথ্য এখানে দেবেন না।",
+      other:"অ্যাকাউন্টের সমস্যাটি সংক্ষেপে লিখুন।"
+    }
+  },
+  other: {
+    title:"অন্যান্য সমস্যা",
+    answer:"আপনার সমস্যার সঠিক ধরন জানতে আরও কিছু তথ্য প্রয়োজন। সমস্যাটি পরিষ্কারভাবে বর্ণনা করুন, তবে পাসওয়ার্ড, PIN বা OTP দেবেন না।",
+    question:"কোন ধরনের সাহায্য প্রয়োজন?",
+    options:[
+      ["app","অ্যাপ কাজ করছে না"],
+      ["technical","Technical সমস্যা"],
+      ["information","তথ্য জানতে চাই"],
+      ["other","অন্য সমস্যা"]
+    ],
+    replies:{
+      app:"ইন্টারনেট সংযোগ পরীক্ষা করুন, তারপর পেজ রিফ্রেশ করুন।",
+      technical:"কোন পেজে এবং কীভাবে সমস্যা হচ্ছে তা বর্ণনা করুন।",
+      information:"আপনার প্রশ্নটি বিস্তারিত লিখুন।",
+      other:"আপনার সমস্যাটি লিখুন, যাতে উপযুক্ত সহায়তা দেওয়া যায়।"
+    }
+  }
+};
+
+/* মোবাইল ব্রাউজার ও HopWeb viewport */
+(function setupViewport(){
+  const root=document.documentElement;
+  let lastHeight=0;
+
+  function updateHeight(){
+    const viewport=window.visualViewport;
+    const height=viewport&&viewport.height?viewport.height:window.innerHeight;
+    if(!height||Math.abs(height-lastHeight)<1)return;
+    lastHeight=height;
+    root.style.setProperty("--app-height",height+"px");
+  }
+
+  updateHeight();
+  window.addEventListener("resize",updateHeight,{passive:true});
+  window.addEventListener("orientationchange",updateHeight,{passive:true});
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize",updateHeight,{passive:true});
+  }
+})();
+
+function hideAllPanels(){
+  panelIds.forEach(id=>$(id).classList.add("hidden"));
+}
+
+function scrollChatToBottom(smooth=true){
+  const chat=$("chatArea");
+  requestAnimationFrame(()=>{
+    chat.scrollTo({
+      top:chat.scrollHeight,
+      behavior:smooth?"smooth":"auto"
+    });
+  });
+}
+
+function showPanel(id){
+  $(id).classList.remove("hidden");
+  scrollChatToBottom();
+}
+
+function showError(id,message){
+  const element=$(id);
+  element.textContent=message;
+  element.style.display="block";
+}
+
+function clearError(id){
+  const element=$(id);
+  element.textContent="";
+  element.style.display="none";
+}
+
+function timeText(){
+  try{
+    return new Date().toLocaleTimeString("bn-BD",{
+      hour:"2-digit",minute:"2-digit"
+    });
+  }catch(error){
+    return new Date().toLocaleTimeString();
+  }
+}
+
+function recordMessage(sender,text){
+  state.history.push({sender,text,time:new Date().toISOString()});
+}
+
+function useImageFallback(img){
+  const fallback=document.createElement("span");
+  fallback.className=img.className;
+  fallback.setAttribute("role","img");
+  fallback.setAttribute("aria-label","CS Officer");
+  fallback.textContent="NP";
+  fallback.style.display="grid";
+  fallback.style.placeItems="center";
+  fallback.style.background="#fff0f6";
+  fallback.style.color="#c2185b";
+  fallback.style.fontSize="11px";
+  fallback.style.fontWeight="800";
+  fallback.style.borderRadius="50%";
+  fallback.style.flexShrink="0";
+  fallback.style.border="1px solid #f1c5d6";
+  img.replaceWith(fallback);
+}
+
+function createAvatar(){
+  const avatar=document.createElement("img");
+  avatar.src=state.officerImage;
+  avatar.alt="CS Officer";
+  avatar.className="message-avatar";
+  avatar.width=28;
+  avatar.height=28;
+  avatar.loading="lazy";
+  avatar.decoding="async";
+  avatar.addEventListener("error",function(){
+    useImageFallback(this);
+  },{once:true});
+  return avatar;
+}
+
+function appendBubble(row,text,sender){
+  const bubble=document.createElement("div");
+  bubble.className="bubble";
+
+  const content=document.createElement("div");
+  content.textContent=text;
+  bubble.appendChild(content);
+
+  const time=document.createElement("span");
+  time.className="time";
+  time.textContent=timeText();
+  bubble.appendChild(time);
+
+  row.appendChild(bubble);
+  $("messages").appendChild(row);
+  recordMessage(sender,text);
+  scrollChatToBottom();
+  return row;
+}
+
+function addMessage(text,sender="bot"){
+  const row=document.createElement("div");
+  row.className="message "+(sender==="user"?"user":"bot");
+  if(sender!=="user")row.appendChild(createAvatar());
+  return appendBubble(row,text,sender);
+}
+
+function wait(ms){
+  return new Promise(resolve=>window.setTimeout(resolve,ms));
+}
+
+async function officerReply(text,runId=state.runId){
+  if(runId!==state.runId)return;
+
+  const row=document.createElement("div");
+  row.className="message bot";
+  row.appendChild(createAvatar());
+
+  const bubble=document.createElement("div");
+  bubble.className="bubble typing-bubble";
+  bubble.setAttribute("role","status");
+  bubble.setAttribute("aria-label","CS Officer উত্তর লিখছেন");
+
+  const dots=document.createElement("span");
+  dots.className="typing-dots";
+  dots.setAttribute("aria-hidden","true");
+
+  for(let i=0;i<3;i++)dots.appendChild(document.createElement("i"));
+
+  bubble.appendChild(dots);
+  row.appendChild(bubble);
+  $("messages").appendChild(row);
+  scrollChatToBottom();
+
+  const delay=Math.max(650,Math.min(1600,500+text.length*8));
+  await wait(delay);
+
+  if(runId!==state.runId){
+    row.remove();
+    return;
+  }
+
+  const content=document.createElement("div");
+  content.textContent=text;
+
+  const time=document.createElement("span");
+  time.className="time";
+  time.textContent=timeText();
+
+  bubble.classList.remove("typing-bubble");
+  bubble.removeAttribute("aria-label");
+  bubble.replaceChildren(content,time);
+
+  recordMessage("bot",text);
+  scrollChatToBottom();
+}
+
+async function runStep(callback){
+  if(state.busy)return;
+  state.busy=true;
+  const runId=state.runId;
+
+  const buttons=document.querySelectorAll(
+    "#nameForm button,#phoneForm button,#issueForm button,"+
+    "#continueBtn,#resolvedAgainBtn,#notResolvedAgainBtn"
+  );
+  buttons.forEach(button=>button.disabled=true);
+
+  try{
+    await callback(runId);
+  }catch(error){
+    console.error("Support flow error:",error);
+    addMessage("দুঃখিত, এই ধাপে একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+  }finally{
+    if(runId===state.runId){
+      state.busy=false;
+      buttons.forEach(button=>button.disabled=false);
+    }
+  }
+}
+
+/* নাম জমা ও সেশন নিশ্চিতকরণ */
+$("nameForm").addEventListener("submit",event=>{
+  event.preventDefault();
+  if(state.busy)return;
+  clearError("nameError");
+
+  const name=$("userName").value.trim();
+  if(name.length<2){
+    showError("nameError","আপনার সঠিক নাম লিখুন।");
+    $("userName").focus();
+    return;
+  }
+
+  runStep(async runId=>{
+    state.name=name;
+    addMessage("আমার নাম "+name,"user");
+    $("namePanel").classList.add("hidden");
+
+    await officerReply(
+      "ধন্যবাদ, "+name+
+      "! NP TOURNAMENT BD Support-এ আপনাকে স্বাগতম। এখন আপনার যোগাযোগের ফোন নম্বরটি লিখুন।",
+      runId
+    );
+
+    if(runId===state.runId)showPanel("phonePanel");
+  });
+});
+
+/* ফোন নম্বর জমা */
+$("phoneForm").addEventListener("submit",event=>{
+  event.preventDefault();
+  if(state.busy)return;
+  clearError("phoneError");
+
+  const phone=$("userPhone").value.trim();
+  const digits=phone.replace(/\D/g,"");
+
+  if(digits.length<7||digits.length>15){
+    showError("phoneError","সঠিক ফোন নম্বর লিখুন।");
+    $("userPhone").focus();
+    return;
+  }
+
+  runStep(async runId=>{
+    state.phone=phone;
+    addMessage("আমার ফোন নম্বর: "+phone,"user");
+    $("phonePanel").classList.add("hidden");
+
+    await officerReply(
+      "ধন্যবাদ! এখন নিচের তালিকা থেকে আপনার সমস্যার ধরন নির্বাচন করুন। আমরা সেই অনুযায়ী সম্ভাব্য সমাধান দেখাব।",
+      runId
+    );
+
+    if(runId!==state.runId)return;
+    $("issueSelect").value="";
+    showPanel("issuePanel");
+  });
+});
+
+/* সমস্যার ক্যাটাগরি */
+$("issueForm").addEventListener("submit",event=>{
+  event.preventDefault();
+  if(state.busy)return;
+  clearError("issueError");
+
+  const key=$("issueSelect").value;
+  if(!key||!SUPPORT_KB[key]){
+    showError("issueError","Dropdown থেকে একটি সমস্যা নির্বাচন করুন।");
+    $("issueSelect").focus();
+    return;
+  }
+
+  runStep(async runId=>{
+    state.issue=key;
+    const kb=SUPPORT_KB[key];
+    const selectedText=$("issueSelect").selectedOptions[0].textContent;
+
+    addMessage("আমার সমস্যা: "+selectedText,"user");
+    $("issuePanel").classList.add("hidden");
+
+    await officerReply(
+      "ঠিক আছে। আপনার নির্বাচিত সমস্যাটি বুঝেছি। প্রথমে নিচের সম্ভাব্য সমাধানটি দেখুন, তারপর একটি প্রশ্নের উত্তর দিন।",
+      runId
+    );
+
+    if(runId!==state.runId)return;
+
+    $("answerTitle").textContent=kb.title;
+    $("answerIntro").textContent="আপনার নির্বাচিত সমস্যার জন্য প্রাথমিক নির্দেশনা:";
+    $("answerText").textContent=kb.answer;
+    $("followupTitle").textContent=kb.question;
+
+    const select=$("followupSelect");
+    select.replaceChildren();
+
+    const first=document.createElement("option");
+    first.value="";
+    first.textContent="-- উত্তর নির্বাচন করুন --";
+    select.appendChild(first);
+
+    kb.options.forEach(([value,label])=>{
+      const option=document.createElement("option");
+      option.value=value;
+      option.textContent=label;
+      select.appendChild(option);
+    });
+
+    $("extraDetails").value="";
+    $("extraQuestionBox").classList.add("hidden");
+    select.value="";
+    clearError("answerError");
+    showPanel("answerPanel");
+  });
+});
+
+/* অতিরিক্ত বিবরণ */
+$("followupSelect").addEventListener("change",function(){
+  const needsDetails=this.value==="other"||this.value==="more";
+  $("extraQuestionBox").classList.toggle("hidden",!needsDetails);
+  if(needsDetails)scrollChatToBottom();
+});
+
+/* উত্তর জমা */
+$("continueBtn").addEventListener("click",()=>{
+  if(state.busy)return;
+  clearError("answerError");
+
+  const kb=SUPPORT_KB[state.issue];
+  const selected=$("followupSelect").value;
+
+  if(!kb||!selected){
+    showError("answerError","দয়া করে একটি উত্তর নির্বাচন করুন।");
+    $("followupSelect").focus();
+    return;
+  }
+
+  const option=kb.options.find(item=>item[0]===selected);
+  const extra=$("extraDetails").value.trim();
+  const needsDetails=selected==="other"||selected==="more";
+
+  if(needsDetails&&!extra){
+    showError("answerError","দয়া করে সমস্যার অতিরিক্ত বিবরণ লিখুন।");
+    $("extraDetails").focus();
+    return;
+  }
+
+  runStep(async runId=>{
+    addMessage("আমার উত্তর: "+(option?option[1]:selected),"user");
+    if(extra)addMessage("অতিরিক্ত বিবরণ: "+extra,"user");
+
+    $("answerPanel").classList.add("hidden");
+
+    const reply=kb.replies[selected]||
+      "আপনার সমস্যার আরও তথ্য প্রয়োজন। বিস্তারিত লিখে সাপোর্টের সাহায্য নিন।";
+
+    await officerReply(reply,runId);
+    if(runId===state.runId)showPanel("resolutionPanel");
+  });
+});
+
+/* সমস্যার সমাধান হয়েছে */
+$("resolvedAgainBtn").addEventListener("click",()=>{
+  if(state.busy)return;
+
+  runStep(async runId=>{
+    addMessage("হ্যাঁ, আমার সমস্যার সমাধান হয়েছে।","user");
+    $("resolutionPanel").classList.add("hidden");
+
+    await officerReply(
+      "চমৎকার! আপনার সমস্যার সমাধান হয়েছে জেনে ভালো লাগল। NP TOURNAMENT BD Support ব্যবহার করার জন্য ধন্যবাদ।",
+      runId
+    );
+
+    if(runId===state.runId)showPanel("successPanel");
+  });
+});
+
+/* সমস্যার সমাধান না হলে Live Chat */
+$("notResolvedAgainBtn").addEventListener("click",()=>{
+  if(state.busy)return;
+
+  runStep(async runId=>{
+    addMessage("না, আমার সমস্যার সমাধান হয়নি।","user");
+    $("resolutionPanel").classList.add("hidden");
+
+    await officerReply(
+      "দুঃখিত, সমস্যাটি এখনো সমাধান হয়নি। নিচের Live Chat বাটন থেকে WhatsApp অথবা Telegram-এ সরাসরি যোগাযোগ করুন।",
+      runId
+    );
+
+    if(runId!==state.runId)return;
+
+    $("whatsappLink").href=SUPPORT_CONFIG.whatsappUrl;
+    $("telegramLink").href=SUPPORT_CONFIG.telegramUrl;
+    showPanel("contactPanel");
+  });
+});
+
+/* নতুন চ্যাট শুরু ও নতুন ছবি রোটেশন */
+$("restartBtn").addEventListener("click",()=>{
+  if(state.busy)return;
+
+  state.runId++;
+  state.busy=false;
+  state.name="";
+  state.phone="";
+  state.issue="";
+  state.history=[];
+
+  // পরবর্তী নতুন Chat session-এ নতুন অফিসারের ছবি সক্রিয়
+  state.officerImage = getNextOfficerImage();
+  const topAvatar = $("officerAvatar");
+  if(topAvatar) {
+    topAvatar.src = state.officerImage;
+  }
+
+  $("messages").replaceChildren();
+  $("nameForm").reset();
+  $("phoneForm").reset();
+  $("issueForm").reset();
+  $("answerText").textContent="";
+  $("answerIntro").textContent="";
+  $("extraDetails").value="";
+  $("followupSelect").replaceChildren();
+
+  ["nameError","phoneError","issueError","answerError"].forEach(clearError);
+
+  hideAllPanels();
+  showPanel("namePanel");
+  $("chatArea").scrollTo({top:0,behavior:"auto"});
+});
+
+/* চ্যাট বন্ধ করার চেষ্টা ও প্যারেন্ট মডালে মেসেজ পাঠানো */
+$("closeChatBtn").addEventListener("click",()=>{
+  // যদি iframe বা popup modal-এ খোলা থাকে, তবে প্যারেন্ট উইন্ডোতে বন্ধ করার বার্তা পাঠানো
+  const inIframe = (function() {
+    try {
+      return window.self !== window.top;
+    } catch(e) {
+      return true;
+    }
+  })();
+
+  if (inIframe) {
+    try {
+      if (window.parent) {
+        window.parent.postMessage({ type: "CLOSE_SUPPORT_POPUP" }, "*");
+      }
+    } catch(e) {
+      console.warn("PostMessage to parent failed:", e);
+    }
+    return;
+  }
+
+  try{
+    window.close();
+  }catch(error){
+    console.warn("Browser close unavailable:",error);
+  }
+
+  window.setTimeout(()=>{
+    if(!window.closed){
+      window.alert(
+        "ব্রাউজারের নিরাপত্তার কারণে এই পেজটি নিজে থেকে বন্ধ করা যায়নি। মূল পেজে ফিরতে আপনার অ্যাপের Home বাটন ব্যবহার করুন বা পপআপটি বন্ধ করুন।"
+      );
+    }
+  },100);
+});
+
+/* প্রথমবার লোডে অফিসার ছবি সেট করা */
+const topAvatarEl = $("officerAvatar");
+if(topAvatarEl) {
+  topAvatarEl.src = state.officerImage;
+  topAvatarEl.addEventListener("error",function(){
+    useImageFallback(this);
+  },{once:true});
+}
+
+/* প্রথমবার স্ক্রল একদম উপরে থাকবে */
+$("chatArea").scrollTop=0;
+</script>
+</body>
+</html>
