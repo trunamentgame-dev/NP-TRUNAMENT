@@ -1776,14 +1776,21 @@
 
   /* Large Provider Credit */
   #np-intro .np-provider {
-    margin-top: 18px;
+    margin: 16px auto 0 auto;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: clamp(15px, 3.8vw, 21px);
+    font-size: clamp(13px, 3.5vw, 17px);
     font-weight: 700;
-    letter-spacing: 2.5px;
+    letter-spacing: clamp(1px, 0.4vw, 2px);
     line-height: 1.5;
     color: #b8c9df;
     white-space: nowrap;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
 
     opacity: 0;
     transform: translateY(8px);
@@ -1934,7 +1941,7 @@
     <div class="np-underline"></div>
 
     <div class="np-provider">
-      PROVIDED BY <span>MostWin88</span>
+      Provided by <span>Mostwin88</span>
     </div>
 
   </div>
@@ -2511,6 +2518,30 @@
   </div>
 
   <!-- 2. TOURNAMENT DETAIL MODAL -->
+    <!-- 1.1 GAME LOGIN REQUIRED POPUP -->
+  <div class="modal-overlay" id="modalGameLoginPrompt" role="dialog" aria-modal="true" aria-labelledby="gameLoginPromptTitle">
+    <div class="modal-sheet" style="max-width: 360px; border-radius: 20px; padding: 22px 20px; text-align: center; background: var(--bg-surface); border: 1px solid var(--border-gold); box-shadow: 0 12px 35px rgba(0,0,0,0.65);">
+      <div class="modal-handle" style="margin-bottom: 14px;"></div>
+      <div style="width: 52px; height: 52px; margin: 0 auto 12px; background: rgba(245, 158, 11, 0.15); border: 1px solid var(--border-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+        🎮
+      </div>
+      <h3 id="gameLoginPromptTitle" style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; line-height: 1.4;">
+        লগইন প্রয়োজন
+      </h3>
+      <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+        গেম খেলতে হলে প্রথমে আপনার অ্যাকাউন্টে লগইন করুন।
+      </p>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-outline" style="flex: 1; border-color: var(--border-subtle); color: var(--text-secondary);" onclick="window.app.closeGameLoginPrompt()">
+          বাতিল
+        </button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="window.app.confirmGameLoginPrompt()">
+          লগইন করুন
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modalTournamentDetail">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
@@ -3204,7 +3235,16 @@
       }
     }
 
+    let pendingGameUrl = null;
+
     function playGameUrl(url) {
+      // 1. Firebase Authentication State check before launching game
+      if (!isLoggedIn()) {
+        pendingGameUrl = url;
+        openGameLoginPrompt();
+        return;
+      }
+
       if (!url || url === '#' || url === 'javascript:void(0)') {
         showToast('এই গেমের প্লে লিংক পাওয়া যায়নি।', 'warning');
         return;
@@ -3214,6 +3254,20 @@
       } catch (e) {
         window.location.href = url;
       }
+    }
+
+    function openGameLoginPrompt() {
+      openModal('modalGameLoginPrompt');
+    }
+
+    function closeGameLoginPrompt() {
+      closeModal('modalGameLoginPrompt');
+      pendingGameUrl = null;
+    }
+
+    function confirmGameLoginPrompt() {
+      closeModal('modalGameLoginPrompt');
+      showAuthModal('login');
     }
 
     function setupUserListeners(uid) {
@@ -4766,6 +4820,12 @@
     }
 
     function switchView(viewId) {
+      if ((viewId === 'viewWallet' || viewId === 'viewMatches') && !isLoggedIn()) {
+        showToast('ব্যক্তিগত তথ্য ও ব্যালেন্স দেখতে অনুগ্রহ করে লগইন করুন।', 'warning');
+        showAuthModal('login');
+        return;
+      }
+
       document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
       const target = document.getElementById(viewId);
       if (target) target.classList.add('active');
@@ -5266,6 +5326,9 @@
       copyText,
       goToSlide,
       playGameUrl,
+      openGameLoginPrompt,
+      closeGameLoginPrompt,
+      confirmGameLoginPrompt,
       openNotificationsModal,
       markNotificationRead,
       markAllNotificationsRead
