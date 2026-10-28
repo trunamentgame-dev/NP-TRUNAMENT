@@ -1121,16 +1121,21 @@
       touch-action: none;
       user-select: none;
       -webkit-user-select: none;
+      overflow: hidden;
     }
 
     .floating-support-btn:active {
       cursor: grabbing;
     }
 
-    .floating-support-btn svg {
-      width: 42px;
-      height: 42px;
+    .floating-support-btn svg,
+    .floating-support-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
       pointer-events: none;
+      display: block;
     }
 
     /* Dual Slim Dropdown Buttons */
@@ -2703,20 +2708,11 @@
     title="Customer Support"
     aria-label="Customer Support"
   >
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-      <path d="M9 61 Q11 43 25 42 L39 42 Q53 43 55 61Z" fill="#e2e8f0"/>
-      <path d="M17 27 Q13 7 32 7 Q51 7 47 29 L44 43 L20 43Z" fill="#202938"/>
-      <ellipse cx="32" cy="27" rx="13" ry="16" fill="#f1bd91"/>
-      <path d="M19 24 Q17 10 31 10 Q43 9 46 22 L39 17 L31 20 L23 17Z" fill="#202938"/>
-      <circle cx="27" cy="28" r="1.5" fill="#273142"/>
-      <circle cx="37" cy="28" r="1.5" fill="#273142"/>
-      <path d="M28 34 Q32 38 36 34" fill="none" stroke="#9b4d43" stroke-width="1.7" stroke-linecap="round"/>
-      <path d="M17 27 A15 17 0 0 1 47 27" fill="none" stroke="#111827" stroke-width="4"/>
-      <rect x="13" y="24" width="8" height="16" rx="4" fill="#1f2937"/>
-      <rect x="43" y="24" width="8" height="16" rx="4" fill="#1f2937"/>
-      <path d="M47 37 Q49 46 39 46" fill="none" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round"/>
-      <circle cx="38" cy="46" r="3" fill="#fbbf24"/>
-    </svg>
+    <img
+      src="https://i.postimg.cc/9FTP1g9N/Gemini-Generated-Image-7ninup7ninup7nin-optimized-5.jpg"
+      alt="Customer Support"
+      loading="lazy"
+    >
   </button>
 
   <!-- 8. TOURNAMENT RULES POPUP -->
