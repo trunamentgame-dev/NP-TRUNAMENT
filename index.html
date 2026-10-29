@@ -886,6 +886,16 @@
     }
 
     /* Transactions */
+    .tx-history-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg, 14px);
+      padding: 10px;
+      max-height: 420px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tx-history-box .tx-item:last-child { margin-bottom: 0; }
     .tx-item {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
@@ -2345,7 +2355,9 @@
         </div>
       </div>
 
-      <div id="txHistoryFeed"></div>
+      <div class="tx-history-box">
+        <div id="txHistoryFeed"></div>
+      </div>
     </main>
 
     <!-- ==================== VIEW 4: PROFILE ==================== -->
@@ -4621,7 +4633,10 @@
       const feed = document.getElementById('txHistoryFeed');
       if (!feed) return;
 
-      if (state.transactions.length === 0) {
+      // Only Add Money (deposit) and Withdraw records are shown here; game / entry-fee / prize records are hidden
+      const walletTx = state.transactions.filter(tx => tx.type && /DEPOSIT|WITHDRAW/i.test(tx.type));
+
+      if (walletTx.length === 0) {
         feed.innerHTML = `
           <div class="empty-state">
             <div class="empty-title">কোনো লেনদেন হিস্ট্রি নেই</div>
@@ -4631,8 +4646,8 @@
         return;
       }
 
-      feed.innerHTML = state.transactions.map(tx => {
-        const isDep = tx.type && (tx.type.includes('DEPOSIT') || tx.type.includes('CREDIT') || tx.type.includes('PRIZE'));
+      feed.innerHTML = walletTx.map(tx => {
+        const isDep = tx.type && (tx.type.includes('DEPOSIT') || tx.type.includes('CREDIT') || tx.type.includes('REFUND'));
         return `
           <div class="tx-item">
             <div class="tx-left">
