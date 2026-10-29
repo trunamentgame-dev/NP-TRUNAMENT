@@ -2884,6 +2884,7 @@
     let auth = null;
     let db = null;
     let isFirebaseConnected = false;
+    let gameIdToken = null; // fresh Firebase login token, handed to the game (different domain) when Play Now is pressed
 
     try {
       if (typeof firebase !== 'undefined') {
@@ -3249,10 +3250,15 @@
         showToast('এই গেমের প্লে লিংক পাওয়া যায়নি।', 'warning');
         return;
       }
+      // Hand the logged-in user to the game (it runs on its own domain): token goes in the URL hash (never sent to any server)
+      let finalUrl = url;
+      if (gameIdToken) {
+        finalUrl = String(url).split('#')[0] + '#t=' + gameIdToken;
+      }
       try {
-        window.open(url, '_blank', 'noopener,noreferrer');
+        window.open(finalUrl, '_blank', 'noopener,noreferrer');
       } catch (e) {
-        window.location.href = url;
+        window.location.href = finalUrl;
       }
     }
 
@@ -3577,6 +3583,9 @@
       if (appRoot) appRoot.style.display = 'block';
 
       if (auth) {
+        auth.onIdTokenChanged(async (u) => {
+          try { gameIdToken = u ? await u.getIdToken() : null; } catch (e) { gameIdToken = null; }
+        });
         auth.onAuthStateChanged((user) => {
           if (user) {
             state.currentUser = user;
