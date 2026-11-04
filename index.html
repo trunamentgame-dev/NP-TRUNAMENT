@@ -1648,63 +1648,6 @@
       background: #f1f5f9;
       color: #334155;
     }
-
-    /* Auth Sidebar & Security Gate Styles */
-    #authGateScreen {
-      min-height: 100vh;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px 14px;
-      background: radial-gradient(circle at top, #141c30 0%, #070a13 100%);
-      position: relative;
-      z-index: 1000;
-    }
-
-    #app-root {
-      display: none;
-    }
-
-    .auth-sidebar-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      z-index: 99998;
-      display: none;
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-
-    .auth-sidebar-overlay.active {
-      display: block;
-      opacity: 1;
-    }
-
-    .auth-sidebar-drawer {
-      position: fixed;
-      top: 0;
-      right: -100%;
-      width: 100%;
-      max-width: 400px;
-      height: 100%;
-      background: var(--bg-surface);
-      border-left: 1px solid var(--border-gold);
-      z-index: 99999;
-      box-shadow: -8px 0 35px rgba(0, 0, 0, 0.7);
-      display: flex;
-      flex-direction: column;
-      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      overflow-y: auto;
-      padding: calc(20px + var(--safe-top)) 20px calc(24px + var(--safe-bottom)) 20px;
-      box-sizing: border-box;
-    }
-
-    .auth-sidebar-drawer.active {
-      right: 0;
-    }
   </style>
 </head>
 <body data-theme="dark">
@@ -2067,7 +2010,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- Mandatory / Auth Gate (Shown only if user tries to register/login directly) -->
-  <div id="authGateScreen" style="display: flex; min-height: 100vh; width: 100%; align-items: center; justify-content: center; padding: 20px 14px; background: radial-gradient(circle at top, #141c30 0%, #070a13 100%);">
+  <div id="authGateScreen" style="display: none; min-height: 100vh; width: 100%; align-items: center; justify-content: center; padding: 20px 14px; background: radial-gradient(circle at top, #141c30 0%, #070a13 100%);">
     <div style="width: 100%; max-width: 440px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 26px 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden;">
       
       <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #f59e0b, #ef4444, #f59e0b);"></div>
@@ -2116,12 +2059,9 @@
           <span>🔐 একাউন্টে লগইন করুন</span>
         </button>
 
-        <div style="display: flex; gap: 8px; margin-top: 14px;">
-          <button type="button" class="btn btn-outline btn-block btn-sm" onclick="window.app.openAuthSidebar('login')" style="flex: 1; font-size: 11.5px; border-color: var(--border-gold); color: var(--color-primary);">
-            <span>☰ সাইডবার ভিউ</span>
-          </button>
-          <button type="button" class="btn btn-outline btn-block btn-sm" onclick="window.app.showAuthModal('login')" style="flex: 1; font-size: 11.5px; border-color: var(--border-subtle);">
-            <span>🪟 পপআপ মোডাল</span>
+        <div style="text-align: center; margin-top: 12px;">
+          <button type="button" class="btn btn-outline btn-block btn-sm" onclick="window.app.returnToHomeFromGate()">
+            <span>🏠 হোম পেজে ফিরে যান</span>
           </button>
         </div>
       </form>
@@ -2168,115 +2108,16 @@
           <span>🚀 নতুন প্লেয়ার অ্যাকাউন্ট খুলুন</span>
         </button>
 
-        <div style="display: flex; gap: 8px; margin-top: 14px;">
-          <button type="button" class="btn btn-outline btn-block btn-sm" onclick="window.app.openAuthSidebar('login')" style="flex: 1; font-size: 11.5px; border-color: var(--border-gold); color: var(--color-primary);">
-            <span>☰ সাইডবার ভিউ</span>
-          </button>
-          <button type="button" class="btn btn-outline btn-block btn-sm" onclick="window.app.showAuthModal('login')" style="flex: 1; font-size: 11.5px; border-color: var(--border-subtle);">
-            <span>🪟 পপআপ মোডাল</span>
+        <div style="text-align: center; margin-top: 12px;">
+          <button type="button" class="btn btn-outline btn-block btn-sm" onclick="window.app.returnToHomeFromGate()">
+            <span>🏠 হোম পেজে ফিরে যান</span>
           </button>
         </div>
       </form>
     </div>
   </div>
 
-    <!-- ==================== AUTH SIDEBAR DRAWER ==================== -->
-  <div class="auth-sidebar-overlay" id="authSidebarOverlay" onclick="window.app.closeAuthSidebar()"></div>
-  <aside class="auth-sidebar-drawer" id="authSidebarDrawer" role="dialog" aria-modal="true" aria-label="Authentication Sidebar">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle);">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <div class="brand-logo-badge" style="width: 36px; height: 36px; font-size: 16px;">NP</div>
-        <div style="display: flex; flex-direction: column;">
-          <span style="font-family: var(--font-esports); font-weight: 800; font-size: 16px; background: linear-gradient(90deg, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">NP TOURNAMENT</span>
-          <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">User Authentication</span>
-        </div>
-      </div>
-      <button class="modal-close-btn" type="button" onclick="window.app.closeAuthSidebar()" aria-label="Close Sidebar">✕</button>
-    </div>
-
-    <div class="tab-pills" style="margin-bottom: 16px;">
-      <button type="button" class="tab-pill active" id="sidebarTabLogin" onclick="window.app.switchSidebarAuthMode('login')" style="flex:1; justify-content:center;">
-        <span>লগইন (Sign In)</span>
-      </button>
-      <button type="button" class="tab-pill" id="sidebarTabSignup" onclick="window.app.switchSidebarAuthMode('signup')" style="flex:1; justify-content:center;">
-        <span>নতুন অ্যাকাউন্ট (Sign Up)</span>
-      </button>
-    </div>
-
-    <div id="sidebarAuthAlert" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; margin-bottom: 16px;"></div>
-
-    <!-- Sidebar Login Form -->
-    <form id="sidebarLoginForm" onsubmit="window.app.handleSidebarLoginSubmit(event)">
-      <div class="form-group" style="margin-bottom: 14px;">
-        <label class="form-label" style="font-size: 12px;">ইউজারনেম বা ইমেইল *</label>
-        <input type="text" class="form-input" id="sidebarLoginEmail" required placeholder="username বা player@gmail.com" autocomplete="username">
-      </div>
-
-      <div class="form-group" style="margin-bottom: 10px;">
-        <label class="form-label" style="font-size: 12px;">পাসওয়ার্ড *</label>
-        <input type="password" class="form-input" id="sidebarLoginPassword" required placeholder="••••••••" autocomplete="current-password">
-      </div>
-
-      <div style="text-align: right; margin-bottom: 18px;">
-        <a href="javascript:void(0)" onclick="window.app.handleForgotPassword()" style="font-size: 12px; color: var(--color-primary); text-decoration: none;">
-          পাসওয়ার্ড ভুলে গেছেন?
-        </a>
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-block" id="btnSidebarLogin">
-        <span>🔐 একাউন্টে লগইন করুন</span>
-      </button>
-    </form>
-
-    <!-- Sidebar Signup Form -->
-    <form id="sidebarSignupForm" onsubmit="window.app.handleSidebarSignupSubmit(event)" style="display: none;">
-      <div class="form-group" style="margin-bottom: 12px;">
-        <label class="form-label" style="font-size: 12px;">ইউজারনেম (ইউনিক) *</label>
-        <input type="text" class="form-input" id="sidebarSignupUsername" required placeholder="যেমন: gamer_rafi99" autocomplete="username">
-      </div>
-
-      <div class="form-group" style="margin-bottom: 12px;">
-        <label class="form-label" style="font-size: 12px;">আপনার পূর্ণ নাম *</label>
-        <input type="text" class="form-input" id="sidebarSignupName" required placeholder="আপনার নাম" autocomplete="name">
-      </div>
-
-      <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-        <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label" style="font-size: 12px;">Free Fire IGN *</label>
-          <input type="text" class="form-input" id="sidebarSignupFfIgn" required placeholder="NP_GAMER">
-        </div>
-        <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label" style="font-size: 12px;">Free Fire UID *</label>
-          <input type="number" class="form-input" id="sidebarSignupFfUid" required placeholder="123456789">
-        </div>
-      </div>
-
-      <div class="form-group" style="margin-bottom: 12px;">
-        <label class="form-label" style="font-size: 12px;">ইমেইল অ্যাড্রেস *</label>
-        <input type="email" class="form-input" id="sidebarSignupEmail" required placeholder="player@gmail.com" autocomplete="email">
-      </div>
-
-      <div class="form-group" style="margin-bottom: 12px;">
-        <label class="form-label" style="font-size: 12px;">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর) *</label>
-        <input type="password" class="form-input" id="sidebarSignupPassword" required placeholder="••••••••" minlength="6" autocomplete="new-password">
-      </div>
-
-      <div class="form-group" style="margin-bottom: 18px;">
-        <label class="form-label" style="font-size: 12px;">কনফার্ম পাসওয়ার্ড *</label>
-        <input type="password" class="form-input" id="sidebarSignupConfirmPassword" required placeholder="••••••••" minlength="6" autocomplete="new-password">
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-block" id="btnSidebarSignup">
-        <span>🚀 নতুন অ্যাকাউন্ট খুলুন</span>
-      </button>
-    </form>
-
-    <div style="margin-top: auto; padding-top: 20px; text-align: center; font-size: 11px; color: var(--text-muted);">
-      NP TOURNAMENT BD • 100% সুরক্ষিত গেমিং প্ল্যাটফর্ম
-    </div>
-  </aside>
-
-  <div id="app-root" style="display: none;">
+  <div id="app-root">
 
     <!-- Top Header -->
     <header class="app-header">
@@ -2610,66 +2451,80 @@
 
   <!-- ==================== MODALS ==================== -->
 
-  <!-- 1. USER LOGIN & SIGNUP POPUP -->
-  <div class="modal-overlay" id="modalAuth">
-    <div class="modal-sheet" style="max-width: 380px; border-radius: 18px; padding: 20px 18px; background: var(--bg-surface); border: 1px solid var(--border-gold); box-shadow: 0 12px 35px rgba(0,0,0,0.65);">
-      <div class="modal-handle" style="margin-bottom: 12px;"></div>
-      <div class="modal-title" style="margin-bottom: 14px; font-size: 16px; font-weight: 800;">
-        <span id="authModalHeader">লগইন করুন</span>
-        <button class="modal-close-btn" onclick="window.app.closeModal('modalAuth')">✕</button>
+  <!-- 1. USER LOGIN & SIGNUP POPUP (Exact Reference Photo Design) -->
+  <div class="modal-overlay" id="modalAuth" style="align-items: flex-end; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+    <div class="modal-sheet" style="max-width: 480px; width: 100%; border-top-left-radius: 28px; border-top-right-radius: 28px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; padding: 14px 20px 24px 20px; background: #0f1624; border: 1px solid rgba(255, 255, 255, 0.08); border-bottom: none; box-shadow: 0 -10px 40px rgba(0,0,0,0.85); box-sizing: border-box; overflow-y: auto; max-height: 92vh;">
+      
+      <!-- Top Drag Handle -->
+      <div style="width: 44px; height: 4px; background: #26334d; border-radius: 9999px; margin: 0 auto 16px auto;"></div>
+      
+      <!-- Header with Title & Circular Close Button (as in reference photo) -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <h2 id="authModalHeader" style="margin: 0; font-size: 20px; font-weight: 800; color: #ffffff; font-family: var(--font-bengali); letter-spacing: -0.2px;">
+          লগইন করুন
+        </h2>
+        <button type="button" id="authModalCloseBtn" onclick="window.app.closeModal('modalAuth')" aria-label="Close" style="width: 32px; height: 32px; border-radius: 50%; background: #1a2336; border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; transition: all 0.2s ease;">
+          ✕
+        </button>
       </div>
 
-      <div class="tab-pills" style="margin-bottom: 14px; gap: 6px;">
-        <button class="tab-pill active" id="tabAuthLogin" onclick="window.app.switchAuthMode('login')" style="flex:1; justify-content:center; padding:7px 12px; font-size:12px;">
+      <!-- Pill Tabs Container (Active: Bright Orange #f59e0b, Inactive: Dark Blue/Grey #141c2e) -->
+      <div style="display: flex; gap: 10px; margin-bottom: 22px; width: 100%; box-sizing: border-box;">
+        <button type="button" class="tab-pill active" id="tabAuthLogin" onclick="window.app.switchAuthMode('login')" style="flex: 1; height: 44px; border-radius: 9999px; font-size: 14px; font-weight: 700; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.25s ease; background: #f59e0b; color: #000000; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);">
           <span id="lblAuthTabLogin">লগইন</span>
         </button>
-        <button class="tab-pill" id="tabAuthSignup" onclick="window.app.switchAuthMode('signup')" style="flex:1; justify-content:center; padding:7px 12px; font-size:12px;">
+        <button type="button" class="tab-pill" id="tabAuthSignup" onclick="window.app.switchAuthMode('signup')" style="flex: 1; height: 44px; border-radius: 9999px; font-size: 14px; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.25s ease; background: #151d2f; color: #94a3b8;">
           <span id="lblAuthTabSignup">নতুন অ্যাকাউন্ট</span>
         </button>
       </div>
 
       <form id="authForm" onsubmit="window.app.handleAuthSubmit(event)">
-        <!-- Signup Only Fields -->
+        <!-- Signup Only Fields (Photo 2: 2x2 grid with dark rounded pill inputs) -->
         <div id="signupFieldsWrap" style="display: none;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">পূর্ণ নাম *</label>
-              <input type="text" class="form-input" id="authName" placeholder="আপনার নাম" style="padding: 8px 10px; font-size: 13px;">
+              <label class="form-label" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">পূর্ণ নাম *</label>
+              <input type="text" class="form-input" id="authName" placeholder="আপনার নাম" style="width: 100%; height: 44px; background: #131b2c; border: 1px solid #1f2b44; border-radius: 12px; padding: 0 14px; color: #ffffff; font-size: 13.5px; outline: none; box-sizing: border-box;">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">ইউজারনেম *</label>
-              <input type="text" class="form-input" id="authUsername" placeholder="username" style="padding: 8px 10px; font-size: 13px;">
+              <label class="form-label" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">ইউজারনেম *</label>
+              <input type="text" class="form-input" id="authUsername" placeholder="username" style="width: 100%; height: 44px; background: #131b2c; border: 1px solid #1f2b44; border-radius: 12px; padding: 0 14px; color: #ffffff; font-size: 13.5px; outline: none; box-sizing: border-box;">
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">Free Fire IGN *</label>
-              <input type="text" class="form-input" id="authFfIgn" placeholder="গেম নাম" style="padding: 8px 10px; font-size: 13px;">
+              <label class="form-label" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Free Fire IGN *</label>
+              <input type="text" class="form-input" id="authFfIgn" placeholder="গেম নাম" style="width: 100%; height: 44px; background: #131b2c; border: 1px solid #1f2b44; border-radius: 12px; padding: 0 14px; color: #ffffff; font-size: 13.5px; outline: none; box-sizing: border-box;">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">Free Fire UID *</label>
-              <input type="number" class="form-input" id="authFfUid" placeholder="গেম আইডি" style="padding: 8px 10px; font-size: 13px;">
+              <label class="form-label" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Free Fire UID *</label>
+              <input type="number" class="form-input" id="authFfUid" placeholder="গেম আইডি" style="width: 100%; height: 44px; background: #131b2c; border: 1px solid #1f2b44; border-radius: 12px; padding: 0 14px; color: #ffffff; font-size: 13.5px; outline: none; box-sizing: border-box;">
             </div>
           </div>
         </div>
 
-        <!-- Common Fields -->
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label class="form-label" id="lblFormEmail" style="font-size: 11px; margin-bottom: 4px;">ইউজারনেম বা ইমেইল *</label>
-          <input type="text" class="form-input" id="authEmail" required placeholder="username বা player@gmail.com" style="padding: 8px 12px; font-size: 13px;" autocomplete="username">
+        <!-- Primary Input: Username / Email (Matches photo 1 & 2 light blue/white filled rounded bar) -->
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" id="lblFormEmail" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; display: block;">ইউজারনেম বা ইমেইল *</label>
+          <input type="text" class="form-input" id="authEmail" required placeholder="mijanbabu2015@gmail.com" autocomplete="username" style="width: 100%; height: 48px; background: #e8f0fe; border: 1.5px solid transparent; border-radius: 14px; padding: 0 16px; color: #0f172a; font-size: 14px; font-weight: 500; outline: none; box-sizing: border-box; transition: all 0.2s ease;">
         </div>
 
+        <!-- Password Input (Matches photo 1 & 2 light blue/white filled rounded bar) -->
         <div class="form-group" style="margin-bottom: 8px;">
-          <label class="form-label" id="lblFormPassword" style="font-size: 11px; margin-bottom: 4px;">পাসওয়ার্ড *</label>
-          <input type="password" class="form-input" id="authPassword" required placeholder="••••••••" minlength="6" style="padding: 8px 12px; font-size: 13px;" autocomplete="current-password">
+          <label class="form-label" id="lblFormPassword" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; display: block;">পাসওয়ার্ড *</label>
+          <input type="password" class="form-input" id="authPassword" required placeholder="•••••••••" minlength="6" autocomplete="current-password" style="width: 100%; height: 48px; background: #e8f0fe; border: 1.5px solid transparent; border-radius: 14px; padding: 0 16px; color: #0f172a; font-size: 16px; letter-spacing: 2px; outline: none; box-sizing: border-box; transition: all 0.2s ease;">
         </div>
 
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 14px;" id="linkForgotPassword">
-          <a href="javascript:void(0)" onclick="window.app.handleForgotPassword()" style="font-size: 11px; color: var(--color-primary); text-decoration: none;">পাসওয়ার্ড ভুলে গেছেন?</a>
+        <!-- Forgot Password link aligned to right (Orange colored) -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;" id="linkForgotPassword">
+          <a href="javascript:void(0)" onclick="window.app.handleForgotPassword()" style="font-size: 13px; color: #f59e0b; font-weight: 600; text-decoration: none;">
+            পাসওয়ার্ড ভুলে গেছেন?
+          </a>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block" id="btnAuthSubmit" style="padding: 9px; font-size: 13px; font-weight: 700; border-radius: var(--radius-md);">
+        <!-- Large Vibrant Yellow-Orange Submit Action Button (Rounded pill bar) -->
+        <button type="submit" class="btn btn-block" id="btnAuthSubmit" style="width: 100%; height: 48px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; border-radius: 14px; color: #000000; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35); font-family: var(--font-bengali); letter-spacing: 0.3px; transition: transform 0.15s ease, box-shadow 0.15s ease;">
           <span id="lblBtnAuth">লগইন করুন</span>
         </button>
       </form>
@@ -2897,7 +2752,6 @@
     type="button"
     title="Customer Support"
     aria-label="Customer Support"
-    style="display: none;"
   >
     <img
       src="https://i.postimg.cc/9FTP1g9N/Gemini-Generated-Image-7ninup7ninup7nin-optimized-5.jpg"
@@ -3716,14 +3570,12 @@
     function initAuth() {
       const authGate = document.getElementById('authGateScreen');
       const appRoot = document.getElementById('app-root');
-      const supportBtn = document.getElementById('floatingSupportBtn');
 
       initUserActivityListeners();
 
-      // Security Enforcement: Unauthenticated users MUST see ONLY Login/Signup
-      if (authGate) authGate.style.display = 'flex';
-      if (appRoot) appRoot.style.display = 'none';
-      if (supportBtn) supportBtn.style.display = 'none';
+      // Ensure normal page is visible with login option in header
+      if (authGate) authGate.style.display = 'none';
+      if (appRoot) appRoot.style.display = 'block';
 
       if (auth) {
         auth.onIdTokenChanged(async (u) => {
@@ -3733,12 +3585,9 @@
           if (user) {
             state.currentUser = user;
 
-            // Successful Login: Reveal Dashboard and features
             if (authGate) authGate.style.display = 'none';
-            closeAuthSidebar();
-            closeModal('modalAuth');
             if (appRoot) appRoot.style.display = 'block';
-            if (supportBtn) supportBtn.style.display = 'flex';
+            closeModal('modalAuth');
 
             setupUserListeners(user.uid);
             resetUserInactivityTimer();
@@ -3751,14 +3600,9 @@
               clearTimeout(userInactivityTimer);
             }
 
-            // Close all modals and popups
-            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-            closeAuthSidebar();
-
-            // Strict Security: Hide Dashboard, show Auth Gate
-            if (authGate) authGate.style.display = 'flex';
+            // Reference Photo requirement: Must show login/signup first before accessing dashboard/pages
             if (appRoot) appRoot.style.display = 'none';
-            if (supportBtn) supportBtn.style.display = 'none';
+            if (authGate) authGate.style.display = 'none';
 
             state.userData = {
               uid: '',
@@ -3779,25 +3623,23 @@
             updateNotificationsUI();
             updateAuthStateUI();
             renderTxHistoryFeed();
+
+            // Prompt exact reference photo login popup
+            showAuthModal('login');
           }
         });
       } else {
-        if (authGate) authGate.style.display = 'flex';
         if (appRoot) appRoot.style.display = 'none';
-        if (supportBtn) supportBtn.style.display = 'none';
+        showAuthModal('login');
         updateAuthStateUI();
       }
     }
 
     function returnToHomeFromGate() {
-      if (isLoggedIn()) {
-        const authGate = document.getElementById('authGateScreen');
-        const appRoot = document.getElementById('app-root');
-        if (authGate) authGate.style.display = 'none';
-        if (appRoot) appRoot.style.display = 'block';
-      } else {
-        showToast('হোম পেজ ও ড্যাশবোর্ডে প্রবেশ করতে অনুগ্রহ করে প্রথমে লগইন করুন।', 'warning');
-      }
+      const authGate = document.getElementById('authGateScreen');
+      const appRoot = document.getElementById('app-root');
+      if (authGate) authGate.style.display = 'none';
+      if (appRoot) appRoot.style.display = 'block';
     }
 
     function switchGateAuthMode(mode) {
@@ -4061,14 +3903,40 @@
       const header = document.getElementById('authModalHeader');
       const btn = document.getElementById('lblBtnAuth');
       const emailLbl = document.getElementById('lblFormEmail');
+      const emailInput = document.getElementById('authEmail');
 
-      if (tabL) tabL.classList.toggle('active', isLogin);
-      if (tabS) tabS.classList.toggle('active', !isLogin);
+      if (tabL && tabS) {
+        if (isLogin) {
+          tabL.style.background = '#f59e0b';
+          tabL.style.color = '#000000';
+          tabL.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.35)';
+          tabL.style.border = 'none';
+
+          tabS.style.background = '#151d2f';
+          tabS.style.color = '#94a3b8';
+          tabS.style.boxShadow = 'none';
+          tabS.style.border = '1px solid rgba(255, 255, 255, 0.08)';
+        } else {
+          tabS.style.background = '#f59e0b';
+          tabS.style.color = '#000000';
+          tabS.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.35)';
+          tabS.style.border = 'none';
+
+          tabL.style.background = '#151d2f';
+          tabL.style.color = '#94a3b8';
+          tabL.style.boxShadow = 'none';
+          tabL.style.border = '1px solid rgba(255, 255, 255, 0.08)';
+        }
+      }
+
       if (signupWrap) signupWrap.style.display = isLogin ? 'none' : 'block';
       if (forgotLink) forgotLink.style.display = isLogin ? 'flex' : 'none';
       if (header) header.innerText = isLogin ? 'লগইন করুন' : 'নতুন অ্যাকাউন্ট তৈরি';
-      if (btn) btn.innerText = isLogin ? 'লগইন করুন' : 'অ্যাকাউন্ট তৈরি করুন';
+      if (btn) btn.innerText = isLogin ? 'লগইন করুন' : 'লগইন করুন';
       if (emailLbl) emailLbl.innerText = isLogin ? 'ইউজারনেম বা ইমেইল *' : 'ইমেইল অ্যাড্রেস *';
+      if (emailInput && !emailInput.value) {
+        emailInput.placeholder = 'mijanbabu2015@gmail.com';
+      }
     }
 
     async function handleAuthSubmit(e) {
@@ -4135,6 +4003,8 @@
               }
             }
             showToast('🎉 অভিনন্দন! অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।', 'success');
+            const appRoot = document.getElementById('app-root');
+            if (appRoot) appRoot.style.display = 'block';
             closeModal('modalAuth');
           } else {
             let resolvedEmail = emailInput;
@@ -4149,6 +4019,8 @@
             }
             await auth.signInWithEmailAndPassword(resolvedEmail, password);
             showToast('লগইন সফল হয়েছে! স্বাগতম।', 'success');
+            const appRoot = document.getElementById('app-root');
+            if (appRoot) appRoot.style.display = 'block';
             closeModal('modalAuth');
           }
         } catch (err) {
@@ -4161,7 +4033,7 @@
           showToast(msg, 'error');
         } finally {
           btn.disabled = false;
-          btn.innerText = state.authMode === 'login' ? 'লগইন করুন' : 'অ্যাকাউন্ট তৈরি করুন';
+          btn.innerText = state.authMode === 'login' ? 'লগইন করুন' : 'লগইন করুন';
         }
       } else {
         showToast('Firebase প্রস্তুত নয়', 'error');
@@ -4185,25 +4057,8 @@
 
     async function handleLogout() {
       if (confirm('আপনি কি নিশ্চিত যে অ্যাকাউন্ট থেকে লগআউট করতে চান?')) {
-        try {
-          if (auth) await auth.signOut();
-        } catch (e) {
-          console.error("Signout error:", e);
-        }
+        if (auth) await auth.signOut();
         state.currentUser = null;
-
-        // Strict security: return to Auth Gate Screen
-        const authGate = document.getElementById('authGateScreen');
-        const appRoot = document.getElementById('app-root');
-        const supportBtn = document.getElementById('floatingSupportBtn');
-
-        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-        closeAuthSidebar();
-
-        if (appRoot) appRoot.style.display = 'none';
-        if (supportBtn) supportBtn.style.display = 'none';
-        if (authGate) authGate.style.display = 'flex';
-
         updateAuthStateUI();
         showToast('সফলভাবে লগআউট সম্পন্ন হয়েছে।', 'info');
       }
@@ -5003,12 +4858,9 @@
     }
 
     function switchView(viewId) {
-      if (!isLoggedIn()) {
-        showToast('ড্যাশবোর্ডে প্রবেশের জন্য অনুগ্রহ করে আগে লগইন করুন।', 'warning');
-        const authGate = document.getElementById('authGateScreen');
-        const appRoot = document.getElementById('app-root');
-        if (authGate) authGate.style.display = 'flex';
-        if (appRoot) appRoot.style.display = 'none';
+      if ((viewId === 'viewWallet' || viewId === 'viewMatches') && !isLoggedIn()) {
+        showToast('ব্যক্তিগত তথ্য ও ব্যালেন্স দেখতে অনুগ্রহ করে লগইন করুন।', 'warning');
+        showAuthModal('login');
         return;
       }
 
@@ -5471,192 +5323,7 @@
       });
     });
 
-    // --- Auth Sidebar Methods ---
-    function openAuthSidebar(mode = 'login') {
-      const drawer = document.getElementById('authSidebarDrawer');
-      const overlay = document.getElementById('authSidebarOverlay');
-      if (drawer && overlay) {
-        switchSidebarAuthMode(mode);
-        overlay.classList.add('active');
-        drawer.classList.add('active');
-      }
-    }
-
-    function closeAuthSidebar() {
-      const drawer = document.getElementById('authSidebarDrawer');
-      const overlay = document.getElementById('authSidebarOverlay');
-      if (drawer) drawer.classList.remove('active');
-      if (overlay) overlay.classList.remove('active');
-    }
-
-    function switchSidebarAuthMode(mode) {
-      const isLogin = mode === 'login';
-      const tabL = document.getElementById('sidebarTabLogin');
-      const tabS = document.getElementById('sidebarTabSignup');
-      const formL = document.getElementById('sidebarLoginForm');
-      const formS = document.getElementById('sidebarSignupForm');
-      const alertBox = document.getElementById('sidebarAuthAlert');
-
-      if (tabL) tabL.classList.toggle('active', isLogin);
-      if (tabS) tabS.classList.toggle('active', !isLogin);
-      if (formL) formL.style.display = isLogin ? 'block' : 'none';
-      if (formS) formS.style.display = isLogin ? 'none' : 'block';
-      if (alertBox) alertBox.style.display = 'none';
-    }
-
-    function showSidebarAlert(msg) {
-      const alertBox = document.getElementById('sidebarAuthAlert');
-      if (alertBox) {
-        alertBox.innerText = msg;
-        alertBox.style.display = 'block';
-      }
-    }
-
-    async function handleSidebarLoginSubmit(e) {
-      e.preventDefault();
-      const userInput = document.getElementById('sidebarLoginEmail').value.trim();
-      const pass = document.getElementById('sidebarLoginPassword').value;
-      const btn = document.getElementById('btnSidebarLogin');
-
-      if (!userInput || !pass) {
-        showSidebarAlert('ইউজারনেম অথবা ইমেইল এবং পাসওয়ার্ড প্রদান করুন');
-        return;
-      }
-
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = 'যাচাই হচ্ছে...';
-      }
-
-      if (auth && db) {
-        try {
-          let resolvedEmail = userInput;
-          if (!userInput.includes('@')) {
-            const cleanUser = userInput.toLowerCase().replace(/[^a-z0-9_]/g, '');
-            const snap = await db.ref(`usernames/${cleanUser}`).once('value');
-            if (snap.exists() && snap.val() && snap.val().email) {
-              resolvedEmail = snap.val().email;
-            } else {
-              resolvedEmail = `${cleanUser}@npapp.local`;
-            }
-          }
-          await auth.signInWithEmailAndPassword(resolvedEmail, pass);
-          closeAuthSidebar();
-          showToast('সফলভাবে লগইন হয়েছে! স্বাগতম।', 'success');
-        } catch (err) {
-          let msg = err.message;
-          if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-            msg = 'ভুল ইউজারনেম/ইমেইল অথবা পাসওয়ার্ড!';
-          }
-          showSidebarAlert(msg);
-          showToast('লগইন ব্যর্থ: ' + msg, 'error');
-        } finally {
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<span>🔐 একাউন্টে লগইন করুন</span>';
-          }
-        }
-      }
-    }
-
-    async function handleSidebarSignupSubmit(e) {
-      e.preventDefault();
-      const rawUsername = document.getElementById('sidebarSignupUsername').value.trim();
-      const name = document.getElementById('sidebarSignupName').value.trim();
-      const ffIgn = document.getElementById('sidebarSignupFfIgn').value.trim();
-      const ffUid = document.getElementById('sidebarSignupFfUid').value.trim();
-      const rawEmail = document.getElementById('sidebarSignupEmail').value.trim();
-      const pass = document.getElementById('sidebarSignupPassword').value;
-      const confirmPass = document.getElementById('sidebarSignupConfirmPassword').value;
-      const btn = document.getElementById('btnSidebarSignup');
-
-      const cleanUsername = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
-
-      if (!cleanUsername || cleanUsername.length < 3) {
-        showSidebarAlert('সঠিক ইউজারনেম প্রদান করুন (কমপক্ষে ৩ অক্ষর)');
-        return;
-      }
-      if (!name || !pass) {
-        showSidebarAlert('সবগুলো আবশ্যক ফিল্ড পূরণ করুন');
-        return;
-      }
-      if (pass !== confirmPass) {
-        showSidebarAlert('পাসওয়ার্ড ও কনফার্ম পাসওয়ার্ড মেলেনি!');
-        return;
-      }
-
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = 'অ্যাকাউন্ট তৈরি হচ্ছে...';
-      }
-
-      if (auth && db) {
-        try {
-          const uSnap = await db.ref(`usernames/${cleanUsername}`).once('value');
-          if (uSnap.exists()) {
-            showSidebarAlert(`দুঃখিত! "${cleanUsername}" ইউজারনেমটি ইতিমধ্যে নেওয়া হয়েছে।`);
-            if (btn) {
-              btn.disabled = false;
-              btn.innerHTML = '<span>🚀 নতুন অ্যাকাউন্ট খুলুন</span>';
-            }
-            return;
-          }
-
-          const email = rawEmail || `${cleanUsername}@npapp.local`;
-          const cred = await auth.createUserWithEmailAndPassword(email, pass);
-          const uid = cred.user.uid;
-
-          await db.ref(`usernames/${cleanUsername}`).set({
-            uid,
-            email,
-            createdAt: firebase.database.ServerValue.TIMESTAMP
-          });
-
-          await db.ref(`users/${uid}`).set({
-            uid,
-            username: cleanUsername,
-            name,
-            email,
-            ffIgn: ffIgn || 'Player',
-            ffUid: ffUid || '000000000',
-            balance: 0,
-            status: 'ACTIVE',
-            dpUrl: '',
-            dpWidth: '75px',
-            createdAt: firebase.database.ServerValue.TIMESTAMP,
-            joinedMatches: {}
-          });
-
-          closeAuthSidebar();
-          showToast('🎉 অভিনন্দন! অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।', 'success');
-        } catch (err) {
-          showSidebarAlert(err.message);
-          showToast('রেজিস্ট্রেশন ত্রুটি: ' + err.message, 'error');
-        } finally {
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<span>🚀 নতুন অ্যাকাউন্ট খুলুন</span>';
-          }
-        }
-      }
-    }
-
-    // Direct URL & Hash Security Guard
-    window.addEventListener('hashchange', function() {
-      if (!isLoggedIn()) {
-        const authGate = document.getElementById('authGateScreen');
-        const appRoot = document.getElementById('app-root');
-        if (authGate) authGate.style.display = 'flex';
-        if (appRoot) appRoot.style.display = 'none';
-      }
-    });
-
     window.app = {
-      openAuthSidebar,
-      closeAuthSidebar,
-      switchSidebarAuthMode,
-      handleSidebarLoginSubmit,
-      handleSidebarSignupSubmit,
       switchView,
       returnToHomeFromGate,
       showGateScreen,
