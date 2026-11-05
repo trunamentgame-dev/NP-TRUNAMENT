@@ -290,6 +290,11 @@ header{flex:none;padding:calc(6px + env(safe-area-inset-top)) 12px 6px}
 .result-badge.show{transform:translate(-50%,-50%) scale(1)}
 .promo,.player-counter{transition:opacity .4s}
 .arena-box.zm .promo,.arena-box.zm .player-counter{opacity:0}
+
+/* v17b: চাকার উপরের অর্ধেক দেখা যাবে, নিচের অর্ধেক বেট বক্সের নিচে ঢুকবে */
+.arena-box{overflow:hidden;overflow:clip;margin-bottom:-8px}
+.panels-container{z-index:5}
+.rig{transition-duration:1.1s}
 </style>
 </head>
 <body>
@@ -510,17 +515,18 @@ function fitWheel(){
   a.style.setProperty('--ws',Math.max(120,Math.min(aw*.74,ah*.84))+'px');
 }
 function zoomIn(){
-  const wr=document.querySelector('.app-wrapper'),a=document.querySelector('.arena-box'),rig=document.querySelector('.rig'),st=document.querySelector('.stage'),hr=document.querySelector('.hrow'),pn=document.querySelector('.panels-container');
-  if(!wr||!a||!rig||!st||Z.on)return;
+  const a=document.querySelector('.arena-box'),rig=document.querySelector('.rig'),st=document.querySelector('.stage'),pn=document.querySelector('.panels-container');
+  if(!a||!rig||!st||!pn||Z.on)return;
   const w=st.offsetWidth;if(!w)return;
-  const hrBottom=hr.offsetTop+hr.offsetHeight,panelTop=pn.offsetTop;
+  /* চাকার মাঝের রেখা = বেট বক্সের উপরের কিনারা; নিচের অর্ধেক বেট বক্সের নিচে ঢুকে যাবে */
+  const cardTop=pn.offsetTop+8;                       /* বেট বক্সের উপরের কিনারা (wrapper-এর হিসাবে) */
+  const arenaTop=a.offsetTop+2;
   const curY=a.offsetTop+rig.offsetTop+st.offsetTop+w/2;
-  const avail=panelTop+4-(hrBottom+6);
-  const u=Math.min(avail/1.08,wr.clientWidth-24);
-  const sc=Math.max(1,Math.min(1.8,u/w)),U=w*sc;
-  const tgtY=hrBottom+6+U*.06+U/2;
+  const avail=cardTop-arenaTop-6;
+  const R=avail/(1.08+16/w),sc=Math.max(1,Math.min(3.4,2*R/w));
+  const tgtY=cardTop;
   rig.style.transform='translate(0,'+(tgtY-curY).toFixed(1)+'px) scale('+sc.toFixed(3)+')';
-  a.style.setProperty('--rby',(tgtY-a.offsetTop).toFixed(1)+'px');
+  a.style.setProperty('--rby',(cardTop-a.offsetTop-34).toFixed(1)+'px');
   a.classList.add('zm');Z.on=true;
 }
 function zoomOut(){
