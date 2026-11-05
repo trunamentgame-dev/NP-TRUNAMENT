@@ -267,6 +267,7 @@ function guide(a){
   for(const p of PK){const px=p[0]-hit.x,py=p[1]-hit.y;if(px*nx+py*ny>0&&Math.abs(px*ny-py*nx)<PR-3){X.strokeStyle='#4cff7a';X.lineWidth=3;X.beginPath();X.arc(p[0],p[1],PR+4,0,7);X.stroke()}}}
  X.restore()}
 function draw(){
+ X.setTransform(C.width/440,0,0,C.height/440,0,0);
  X.clearRect(0,0,440,440);
  let g;
  X.fillStyle='#2e1305';X.beginPath();X.roundRect(0,0,440,440,10);X.fill();
@@ -312,6 +313,9 @@ $('pg').onclick=e=>{if(e.target.id=='pg')sheet('pg',false)};
 $('mRules').onclick=()=>openPg('খেলার নিয়ম ও বাজি/প্রাইজ','<h3>🎯 কীভাবে খেলবেন</h3><ul><li>স্ট্রাইকার স্লাইডার দিয়ে বেস লাইনে বসান, টেনে ছেড়ে দিন।</li><li>নিজের গুটি পকেটে ফেললে আবার চাল পাবেন, স্ট্রাইকার পকেটে গেলে ফাউল ও পালা বদল।</li><li>প্রতিটি গুটি ৩ পয়েন্ট, রানী (লাল) ৫ পয়েন্ট। আগে ২৭ পয়েন্ট পেলে জয়।</li></ul><h3>💰 বাজি ও প্রাইজ</h3><ul><li>বাজির টাকা ম্যাচ খোঁজা শুরুর সময় ওয়ালেট থেকে কাটা হয়; বাতিল করলে বা ম্যাচ না হলে ফেরত পাবেন।</li><li>Real Player ম্যাচে দুজনের বাজি মিলিয়ে পুলের ৯০% বিজয়ী পায়, ১০% হাউস ফি।</li><li>২০ সেকেন্ডে Real Player না পেলে Computer Player-এর সঙ্গে খেলতে পারেন। Computer Player ম্যাচেও আপনার বাজি যায় ও Computer-এর সমান বাজি ধরা হয় (যেমন ৫০ + ৫০ = ১০০)। জিতলে ৯০ টাকা আপনার মূল ওয়ালেটে যোগ হয়, হারলে বাজির টাকা যায়।</li></ul>');
 $('exitBtn').onclick=()=>{if(window.AndroidBridge&&window.AndroidBridge.exitToUserPanel) window.AndroidBridge.exitToUserPanel()};
 $('mExit').onclick=()=>{sheet('menuS',false);if(window.AndroidBridge&&window.AndroidBridge.exitToUserPanel) window.AndroidBridge.exitToUserPanel()};
+function goPanel(){try{tx({t:'cancel'})}catch(e){}if(window.AndroidBridge&&window.AndroidBridge.exitToUserPanel)window.AndroidBridge.exitToUserPanel();else if(window.CK_HOME)location.href=window.CK_HOME}
+window.onBackPressed=window.handleBack=window.onBack=function(){goPanel();return true};
+try{history.pushState({ck:1},'',location.href);window.addEventListener('popstate',()=>{history.pushState({ck:1},'',location.href);goPanel()})}catch(e){}
 if(BR&&BR.getUserName) $('nm').value=BR.getUserName(); // preview only; replaced by the server-verified name on connect
 if(window.AndroidBridge&&window.AndroidBridge.getUserBalance){
   bal=window.AndroidBridge.getUserBalance()||0;
