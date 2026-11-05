@@ -347,6 +347,7 @@ const CHIPS=[10,20,50,100,500];
 const CHIPCOL={10:'#3b82f6',20:'#10b981',50:'#ef4444',100:'#475569',500:'#7c3aed',all:'#d97706'};
 let ws,tt,popT,AC;
 const Z={on:false,skip:null};
+const ZOOM_MAX=2.0; /* zoom-এর সর্বোচ্চ মাত্রা: বাড়ালে চাকা আরও বড় হবে */
 
 const spotOf=id=>S.spots.find(x=>x.id===id)||{};
 const colorOf=id=>COLORS[id]||spotOf(id).color||'#444',labelOf=id=>spotOf(id).label||'';
@@ -470,7 +471,7 @@ setInterval(tick,200);
 function onState(m){
   S.off=m.now-Date.now();S.st=m;S.winSeg=(m.phase==='result'&&m.result)?m.result.seg:null;const rb=$('rb');if(m.phase==='result'&&m.result){rb.textContent=resLabel(m.result.spot,m.result.mega);paintRB(rb,m.result.spot);if(Z.skip!==m.roundId){zoomIn();rb.classList.add('show')}}else{rb.classList.remove('show');if(m.phase==='spin'){if(Z.skip!==m.roundId)zoomIn()}else zoomOut()}
   $('ph').textContent={betting:'বেট ধরুন',spin:'ঘুরছে',result:'ফলাফল',paused:'বিরতি'}[m.phase]||'';
-  $('online').textContent='👥 '+(m.online||0);
+  if(m.phase==='betting'||S.onl==null){S.onl=m.online||0;$('online').textContent='👥 '+S.onl}
   {const fl=$('fairLine');if(fl)fl.textContent=m.hash?('Round #'+m.roundId+' hash: '+m.hash+(m.reveal?'  |  Round #'+m.reveal.id+' seed: '+m.reveal.seed:'')):''}
   $('limits').textContent=m.cfg?`${money(m.cfg.minBet)} – ${money(m.cfg.maxBet)}`:'';
   if(m.phase==='betting'&&m.roundId!==S.lastRound){S.bets={};S.lastRound=m.roundId}
@@ -523,7 +524,7 @@ function zoomIn(){
   const arenaTop=a.offsetTop+2;
   const curY=a.offsetTop+rig.offsetTop+st.offsetTop+w/2;
   const avail=cardTop-arenaTop-6;
-  const R=avail/(1.08+16/w),sc=Math.max(1,Math.min(3.4,2*R/w));
+  const R=avail/(1.08+16/w),sc=Math.max(1,Math.min(ZOOM_MAX,2*R/w));
   const tgtY=cardTop;
   rig.style.transform='translate(0,'+(tgtY-curY).toFixed(1)+'px) scale('+sc.toFixed(3)+')';
   a.style.setProperty('--rby',(cardTop-a.offsetTop-34).toFixed(1)+'px');
