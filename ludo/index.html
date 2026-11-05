@@ -1,1 +1,1133 @@
 
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LODU TRUNAMENT</title>
+<style>
+:root{--bg:#143b78;--card:#1f5198;--tx:#f4f7ff;--mut:#a9c3ea;--ac:#ffd23f;--c0:#1fa6fb;--c1:#ec1c24;--c2:#0a9a47;--c3:#f7d200;--y0:#1fa6fb;--y1:#ec1c24;--y2:#0a9a47;--y3:#c9a50c}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg) repeating-linear-gradient(45deg,#ffffff10 0 22px,transparent 22px 44px);color:var(--tx);font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))}
+.hide{display:none!important}
+.screen{width:100%;max-width:460px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+h1{font-size:2.3rem;font-weight:700;letter-spacing:-.5px}
+.sub{color:var(--mut)}
+.lbl{font-weight:600;margin-top:4px}
+button{font:inherit;cursor:pointer;border:0;border-radius:14px;padding:13px 24px;font-weight:600;background:var(--ac);color:#2a2100}
+button.ghost{background:transparent;color:var(--tx);border:1.5px solid var(--mut)}
+button:focus-visible,input:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.big{font-size:1.2rem;padding:16px 34px}
+.seg{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.seg button{background:var(--card);color:var(--tx);border:2px solid transparent;padding:10px 18px}
+.seg button[aria-pressed=true]{border-color:var(--ac);background:#2c66b8}
+input{font:inherit;padding:12px 16px;border-radius:12px;border:1.5px solid var(--mut);background:var(--card);color:var(--tx);width:min(100%,280px);text-align:center}
+details{max-width:340px;color:var(--mut);text-align:left;font-size:.92rem}summary{cursor:pointer;text-align:center}
+.note{font-size:.88rem;color:var(--mut);max-width:340px}
+.ring{width:120px;height:120px;border-radius:50%;border:6px solid #ffffff33;border-top-color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:700;animation:spin 1.2s linear infinite}
+.ring span{animation:spin 1.2s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bar{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.arena{width:min(94vw,460px);display:flex;flex-direction:column;gap:10px}
+.drow{display:flex;justify-content:space-between}
+.dp{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:12px;background:#ffffff26;border:2px solid #9fd4ff55}
+.dp.off{visibility:hidden}
+.dp.act{border-color:var(--ac);background:#ffffff45}
+.pin svg{width:24px;height:32px;display:block}
+.die{position:relative;flex:none;width:50px;height:50px;padding:0;border:0;background:none;perspective:340px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.die:disabled{opacity:1;cursor:default}
+.die.ready{animation:ready 1s infinite}
+@keyframes ready{50%{transform:scale(1.12)}}
+.die .sc{position:absolute;inset:0;transform-style:preserve-3d}
+.die .cube{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .3s cubic-bezier(.22,.75,.25,1)}
+.die.roll{z-index:10}
+.die.roll .sc{animation:hop .85s cubic-bezier(.45,0,.25,1)}
+@keyframes hop{0%{transform:none}35%{transform:rotate(30deg) scale(1.25)}60%{transform:rotate(30deg) scale(1.25)}100%{transform:none}}
+.face{position:absolute;inset:0;border-radius:9px;background:#fff;padding:7px;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);gap:1px;backface-visibility:hidden;box-shadow:inset 0 0 0 1px #0002}
+.f1{transform:translateZ(25px)}
+.f6{transform:rotateY(180deg) translateZ(25px);background:#eef1f5}
+.f3{transform:rotateY(90deg) translateZ(25px);background:#e3e8ef}
+.f4{transform:rotateY(-90deg) translateZ(25px);background:#e3e8ef}
+.f2{transform:rotateX(90deg) translateZ(25px);background:#f6f8fb}
+.f5{transform:rotateX(-90deg) translateZ(25px);background:#d9dfe8}
+.pp{border-radius:50%}.pp.on{background:#111}
+.brand{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 6px;border-radius:999px;background:#ffffff1f;border:1.5px solid #ffffff33;font-size:.78rem;color:var(--mut)}
+.brand i{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ffe27a,#f2a900);color:#3a2a00;font:800 .95rem/28px system-ui,sans-serif;text-align:center;font-style:normal}
+.brand b{display:block;color:#fff;font-size:1rem;line-height:1;letter-spacing:.3px}
+.brand span{line-height:1.1;text-align:left}
+.board{position:relative;width:100%;aspect-ratio:1;display:grid;grid-template:repeat(15,1fr)/repeat(15,1fr);background:#fff;border-radius:4px;overflow:hidden;box-shadow:0 6px 24px #0007}
+.c{border:0 solid #a9b0b8;border-right-width:1px;border-bottom-width:1px;display:flex;align-items:center;justify-content:center}.c.k{border-color:#ffffff99}.c svg{width:72%;height:72%;display:block}
+.ctr{grid-area:7/7/10/10;background:conic-gradient(from -45deg,var(--c2) 0 90deg,var(--c3) 90deg 180deg,var(--c0) 180deg 270deg,var(--c1) 270deg)}
+.yard{position:absolute;width:40%;height:40%;background:var(--sc);display:flex;align-items:center;justify-content:center}
+.yard.off{filter:grayscale(1);opacity:.35}
+.yn{position:absolute;left:0;right:0;font-weight:700;color:#fff;text-align:center;font-size:clamp(11px,3.4vw,16px);text-shadow:0 1px 2px #0006}
+.yard.top .yn{top:3%}.yard:not(.top) .yn{bottom:3%}
+.yin{position:relative;width:66.7%;height:66.7%;background:#fff;border-radius:14px}
+.spot{position:absolute;width:32%;aspect-ratio:1;border-radius:50%;background:var(--sc);transform:translate(-50%,-50%)}
+.pc{position:absolute;width:6.2%;aspect-ratio:24/32;transform:translate(-50%,-70%);transition:left .3s,top .3s;z-index:2;filter:drop-shadow(0 2px 2px #0008)}
+.pc svg{width:100%;height:100%;display:block}
+.pc.can{z-index:6;cursor:pointer;animation:pulse .8s infinite}
+@keyframes pulse{50%{transform:translate(-50%,-70%) scale(1.3)}}
+#status{min-height:1.6em;flex:1;text-align:center}
+.prov{font-size:.8rem;color:var(--mut)}
+.prov b{color:var(--ac)}
+.scrim{position:fixed;inset:0;background:#06142ccc;backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{width:min(100%,480px);background:linear-gradient(180deg,#25599f,#173f78);border-radius:26px 26px 0 0;padding:10px 20px max(22px,env(safe-area-inset-bottom));box-shadow:0 -12px 40px #0008;transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;gap:12px;text-align:center;max-height:100vh;overflow:auto}
+.scrim.open .sheet{transform:none}
+.grab{width:44px;height:5px;border-radius:3px;background:#ffffff55;margin:0 auto}
+.sheet h2{font-size:1.35rem}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{background:#ffffff1a;color:var(--tx);border:2px solid #ffffff22;border-radius:16px;padding:14px 8px;display:flex;flex-direction:column;gap:2px;align-items:center;transition:transform .15s,background .15s}
+.opt b{font-size:1.5rem;line-height:1.1}.opt small{color:var(--mut);font-weight:500}
+.opt[aria-pressed=true]{background:linear-gradient(135deg,#ffd23f,#ffae1a);color:#2a2100;border-color:#fff;transform:scale(1.03)}
+.opt[aria-pressed=true] small{color:#5a4300}
+.sum{background:#0003;border-radius:14px;padding:10px;font-weight:600}
+
+/* ===== গেমিং স্টাইল থিম ===== */
+.pc.hop{transition:none}
+body{background:radial-gradient(ellipse 80% 45% at 50% -8%,#2f7bff88,transparent 70%),radial-gradient(circle at 100% 100%,#8b3dff55,transparent 50%),radial-gradient(circle at 0 90%,#00e0ff33,transparent 45%),linear-gradient(180deg,#0b1d46,#050c22);background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(#ffffff09 1px,transparent 1px),linear-gradient(90deg,#ffffff09 1px,transparent 1px),radial-gradient(circle,#ffffff14 1.5px,transparent 2px);background-size:36px 36px,36px 36px,36px 36px;-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 85%);mask-image:radial-gradient(ellipse at center,#000 30%,transparent 85%)}
+.screen,.scrim{position:relative;z-index:1}.scrim{position:fixed;z-index:50}
+h1{background:linear-gradient(180deg,#fff,#ffd23f 55%,#ff9d00);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #0008) drop-shadow(0 0 14px #ffb30066)}
+button{background:linear-gradient(180deg,#ffe27a,#ffb300);box-shadow:0 4px 0 #a86f00,0 8px 16px #0006;transition:transform .1s,box-shadow .1s}
+button:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 #a86f00,0 3px 8px #0006}
+button.ghost{background:#ffffff14;box-shadow:none;border:1.5px solid #ffffff44;backdrop-filter:blur(4px)}
+.seg button,.opt{box-shadow:none}
+.die{box-shadow:none}.die:active{transform:none}
+input{background:#0a1a40cc;border-color:#5aa8ff77;box-shadow:inset 0 2px 8px #0008}
+.sheet{background:linear-gradient(180deg,#1b3f86,#0c2050);border-top:2px solid #6db4ff88;box-shadow:0 -12px 40px #000a,0 -2px 24px #3aa0ff55}
+.sum{background:#0008;border:1px solid #ffffff22}
+.arena{padding:10px;border-radius:22px;background:linear-gradient(160deg,#ffffff1c,#ffffff06);border:1px solid #ffffff2a;box-shadow:0 22px 50px #000b,inset 0 0 34px #5aa8ff22}
+.board{border-radius:18px;background:#fff;box-shadow:0 6px 22px #0008}
+.yard{background:var(--sc)}
+.yin{background:#fff;border-radius:5px}
+.spot{background:var(--sc);box-shadow:inset 0 0 0 3px #0000003a}
+.dp{width:40%;min-width:136px;justify-content:center;background:linear-gradient(160deg,#ffffff26,#ffffff0a);border:2px solid #7fb4ff44;backdrop-filter:blur(6px);box-shadow:0 6px 16px #0007}
+.dp.act{border-color:var(--ac);background:linear-gradient(160deg,#ffd23f33,#ffffff10);animation:glow 1.2s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 22px #ffd23faa,0 6px 16px #0007}}
+#status{flex:none;align-self:center;padding:8px 18px;border-radius:999px;background:#050c22cc;border:1px solid #ffffff2a;font-weight:600;box-shadow:inset 0 0 12px #3aa0ff33}
+.brand{border-color:#ffd23f88;background:linear-gradient(160deg,#ffffff26,#ffffff0a);box-shadow:0 0 16px #ffb30044}
+#game{min-height:calc(100vh - 28px);min-height:calc(100dvh - max(14px,env(safe-area-inset-top)) - max(14px,env(safe-area-inset-bottom)))}
+#game::before,.gspace{content:"";flex:1 1 0}
+.foot{white-space:nowrap;text-align:center;font-size:.85rem;letter-spacing:.4px;padding:4px 0}
+.av{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;width:58px;flex:none}
+.ph{width:44px;height:44px;border-radius:50%;border:3px solid #fff;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#fff;box-shadow:0 3px 8px #0007}
+.ph img,.ph svg{width:100%;height:100%;object-fit:cover;display:block}
+.nm{font-size:.7rem;font-weight:600;max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.1}
+.chip{display:none;position:absolute;right:-2px;top:28px;width:17px;height:17px;border-radius:50%;background:#0b1d46;border:1px solid #ffffff77;font-size:.62rem;line-height:15px;text-align:center;font-style:normal}
+.av.cpu .chip{display:block}
+.dp.act .ph{box-shadow:0 0 14px var(--ac)}
+.gname{font-size:1.5rem;font-weight:700;letter-spacing:2px;color:#ffd23f;text-shadow:0 2px 0 #0008,0 0 14px #ffb30088;margin-top:-8px}
+h1{font-size:clamp(1.5rem,8.2vw,2.3rem);white-space:nowrap}
+/* ===== খেলার পেজ এক পর্দায়, স্ক্রল নেই; বোর্ডের মাপ অপরিবর্তিত ===== */
+.arena{padding:0;background:none;border:0;box-shadow:none;gap:8px}
+body.ingame{overflow:hidden;height:100vh;height:100dvh;min-height:0;overscroll-behavior:none;padding:max(8px,env(safe-area-inset-top)) 14px max(8px,env(safe-area-inset-bottom))}
+body.ingame #game{height:100%;min-height:0;gap:8px}
+#game #status{padding:5px 16px;min-height:0;font-size:.92rem}
+#game .note{max-width:none;font-size:.68rem;line-height:1.25;text-align:center}
+#game .bar{width:auto;justify-content:center;gap:10px;flex-wrap:nowrap}
+#game .bar button{padding:7px 18px;font-size:.85rem;border-radius:12px}
+#game .foot{padding:0}
+@media(max-height:780px){.dp{padding:4px 8px}.ph{width:38px;height:38px;border-width:2px}.av{width:54px}.nm{font-size:.66rem}.arena{gap:5px}#game{gap:6px!important}}
+@media(max-height:640px){.dp{padding:2px 8px}.ph{width:34px;height:34px}.foot{font-size:.75rem}#game{gap:4px!important}#game #status{padding:3px 14px;font-size:.85rem}}
+#stake{grid-template-columns:repeat(3,1fr)}
+/* ===== ম্যাচ পাওয়া গেছে: দুই দিক থেকে এসে মুখোমুখি, তারপর বোর্ড খোলে ===== */
+.vs{position:fixed;inset:0;z-index:80;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;overflow:hidden;
+  background:radial-gradient(ellipse 80% 45% at 50% 0,#2f7bff88,transparent 70%),radial-gradient(circle at 100% 100%,#8b3dff66,transparent 55%),radial-gradient(circle at 0 100%,#00e0ff44,transparent 50%),linear-gradient(180deg,#0b1d46,#050c22);clip-path:circle(150% at 50% 50%)}
+.vs.on{display:flex}
+.vs.out{animation:vsout .75s cubic-bezier(.7,0,.3,1) forwards}
+@keyframes vsout{to{clip-path:circle(0 at 50% 50%)}}
+.vs::before{content:"";position:absolute;left:50%;top:50%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(#ffffff12 0 7deg,transparent 7deg 14deg);-webkit-mask-image:radial-gradient(circle,#000 8%,transparent 55%);mask-image:radial-gradient(circle,#000 8%,transparent 55%);animation:vsspin 14s linear infinite}
+@keyframes vsspin{to{transform:rotate(360deg)}}
+.vs::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,#fff,#ffd23f66 35%,transparent 62%);opacity:0;animation:vsflash .55s .8s ease-out}
+@keyframes vsflash{0%{opacity:.95}100%{opacity:0}}
+.vs>*{position:relative;z-index:1}
+.vs h2{font-size:1.5rem;background:linear-gradient(180deg,#fff,#ffd23f 60%,#ff9d00);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #0008);animation:vsfade .5s both}
+@keyframes vsfade{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+.vrow{width:min(94vw,460px);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px}
+.side{display:flex;flex-direction:column;align-items:center;gap:18px}
+.side.l .vcard{animation:vsL .7s cubic-bezier(.2,.9,.3,1.15) both}
+.side.r .vcard{animation:vsR .7s cubic-bezier(.2,.9,.3,1.15) both}
+@keyframes vsL{from{transform:translateX(-140%) rotate(-10deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes vsR{from{transform:translateX(140%) rotate(10deg);opacity:0}to{transform:none;opacity:1}}
+.vcard{display:flex;flex-direction:column;align-items:center;gap:5px;width:100%}
+.vph{width:84px;height:84px;border-radius:50%;border:4px solid var(--rc);background:var(--rc);overflow:hidden;box-shadow:0 0 26px var(--rc),0 8px 18px #0009}
+.vph svg{width:100%;height:100%;display:block}
+.vnm{font-weight:700;font-size:1rem;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 2px 4px #000a}
+.vtag{font-size:.72rem;color:var(--mut)}
+.vsmark{font-size:3rem;font-weight:900;font-style:italic;color:#ffd23f;text-shadow:0 3px 0 #a86f00,0 0 22px #ffb300cc;padding:0 6px;animation:vsslam .6s .7s cubic-bezier(.2,2,.4,1) both}
+@keyframes vsslam{from{transform:scale(4) rotate(-14deg);opacity:0}to{transform:scale(1) rotate(-6deg);opacity:1}}
+.vinfo{color:var(--mut);font-size:.9rem}
+.vbar{width:170px;height:5px;border-radius:3px;background:#ffffff22;overflow:hidden}
+.vbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd23f,#ff7a18);animation:vsfill 2.3s linear forwards}
+@keyframes vsfill{to{width:100%}}
+.sndrow{display:flex;align-items:center;justify-content:space-between;gap:10px}.sndrow .lbl{margin:0}.sndrow .seg button{padding:8px 14px}
+.back{position:absolute;bottom:0;right:0;width:34px;height:34px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#ffffff1c;color:#fff;border:1.5px solid #ffffff55;box-shadow:0 3px 8px #0006;backdrop-filter:blur(4px);z-index:5}
+.back:active{transform:scale(.92)}
+body.ingame #game{position:relative;padding-top:38px}
+#game .bar:not(:has(button:not(.hide))){display:none}
+.ghead{position:absolute;top:2px;left:0;right:0;display:flex;justify-content:center;pointer-events:none}
+#game .foot{min-height:34px;display:flex;align-items:center;justify-content:center}
+#game .foot b{margin-left:.3em}
+/* ===== গেমিং লোগো ===== */
+.logo{--lf:2rem;display:inline-flex;align-items:center;gap:.4em;font-family:Impact,"Arial Black","Haettenschweiler",system-ui,sans-serif;font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:.04em;font-size:var(--lf);line-height:1;white-space:nowrap;transform:skewX(-6deg);filter:drop-shadow(0 .08em 0 #6b3300) drop-shadow(0 0 .45em #ffb30077)}
+.logo.big{--lf:clamp(1.4rem,7.6vw,2.3rem)}.logo.sm{--lf:1.05rem}
+.lg-np{padding:.16em .55em .16em .5em;color:#1b1200;background:linear-gradient(180deg,#fff0a8,#ffc21a 55%,#ff8a00);clip-path:polygon(14% 0,100% 0,86% 100%,0 100%);box-shadow:inset 0 -.12em 0 #0003}
+.lg-txt{background:linear-gradient(110deg,transparent 38%,#ffffffcc 50%,transparent 62%) 160% 0/250% 100% no-repeat,linear-gradient(180deg,#fff 0,#e3ecff 40%,#ffd23f 54%,#ff8a00 100%);-webkit-background-clip:text;background-clip:text;color:transparent;animation:lgshine 3.2s 1s infinite linear;padding-right:.1em}
+@keyframes lgshine{to{background-position:-60% 0,0 0}}
+.lg-line{width:min(70%,240px);height:3px;border-radius:2px;background:linear-gradient(90deg,transparent,#ffd23f,#ff8a00,#ffd23f,transparent);box-shadow:0 0 10px #ffb300aa;margin:-6px 0 -4px}
+.gname{margin-top:-6px}
+.alt{background:linear-gradient(180deg,#6fd0ff,#1b8fe0);color:#fff;box-shadow:0 4px 0 #0b5a96,0 8px 16px #0006;text-shadow:0 1px 2px #0005}
+.alt:active:not(:disabled){box-shadow:0 1px 0 #0b5a96,0 3px 8px #0006}
+.code{font-size:clamp(2.2rem,12vw,3.2rem);font-weight:800;letter-spacing:.3em;padding:8px 14px 8px calc(14px + .3em);border-radius:16px;background:#0008;border:2px dashed var(--ac);color:var(--ac);user-select:all}
+#fstake{grid-template-columns:repeat(3,1fr)}.opt.wide{grid-column:1/-1}
+#rc{letter-spacing:.3em;font-size:1.3rem;font-weight:700}
+.ferr{min-height:1.3em;color:#ffb4b4;font-weight:600}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== রেফারেন্স (Aviator) স্টাইল: কালো ব্যাকগ্রাউন্ড, মাঝখানে কার্ড, উপরে হেডার, মোবাইলে ফুল ভিউ ===== */
+html,body{background:#05050a!important;background-attachment:scroll!important}
+body{display:block!important;padding:0!important;min-height:100vh;min-height:100dvh}
+body::before{display:none!important}
+#shell{position:relative;z-index:1;width:100%;max-width:574px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:linear-gradient(180deg,#14141c,#0b0b11 40%);border-left:1px solid #ffffff14;border-right:1px solid #ffffff14;box-shadow:0 0 60px #000c}
+@media(min-width:600px){body{padding:14px 0!important}#shell{min-height:calc(100dvh - 28px);border:1px solid #ffffff1f;border-radius:22px;overflow:hidden}}
+.topbar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:max(12px,env(safe-area-inset-top)) 14px 12px;background:#0d0d14;border-bottom:1px solid #ffffff12}
+.tb-l{display:flex;align-items:center;gap:10px}
+.tb-ic{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#ff2d55,#c4002a);display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 0 14px #ff2d5555}
+.tb-t{font:800 1.45rem/1 Impact,"Arial Black",system-ui,sans-serif;font-style:italic;letter-spacing:.3px;color:#ff2d55;position:relative;padding-bottom:4px}
+.tb-t::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:#ff2d55;border-radius:2px}
+.tb-t small{display:block;font:600 .6rem/1 system-ui,sans-serif;font-style:normal;letter-spacing:1.5px;color:#ffd23f;margin-top:3px}
+.tb-snd{width:38px;height:38px;padding:0;border-radius:11px;background:#1b2a22;color:#3ddc84;border:1px solid #3ddc8433;box-shadow:none;font-size:1.05rem;display:flex;align-items:center;justify-content:center}
+.tb-snd:active:not(:disabled){transform:scale(.94);box-shadow:none}
+#shell>.screen{flex:1 1 auto;max-width:none;width:100%;justify-content:center;padding:18px 14px}
+#shell>#game{justify-content:flex-start}
+.arena{width:min(100%,520px)!important}
+body.ingame{padding:0!important}
+body.ingame #shell{height:100vh;height:100dvh;min-height:0}
+@media(min-width:600px){body.ingame{padding:14px 0!important}body.ingame #shell{height:calc(100dvh - 28px)}}
+body.ingame #shell>#game{min-height:0;height:auto;flex:1 1 0;padding:38px 14px max(8px,env(safe-area-inset-bottom))}
+.sheet{background:linear-gradient(180deg,#191922,#0b0b11)!important;border-top:1px solid #ffffff22!important;box-shadow:0 -12px 40px #000c!important}
+.opt,.seg button{background:#ffffff0d}
+.vs{background:#05050a!important}
+
+/* ===== মোবাইল ডিসপ্লে ফিট: কোনো পেজ কাটবে না ===== */
+html,body{height:100%;overflow:hidden!important}
+body{padding:0!important;min-height:0!important}
+#shell{max-width:430px!important;height:100vh;height:100dvh;min-height:0!important;overflow:hidden;border-radius:0}
+@media(min-width:460px){body,body.ingame{padding:12px 0!important}#shell,body.ingame #shell{height:calc(100dvh - 24px)!important;border:1px solid #ffffff22;border-radius:22px}}
+.topbar{padding:max(10px,env(safe-area-inset-top)) 12px 10px}
+.tb-ic{width:34px;height:34px;font-size:1.1rem}.tb-t{font-size:1.25rem}.tb-snd{width:34px;height:34px}
+/* হোম/ফ্রেন্ড/লবি/ফাইন্ড: স্ক্রিনে ধরে যাবে, বেশি হলে ভেতরে স্ক্রল */
+#shell>.screen:not(#game){flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;justify-content:flex-start;padding:14px 16px;gap:12px;-webkit-overflow-scrolling:touch}
+#shell>.screen:not(#game)::before,#shell>.screen:not(#game)::after{content:"";flex:1 1 0;min-height:0}
+#shell>.screen:not(#game)>*{flex:none;max-width:100%}
+.screen h1{font-size:clamp(1.3rem,7vw,1.9rem)}
+.screen .big{width:100%;max-width:340px;padding:14px 16px;font-size:1.05rem}
+.screen input{width:100%;max-width:340px}
+/* গেম পেজ: বোর্ড স্ক্রিনের উচ্চতা ও প্রস্থ দুটোর মধ্যে ধরবে */
+body.ingame #shell>#game{flex:1 1 0;min-height:0;overflow:hidden;padding:36px 12px max(8px,env(safe-area-inset-bottom));gap:6px!important;justify-content:flex-start}
+#game .gspace{flex:1 1 0;min-height:0}
+.arena{width:min(100%,max(230px,calc(100dvh - 330px)))!important;margin:0 auto;gap:6px}
+@media(min-width:460px){.arena{width:min(100%,max(230px,calc(100dvh - 354px)))!important}}
+.dp{min-width:0!important;width:44%!important}
+.drow{gap:6px}
+/* বটম শিট ও VS স্ক্রিন */
+.sheet{max-height:100dvh!important;width:min(100%,430px)!important}
+.vrow{width:min(94vw,430px)}
+/* ছোট স্ক্রিন */
+@media(max-height:700px){#shell>.screen:not(#game){gap:8px;padding:10px 14px}.ring{width:84px;height:84px;font-size:1.8rem}.code{font-size:2rem}.screen .big{padding:11px 14px}.gname{font-size:1.2rem}.note,.sub{font-size:.82rem}}
+@media(max-width:360px){.tb-t small{display:none}.dp{width:46%!important}.nm{font-size:.62rem}}
+
+/* ===== লুডু থিম: গাঢ় নীল প্রফেশনাল ব্যাকগ্রাউন্ড (কালো নয়) + ধীরে ঘোরা চোক্কা ===== */
+html,body{background:#0d2a5e!important}
+body{background:radial-gradient(ellipse 90% 50% at 50% -5%,#3b86ff99,transparent 70%),radial-gradient(circle at 0 0,#ec1c2455,transparent 38%),radial-gradient(circle at 100% 0,#0a9a4755,transparent 38%),radial-gradient(circle at 0 100%,#1fa6fb55,transparent 40%),radial-gradient(circle at 100% 100%,#f7d20044,transparent 40%),linear-gradient(180deg,#163f86,#0b2252)!important;background-attachment:fixed!important}
+#shell{background:linear-gradient(180deg,#1d4f9f 0%,#153c80 45%,#0f2d63 100%)!important;border-color:#8cc4ff40!important;box-shadow:0 20px 60px #020a1fcc,0 0 0 1px #ffffff10 inset!important}
+.topbar{background:linear-gradient(180deg,#163b7d,#102f66)!important;border-bottom:1px solid #8cc4ff33!important;box-shadow:0 4px 14px #0a1c4a66}
+.tb-ic{background:linear-gradient(135deg,#ffe27a,#f2a900)!important;box-shadow:0 0 14px #ffb30066!important}
+.tb-t{color:#ffd23f!important;text-shadow:0 2px 0 #7a4a00,0 0 12px #ffb30066}
+.tb-t::after{background:linear-gradient(90deg,#ffd23f,#ff8a00)!important}
+.tb-t small{color:#bcd8ff!important}
+.tb-snd{background:#ffffff1c!important;color:#fff!important;border:1px solid #ffffff44!important}
+.sheet{background:linear-gradient(180deg,#25599f,#133672)!important;border-top:2px solid #8cc4ffaa!important}
+.opt,.seg button{background:#ffffff1f}
+.vs{background:radial-gradient(ellipse 80% 45% at 50% 0,#3b86ffaa,transparent 70%),radial-gradient(circle at 100% 100%,#8b3dff66,transparent 55%),radial-gradient(circle at 0 100%,#00e0ff55,transparent 50%),linear-gradient(180deg,#163f86,#0b2252)!important}
+.dp{background:linear-gradient(160deg,#ffffff30,#ffffff12)!important;border-color:#bcd8ff66!important}
+#status{background:#0b2252cc!important;border-color:#8cc4ff55!important}
+.die.roll .sc{animation-duration:1.15s!important}
+.die.roll .cube{transition:transform 1.05s cubic-bezier(.2,.65,.2,1)!important}
+@keyframes hop{0%{transform:none}25%{transform:translateY(-10px) rotate(18deg) scale(1.28)}50%{transform:translateY(0) rotate(-14deg) scale(1.28)}75%{transform:translateY(-5px) rotate(8deg) scale(1.28)}100%{transform:none}}
+
+/* ===== পুরো ব্যাকগ্রাউন্ডে আবছা লুডু বোর্ড ===== */
+.bgl{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:linear-gradient(180deg,#163f86,#0b2252)}
+.bgl-svg{position:absolute;left:50%;top:50%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;transform:rotate(-12deg);opacity:.34;filter:blur(2.5px) saturate(1.15)}
+.bgl::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 75% 60% at 50% 40%,#0d2a5e00,#0b2252aa 100%),linear-gradient(180deg,#2f7bff22,#05102e55)}
+body{background:#0b2252!important}
+#shell{background:linear-gradient(180deg,#1d4f9fd9,#153c80d1 45%,#0f2d63de)!important}
+.topbar{background:linear-gradient(180deg,#163b7dee,#102f66ee)!important}
+
+/* ===== ছবি নেই: শুধু লুডুর মতো খোপ খোপ; সবকিছু মোবাইলের সাইজের ভেতরে ===== */
+.bgl{display:none!important}
+html,body{background:#0a1f4a!important}
+body{background:#0a1f4a!important}
+#shell{background-color:#143b7e!important;background-image:linear-gradient(180deg,#2a6bd244,#0a1f4a55),linear-gradient(#ffffff1c 1px,transparent 1px),linear-gradient(90deg,#ffffff1c 1px,transparent 1px),conic-gradient(#ffffff0c 25%,transparent 0 50%,#ffffff0c 0 75%,transparent 0)!important;background-size:100% 100%,30px 30px,30px 30px,60px 60px!important}
+.topbar{background:#102f66f2!important}
+/* ম্যাচ পাওয়া গেছে (VS) ও বটম শিট: মোবাইল বক্সের ভেতরে */
+.vs,.scrim{left:50%!important;right:auto!important;width:min(100%,430px)!important;transform:translateX(-50%)}
+.vs{background-color:#143b7e!important;background-image:linear-gradient(180deg,#2a6bd255,#0a1f4a66),linear-gradient(#ffffff1c 1px,transparent 1px),linear-gradient(90deg,#ffffff1c 1px,transparent 1px)!important;background-size:100% 100%,30px 30px,30px 30px!important}
+.vs::before{display:none!important}
+.vrow{width:calc(100% - 24px)!important}
+.sheet{width:100%!important}
+@media(min-width:460px){.vs,.scrim{top:12px!important;bottom:12px!important;height:auto!important;border-radius:22px;overflow:hidden}}
+
+/* ===== ব্যালেন্স (হেডারে, সাউন্ড আইকনের পাশে) ===== */
+.tb-r{display:flex;align-items:center;gap:8px}
+.tb-bal{height:34px;display:flex;align-items:center;padding:0 12px;border-radius:999px;background:#0a3a2a;border:1px solid #3ddc8466;color:#3ddc84;font:800 .95rem/1 system-ui,sans-serif;letter-spacing:.2px;white-space:nowrap;box-shadow:inset 0 0 10px #3ddc8422}
+@media(max-width:360px){.tb-bal{padding:0 9px;font-size:.85rem}}
+
+/* খুব ছোট উচ্চতা (ফোন আড়াআড়ি) হলে গেম পেজ ভেতরে স্ক্রল করবে, কিছু কাটা পড়বে না */
+body.ingame #shell>#game{overflow-y:auto!important;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+@media(max-height:520px){.arena{width:min(100%,260px)!important}.vs h2{font-size:1.2rem}.vph{width:60px;height:60px}.vsmark{font-size:2.2rem}.vs{gap:8px}}
+
+/* ম্যাচ বেছে নিন শিটে সাউন্ডের অংশ দেখাবে না (হেডারের সাউন্ড বাটন আগের মতোই কাজ করবে) */
+.sndrow{display:none!important}
+
+/* ===== ভিডিওর মতো ব্যাকগ্রাউন্ড: নীল রঙে হেলানো ব্লকের নকশা ===== */
+#shell,.vs{background-color:#1648a0!important;background-image:url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22120%22%20height=%22120%22%20viewBox=%220%200%20120%20120%22%3E%3Cg%20transform=%22rotate%28-28%2060%2060%29%22%20fill=%22none%22%20stroke=%22%239fd0ff%22%20stroke-opacity=%22.20%22%20stroke-width=%222%22%3E%3Crect%20x=%2214%22%20y=%2214%22%20width=%2240%22%20height=%2240%22%20rx=%229%22%20fill=%22%23ffffff%22%20fill-opacity=%22.05%22/%3E%3Crect%20x=%2266%22%20y=%2214%22%20width=%2240%22%20height=%2240%22%20rx=%229%22%20fill=%22%23000000%22%20fill-opacity=%22.07%22/%3E%3Crect%20x=%2214%22%20y=%2266%22%20width=%2240%22%20height=%2240%22%20rx=%229%22%20fill=%22%23000000%22%20fill-opacity=%22.07%22/%3E%3Crect%20x=%2266%22%20y=%2266%22%20width=%2240%22%20height=%2240%22%20rx=%229%22%20fill=%22%23ffffff%22%20fill-opacity=%22.05%22/%3E%3Crect%20x=%2224%22%20y=%2224%22%20width=%2220%22%20height=%2220%22%20rx=%225%22%20stroke-opacity=%22.14%22/%3E%3Crect%20x=%2276%22%20y=%2276%22%20width=%2220%22%20height=%2220%22%20rx=%225%22%20stroke-opacity=%22.14%22/%3E%3C/g%3E%3C/svg%3E"),radial-gradient(ellipse 85% 70% at 50% 45%,#2d78e0 0%,#1a52ae 50%,#0b275f 100%)!important;background-size:120px 120px,100% 100%!important;background-repeat:repeat,no-repeat!important}
+#shell::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:linear-gradient(180deg,#04122e66 0,transparent 22%,transparent 78%,#04122e77 100%)}
+#shell>*{position:relative;z-index:1}
+
+/* ===== চোক্কা ও নিচের বার: ভিডিওর মতো (You [চোক্কা] Com) ===== */
+.drow{display:none!important}
+.arena{width:min(100%,max(230px,calc(100dvh - 300px)))!important}
+@media(min-width:460px){.arena{width:min(100%,max(230px,calc(100dvh - 324px)))!important}}
+@media(max-height:520px){.arena{width:min(100%,230px)!important}}
+.dbar{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:8px 8px;margin-top:6px;border-radius:14px;background:linear-gradient(180deg,#2557c4,#12318a);border:3px solid #f5c542;box-shadow:0 0 0 2px #a8740a,0 8px 18px #0009,inset 0 0 12px #0006}
+.dside{display:flex;align-items:center;gap:6px;min-width:0;height:50px;padding:0 8px;border-radius:10px;background:#0d2a7a;box-shadow:inset 0 2px 8px #0008}
+.dside.r{flex-direction:row-reverse}
+.dside .av{flex-direction:row;width:auto;gap:6px;align-items:center}
+.dside .ph{width:36px;height:36px;border-width:2px}
+.dside .nm{max-width:62px;font:italic 800 1.02rem/1 system-ui,sans-serif;color:#ffc933;text-shadow:0 2px 0 #5a3a00;overflow:hidden;text-overflow:ellipsis}
+.dside .chip{top:18px;right:-4px}
+.dbar.four .dside .nm{display:none}
+.dbar.four .dside.r{gap:2px;padding:0 4px}.dbar.four .dside.r .ph{width:28px;height:28px}
+.av.act .ph{box-shadow:0 0 14px #ffd23f,0 0 0 2px #ffd23f}
+.dslot{position:relative;z-index:5;width:72px;height:72px;margin:-12px 0;border-radius:11px;background:linear-gradient(180deg,#f7d6dc,#dca3b0);border:3px solid #f5c542;box-shadow:0 0 0 2px #a8740a,inset 0 0 10px #0005;display:flex;align-items:center;justify-content:center}
+.dslot .die{position:absolute;left:50%;top:50%;margin:-25px 0 0 -25px}
+.die:not(.cur){display:none}
+.die.ready{animation:readyd 1s infinite}
+@keyframes readyd{50%{transform:scale(1.14)}}
+.die .face{background:var(--dc);background-image:linear-gradient(150deg,#ffffff66,#ffffff00 50%,#00000038);box-shadow:inset 0 0 0 2px #0003,inset 0 -3px 0 #0003;padding:8px}
+.die .f2{filter:brightness(1.06)}.die .f3,.die .f4{filter:brightness(.9)}.die .f5{filter:brightness(.8)}.die .f6{filter:brightness(.95)}
+.die .pp.on{background:#fff;box-shadow:0 0 0 1.5px #0004,inset 0 -1px 0 #0003}
+.die.roll{z-index:30}
+@keyframes hop{0%{transform:none}12%{transform:translateY(-34px) rotate(-14deg) scale(1.85)}30%{transform:translateY(-26px) rotate(12deg) scale(1.8)}50%{transform:translateY(-34px) rotate(-8deg) scale(1.85)}72%{transform:translateY(-24px) rotate(6deg) scale(1.8)}88%{transform:translateY(-8px) scale(1.3)}100%{transform:none}}
+.dside.r .av{flex-direction:row-reverse}.dside.r{justify-content:flex-start}.dside.r .chip{right:auto;left:-2px}
+.dside.r .chip{left:auto!important;right:-5px!important;top:22px!important;width:15px;height:15px;line-height:13px;font-size:.55rem}
+.dside .nm{max-width:58px}
+
+/* ===== গুটির মাথা কাটবে না + চোক্কার বার আরও নিচে ===== */
+.board{overflow:visible!important;margin-top:16px}
+.dbar{margin-top:34px!important}
+.arena{width:min(100%,max(230px,calc(100dvh - 350px)))!important}
+@media(min-width:460px){.arena{width:min(100%,max(230px,calc(100dvh - 374px)))!important}}
+@media(max-height:520px){.arena{width:min(100%,230px)!important}}
+
+/* ===== লেখা চোক্কার উপরে, বার একদম নিচে, বোর্ড আরও বড় ===== */
+body.ingame #shell>#game{padding:30px 6px max(8px,env(safe-area-inset-bottom))!important}
+#game .gspace{flex:0 0 0!important}
+.arena{flex:1 0 auto!important;display:flex;flex-direction:column;width:min(100%,max(230px,calc(100dvh - 290px)))!important;gap:0!important}
+@media(min-width:460px){.arena{width:min(100%,max(230px,calc(100dvh - 314px)))!important}}
+@media(max-height:520px){.arena{width:min(100%,230px)!important}}
+.arena #status{margin:auto auto 10px!important;flex:none}
+.dbar{margin:0 0 4px!important}
+/* নিজের পালায় চোক্কা জুম/স্পন্দন হবে না */
+.die.ready,.die.ready .sc{animation:none!important}
+
+/* ===== প্রফেশনাল কালার থিম: শুধু রঙ বদলানো হয়েছে (হালকা স্লেট-নীল + সংযত গোল্ড) ===== */
+:root{--bg:#2b4670;--card:#35527f;--mut:#b9c8e0;--ac:#e6c36a}
+html,body{background:#1f3152!important}
+#shell,.vs{background-color:#2b4670!important;background-image:url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22120%22%20height=%22120%22%20viewBox=%220%200%20120%20120%22%3E%3Cg%20transform=%22rotate%28-28%2060%2060%29%22%20fill=%22none%22%20stroke=%22%239fd0ff%22%20stroke-opacity=%22.20%22%20stroke-width=%222%22%3E%3Crect%20x=%2214%22%20y=%2214%22%20width=%2240%22%20height=%2240%22%20rx=%229%22%20fill=%22%23ffffff%22%20fill-opacity=%22.05%22/%3E%3Crect%20x=%2266%22%20y=%2214%22%20width=%2240%22%20height=%2240%22%20rx=%229%22%20fill=%22%23000000%22%20fill-opacity=%22.07%22/%3E%3Crect%20x=%2214%22%20y=%2266%22%20width=%2240%22%20height=%2240%22%20rx=%229%22%20fill=%22%23000000%22%20fill-opacity=%22.07%22/%3E%3Crect%20x=%2266%22%20y=%2266%22%20width=%2240%22%20height=%2240%22%20rx=%229%22%20fill=%22%23ffffff%22%20fill-opacity=%22.05%22/%3E%3Crect%20x=%2224%22%20y=%2224%22%20width=%2220%22%20height=%2220%22%20rx=%225%22%20stroke-opacity=%22.14%22/%3E%3Crect%20x=%2276%22%20y=%2276%22%20width=%2220%22%20height=%2220%22%20rx=%225%22%20stroke-opacity=%22.14%22/%3E%3C/g%3E%3C/svg%3E"),radial-gradient(ellipse 85% 70% at 50% 40%,#3f5f90 0%,#2f4c7a 55%,#233a62 100%)!important}
+.vs{background-image:linear-gradient(180deg,#3f5f9066,#1f315266),linear-gradient(#ffffff14 1px,transparent 1px),linear-gradient(90deg,#ffffff14 1px,transparent 1px)!important}
+#shell{border-color:#a9c1e640!important;box-shadow:0 20px 60px #0c1628b3,0 0 0 1px #ffffff10 inset!important}
+#shell::after{background:linear-gradient(180deg,#14203a44 0,transparent 22%,transparent 78%,#14203a55 100%)!important}
+.topbar{background:#243c63f2!important;border-bottom:1px solid #a9c1e633!important;box-shadow:0 4px 14px #0f1b3355!important}
+.tb-ic{background:linear-gradient(135deg,#f0d88c,#d4a73f)!important;box-shadow:0 0 10px #d4a73f44!important}
+.tb-t{color:#e6c36a!important;text-shadow:0 2px 0 #3a2a08aa!important}
+.tb-t::after{background:linear-gradient(90deg,#e6c36a,#c99a2e)!important}
+.tb-t small{color:#c3d2ea!important}
+.tb-snd{background:#ffffff1c!important;color:#fff!important;border:1px solid #ffffff44!important}
+.tb-bal{background:#1f4a3f!important;border-color:#5fcf9a66!important;color:#6fdca6!important;box-shadow:none!important}
+h1,.lg-txt{background-image:linear-gradient(180deg,#fff,#f0d88c 60%,#d4a73f)!important}
+.lg-txt{background-image:linear-gradient(110deg,transparent 38%,#ffffffcc 50%,transparent 62%),linear-gradient(180deg,#fff 0,#e3ecff 40%,#f0d88c 54%,#d4a73f 100%)!important}
+h1{filter:drop-shadow(0 2px 0 #14203a88)!important}
+.logo{filter:drop-shadow(0 .08em 0 #5a4210) drop-shadow(0 0 .35em #d4a73f44)!important}
+.lg-np{background:linear-gradient(180deg,#f6e5ae,#e0b74d 55%,#c99a2e)!important}
+.lg-line{background:linear-gradient(90deg,transparent,#e6c36a,#c99a2e,#e6c36a,transparent)!important;box-shadow:0 0 8px #d4a73f66!important}
+.gname{color:#e6c36a!important;text-shadow:0 2px 0 #14203a88!important}
+button{background:linear-gradient(180deg,#f2dc94,#d9aa3c)!important;box-shadow:0 3px 0 #94701c,0 6px 12px #14203a66!important;color:#2a2100}
+button:active:not(:disabled){box-shadow:0 1px 0 #94701c,0 2px 6px #14203a66!important}
+button.ghost,.tb-snd,.back{background:#ffffff1a!important;box-shadow:none!important}
+.alt{background:linear-gradient(180deg,#7fb2e0,#4f8bc2)!important;box-shadow:0 3px 0 #2f5f8c,0 6px 12px #14203a66!important;color:#fff!important}
+.alt:active:not(:disabled){box-shadow:0 1px 0 #2f5f8c,0 2px 6px #14203a66!important}
+input{background:#1b2d4ecc!important;border-color:#8fb0dd66!important;box-shadow:inset 0 2px 6px #0c162877!important}
+.code{border-color:#e6c36a!important;color:#e6c36a!important;background:#1b2d4e99!important}
+.sheet{background:linear-gradient(180deg,#3d5c8e,#29436e)!important;border-top:2px solid #a9c1e6aa!important;box-shadow:0 -12px 40px #0c162888!important}
+.scrim{background:#101c33cc!important}
+.opt{background:#ffffff1c!important;border-color:#ffffff2e!important}
+.opt[aria-pressed=true]{background:linear-gradient(135deg,#f2dc94,#d9aa3c)!important;color:#2a2100!important;border-color:#fff!important}
+.seg button[aria-pressed=true]{border-color:var(--ac)!important;background:#4b6ca0!important}
+.sum{background:#14203a66!important}
+.dp{background:linear-gradient(160deg,#ffffff2b,#ffffff12)!important;border-color:#c3d2ea55!important}
+.dp.act{border-color:var(--ac)!important;background:linear-gradient(160deg,#e6c36a30,#ffffff10)!important}
+@keyframes glow{50%{box-shadow:0 0 16px #e6c36a88,0 6px 16px #14203a66}}
+#status{background:#1b2d4ecc!important;border-color:#a9c1e644!important;box-shadow:none!important}
+.arena{border-color:#ffffff26!important;box-shadow:0 18px 40px #0c162888,inset 0 0 28px #a9c1e61a!important}
+.brand{border-color:#e6c36a77!important;box-shadow:0 0 10px #d4a73f33!important}
+.brand i{background:linear-gradient(135deg,#f0d88c,#d4a73f)!important}
+.chip{background:#1b2d4e!important}
+.dbar{background:linear-gradient(180deg,#3d5c8e,#2a446f)!important;border-color:#d9b45a!important;box-shadow:0 0 0 2px #8a6a1c,0 6px 14px #14203a88,inset 0 0 10px #14203a55!important}
+.dside{background:#22385f!important;box-shadow:inset 0 2px 6px #0c162877!important}
+.dside .nm{color:#e6c36a!important;text-shadow:0 2px 0 #3a2a08!important}
+.dslot{background:linear-gradient(180deg,#eef1f6,#c5cedb)!important;border-color:#d9b45a!important;box-shadow:0 0 0 2px #8a6a1c,inset 0 0 8px #14203a44!important}
+.av.act .ph{box-shadow:0 0 10px #e6c36a,0 0 0 2px #e6c36a!important}
+.vsmark{color:#e6c36a!important;text-shadow:0 3px 0 #7a5a14,0 0 16px #d4a73f99!important}
+.vs h2{background-image:linear-gradient(180deg,#fff,#f0d88c 60%,#d4a73f)!important}
+.vbar i{background:linear-gradient(90deg,#e6c36a,#c99a2e)!important}
+.vs::after{background:radial-gradient(circle at 50% 50%,#fff,#e6c36a55 35%,transparent 62%)!important}
+
+/* ===== না চালালে কাউন্টডাউন: ছবি+নামের বক্সে লাল বর্ডার ===== */
+.dside{position:relative}
+.idlering{position:absolute;inset:0;pointer-events:none;z-index:3}
+.idlering svg{position:absolute;left:0;top:0;overflow:visible}
+.idlering .trk{fill:none;stroke:#ff3b3b33;stroke-width:3}
+.idlering .fil{fill:none;stroke:#ff3b3b;stroke-width:3;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;filter:drop-shadow(0 0 3px #ff3b3bbb)}
+/* ===== নাম: কাটবে না, বাঁকা হবে না, সোজা ও পুরো দেখাবে ===== */
+.dbar .dside .nm{font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif!important;font-style:normal!important;font-weight:700;line-height:1.5;max-width:none!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap}
+.dbar:not(.four) .dside .av{flex:1 1 0;min-width:0}
+.dbar:not(.four) .dside .nm{flex:1 1 0;min-width:0}
+.dside.l .nm{text-align:left}.dside.r .nm{text-align:right}
+.dside .ph{flex:none}
+/* ===== বার্তা (toast) ===== */
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#1b2d4ef2;color:#fff;border:1px solid #e6c36a88;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;z-index:99;max-width:86%;text-align:center;box-shadow:0 6px 18px #0008;font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif}
+</style>
+</head>
+<body>
+<div id="shell">
+<div class="topbar">
+  <div class="tb-l"><div class="tb-ic">🎲</div><div class="tb-t">LUDO<small>MOSTWIN88</small></div></div>
+  <div class="tb-r"><div class="tb-bal" id="tbBal" aria-label="ব্যালেন্স">৳0.00</div><button class="tb-snd" id="tbSnd" aria-label="সাউন্ড">🔊</button></div>
+</div>
+
+<div class="screen" id="home">
+  <p class="gname">LODU TRUNAMENT</p>
+  <p class="sub">লাইভ অনলাইন প্লেয়ার</p>
+  <input id="nm" maxlength="14" placeholder="আপনার নাম" aria-label="আপনার নাম">
+  <button class="big" id="play">লাইভ অনলাইন প্লেয়ার</button>
+  <button class="big alt" id="frd">বন্ধুর সাথে খেলুন</button>
+  <p class="prov">provided by <b>MostWin88</b></p>
+  <details><summary>খেলার নিয়ম</summary>
+    <p>৬ উঠলে ঘর থেকে গুটি বের হয় এবং আবার চাল পাবেন। প্রতিপক্ষের গুটিতে উঠলে সেটা ঘরে ফিরে যায় (★ ঘরে কাটা যায় না)। পরপর তিনটি ৬ উঠলে পালা চলে যায়। আগে চার গুটি মাঝখানে পৌঁছালে জয়। ২০ সেকেন্ড কিছু না করলে স্বয়ংক্রিয় চাল হবে।</p>
+  </details>
+</div>
+
+<div class="screen hide" id="friend">
+  <h1>বন্ধুর সাথে খেলুন</h1>
+  <p class="sub">রুম বানিয়ে কোড পাঠান, অথবা বন্ধুর কোড দিয়ে যোগ দিন</p>
+  <button class="big" id="mk">নতুন রুম তৈরি করুন</button>
+  <p class="lbl">অথবা বন্ধুর রুম কোড দিন</p>
+  <input id="rc" inputmode="numeric" maxlength="5" placeholder="৫ সংখ্যার কোড" aria-label="রুম কোড" autocomplete="off">
+  <button class="big alt" id="jn">রুমে যোগ দিন</button>
+  <p class="ferr" id="ferr" aria-live="polite"></p>
+    <button class="ghost" id="fback">ফিরে যান</button>
+  <p class="prov">provided by <b>MostWin88</b></p>
+</div>
+
+<div class="screen hide" id="lobby">
+  <h1>আপনার রুম কোড</h1>
+  <div class="code" id="lcode">-----</div>
+  <div class="sum" id="lstake"></div>
+  <p class="sub">কোডটি বন্ধুকে পাঠান। বন্ধু কোড দিলেই দুজন একসাথে খেলা শুরু হবে।</p>
+  <div class="seg"><button id="cpy">কপি করুন</button><button id="shr">শেয়ার করুন</button></div>
+  <div class="ring"><span>👥</span></div>
+  <p class="note" id="lst">বন্ধুর জন্য অপেক্ষা করা হচ্ছে...</p>
+  <button class="ghost" id="lcancel">রুম বাতিল করুন</button>
+  <p class="prov">provided by <b>MostWin88</b></p>
+</div>
+
+<div class="screen hide" id="find">
+  <h1>প্লেয়ার খোঁজা হচ্ছে</h1>
+  <p class="sub" id="fi"></p>
+  <div class="ring"><span id="cd">0</span></div>
+  <p class="note">একই বাজির আরেকজন প্লেয়ার পেলেই ম্যাচ শুরু হবে। ম্যাচ শুরুর সময় আপনার ওয়ালেট থেকে বাজি কাটা হবে। প্লেয়ার না পাওয়া পর্যন্ত কোনো টাকা কাটা হয় না।</p>
+  <button id="skip">অপেক্ষা না করে কম্পিউটারের সাথে খেলুন (ফ্রি প্র্যাকটিস)</button>
+  <button class="ghost" id="cancel">বাতিল করুন</button>
+  <p class="prov">provided by <b>MostWin88</b></p>
+</div>
+
+<div class="screen hide" id="game">
+  <button class="back" id="leave" aria-label="বের হন" title="বের হন"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <div class="arena">
+    <div class="drow"><div class="dp" data-s="1"></div><div class="dp" data-s="2"></div></div>
+    <div class="board" id="board"></div>
+    <div class="drow"><div class="dp" data-s="0"></div><div class="dp" data-s="3"></div></div>
+  </div>
+  <p id="status" aria-live="polite"></p>
+  <div class="bar">
+    <button class="hide" id="again">আবার খেলুন</button>
+  </div>
+  <div class="gspace"></div>
+  <p class="prov foot">provided by <b>MostWin88</b></p>
+</div>
+
+</div>
+
+<div class="scrim" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t">
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2 id="sh-t">ম্যাচ বেছে নিন</h2>
+    <div class="lbl">কতজনের ম্যাচ</div>
+    <div class="opts" id="mode">
+      <button class="opt" data-v="2"><b>২ জন</b><small>এক বনাম এক</small></button>
+      <button class="opt" data-v="4" disabled style="opacity:.45"><b>৪ জন</b><small>শীঘ্রই আসছে</small></button>
+    </div>
+    <div class="lbl">বাজির পরিমাণ</div>
+    <div class="opts" id="stake">
+      <button class="opt" data-v="50"><b>৳50</b></button>
+      <button class="opt" data-v="100"><b>৳100</b></button>
+      <button class="opt" data-v="250"><b>৳250</b></button>
+      <button class="opt" data-v="500"><b>৳500</b></button>
+      <button class="opt" data-v="750"><b>৳750</b></button>
+      <button class="opt" data-v="1000"><b>৳1000</b></button>
+    </div>
+    <div class="sndrow"><span class="lbl">সাউন্ড</span><div class="seg" id="sndopts"><button data-v="1">🔊 চালু</button><button data-v="0">🔇 বন্ধ</button></div></div>
+    <div class="sum" id="sum"></div>
+    <button class="big" id="go">ম্যাচ শুরু করুন</button>
+    <button class="ghost" id="shx">বাতিল</button>
+    <p class="note">ম্যাচ শুরুর সময় আপনার মেইন ওয়ালেট থেকে বাজি কাটা হবে। বিজয়ী পাবে মোট বাজির ৯০%। প্লেয়ার না পেলে কোনো টাকা কাটা হবে না।</p>
+    <p class="prov">provided by <b>MostWin88</b></p>
+  </div>
+</div>
+
+<div class="scrim" id="fsheet" role="dialog" aria-modal="true" aria-labelledby="fs-t">
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2 id="fs-t">রুমের বাজি বেছে নিন</h2>
+    <div class="opts" id="fstake">
+      <button class="opt" data-v="50"><b>৳50</b></button>
+      <button class="opt" data-v="100"><b>৳100</b></button>
+      <button class="opt" data-v="250"><b>৳250</b></button>
+      <button class="opt" data-v="500"><b>৳500</b></button>
+      <button class="opt" data-v="750"><b>৳750</b></button>
+      <button class="opt" data-v="1000"><b>৳1000</b></button>
+    </div>
+    <div class="sum" id="fsum"></div>
+    <button class="big" id="fgo">রুম তৈরি করুন</button>
+    <button class="ghost" id="fx">বাতিল</button>
+    <p class="note">বন্ধু যোগ দেওয়ার আগে বাজির পরিমাণ দেখে নিতে পারবে। বিজয়ী পাবে মোট বাজির ৯০%।</p>
+  </div>
+</div>
+
+<div class="scrim" id="jsheet" role="dialog" aria-modal="true" aria-labelledby="js-t">
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2 id="js-t">এই রুমে বাজি আছে</h2>
+    <div class="sum" id="jsum"></div>
+    <button class="big" id="jgo">বাজি ধরে যোগ দিন</button>
+    <button class="ghost" id="jx">বাতিল</button>
+  </div>
+</div>
+
+<div class="vs" id="vs" aria-hidden="true">
+  <h2>ম্যাচ পাওয়া গেছে!</h2>
+  <div class="vrow"><div class="side l" id="vsL"></div><div class="vsmark">VS</div><div class="side r" id="vsR"></div></div>
+  <p class="vinfo" id="vsInfo"></p>
+  <div class="vbar"><i></i></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const Q=new URLSearchParams(location.search);
+const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
+const MYNAME=()=>(($('#nm').value||'').trim()||'প্লেয়ার').slice(0,14);
+$('#nm').value=Q.get('name')||ls('ludo-name')||'';
+let MODE=2,STAKE=[50,100,250,500,750,1000].includes(+ls('ludo-stake'))?+ls('ludo-stake'):500;
+let muted=ls('ludo-mute')==='1';const AC=window.AudioContext||window.webkitAudioContext;let ac;
+function beep(f,d=.08,ty='sine'){if(muted||!AC)return;try{ac=ac||new AC();const o=ac.createOscillator(),g=ac.createGain();o.type=ty;o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function getAC(){if(muted||!AC)return null;try{ac=ac||new AC();if(ac.state==='suspended')ac.resume();return ac}catch(e){return null}}
+/* সুর: f0 থেকে f1 ফ্রিকোয়েন্সিতে নামে/ওঠে */
+function tone(f0,f1,d,ty='sine',g=.12,delay=0){const a=getAC();if(!a)return;try{const t=a.currentTime+delay,o=a.createOscillator(),v=a.createGain();o.type=ty;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+d);v.gain.setValueAtTime(0.0001,t);v.gain.exponentialRampToValueAtTime(g,t+.006);v.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(v);v.connect(a.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
+/* শব্দ (নয়েজ) ঝাপটা: ডাইসের খটখট */
+function noise(d,g=.2,lo=500,hi=5000,delay=0){const a=getAC();if(!a)return;try{const t=a.currentTime+delay,n=Math.max(1,a.sampleRate*d|0),b=a.createBuffer(1,n,a.sampleRate),c=b.getChannelData(0);for(let i=0;i<n;i++)c[i]=Math.random()*2-1;const s=a.createBufferSource();s.buffer=b;const h=a.createBiquadFilter();h.type='highpass';h.frequency.value=lo;const l=a.createBiquadFilter();l.type='lowpass';l.frequency.value=hi;const v=a.createGain();v.gain.setValueAtTime(g,t);v.gain.exponentialRampToValueAtTime(.0001,t+d);s.connect(h);h.connect(l);l.connect(v);v.connect(a.destination);s.start(t)}catch(e){}}
+function rattle(){if(muted)return;const T=[0,.07,.15,.26,.38,.5,.62,.74,.86,.95];T.forEach((t,k)=>{noise(.07+(k>6?.03:0),.22-k*.012,700+Math.random()*500,5200,t);tone(260+Math.random()*180,110,.05,'square',.04,t)});noise(.22,.3,300,3200,1.02);tone(170,70,.18,'triangle',.18,1.02)}
+function stepSnd(k){tone(1150+k*25,420,.07,'sine',.16);noise(.03,.06,1500,5000)}
+function landSnd(){tone(700,420,.12,'sine',.14);tone(1400,900,.08,'triangle',.05)}
+function capSnd(){noise(.45,.22,200,2600);tone(620,130,.55,'sawtooth',.1);tone(310,90,.55,'square',.05)}
+function winSnd(){[523,659,784,1047].forEach((f,k)=>{tone(f,f,.28,'triangle',.14,k*.16)})}
+function report(result,x){try{if(window.parent!==window)parent.postMessage(Object.assign({type:'ludo-result',result,mode:MODE,uid:Q.get('uid')},x||{}),'*')}catch(e){}}
+function emit(type,x){try{if(window.parent!==window)parent.postMessage(Object.assign({type,mode:2,uid:Q.get('uid')},x||{}),'*')}catch(e){}}
+
+/* বোর্ডের জ্যামিতি: ৯০° ঘুরিয়ে নীল নিচে-বামে, লাল উপরে-বামে, সবুজ উপরে-ডানে, হলুদ নিচে-ডানে */
+const R=([r,c])=>[14-c,r],RC=([y,x])=>[15-x,y];
+const PATH=[[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]].map(R);
+const OFF=[0,13,26,39];
+const HOME=[[[7,1],[7,2],[7,3],[7,4],[7,5]],[[1,7],[2,7],[3,7],[4,7],[5,7]],[[7,13],[7,12],[7,11],[7,10],[7,9]],[[13,7],[12,7],[11,7],[10,7],[9,7]]].map(a=>a.map(R));
+const BASE=[[[2,2],[2,4],[4,2],[4,4]],[[2,11],[2,13],[4,11],[4,13]],[[11,11],[11,13],[13,11],[13,13]],[[11,2],[11,4],[13,2],[13,4]]].map(a=>a.map(RC));
+const FIN=[[7.5,6.9],[6.9,7.5],[7.5,8.1],[8.1,7.5]].map(RC);
+const SAFE=new Set([0,8,13,21,26,34,39,47]);
+const YPOS=[[0,60],[0,0],[60,0],[60,60]];
+const PIN='<svg viewBox="0 0 24 32"><path d="M12 1C5.9 1 1 5.9 1 12c0 8 11 19 11 19s11-11 11-19C23 5.9 18.1 1 12 1z" fill="#eef1f5" stroke="#5b616b" stroke-width="1.3"/><path d="M12 1c6.1 0 11 4.9 11 11 0 8-11 19-11 19z" fill="#b9c0ca" opacity=".55"/><circle cx="12" cy="12" r="6.2" fill="currentColor" stroke="#0007" stroke-width="1.2"/><circle cx="10.2" cy="9.8" r="2" fill="#fff" opacity=".5"/></svg>';
+const PIPS=[[],[4],[0,8],[0,4,8],[0,2,6,8],[0,2,4,6,8],[0,2,3,5,6,8]];
+
+/* ---------- বোর্ড তৈরি ---------- */
+const B=$('#board'),E=[[],[],[],[]],YD=[],DP=[],DIE=[];
+const col={};
+HOME.forEach((a,s)=>a.forEach(([r,c])=>col[r+','+c]=s));
+OFF.forEach((o,s)=>col[PATH[o].join()]=s);
+const stars=new Set([8,21,34,47].map(i=>PATH[i].join()));
+const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.2 6.8.8-5 4.7 1.3 6.7L12 17.6 6 20.9l1.3-6.7-5-4.7 6.8-.8z" fill="#fff" stroke="#8a9099" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+const ARW={'7,0':[1,0],'0,7':[2,90],'7,14':[3,180],'14,7':[0,270]};
+for(let r=0;r<15;r++)for(let c=0;c<15;c++){
+  if(r>=6&&r<=8&&c>=6&&c<=8)continue;
+  if((r<6||r>8)&&(c<6||c>8))continue;
+  const d=document.createElement('div');d.className='c';d.style.gridArea=(r+1)+'/'+(c+1);
+  const k=col[r+','+c];if(k!==undefined){d.style.background='var(--c'+k+')';d.classList.add('k')}
+  if(c===14)d.style.borderRightWidth='0';if(r===14)d.style.borderBottomWidth='0';
+  if(stars.has(r+','+c))d.innerHTML=STAR;
+  const a=ARW[r+','+c];if(a)d.innerHTML='<svg viewBox="0 0 24 24" style="transform:rotate('+a[1]+'deg)"><path d="M2 12h18M14 5l7 7-7 7" fill="none" style="stroke:var(--c'+a[0]+')" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  B.appendChild(d);
+}
+const ctr=document.createElement('div');ctr.className='ctr';B.appendChild(ctr);
+for(let s=0;s<4;s++){
+  const y=document.createElement('div');y.className='yard'+(s===1||s===2?' top':'');
+  y.style.left=YPOS[s][0]+'%';y.style.top=YPOS[s][1]+'%';y.style.borderRadius=['0 0 0 18px','18px 0 0 0','0 18px 0 0','0 0 18px 0'][s];y.style.setProperty('--sc','var(--y'+s+')');
+  y.innerHTML='<div class="yn"></div><div class="yin"></div>';
+  const yin=y.querySelector('.yin');
+  for(let k=0;k<4;k++){const sp=document.createElement('div');sp.className='spot';sp.style.left=(k%2?75:25)+'%';sp.style.top=(k<2?25:75)+'%';yin.appendChild(sp)}
+  B.appendChild(y);YD[s]=y;
+}
+for(let s=0;s<4;s++)for(let i=0;i<4;i++){
+  const e=document.createElement('div');e.className='pc';e.innerHTML=PIN;e.style.color='var(--c'+s+')';
+  if(s===0)e.onclick=()=>{if(e.classList.contains('can'))userMove(i)};
+  B.appendChild(e);E[s][i]=e;
+}
+$$('.dp').forEach(el=>{
+  const s=+el.dataset.s;DP[s]=el;
+  const av=document.createElement('div');av.className='av';av.innerHTML='<div class="ph"></div><span class="nm"></span><i class="chip" title="Computer">🤖</i>';DP[s]._av=av;
+  const d=document.createElement('button');d.className='die';d.setAttribute('aria-label',s===0?'ডাইস ঘোরান':'ডাইস');
+  const sc=document.createElement('div');sc.className='sc';const cu=document.createElement('div');cu.className='cube';
+  for(let f=1;f<=6;f++){const fe=document.createElement('div');fe.className='face f'+f;
+    for(let i=0;i<9;i++){const x=document.createElement('span');x.className='pp'+(PIPS[f].includes(i)?' on':'');fe.appendChild(x)}
+    cu.appendChild(fe)}
+  sc.appendChild(cu);d.appendChild(sc);d._cu=cu;d._x=0;d._y=0;
+  if(s!==0){d.style.pointerEvents='none';d.tabIndex=-1}
+  if(s>=2)el.append(d,av);else el.append(av,d);
+  DIE[s]=d;
+});
+(()=>{const ar=document.querySelector('.arena');const bar=document.createElement('div');bar.className='dbar';
+const L=document.createElement('div'),Sl=document.createElement('div'),R=document.createElement('div');L.className='dside l';Sl.className='dslot';R.className='dside r';
+L.appendChild(DP[0]._av);[1,2,3].forEach(s=>R.appendChild(DP[s]._av));
+for(let s=0;s<4;s++){DIE[s].style.setProperty('--dc','var(--c'+s+')');Sl.appendChild(DIE[s])}
+bar.append(L,Sl,R);ar.appendChild(document.getElementById('status'));ar.appendChild(bar);window._dbar=bar})();
+const FACE={1:[0,0],2:[-90,0],3:[0,-90],4:[0,90],5:[90,0],6:[0,180]};
+const setFace=(el,v,spin)=>{if(el._rolling&&!spin)return;const t=FACE[v||1];
+  const f=(c,tg,k)=>Math.ceil((c+k-tg)/360)*360+tg;
+  el._x=spin?f(el._x,t[0],1440):f(el._x,t[0],0);el._y=spin?f(el._y,t[1],1800):f(el._y,t[1],0);
+  el._cu.style.transform='rotateX('+el._x+'deg) rotateY('+el._y+'deg)'};
+
+/* ---------- খেলার নিয়ম ---------- */
+let S,idle;
+const abs=(s,r)=>(r+OFF[s])%52;
+const nextSeat=s=>{const a=S.seats;return a[(a.indexOf(s)+1)%a.length]};
+const foes=s=>S.seats.filter(x=>x!==s);
+function pos(s,i){return posAt(s,i,S.pc[s][i])}
+function posAt(s,i,r){
+  if(r<0)return BASE[s][i];
+  if(r<=50){const a=PATH[abs(s,r)];return[a[0]+.5,a[1]+.5]}
+  if(r<=55){const a=HOME[s][r-51];return[a[0]+.5,a[1]+.5]}
+  return FIN[s]}
+const legal=(s,v)=>[0,1,2,3].filter(i=>{const r=S.pc[s][i];return r<0?v===6:r+v<=56});
+const threat=(s,a)=>!SAFE.has(a)&&foes(s).some(f=>S.pc[f].some(r=>{if(r<0||r>50)return false;const d=((a-abs(f,r))%52+52)%52;return d>=1&&d<=6}));
+const hits=(s,a)=>!SAFE.has(a)&&foes(s).some(f=>S.pc[f].some(r=>r>=0&&r<=50&&abs(f,r)===a));
+const say=t=>{$('#status').textContent=t};
+
+function render(){
+  const g={};
+  for(const s of S.seats)S.pc[s].forEach((r,i)=>{const[y,x]=pos(s,i);(g[y+','+x]=g[y+','+x]||[]).push([s,i,y,x])});
+  Object.values(g).forEach(a=>a.forEach(([s,i,y,x],j)=>{
+    const e=E[s][i],o=a.length>1?(j-(a.length-1)/2)*.4:0;
+    e.style.left=((x+o)/15*100)+'%';e.style.top=(y/15*100)+'%';
+    e.classList.toggle('can',s===0&&S.turn===0&&S.rolled&&!S.over&&legal(0,S.dice).includes(i));
+  }));
+  for(let s=0;s<4;s++){
+    const on=S.seats.includes(s);
+    E[s].forEach(e=>e.style.display=on?'':'none');
+    YD[s].classList.toggle('off',!on);DP[s].classList.toggle('off',!on);
+    DP[s].classList.toggle('act',on&&S.turn===s&&!S.over);
+    DP[s]._av.style.display=on?'':'none';DP[s]._av.classList.toggle('act',on&&S.turn===s&&!S.over);DIE[s].classList.toggle('cur',on&&S.turn===s);
+    setFace(DIE[s],S.last[s]);
+  }
+  window._dbar.classList.toggle('four',S.seats.length>2);
+  const my=S.turn===0&&!S.rolled&&!S.over&&!S.rolling;
+  DIE[0].disabled=!my;DIE[0].classList.toggle('ready',my);
+}
+/* ---------- না চালালে কাউন্টডাউন: ছবি+নামের বক্সের চারদিকে লাল বর্ডার ঘুরবে, প্রতি সেকেন্ডে বিপ; শেষে কম্পিউটার চাল দেবে ---------- */
+const IDLE_GRACE=5000,IDLE_COUNT=10; // IDLE_GRACE: কত মিলিসেকেন্ড পরে কাউন্টডাউন শুরু; IDLE_COUNT: কাউন্টডাউন কত সেকেন্ড
+let idleWrap,idleAnim,idleTick;
+function stopIdle(){clearTimeout(idle);clearInterval(idleTick);
+  if(idleAnim){try{idleAnim.cancel()}catch(e){}idleAnim=null}
+  if(idleWrap){idleWrap.remove();idleWrap=null}}
+const idleBeep=k=>{if(k<=3)tone(1250,1250,.13,'square',.09);else tone(860,860,.08,'square',.06)};
+/* যার পালা তার ছবি+নামের বক্সের (দাগ দেওয়া জায়গা) চারদিকে লাল বর্ডার ঘুরবে */
+function showIdle(p,G){
+  const av=DP[p]&&DP[p]._av,box=av&&av.parentElement;
+  if(box&&box.offsetWidth>0){
+    const w=box.offsetWidth,h=box.offsetHeight,m=1.5,q=8.5;
+    const d='M'+w/2+' '+m+'H'+(w-m-q)+'A'+q+' '+q+' 0 0 1 '+(w-m)+' '+(m+q)+'V'+(h-m-q)+'A'+q+' '+q+' 0 0 1 '+(w-m-q)+' '+(h-m)+'H'+(m+q)+'A'+q+' '+q+' 0 0 1 '+m+' '+(h-m-q)+'V'+(m+q)+'A'+q+' '+q+' 0 0 1 '+(m+q)+' '+m+'Z';
+    const wr=document.createElement('div');wr.className='idlering';
+    wr.innerHTML='<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><path class="trk" d="'+d+'"/><path class="fil" pathLength="100" d="'+d+'"/></svg>';
+    box.appendChild(wr);idleWrap=wr;
+    const f=wr.querySelector('.fil');
+    idleAnim=f.animate?f.animate([{strokeDashoffset:100},{strokeDashoffset:0}],{duration:IDLE_COUNT*1000,easing:'linear',fill:'forwards'}):null}
+  let k=IDLE_COUNT;idleBeep(k);
+  idleTick=setInterval(()=>{k--;if(k>0)idleBeep(k);else clearInterval(idleTick)},1000)}
+/* নাম বক্সে না ধরলে লেখা একটু ছোট হয়ে পুরোটা দেখায় (কাটে না) */
+function fitNames(){
+  document.querySelectorAll('.dside .nm').forEach(nm=>{
+    nm.style.fontSize='';
+    if(!nm.offsetWidth||getComputedStyle(nm).display==='none')return;
+    let fs=parseFloat(getComputedStyle(nm).fontSize);
+    while(nm.scrollWidth>nm.clientWidth+1&&fs>9){fs-=.5;nm.style.fontSize=fs+'px'}
+  })}
+addEventListener('resize',()=>setTimeout(fitNames,50));
+/* নিজের পালা: না চালালে কাউন্টডাউন শেষে অটো চাল */
+function arm(){stopIdle();const G=S;if(!G||G.over||G.turn!==0)return;
+  idle=setTimeout(()=>{
+    if(S!==G||G.over||G.turn!==0||G.moving)return stopIdle();
+    showIdle(0,G);
+    idle=setTimeout(()=>{
+      if(S!==G||G.over||G.turn!==0||G.moving||G.rolling)return stopIdle();
+      stopIdle();
+      if(!G.rolled)DIE[0].click();else if(legal(0,G.dice).length)userMove(pick(0,G.dice))
+    },IDLE_COUNT*1000)
+  },IDLE_GRACE)}
+/* বন্ধুর (ইউজার ২) পালা: শুধু কাউন্টডাউন দেখানো, অটো চাল তার নিজের ফোনেই হয় */
+function armView(p){stopIdle();const G=S;if(!G||G.over||G.turn!==p)return;
+  idle=setTimeout(()=>{
+    if(S!==G||G.over||G.turn!==p||G.moving||G.rolling)return stopIdle();
+    showIdle(p,G);
+    idle=setTimeout(stopIdle,IDLE_COUNT*1000)
+  },IDLE_GRACE)}
+function pass(p,ms){const G=S;setTimeout(()=>{if(S!==G||G.over)return;G.rolled=false;G.dice=0;G.turn=nextSeat(p);render();next()},ms)}
+// যে-ই ডাইস ঘোরাক (আপনি বা Computer), তার নিজের ডাইস ঘোরে ও শব্দ হয়
+function roll(p,v){
+  const G=S;if(G.rolling)return;stopIdle();G.rolling=true;DIE.forEach((x,k)=>x.classList.toggle('cur',k===p));
+  G.rollSent=false;
+  const d=DIE[p];DIE[0].disabled=true;DIE[0].classList.remove('ready');
+  say(p===0?'আপনি ডাইস ঘোরাচ্ছেন...':G.names[p]+' ডাইস ঘোরাচ্ছে...');
+  d.classList.remove('roll');void d.offsetWidth;d.classList.add('roll');rattle();
+  d._rolling=true;setFace(d,v,true);
+  setTimeout(()=>{d._rolling=false;if(S!==G)return;G.rolling=false;applyRoll(p,v)},1150);
+}
+function applyRoll(p,v){
+  const G=S;G.dice=v;G.last[p]=v;G.rolled=true;render();
+  if(G.sp!==p){G.sp=p;G.sixes=0}
+  G.sixes=v===6?G.sixes+1:0;
+  if(G.sixes>=3){G.sixes=0;say((p===0?'আপনার':G.names[p]+'-এর')+' পরপর তিনটি ৬, পালা গেল');return pass(p,1200)}
+  const mv=legal(p,v);
+  if(!mv.length){say(p?G.names[p]+'-এর চাল নেই':'কোনো চাল নেই');return pass(p,1000)}
+  if(p===0){say('একটি গুটি বেছে নিন');arm();
+    if(mv.length===1)setTimeout(()=>{if(S===G&&!G.over&&G.turn===0&&G.rolled)userMove(mv[0])},600)}
+  else if(!G.net)setTimeout(()=>{if(S===G&&!G.over&&G.turn===p&&G.rolled)move(p,pick(p,v))},800+Math.random()*900);
+  else armView(p);
+}
+/* গুটি এক ঘর এক ঘর করে লাফিয়ে লাফিয়ে এগোয় */
+function move(p,i){
+  const G=S;if(G.moving||G.over)return;
+  G.moveSent=false;
+  const v=G.dice,r=G.pc[p][i],n=r<0?0:r+v;
+  G.moving=true;stopIdle();
+  E[0].forEach(x=>x.classList.remove('can'));
+  const steps=[];if(r<0)steps.push(0);else for(let k=r+1;k<=n;k++)steps.push(k);
+  const e=E[p][i];e.classList.add('hop');e.style.zIndex=9;
+  const dur=steps.length>1?250:320;let k=0;
+  const tick=()=>{
+    if(S!==G){e.classList.remove('hop');e.style.zIndex='';return}
+    if(k>=steps.length){e.classList.remove('hop');e.style.zIndex='';G.moving=false;return finishMove(p,i,v,n)}
+    const fl=parseFloat(e.style.left),ft=parseFloat(e.style.top);
+    const[y,x]=posAt(p,i,steps[k]);const tl=x/15*100,tt=y/15*100;
+    e.style.left=tl+'%';e.style.top=tt+'%';
+    if(e.animate){const kfs=[];for(let q=0;q<=6;q++){const t=q/6,h=-4*17*t*(1-t);
+      kfs.push({left:(fl+(tl-fl)*t)+'%',top:(ft+(tt-ft)*t)+'%',transform:'translate(-50%,calc(-70% + '+h+'px)) scale('+(1+.22*4*t*(1-t))+')'})}
+      e.animate(kfs,{duration:dur,easing:'ease-in-out'})}
+    stepSnd(k);
+    k++;setTimeout(tick,dur);
+  };
+  tick();
+}
+function finishMove(p,i,v,n){
+  let extra=v===6,cap=false;
+  S.pc[p][i]=n;
+  if(n<=50){const a=abs(p,n);
+    if(!SAFE.has(a))foes(p).forEach(f=>S.pc[f].forEach((x,k)=>{if(x>=0&&x<=50&&abs(f,x)===a){S.pc[f][k]=-1;extra=true;cap=true}}))}
+  cap?capSnd():landSnd();
+  if(n===56)extra=true;
+  if(S.net&&S.expect){S.pc[0]=S.expect.me.slice();S.pc[2]=S.expect.opp.slice();S.expect=null}
+  S.rolled=false;S.dice=0;
+  if(S.pc[p].every(x=>x===56)){S.over=true;render();
+    say(p===0?'🎉 আপনি জিতেছেন!':S.names[p]+' জিতেছে');
+    winSnd();
+    if(!S.net)report(p===0?'win':'lose');$('#again').classList.remove('hide');return}
+  if(!extra)S.turn=nextSeat(p);
+  render();next();
+}
+function next(){
+  const G=S;if(G.over)return;
+  if(G.turn===0){say('আপনার পালা, ডাইস ঘোরান');arm()}
+  else{const t=G.turn;say(G.names[t]+' খেলছে...');
+    if(!G.net)setTimeout(()=>{if(S===G&&!G.over&&G.turn===t&&!G.rolled)roll(t,1+Math.random()*6|0)},900+Math.random()*900);
+    else armView(t)}
+}
+function pick(p,v){
+  const mv=legal(p,v);
+  const sc=mv.map(i=>{
+    const r=S.pc[p][i],n=r<0?0:r+v;let s=n/3;
+    if(r<0)s+=50;
+    if(n===56)s+=60;
+    if(n<=50){const a=abs(p,n);if(SAFE.has(a))s+=25;if(threat(p,a))s-=25;if(hits(p,a))s+=100}else s+=20;
+    if(r>=0&&r<=50&&threat(p,abs(p,r)))s+=30;
+    return s;
+  });
+  const o=mv.map((_,k)=>k).sort((a,b)=>sc[b]-sc[a]);
+  return mv[(o.length>1&&Math.random()<.15)?o[1]:o[0]];
+}
+
+/* ---------- প্লেয়ারের ছবি ও নাম ---------- */
+const NAMEPOOL=['রাকিব','সুমন','তানিয়া','নুসরাত','হাসান','রিমন','মিম','শুভ','জাহিদ','সাদিয়া','আরিফ','নাবিলা','তানভীর','ফারহান','মৌসুমী','রনি','সাকিব','ইমরান','পলাশ','লিজা','রুবেল','সাবরিনা','মাহফুজ','ইয়াসমিন'];
+const rnd=a=>a[Math.random()*a.length|0];
+function cartoon(){
+  const bg=rnd(['#ff8a65','#4fc3f7','#81c784','#ba68c8','#ffd54f','#4db6ac','#f06292']),
+  skin=rnd(['#ffd9b3','#f2b98c','#d99a6c','#9a6540']),hair=rnd(['#1d1d1d','#4a2c12','#8a5a2b','#b5382a','#e0b44c']),
+  shirt=rnd(['#e53935','#1e88e5','#43a047','#fdd835','#8e24aa','#fb8c00']),
+  v=Math.random()*4|0,m=Math.random()*3|0,gl=Math.random()<.3;
+  const back=v===2?'<path d="M14 34C11 8 53 8 50 34L50 50 42 50 42 30 22 30 22 50 14 50Z" fill="'+hair+'"/>':'';
+  const front=['<path d="M16 29C15 12 49 12 48 29 43 21 21 21 16 29Z" fill="'+hair+'"/>',
+    '<path d="M16 29L17 13 24 21 32 10 40 21 47 13 48 29C43 22 21 22 16 29Z" fill="'+hair+'"/>',
+    '<path d="M16 29C15 12 49 12 48 29 40 20 26 22 16 29Z" fill="'+hair+'"/>',
+    '<path d="M15 27C15 10 49 10 49 27Z" fill="'+shirt+'"/><rect x="13" y="25" width="30" height="4" rx="2" fill="'+shirt+'"/>'][v];
+  const mouth=['<path d="M25 38Q32 45 39 38" stroke="#5a2a1a" stroke-width="2.2" fill="none" stroke-linecap="round"/>','<path d="M26 38Q32 48 38 38Z" fill="#7a2230"/>','<path d="M26 39H38" stroke="#5a2a1a" stroke-width="2.2" stroke-linecap="round"/>'][m];
+  return '<svg viewBox="0 0 64 64"><rect width="64" height="64" fill="'+bg+'"/><ellipse cx="32" cy="66" rx="24" ry="15" fill="'+shirt+'"/>'+back+'<circle cx="32" cy="32" r="16" fill="'+skin+'"/>'+front+'<circle cx="26" cy="33" r="2.2" fill="#222"/><circle cx="38" cy="33" r="2.2" fill="#222"/>'+(gl?'<g fill="none" stroke="#222" stroke-width="1.6"><circle cx="26" cy="33" r="5"/><circle cx="38" cy="33" r="5"/><path d="M31 33h2"/></g>':'')+mouth+'</svg>';
+}
+function paintAvatar(s,name,cpu,svg0){
+  const av=DP[s]._av,ph=av.querySelector('.ph');
+  av.querySelector('.nm').textContent=name;av.classList.toggle('cpu',!!cpu);
+  ph.style.borderColor='var(--c'+s+')';ph.style.background='var(--c'+s+')';
+  if(svg0){ph.innerHTML=svg0;return}
+  if(cpu){ph.innerHTML=cartoon();return}
+  let svg=ls('ludo-av');if(!svg||svg.indexOf('<svg')!==0){svg=cartoon();ls('ludo-av',svg)}
+  ph.innerHTML=svg;
+}
+
+/* ---------- ম্যাচ পাওয়া গেছে অ্যানিমেশন ---------- */
+function vsIntro(seats,names,done){
+  const vs=$('#vs'),L=$('#vsL'),Rr=$('#vsR');L.innerHTML=Rr.innerHTML='';
+  seats.forEach((s,i)=>{
+    const d=document.createElement('div');d.className='vcard';d.style.setProperty('--rc','var(--c'+s+')');d.style.animationDelay=(i*.12)+'s';
+    d.innerHTML='<div class="vph"></div><div class="vnm"></div><div class="vtag"></div>';
+    d.querySelector('.vph').innerHTML=DP[s]._av.querySelector('.ph').innerHTML;
+    d.querySelector('.vnm').textContent=names[s];
+    d.querySelector('.vtag').textContent=s===0?'আপনি':'';
+    (seats.length===2?i===0:i<2)?L.appendChild(d):Rr.appendChild(d);
+  });
+  $('#vsInfo').textContent=(S&&S.net?(S.kind==='room'?'বন্ধুর সাথে ম্যাচ':'লাইভ ম্যাচ')+' • '+(S.stake?'বাজি ৳'+S.stake+' • প্রাইজ ৳'+S.prize:'ফ্রি'):'কম্পিউটারের সাথে প্র্যাকটিস')+' • ম্যাচ শুরু হচ্ছে...';
+  vs.classList.remove('out');vs.classList.add('on');
+  [300,420,540].forEach((f,k)=>setTimeout(()=>beep(f,.09,'triangle'),k*110));
+  setTimeout(()=>{beep(90,.3,'sawtooth');setTimeout(()=>beep(880,.25),120)},780);
+  setTimeout(()=>{show('game');render();fitNames();vs.classList.add('out')},2300);
+  setTimeout(()=>{vs.classList.remove('on','out');done()},3100);
+}
+
+/* ---------- ডেমো ম্যাচমেকিং ---------- */
+let searching=false,mm;
+const show=id=>{['home','find','game','friend','lobby'].forEach(s=>$('#'+s).classList.toggle('hide',s!==id));document.body.classList.toggle('ingame',id==='game')};
+function sel(){
+  $$('#mode button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===MODE));
+  $$('#stake button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===STAKE));
+  $('#sum').textContent=MODE+' জনের ম্যাচ • বাজি ৳'+STAKE;
+}
+$$('#mode button').forEach(b=>b.onclick=()=>{MODE=+b.dataset.v;ls('ludo-mode',MODE);sel()});
+$$('#stake button').forEach(b=>b.onclick=()=>{STAKE=+b.dataset.v;ls('ludo-stake',STAKE);sel()});
+sel();
+function search(){startSearch()}
+function startGame(){
+  clearInterval(mm);searching=false;stopIdle();
+  const seats=MODE===2?[0,2]:[0,1,2,3],names={0:MYNAME()};
+  const pool=[...NAMEPOOL].sort(()=>Math.random()-.5);
+  seats.slice(1).forEach(s=>names[s]=pool.pop());
+  S={seats,names,pc:[0,1,2,3].map(()=>[-1,-1,-1,-1]),turn:0,dice:0,last:[0,0,0,0],rolled:false,rolling:false,over:false,sp:-1,sixes:0};const G=S;
+  for(let s=0;s<4;s++)YD[s].querySelector('.yn').textContent=names[s]||'';
+  seats.forEach(s=>paintAvatar(s,names[s],s!==0));
+  $('#again').classList.add('hide');$('#again').textContent='আবার খেলুন';
+  vsIntro(seats,names,()=>{if(S===G)next()});
+}
+const sheet=(on)=>{$('#sheet').classList.toggle('open',on);if(on)$('#go').focus()};
+$('#play').onclick=()=>sheet(true);
+$('#go').onclick=()=>{sheet(false);search()};
+$('#shx').onclick=()=>sheet(false);
+$('#sheet').onclick=e=>{if(e.target.id==='sheet')sheet(false)};
+addEventListener('keydown',e=>{if(e.key==='Escape')sheet(false)});
+$('#skip').onclick=()=>{searching=false;clearInterval(mm);if(Net.mode==='queue')Net.send({t:'unqueue'});Net.mode='idle';startGame()};
+$('#cancel').onclick=()=>{searching=false;clearInterval(mm);if(Net.mode==='queue')Net.send({t:'unqueue'});Net.mode='idle';show('home')};
+$('#again').onclick=()=>{if(S&&S.net){S=null;Net.mode='idle';Net.started=false;show('home')}else{show('home');sheet(true)}};
+$('#leave').onclick=()=>{
+  if(S&&S.net&&!S.over){if(!confirm('এখন বের হলে বাজি হেরে যাবেন। বের হবেন?'))return;Net.send({t:'leave'})}
+  stopIdle();S=null;searching=false;Net.q=[];Net.mode='idle';Net.started=false;show('home')};
+const sndSel=()=>$$('#sndopts button').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.v==='0')===muted));
+$$('#sndopts button').forEach(b=>b.onclick=()=>{muted=b.dataset.v==='0';ls('ludo-mute',muted?'1':'0');sndSel();if(!muted)beep(660,.1)});
+sndSel();
+DIE[0].onclick=userRoll;
+/* ---------- অনলাইন ম্যাচ: Render সার্ভারের সাথে WebSocket ---------- */
+/* ⚠️ নিচের লাইনে আপনার Render সার্ভারের ঠিকানা বসান (https নয়, wss:// দিয়ে শুরু হবে)।
+   উদাহরণ: 'wss://ludo-server-abcd.onrender.com'  (অথবা পেজ লোডের আগে window.LUDO_SERVER_URL সেট করুন) */
+const LUDO_SERVER=window.LUDO_SERVER_URL||'wss://ludo-server-p6e0.onrender.com';
+/* ইউজার প্যানেলের Firebase ওয়েব কনফিগ (এটা প্রকাশ্য তথ্য; একই ডোমেইনে থাকলে লগইন আপনাআপনি পাওয়া যায়) */
+const FB_CFG={apiKey:"AIzaSyBFaoU_cDws6YVAXFMWBnogGAQHhjfC23Q",authDomain:"np-trunament-bd.firebaseapp.com",databaseURL:"https://np-trunament-bd-default-rtdb.firebaseio.com",projectId:"np-trunament-bd",appId:"1:324972484501:web:38598aa922e983990b889c"};
+const HASH_TOKEN=((location.hash.match(/[#&]t=([^&]+)/)||[])[1])||null;
+if(HASH_TOKEN){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
+
+const ST=[50,100,250,500,750,1000],stk=v=>ST.includes(+v)?+v:null;
+const stakeTxt=st=>st>0?'বাজি ৳'+st+' • বিজয়ী পাবে ৳'+Math.round(st*1.8):'ফ্রি ম্যাচ (বাজি নেই)';
+const openS=(id,on)=>$('#'+id).classList.toggle('open',on);
+let FST=stk(ls('ludo-fstake'))||100,JP=null;
+const ferr=t=>{$('#ferr').textContent=t};
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),4200)}
+const Net={ws:null,ok:false,mode:'idle',code:null,stake:0,q:[],started:false,busy:false,hb:null};
+Net.send=o=>{try{if(Net.ws&&Net.ws.readyState===1)Net.ws.send(JSON.stringify(o))}catch(e){}};
+function myAv(){let svg=ls('ludo-av');if(!svg||svg.indexOf('<svg')!==0){svg=cartoon();ls('ludo-av',svg)}return svg}
+/* অন্য প্লেয়ারের পাঠানো ছবি শুধু নিরাপদ SVG হলে নেওয়া হয় */
+function cleanSvg(str){
+  try{
+    if(typeof str!=='string'||str.length>4000)return'';
+    const d=new DOMParser().parseFromString(str,'image/svg+xml'),r=d.documentElement;
+    if(!r||r.nodeName!=='svg'||d.querySelector('parsererror'))return'';
+    const T=new Set(['svg','rect','ellipse','path','circle','g']),A=new Set(['viewBox','x','y','cx','cy','r','rx','ry','width','height','d','fill','stroke','stroke-width','stroke-linecap','stroke-linejoin']);
+    let ok=true;
+    const walk=n=>{if(!ok)return;if(!T.has(n.nodeName)){ok=false;return}
+      for(const a of [...n.attributes])if(!A.has(a.name)||/url\(|javascript|&|</i.test(a.value)){ok=false;return}
+      [...n.children].forEach(walk)};
+    walk(r);
+    return ok?new XMLSerializer().serializeToString(r):'';
+  }catch(e){return''}
+}
+const loadJs=u=>new Promise((ok,no)=>{const x=document.createElement('script');x.src=u;x.onload=ok;x.onerror=()=>no(new Error('sdk'));document.head.appendChild(x)});
+let fbAuth=null;
+async function getToken(){
+  try{
+    if(!fbAuth){const B='https://www.gstatic.com/firebasejs/9.23.0/';
+      await loadJs(B+'firebase-app-compat.js');await loadJs(B+'firebase-auth-compat.js');
+      const app=firebase.apps.length?firebase.app():firebase.initializeApp(FB_CFG);fbAuth=firebase.auth(app)}
+    const u=await new Promise(res=>{const off=fbAuth.onAuthStateChanged(x=>{off();res(x)})});
+    if(u)return await u.getIdToken();
+  }catch(e){}
+  return HASH_TOKEN;
+}
+const connMsg=e=>e&&e.message==='login'?'লগইন পাওয়া যায়নি। ইউজার প্যানেল থেকে লগইন করে গেমটি খুলুন':'সার্ভারের সাথে যুক্ত হওয়া যায়নি। একটু পরে আবার চেষ্টা করুন';
+/* Render ফ্রি প্ল্যানে সার্ভার ঘুমিয়ে থাকলে আগেই জাগিয়ে রাখি */
+try{if(LUDO_SERVER.indexOf('YOUR-LUDO')<0)fetch(LUDO_SERVER.replace(/^ws/,'http')+'/health',{mode:'no-cors'}).catch(()=>{})}catch(e){}
+
+let wsP=null;
+function netEnsure(){
+  if(Net.ok)return Promise.resolve();
+  if(wsP)return wsP;
+  if(LUDO_SERVER.indexOf('YOUR-LUDO')>=0){return Promise.reject(new Error('server-url'))}
+  wsP=(async()=>{
+    const token=await getToken();
+    if(!token)throw new Error('login');
+    let lastErr=new Error('conn');
+    for(let n=0;n<4;n++){
+      try{await new Promise((res,rej)=>{
+        let ws,done=false;
+        const fail=e=>{if(!done){done=true;clearTimeout(to);rej(e)}};
+        const to=setTimeout(()=>{fail(new Error('timeout'));try{ws.close()}catch(e){}},25000);
+        try{ws=new WebSocket(LUDO_SERVER)}catch(e){return fail(e)}
+        ws.onopen=()=>ws.send(JSON.stringify({t:'auth',token,name:($('#nm').value||'').trim().slice(0,14),av:myAv()}));
+        ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return}
+          if(m.t==='ready'&&!done){done=true;clearTimeout(to);Net.ws=ws;Net.ok=true;startHb();onSrv(m);res()}
+          else if(m.t==='err'&&m.code==='auth'){fail(new Error('login'))}
+          else onSrv(m)};
+        ws.onclose=()=>{const was=Net.ok&&Net.ws===ws;if(Net.ws===ws){Net.ok=false;stopHb()}fail(new Error('conn'));if(was)onDrop()};
+        ws.onerror=()=>{};
+      });return}catch(e){lastErr=e;if(e.message==='login')break;await new Promise(r=>setTimeout(r,2500))}
+    }
+    throw lastErr;
+  })();
+  wsP.then(()=>{wsP=null},()=>{wsP=null});
+  return wsP;
+}
+function startHb(){stopHb();Net.hb=setInterval(()=>Net.send({t:'ping'}),20000)}
+function stopHb(){clearInterval(Net.hb);Net.hb=null}
+function onDrop(){
+  if(Net.mode==='match'&&S&&S.net&&!S.over){say('সংযোগ ছিন্ন হয়েছে, আবার যুক্ত হচ্ছে...');reconnect(0)}
+  else if(Net.mode==='queue')failSearch('সংযোগ ছিন্ন হয়েছে, আবার চেষ্টা করুন');
+  else if(Net.mode==='room'){Net.mode='idle';show('friend');ferr('সংযোগ ছিন্ন হয়েছে, রুম বাতিল হয়েছে')}
+}
+function reconnect(n){
+  if(!(S&&S.net&&!S.over))return;
+  netEnsure().catch(()=>{if(n<15)setTimeout(()=>reconnect(n+1),Math.min(1500*(n+1),5000));else say('সংযোগ পাওয়া যায়নি। ম্যাচের ফল পরে ব্যালেন্সে দেখুন')});
+}
+/* ক্লায়েন্টের হিসাব সার্ভারের সাথে না মিললে: সংযোগ নতুন করে নিয়ে সার্ভারের অবস্থা আনা */
+function resync(){try{if(Net.ws)Net.ws.close()}catch(e){}}
+
+function failSearch(msg){searching=false;clearInterval(mm);Net.mode='idle';show('home');if(msg)toast(msg)}
+function onSrv(m){
+  switch(m.t){
+    case'ready':case'bal':if(m.balance!=null&&window.setLudoBalance)window.setLudoBalance(m.balance);break;
+    case'room':Net.code=m.code;$('#lcode').textContent=m.code;$('#lstake').textContent=stakeTxt(m.stake);$('#lst').textContent='বন্ধুর জন্য অপেক্ষা করা হচ্ছে...';show('lobby');break;
+    case'roomgone':if(Net.mode==='room'){Net.mode='idle';show('friend');ferr(m.why==='expired'?'রুমের সময় শেষ হয়ে গেছে':'রুম বাতিল হয়েছে')}break;
+    case'confirm':JP={code:m.code,st:m.stake};$('#jsum').textContent=stakeTxt(m.stake);openS('jsheet',true);Net.busy=false;break;
+    case'start':beginNet(m);break;
+    case'roll':if(S&&S.net)Net.q.push({t:'r',who:m.who,v:m.v,ts:Date.now()});break;
+    case'move':if(S&&S.net)Net.q.push({t:'m',who:m.who,i:m.i,pc:m.pc,ts:Date.now()});break;
+    case'opp':if(S&&S.net&&!S.over){S.oppAway=m.st==='away';if(S.oppAway)say('প্রতিপক্ষের সংযোগ চলে গেছে, অপেক্ষা করা হচ্ছে...')}break;
+    case'over':
+      if(m.balance!=null&&window.setLudoBalance)window.setLudoBalance(m.balance);
+      if(S&&S.net)Net.q.push(Object.assign({t:'over',ts:Date.now()},m));
+      else if(m.winner==='opp'&&m.reason==='forfeit')toast('আপনি ম্যাচ ছেড়ে দিয়েছেন');
+      break;
+    case'err':
+      if(m.code==='other-device'){toast(m.msg);Net.mode='idle';break}
+      if(Net.mode==='queue'&&searching){failSearch(m.msg||'ম্যাচ খোঁজা যায়নি');break}
+      if(Net.mode==='room'||$('#friend').classList.contains('hide')===false){Net.busy=false;if(Net.mode==='room'&&!Net.code)Net.mode='idle';ferr(m.msg||'কিছু একটা সমস্যা হয়েছে');break}
+      if(S&&S.net&&!S.over){
+        if(['illegal','bad-piece'].includes(m.code)){S.rollSent=S.moveSent=false;resync()}
+        else if(m.code==='not-your-turn'){S.rollSent=S.moveSent=false}
+        else if(m.code==='not-rolled'||m.code==='already-rolled'||m.code==='over'){/* দ্বিতীয় বার্তা: প্রথমটির উত্তর আসছে, কিছু করার নেই */}
+        else if(m.msg)toast(m.msg);
+      }else if(m.msg)toast(m.msg);
+      break;
+  }
+}
+/* সার্ভারের ম্যাচ শুরু (বা সংযোগ ফিরলে ম্যাচে ফেরা) */
+function beginNet(m){
+  stopIdle();searching=false;clearInterval(mm);
+  const resume=!!m.resume&&!!m.snap;
+  if(Net.started&&!resume&&S&&S.net&&!S.over)return;
+  Net.mode='match';Net.started=true;Net.q=[];
+  openS('jsheet',false);openS('fsheet',false);JP=null;
+  const names={0:String(m.you.n||MYNAME()).slice(0,14),2:String(m.opp.n||'প্লেয়ার').slice(0,14)},oav=cleanSvg(m.opp.av)||cartoon();
+  S={seats:[0,2],names,pc:[0,1,2,3].map(()=>[-1,-1,-1,-1]),turn:m.first==='me'?0:2,dice:0,last:[0,0,0,0],rolled:false,rolling:false,over:false,sp:-1,sixes:0,net:true,ready:false,stake:m.stake,prize:m.prize,kind:m.kind};
+  const G=S;
+  if(resume){const sn=m.snap;G.pc[0]=sn.me.slice();G.pc[2]=sn.opp.slice();G.turn=sn.turn==='me'?0:2;G.dice=sn.dice||0;G.rolled=!!sn.rolled;G.last[0]=sn.last?sn.last.me:0;G.last[2]=sn.last?sn.last.opp:0}
+  for(let s=0;s<4;s++)YD[s].querySelector('.yn').textContent=names[s]||'';
+  paintAvatar(0,names[0],false);paintAvatar(2,names[2],false,oav);
+  $('#again').classList.add('hide');$('#again').textContent='হোমে ফিরুন';
+  if(resume){
+    show('game');G.ready=true;render();fitNames();
+    if(G.rolled){if(G.turn===0){say('একটি গুটি বেছে নিন');arm()}else armView(G.turn)}else next();
+  }else vsIntro([0,2],names,()=>{if(S===G){G.ready=true;next()}});
+}
+/* সার্ভার থেকে আসা ডাইস/চাল ক্রমানুযায়ী চালানো (অ্যানিমেশন শেষ হলে পরেরটা) */
+function pump(){
+  const G=S;if(!G||!G.net||!G.ready||!Net.q.length)return;
+  const a=Net.q[0];
+  if(Date.now()-a.ts>9000){Net.q=[];resync();return}
+  if(G.moving||G.rolling)return;
+  if(a.t==='over'){Net.q.shift();endNet(a);return}
+  if(G.over)return;
+  const p=a.who==='me'?0:2;
+  if(p===2)G.rollSent=G.moveSent=false;
+  if(a.t==='r'){if(G.rolled||G.turn!==p)return;Net.q.shift();roll(p,a.v)}
+  else if(a.t==='m'){if(!G.rolled||G.turn!==p)return;Net.q.shift();
+    if(legal(p,G.dice).includes(a.i)){G.expect=a.pc;move(p,a.i)}else{Net.q=[];resync()}}
+}
+setInterval(pump,100);
+function endNet(m){
+  const G=S;if(!G||!G.net)return;
+  G.over=true;stopIdle();render();
+  const won=m.winner==='me';
+  const why={forfeit:won?'প্রতিপক্ষ ম্যাচ ছেড়ে গেছে':'আপনি ম্যাচ ছেড়েছেন',disconnect:won?'প্রতিপক্ষের সংযোগ চলে গেছে':'সংযোগ বিচ্ছিন্ন থাকায় হেরেছেন',idle:won?'প্রতিপক্ষ খেলেনি':'অনেকক্ষণ না খেলায় হেরেছেন'}[m.reason]||'';
+  say((won?'🎉 আপনি জিতেছেন! +৳'+m.prize:'আপনি হেরেছেন')+(why?' • '+why:'')+(won&&m.paid===false?' • প্রাইজ যোগ হতে একটু দেরি হতে পারে':''));
+  if(won&&m.reason!=='win')winSnd();
+  Net.mode='idle';Net.started=false;Net.q=[];
+  $('#again').textContent='হোমে ফিরুন';$('#again').classList.remove('hide');
+}
+function userMove(i){
+  const G=S;if(!G||G.over||G.moving)return;
+  if(!G.net)return move(0,i);
+  if(G.moveSent||!G.rolled||G.turn!==0)return;
+  G.moveSent=true;Net.send({t:'move',i});
+}
+function userRoll(){
+  const G=S;if(!G||G.turn!==0||G.rolled||G.over||G.rolling)return;
+  if(!G.net)return roll(0,1+Math.random()*6|0);
+  if(G.rollSent)return;
+  G.rollSent=true;Net.send({t:'roll'});DIE[0].disabled=true;DIE[0].classList.remove('ready');
+}
+
+/* ---------- বাজি ধরে লাইভ ম্যাচ খোঁজা ---------- */
+async function startSearch(){
+  ls('ludo-name',MYNAME());
+  show('find');searching=true;let t=0;
+  $('#fi').textContent='২ জনের ম্যাচ • বাজি ৳'+STAKE;$('#cd').textContent='0';
+  clearInterval(mm);mm=setInterval(()=>{if(!searching){clearInterval(mm);return}$('#cd').textContent=++t},1000);
+  try{await netEnsure()}catch(e){if(searching)failSearch(connMsg(e));return}
+  if(!searching||Net.mode==='match')return;
+  Net.mode='queue';Net.send({t:'queue',stake:STAKE});
+}
+
+/* ---------- বন্ধুর সাথে খেলা (রুম কোড) ---------- */
+async function makeRoom(stake){
+  if(stk(stake)===null)return ferr('বাজির পরিমাণ বেছে নিন');
+  if(Net.busy)return;Net.busy=true;ferr('');
+  try{await netEnsure()}catch(e){Net.busy=false;return ferr(connMsg(e))}
+  Net.code=null;Net.mode='room';Net.stake=stake;Net.send({t:'mkroom',stake});
+  Net.busy=false;
+}
+async function joinRoom(raw,conf){
+  const code=String(raw||'').replace(/\D/g,'').slice(0,5);
+  if(code.length!==5)return ferr('৫ সংখ্যার রুম কোড দিন');
+  if(Net.busy)return;Net.busy=true;ferr('');
+  try{await netEnsure()}catch(e){Net.busy=false;return ferr(connMsg(e))}
+  Net.busy=false;
+  Net.send({t:'join',code,conf:conf||0});
+}
+function leaveRoom(){if(Net.mode==='room'){Net.send({t:'unroom'});Net.mode='idle';Net.code=null}}
+const shareText=()=>'আমার সাথে লুডু খেলো! রুম কোড: '+Net.code+'\n'+location.origin+location.pathname+'?room='+Net.code;
+$('#frd').onclick=()=>{ls('ludo-name',MYNAME());ferr('');show('friend')};
+$('#fback').onclick=()=>show('home');
+const fsel=()=>{$$('#fstake button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===FST));$('#fsum').textContent=stakeTxt(FST)};
+$$('#fstake button').forEach(b=>b.onclick=()=>{FST=+b.dataset.v;ls('ludo-fstake',FST);fsel()});
+$('#mk').onclick=()=>{ferr('');fsel();openS('fsheet',true)};
+$('#fgo').onclick=()=>{openS('fsheet',false);makeRoom(FST)};
+$('#fx').onclick=()=>openS('fsheet',false);
+$('#jgo').onclick=()=>{openS('jsheet',false);if(JP)joinRoom(JP.code,JP.st)};
+$('#jx').onclick=()=>{openS('jsheet',false);JP=null};
+['fsheet','jsheet'].forEach(id=>$('#'+id).onclick=e=>{if(e.target.id===id)openS(id,false)});
+addEventListener('keydown',e=>{if(e.key==='Escape'){openS('fsheet',false);openS('jsheet',false)}});
+$('#jn').onclick=()=>joinRoom($('#rc').value);
+$('#rc').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom($('#rc').value)});
+$('#lcancel').onclick=()=>{leaveRoom();show('friend')};
+$('#cpy').onclick=()=>{const b=$('#cpy');
+  const ok=()=>{b.textContent='কপি হয়েছে ✓';setTimeout(()=>b.textContent='কপি করুন',1500)};
+  try{navigator.clipboard.writeText(Net.code).then(ok,()=>{})}catch(e){}};
+$('#shr').onclick=()=>{if(navigator.share)navigator.share({text:shareText()}).catch(()=>{});else{try{navigator.clipboard.writeText(shareText()).then(()=>{$('#shr').textContent='কপি হয়েছে ✓';setTimeout(()=>$('#shr').textContent='শেয়ার করুন',1500)},()=>{})}catch(e){}}};
+{const rq=(Q.get('room')||'').replace(/\D/g,'').slice(0,5);if(rq.length===5){$('#rc').value=rq;show('friend')}}
+
+
+/* হেডারের সাউন্ড বাটন */
+(()=>{const b=document.getElementById('tbSnd');if(!b)return;const bs=()=>[...document.querySelectorAll('#sndopts button')];
+const sync=()=>{const off=bs().some(x=>x.dataset.v==='0'&&x.getAttribute('aria-pressed')==='true');b.textContent=off?'🔇':'🔊';b.style.color=off?'#ff6b6b':'#3ddc84'};
+b.onclick=()=>{const off=bs().some(x=>x.dataset.v==='0'&&x.getAttribute('aria-pressed')==='true');const t=bs().find(x=>x.dataset.v===(off?'1':'0'));if(t)t.click();sync()};
+setTimeout(sync,0);})();
+
+/* ব্যালেন্স: ইউজার প্যানেল থেকে window.setLudoBalance(1234.5) ডাকুন,
+   অথবা প্যারেন্ট পেজ থেকে postMessage({type:'ludo-balance',value:1234.5}) পাঠান।
+   শুরুতে window.LUDO_BALANCE সেট করা থাকলে সেটাই দেখাবে। */
+(()=>{const el=document.getElementById('tbBal');if(!el)return;
+const fmt=n=>'৳'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+window.setLudoBalance=v=>{const n=parseFloat(v);if(!isFinite(n))return;window.LUDO_BALANCE=n;el.textContent=fmt(n)};
+window.addEventListener('message',e=>{const d=e.data;if(d&&d.type==='ludo-balance')window.setLudoBalance(d.value)});
+window.setLudoBalance(window.LUDO_BALANCE!=null?window.LUDO_BALANCE:0);})();
+</script>
+</body>
+</html>
