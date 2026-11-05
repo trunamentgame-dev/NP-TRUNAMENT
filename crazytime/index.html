@@ -258,6 +258,38 @@ header{background:linear-gradient(180deg,#4a1238,#220a24);border-bottom:2px soli
 /* ===== v16: hub shows only the 10..1 countdown ===== */
 .hub small{display:none!important}
 .hub b{font-size:min(13vw,60px)}
+
+/* ===== v17: এক স্ক্রিনে পুরো পেজ (স্ক্রল নেই) + রেজাল্টে চাকা zoom ===== */
+html{height:100%;overflow:hidden;overscroll-behavior:none}
+body{height:100vh;height:100dvh;min-height:0;overflow:hidden;overscroll-behavior:none}
+.app-wrapper{height:100vh;height:100dvh;min-height:0;overflow:hidden}
+@media(min-width:480px){body{padding:8px}.app-wrapper{height:calc(100vh - 16px);height:calc(100dvh - 16px)}}
+header{flex:none;padding:calc(6px + env(safe-area-inset-top)) 12px 6px}
+.logo-svg{height:clamp(30px,5.2vh,42px);width:auto}
+.hrow{flex:none}
+.history-bar{min-height:30px;padding:4px 10px}
+.arena-box{flex:1 1 0;min-height:0;padding:14px 0 54px;--ws:min(70vw,34vh);overflow:visible}
+.stage{width:var(--ws)}
+.ptr{width:clamp(26px,calc(var(--ws)*.1),40px);top:calc(var(--ws)*-.04)}
+.hub b{font-size:calc(var(--ws)*.14)}
+.promo{height:34px;bottom:8px}
+.player-counter{bottom:46px;font-size:13px}
+.panels-container{flex:none;margin-top:0;padding:8px 10px 4px;gap:6px}
+.bet-card{padding:8px 10px}
+.status{margin-bottom:5px;font-size:12px}
+.stepper-box{padding:8px 6px 6px;margin-bottom:6px}
+.chip{width:clamp(36px,6vh,46px);height:clamp(36px,6vh,46px)}
+.spots{gap:6px}
+.spot{padding:8px 2px 6px;font-size:clamp(15px,4.6vw,20px)}
+.spot small{font-size:9px;margin-top:0}
+.provably-fair-tag{flex:none;padding:5px 14px}
+#fairLine{flex:none;padding:0 14px 5px!important;font-size:7px!important;line-height:1.25!important}
+/* zoom */
+.rig{transform-origin:50% 50%;transition:transform .9s cubic-bezier(.22,.8,.24,1);will-change:transform}
+.result-badge{bottom:auto;top:var(--rby,50%);transform:translate(-50%,-50%) scale(.4);font-size:20px}
+.result-badge.show{transform:translate(-50%,-50%) scale(1)}
+.promo,.player-counter{transition:opacity .4s}
+.arena-box.zm .promo,.arena-box.zm .player-counter{opacity:0}
 </style>
 </head>
 <body>
@@ -275,7 +307,7 @@ header{background:linear-gradient(180deg,#4a1238,#220a24);border-bottom:2px soli
       </button>
     </div>
   </header>
-  <div class="hrow"><div class="history-bar" id="hist"></div><button class="my-bets" id="btnBets">📋 আমার বেট</button></div>
+  <div class="hrow"><div class="history-bar" id="hist"></div></div>
   <div class="arena-box">
     <div class="player-counter" id="online">👥 --</div>
     <div class="room"><i class="curt l"></i><i class="curt r"></i><i class="floor"></i><i class="cornice"></i><i class="bulbs"></i></div>
@@ -309,6 +341,7 @@ const S={spots:[],layout:[],bets:{},chip:10,rot:0,off:0,st:null,lastRound:0,spun
 const CHIPS=[10,20,50,100,500];
 const CHIPCOL={10:'#3b82f6',20:'#10b981',50:'#ef4444',100:'#475569',500:'#7c3aed',all:'#d97706'};
 let ws,tt,popT,AC;
+const Z={on:false,skip:null};
 
 const spotOf=id=>S.spots.find(x=>x.id===id)||{};
 const colorOf=id=>COLORS[id]||spotOf(id).color||'#444',labelOf=id=>spotOf(id).label||'';
@@ -321,7 +354,7 @@ function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');cle
 function beep(f,d,v){if(!S.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v||.05;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
 function confetti(){const cf=$('cf'),cols=['#fbbf24','#ef4444','#3b82f6','#a855f7','#10b981','#fff'];let h='';for(let i=0;i<46;i++)h+=`<i style="left:${Math.random()*100}%;background:${cols[i%6]};animation-duration:${1.8+Math.random()*1.8}s;animation-delay:${Math.random()*.5}s"></i>`;cf.innerHTML=h;setTimeout(()=>cf.innerHTML='',4200)}
 function winPop(w){confetti();$('popAmt').textContent=money(w);$('pop').classList.add('on');[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.18,.07),i*120));clearTimeout(popT);popT=setTimeout(()=>$('pop').classList.remove('on'),3500)}
-$('btnBets').onclick=()=>{renderTable();$('betPop').classList.add('on')};
+if($('btnBets'))$('btnBets').onclick=()=>{renderTable();$('betPop').classList.add('on')};
 $('betClose').onclick=()=>$('betPop').classList.remove('on');
 $('betPop').onclick=e=>{if(e.target.id==='betPop')$('betPop').classList.remove('on')};
 $('popOk').onclick=()=>$('pop').classList.remove('on');
@@ -361,7 +394,7 @@ function spinTo(seg,dur){
   const n=S.layout.length,st=2*Math.PI/n,TAU=2*Math.PI,base=-((seg+.5)*st)+(Math.random()-.5)*st*.6,from=S.rot;
   const d=(((base-from)%TAU)+TAU)%TAU,to=from+d+TAU*6,t0=performance.now();let lastTick=0;
   (function f(now){const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,4);S.rot=from+(to-from)*e;
-    const k=Math.floor(S.rot/st);if(k!==lastTick&&p<.95){lastTick=k;beep(900,.02,.015)}if(p<1)requestAnimationFrame(f);else{const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);rb.classList.add('show')}}})(t0);
+    const k=Math.floor(S.rot/st);if(k!==lastTick&&p<.95){lastTick=k;beep(900,.02,.015)}if(p<1)requestAnimationFrame(f);else{const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}})(t0);
 }
 function setRot(seg){S.rot=-((seg+.5)*(2*Math.PI/S.layout.length));draw()}
 
@@ -424,13 +457,13 @@ function renderTable(){
 }
 function tick(){
   const s=S.st;if(!s||!s.endsAt)return;
-  const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:15000,spin:8000,result:5000}[s.phase]||1;
+  const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:15000,spin:8000,result:5000}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on){zoomOut()}
   {const c=Math.ceil(left/1000);$('tm').textContent=(s.phase==='betting'&&c>=1&&c<=15)?c:''}$('bar').style.width=(left/tot*100)+'%';
 }
 setInterval(tick,200);
 
 function onState(m){
-  S.off=m.now-Date.now();S.st=m;S.winSeg=(m.phase==='result'&&m.result)?m.result.seg:null;const rb=$('rb');if(m.phase==='result'&&m.result){rb.textContent=resLabel(m.result.spot,m.result.mega);paintRB(rb,m.result.spot);rb.classList.add('show')}else rb.classList.remove('show');
+  S.off=m.now-Date.now();S.st=m;S.winSeg=(m.phase==='result'&&m.result)?m.result.seg:null;const rb=$('rb');if(m.phase==='result'&&m.result){rb.textContent=resLabel(m.result.spot,m.result.mega);paintRB(rb,m.result.spot);if(Z.skip!==m.roundId){zoomIn();rb.classList.add('show')}}else{rb.classList.remove('show');zoomOut()}
   $('ph').textContent={betting:'বেট ধরুন',spin:'ঘুরছে',result:'ফলাফল',paused:'বিরতি'}[m.phase]||'';
   $('online').textContent='👥 '+(m.online||0);
   {const fl=$('fairLine');if(fl)fl.textContent=m.hash?('Round #'+m.roundId+' hash: '+m.hash+(m.reveal?'  |  Round #'+m.reveal.id+' seed: '+m.reveal.seed:'')):''}
@@ -468,6 +501,36 @@ function connect(){
 }
 
 (function(){const sl=document.querySelectorAll('.promo .sl'),dt=document.querySelectorAll('.promo .dots i');let k=0;function go(n){k=n%sl.length;sl.forEach((e,i)=>e.classList.toggle('on',i===k));dt.forEach((e,i)=>e.classList.toggle('on',i===k))}go(0);setInterval(()=>go(k+1),3500)})();
+
+/* ===== চাকার সাইজ ফিট + রেজাল্টে zoom ===== */
+function fitWheel(){
+  const a=document.querySelector('.arena-box');if(!a)return;
+  const cs=getComputedStyle(a),pt=parseFloat(cs.paddingTop)||0,pb=parseFloat(cs.paddingBottom)||0;
+  const ah=a.clientHeight-pt-pb-22,aw=a.clientWidth;
+  a.style.setProperty('--ws',Math.max(120,Math.min(aw*.74,ah*.84))+'px');
+}
+function zoomIn(){
+  const wr=document.querySelector('.app-wrapper'),a=document.querySelector('.arena-box'),rig=document.querySelector('.rig'),st=document.querySelector('.stage'),hr=document.querySelector('.hrow'),pn=document.querySelector('.panels-container');
+  if(!wr||!a||!rig||!st||Z.on)return;
+  const w=st.offsetWidth;if(!w)return;
+  const hrBottom=hr.offsetTop+hr.offsetHeight,panelTop=pn.offsetTop;
+  const curY=a.offsetTop+rig.offsetTop+st.offsetTop+w/2;
+  const avail=panelTop+4-(hrBottom+6);
+  const u=Math.min(avail/1.08,wr.clientWidth-24);
+  const sc=Math.max(1,Math.min(1.8,u/w)),U=w*sc;
+  const tgtY=hrBottom+6+U*.06+U/2;
+  rig.style.transform='translate(0,'+(tgtY-curY).toFixed(1)+'px) scale('+sc.toFixed(3)+')';
+  a.style.setProperty('--rby',(tgtY-a.offsetTop).toFixed(1)+'px');
+  a.classList.add('zm');Z.on=true;
+}
+function zoomOut(){
+  const a=document.querySelector('.arena-box'),rig=document.querySelector('.rig');
+  if(!Z.on||!rig)return;
+  Z.on=false;rig.style.transform='';a.classList.remove('zm');$('rb').classList.remove('show');
+  if(S.st)Z.skip=S.st.roundId;
+}
+fitWheel();
+try{new ResizeObserver(()=>{fitWheel();if(Z.on){Z.on=false;zoomIn()}}).observe(document.querySelector('.arena-box'))}catch(e){addEventListener('resize',fitWheel)}
 renderChips();renderHist();renderTable();
 const NOLOGIN='লগইন টোকেন নেই। ইউজার প্যানেল থেকে Play Now চাপুন।';
 if(CT_SERVER.indexOf('YOUR-')>=0)showFatal('সার্ভারের ঠিকানা বসানো হয়নি।');
