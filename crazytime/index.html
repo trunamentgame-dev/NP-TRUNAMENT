@@ -463,7 +463,7 @@ function tick(){
 setInterval(tick,200);
 
 function onState(m){
-  S.off=m.now-Date.now();S.st=m;S.winSeg=(m.phase==='result'&&m.result)?m.result.seg:null;const rb=$('rb');if(m.phase==='result'&&m.result){rb.textContent=resLabel(m.result.spot,m.result.mega);paintRB(rb,m.result.spot);if(Z.skip!==m.roundId){zoomIn();rb.classList.add('show')}}else{rb.classList.remove('show');zoomOut()}
+  S.off=m.now-Date.now();S.st=m;S.winSeg=(m.phase==='result'&&m.result)?m.result.seg:null;const rb=$('rb');if(m.phase==='result'&&m.result){rb.textContent=resLabel(m.result.spot,m.result.mega);paintRB(rb,m.result.spot);if(Z.skip!==m.roundId){zoomIn();rb.classList.add('show')}}else{rb.classList.remove('show');if(m.phase==='spin'){if(Z.skip!==m.roundId)zoomIn()}else zoomOut()}
   $('ph').textContent={betting:'বেট ধরুন',spin:'ঘুরছে',result:'ফলাফল',paused:'বিরতি'}[m.phase]||'';
   $('online').textContent='👥 '+(m.online||0);
   {const fl=$('fairLine');if(fl)fl.textContent=m.hash?('Round #'+m.roundId+' hash: '+m.hash+(m.reveal?'  |  Round #'+m.reveal.id+' seed: '+m.reveal.seed:'')):''}
