@@ -102,17 +102,11 @@ html{background:#02060f}
 #mwGo.on,.mwg.on{display:flex}
 #mwLoad{transition:opacity .4s ease}
 #mwGo::after,.mwg::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,transparent 35%,rgba(2,6,20,.75) 100%)}
-.mwg-bg{position:absolute;left:50%;top:50%;width:190vmax;height:190vmax;transform:translate(-50%,-50%) rotate(-30deg);display:flex;flex-direction:column;justify-content:center;gap:.9em;font-size:clamp(16px,4.6vw,26px);font-weight:900;letter-spacing:.18em;white-space:nowrap;color:rgba(150,200,255,.07);pointer-events:none;-webkit-user-select:none;user-select:none}
-.mwg-word{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;font-size:min(8.4vw,44px,6.2vh);font-weight:900;line-height:1;letter-spacing:.02em}
-.mwg-l{position:relative;display:inline-block;--h:#fff7cf;--a:#ffe27a;--b:#ffd23f;--d:#ff9d00;--e1:#a86f00;--e2:#4a2f00;color:var(--e1);
- text-shadow:0 .018em 0 var(--e1),0 .036em 0 var(--e1),0 .054em 0 var(--e1),0 .072em 0 var(--e2),0 .09em 0 var(--e2),0 .108em 0 var(--e2),0 .126em 0 var(--e2),0 .22em .12em rgba(0,0,0,.85);
- animation:mwg-z var(--cy) cubic-bezier(.45,.05,.25,1) infinite;animation-delay:calc(var(--i) * var(--cy) / 12);will-change:transform}
-.mwg-l::before,.mwg-l::after{content:attr(data-l);position:absolute;left:0;top:0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-.mwg-l::before{background-image:linear-gradient(180deg,var(--h) 0%,var(--a) 24%,var(--b) 47%,var(--d) 52%,var(--a) 76%,var(--h) 100%)}
-.mwg-l::after{background-image:linear-gradient(180deg,#fff 0%,#fff0a0 35%,#ffd45a 60%,#fff6c9 100%);opacity:0;animation:mwg-g var(--cy) ease-in-out infinite;animation-delay:calc(var(--i) * var(--cy) / 12)}
-@keyframes mwg-z{0%{transform:scale(1)}4.2%{transform:scale(1.7)}8.33%,100%{transform:scale(1)}}
-@keyframes mwg-g{0%{opacity:0}4.2%{opacity:1}8.33%,100%{opacity:0}}
-@media (prefers-reduced-motion:reduce){.mwg-l,.mwg-l::after{animation:none!important}}
+.mwg-bg{position:absolute;left:50%;top:50%;width:190vmax;height:190vmax;transform:translate(-50%,-50%) rotate(-30deg);display:flex;flex-direction:column;justify-content:center;gap:.9em;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-style:italic;font-size:clamp(16px,4.6vw,26px);font-weight:900;letter-spacing:.15em;white-space:nowrap;color:rgba(251,191,36,.09);filter:blur(1.5px);pointer-events:none;-webkit-user-select:none;user-select:none}
+.mwg-word{position:relative;z-index:2;display:flex;flex-wrap:nowrap;align-items:baseline;justify-content:center;max-width:100%;padding:0 8px;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-size:min(8.4vw,44px,6.2vh);font-weight:900;line-height:1;letter-spacing:.03em}
+.mwg-l{display:inline-block;color:#fcd34d;transform-origin:50% 60%;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:mwg-z 1.6s ease-in-out infinite;animation-delay:calc(var(--i) * .11s)}
+@keyframes mwg-z{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
+@media (prefers-reduced-motion:reduce){.mwg .mwg-l{animation:none!important;opacity:1;transform:none;filter:none}}
 
 /* ===== VS / match found: 3D carrom theme ===== */
 #vs{gap:clamp(10px,2.4vh,22px)}
