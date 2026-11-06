@@ -3032,6 +3032,7 @@
       db.ref('settings').on('value', (snap) => {
         if (snap.exists()) {
           state.settings = { ...state.settings, ...snap.val() };
+          try { localStorage.setItem('NP_CACHED_SETTINGS', JSON.stringify(snap.val())); } catch (e) {}
           applySettings();
         }
       });
@@ -3298,6 +3299,7 @@
           };
           updateAuthStateUI();
           renderMyMatchesFeed();
+          saveUserCache();
 
           if (state.userData.status === 'SUSPENDED') {
             showToast('⚠️ আপনার অ্যাকাউন্টটি সাময়িক স্থগিত (Suspended) করা হয়েছে।', 'error');
@@ -3313,6 +3315,7 @@
           state.transactions = [];
         }
         renderTxHistoryFeed();
+        saveUserCache();
       });
 
       db.ref('notifications').on('value', (snap) => {
@@ -3343,16 +3346,49 @@
       });
     }
 
-    // --- 3-Minute Inactivity Auto-Logout: OFF (স্বয়ংক্রিয় লগআউট বন্ধ রাখা হয়েছে) ---
-    // ইউজার নিজে লগআউট না করা পর্যন্ত অ্যাকাউন্ট লগইন থাকবে। কোনো অটো লগআউট হবে না।
+    // --- ১ ঘণ্টা নিষ্ক্রিয় থাকলে অটো লগআউট (সক্রিয় থাকলে লগইন থাকে; অ্যাপ বন্ধ থাকলেও সময় গোনা হয়) ---
     let userInactivityTimer = null;
+    const NP_IDLE_MS = 60 * 60 * 1000;   // ১ ঘণ্টা কোনো কাজ না করলে অটো লগআউট
+    let npLastActWrite = 0;
+    let npIdleListenersOn = false;
+
+    function npTouchActive(force) {
+      const now = Date.now();
+      if (!force && now - npLastActWrite < 15000) return;
+      npLastActWrite = now;
+      try { localStorage.setItem('NP_LAST_ACTIVE', String(now)); } catch (e) {}
+    }
+
+    function npIdleExpired() {
+      let last = 0;
+      try { last = Number(localStorage.getItem('NP_LAST_ACTIVE')) || 0; } catch (e) {}
+      return !!last && (Date.now() - last) >= NP_IDLE_MS;
+    }
+
+    async function npIdleLogout() {
+      try { if (auth) await auth.signOut(); } catch (e) {}
+      showToast('১ ঘণ্টা কোনো কাজ না করায় স্বয়ংক্রিয়ভাবে লগআউট হয়েছে। আবার লগইন করুন।', 'info');
+    }
+
+    function npCheckIdle() {
+      if (state.currentUser && npIdleExpired()) npIdleLogout();
+    }
 
     function resetUserInactivityTimer() {
-      // Inactivity auto-logout is disabled as requested.
+      npTouchActive(true);
+      clearTimeout(userInactivityTimer);
+      userInactivityTimer = setTimeout(npCheckIdle, NP_IDLE_MS + 1000);
     }
 
     function initUserActivityListeners() {
-      // Inactivity listeners disabled.
+      if (npIdleListenersOn) return;
+      npIdleListenersOn = true;
+      ['click', 'touchstart', 'pointerdown', 'keydown', 'scroll'].forEach(function (ev) {
+        window.addEventListener(ev, function () { if (state.currentUser) npTouchActive(false); }, { passive: true, capture: true });
+      });
+      setInterval(npCheckIdle, 30000);
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) npCheckIdle(); });
+      window.addEventListener('focus', npCheckIdle);
     }
 
     function checkTournamentRulesModal() {
@@ -3571,12 +3607,14 @@
         });
         auth.onAuthStateChanged((user) => {
           if (user) {
+            if (npIdleExpired()) { state.currentUser = user; npIdleLogout(); return; }
             state.currentUser = user;
 
             if (authGate) authGate.style.display = 'none';
             if (appRoot) appRoot.style.display = 'block';
             closeModal('modalAuth');
 
+            restoreUserCache(user.uid);
             setupUserListeners(user.uid);
             resetUserInactivityTimer();
             checkTournamentRulesModal();
@@ -3587,6 +3625,7 @@
             if (userInactivityTimer) {
               clearTimeout(userInactivityTimer);
             }
+            try { localStorage.removeItem('NP_LAST_ACTIVE'); localStorage.removeItem('NP_CACHED_USER'); } catch (e) {}
 
             // Reference Photo requirement: Must show login/signup first before accessing dashboard/pages
             if (appRoot) appRoot.style.display = 'none';
@@ -5247,7 +5286,43 @@
     function openModal(id) { const m = document.getElementById(id); if (m) m.classList.add('active'); }
     function closeModal(id) { const m = document.getElementById(id); if (m) m.classList.remove('active'); }
 
+    // ইউজারের ডেটা (নাম, ব্যালেন্স, ট্রানজেকশন) ডিভাইসে সেভ থাকে; পরের বার খুললে সাথে সাথে আগের অবস্থা দেখায়, তারপর নতুন ডেটা এসে আপডেট হয়
+    function saveUserCache() {
+      try {
+        if (!state.currentUser || !state.userData || state.userData.uid !== state.currentUser.uid) return;
+        localStorage.setItem('NP_CACHED_USER', JSON.stringify({
+          uid: state.currentUser.uid,
+          data: state.userData,
+          tx: (state.transactions || []).slice(0, 60)
+        }));
+      } catch (e) {}
+    }
+
+    function restoreUserCache(uid) {
+      try {
+        const raw = localStorage.getItem('NP_CACHED_USER');
+        if (!raw) return;
+        const c = JSON.parse(raw);
+        if (!c || c.uid !== uid || !c.data) return;
+        state.userData = c.data;
+        if (Array.isArray(c.tx)) state.transactions = c.tx;
+        updateAuthStateUI();
+        renderMyMatchesFeed();
+        renderTxHistoryFeed();
+      } catch (e) {}
+    }
+
     function restoreCachedData() {
+      try {
+        const cachedS = localStorage.getItem('NP_CACHED_SETTINGS');
+        if (cachedS) {
+          const parsedS = JSON.parse(cachedS);
+          if (parsedS && typeof parsedS === 'object') {
+            state.settings = { ...state.settings, ...parsedS };
+            try { applySettings(); } catch (e) {}
+          }
+        }
+      } catch (e) {}
       try {
         const cachedT = localStorage.getItem('NP_CACHED_TOURNAMENTS');
         if (cachedT) {
