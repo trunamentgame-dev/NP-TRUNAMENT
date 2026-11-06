@@ -409,9 +409,31 @@ input{background:#1b2d4ecc!important;border-color:#8fb0dd66!important;box-shadow
 .dside .ph{flex:none}
 /* ===== বার্তা (toast) ===== */
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#1b2d4ef2;color:#fff;border:1px solid #e6c36a88;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;z-index:99;max-width:86%;text-align:center;box-shadow:0 6px 18px #0008;font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif}
+/* ===== লোডিং পেজ (ক্যারামের মতো) ===== */
+/* Home -> loading screen (CRAMBOD tilted background + LOADING..... letter animation) */
+/* shared by #mwLoad (game open) and #mwGo (home) */
+.mwg{display:none;position:fixed;inset:0;z-index:100000;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 80% 45% at 50% -8%,#2f7bff88,transparent 70%),radial-gradient(circle at 100% 100%,#8b3dff55,transparent 50%),radial-gradient(circle at 0 90%,#00e0ff33,transparent 45%),linear-gradient(180deg,#0b1d46,#050c22);--cy:9.6s;font-family:Georgia,"Times New Roman",serif;touch-action:none}
+#mwGo.on,.mwg.on{display:flex}
+#mwLoad{transition:opacity .4s ease}
+#mwGo::after,.mwg::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,transparent 35%,rgba(2,6,20,.75) 100%)}
+.mwg-bg{position:absolute;left:50%;top:50%;width:190vmax;height:190vmax;transform:translate(-50%,-50%) rotate(-30deg);display:flex;flex-direction:column;justify-content:center;gap:.9em;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-style:italic;font-size:clamp(16px,4.6vw,26px);font-weight:900;letter-spacing:.15em;white-space:nowrap;color:rgba(251,191,36,.09);filter:blur(1.5px);pointer-events:none;-webkit-user-select:none;user-select:none}
+.mwg-word{position:relative;z-index:2;display:flex;flex-wrap:nowrap;align-items:baseline;justify-content:center;max-width:100%;padding:0 8px;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-size:min(8.4vw,44px,6.2vh);font-weight:900;line-height:1;letter-spacing:.03em}
+.mwg-l{display:inline-block;color:#fcd34d;transform-origin:50% 60%;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:mwg-z 1.6s ease-in-out infinite;animation-delay:calc(var(--i) * .11s)}
+@keyframes mwg-z{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
+@media (prefers-reduced-motion:reduce){.mwg .mwg-l{animation:none!important;opacity:1;transform:none;filter:none}}
 </style>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://ludo-server-p6e0.onrender.com" crossorigin>
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js">
 </head>
 <body>
+<div id="mwLoad" class="mwg on" aria-label="Loading"></div>
+<script>
+function mwHide(){var e=document.getElementById("mwLoad");if(!e||e._h)return;e._h=1;window.__mwDone=1;e.style.opacity="0";e.style.pointerEvents="none";setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e)},450)}
+function mwBuild(o,t){if(!o||o.firstChild)return;var bg=document.createElement("div");bg.className="mwg-bg";var row=new Array(27).join("CRAMBOD "),h="";for(var r=0;r<44;r++)h+='<div style="margin-left:'+(r%2?"-2.6em":"0")+'">'+row+"</div>";bg.innerHTML=h;var w=document.createElement("div");w.className="mwg-word";for(var i=0;i<t.length;i++){var s=document.createElement("span");s.className="mwg-l";s.setAttribute("data-l",t.charAt(i));s.style.setProperty("--i",i);s.textContent=t.charAt(i);w.appendChild(s)}o.appendChild(bg);o.appendChild(w)}
+mwBuild(document.getElementById("mwLoad"),"LOADING.....");
+</script>
 <div id="shell">
 <div class="topbar">
   <div class="tb-l"><div class="tb-ic">🎲</div><div class="tb-t">LUDO<small>MOSTWIN88</small></div></div>
@@ -1124,12 +1146,25 @@ setTimeout(sync,0);})();
    শুরুতে window.LUDO_BALANCE সেট করা থাকলে সেটাই দেখাবে। */
 (()=>{const el=document.getElementById('tbBal');if(!el)return;
 const fmt=n=>'৳'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-window.setLudoBalance=v=>{const n=parseFloat(v);if(!isFinite(n))return;window.LUDO_BALANCE=n;el.textContent=fmt(n)};
+let armed=false;const pre=window.LUDO_BALANCE!=null;
+window.setLudoBalance=v=>{const n=parseFloat(v);if(!isFinite(n))return;window.LUDO_BALANCE=n;el.textContent=fmt(n);if(armed&&window.mwHide)mwHide()};
 window.addEventListener('message',e=>{const d=e.data;if(d&&d.type==='ludo-balance')window.setLudoBalance(d.value)});
-window.setLudoBalance(window.LUDO_BALANCE!=null?window.LUDO_BALANCE:0);})();
-/* পেজ খুললেই সার্ভারের সাথে যুক্ত হই, যাতে ব্যালেন্স সঙ্গে সঙ্গে দেখা যায় */
-setTimeout(()=>{netEnsure().catch(()=>{})},300);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!Net.ok&&Net.mode==='idle')netEnsure().catch(()=>{})});
+window.setLudoBalance(window.LUDO_BALANCE!=null?window.LUDO_BALANCE:0);
+armed=true;if(pre&&window.mwHide)mwHide();})();
+
+/* লোডিং পেজ: ইউজারের মূল ব্যালেন্স দেখানো পর্যন্ত থাকবে; শুরুতেই সার্ভার থেকে ব্যালেন্স আনার চেষ্টা চলবে */
+(()=>{
+  try{if(window.AndroidBridge&&window.AndroidBridge.getUserBalance){const b=Number(window.AndroidBridge.getUserBalance());if(b>0)window.setLudoBalance(b)}}catch(e){}
+  let n=0;
+  const boot=()=>netEnsure().then(()=>{
+    /* ব্যালেন্স আনা হয়ে গেছে; খেলা শুরু না হলে সংযোগ বন্ধ করি, যাতে Play চাপলে নামসহ নতুন করে যুক্ত হয় */
+    setTimeout(()=>{if(Net.ok&&Net.ws&&!Net.started&&!searching&&Net.mode==='idle'){try{Net.ws.close()}catch(e){}}},1500);
+  },e=>{
+    if(e&&(e.message==='login'||e.message==='server-url')){if(window.mwHide)mwHide();if(e.message==='login')toast(connMsg(e));return}
+    if(!window.__mwDone)setTimeout(boot,Math.min(1500*(++n),5000));
+  });
+  boot();
+})();
 </script>
 </body>
 </html>
