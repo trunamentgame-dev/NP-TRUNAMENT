@@ -83,8 +83,8 @@ details{max-width:340px;color:var(--mut);text-align:left;font-size:.92rem}summar
 .opt[aria-pressed=true] small{color:#5a4300}
 .sum{background:#0003;border-radius:14px;padding:10px;font-weight:600}
 
-/* ===== গেমিং স্টাইল থিম ===== */
-.pc.hop{transition:none}
+.pc.hop,.pc.retreat{transition:none}
+.pc.retreat{z-index:20!important;filter:drop-shadow(0 0 8px #ff2222) drop-shadow(0 4px 6px #0008)}
 body{background:radial-gradient(ellipse 80% 45% at 50% -8%,#2f7bff88,transparent 70%),radial-gradient(circle at 100% 100%,#8b3dff55,transparent 50%),radial-gradient(circle at 0 90%,#00e0ff33,transparent 45%),linear-gradient(180deg,#0b1d46,#050c22);background-attachment:fixed}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(#ffffff09 1px,transparent 1px),linear-gradient(90deg,#ffffff09 1px,transparent 1px),radial-gradient(circle,#ffffff14 1.5px,transparent 2px);background-size:36px 36px,36px 36px,36px 36px;-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 85%);mask-image:radial-gradient(ellipse at center,#000 30%,transparent 85%)}
 .screen,.scrim{position:relative;z-index:1}.scrim{position:fixed;z-index:50}
@@ -421,9 +421,17 @@ input{background:#1b2d4ecc!important;border-color:#8fb0dd66!important;box-shadow
 .mwg-l{display:inline-block;color:#fcd34d;transform-origin:50% 60%;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:mwg-z 1.6s ease-in-out infinite;animation-delay:calc(var(--i) * .11s)}
 @keyframes mwg-z{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
 @media (prefers-reduced-motion:reduce){.mwg .mwg-l{animation:none!important;opacity:1;transform:none;filter:none}}
+
+/* হোম বাটন: হোম পেজের একদম নিচে */
+#shell>#home{padding-bottom:84px}
+#home #goPanel{position:absolute;left:0;right:0;margin:0 auto;bottom:max(16px,env(safe-area-inset-bottom));width:calc(100% - 28px);max-width:340px}
+
+/* ===== ব্যাকগ্রাউন্ড: ছোট ছোট লুডু বোর্ড, ৩০° বাঁকা, একটার গায়ে আরেকটা লাগানো (কোনো ফাঁক নেই) ===== */
+/* বোর্ডের সাইজ বদলাতে চাইলে নিচের SVG-তে pattern/image-এর width ও height (এখন ১৬০) বদলাতে হবে */
+#shell,.vs{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIj48ZGVmcz48cGF0dGVybiBpZD0icCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgzMCkiPjxpbWFnZSB4bGluazpocmVmPSJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQVpBQUFBR1FDQU1BQUFDM1ljYitBQUFBa0ZCTVZFWC8vLy8vL1AvOS92L2w5di8vLy83Ky92NzgvdjMrL2YzOC9QejgrL3YrKytMbTcrai8vQm4vOGdYKy9nRC84Z0QrN3dEODZ3RFl6YmpFcUhDQnk2RnFySG9IdGY0R3E3c0huVFFHbkNvQXQvOEFyUDhBclA0QXAvNEFvNGdBbXlzQW1pc0FuU2luaWwyTWdIdDVlMzBjaXlNQWlvRUFreHJlUkJMc0NRVDhBZ0ZjWHo0a01TSC9BQUwvQUFDcEFBZmRDRWd3QUFBUVRVbEVRVlI0MnUzZGZWL2FQQlFHNE1yNktrNjBnb0tUSDJxTElLbncvYi9kMDZKN052WGNvUzlKYWRsOS9seVdncjA0YWFFbmlaTm1qQTVGNnFUWjg3ckRzWnc0S0pJWXRjUUo3blE5V1pxTXFkR2pUZllnNjIxMzQwMU5JaFJKSEVXQkVGRVVKMUVZaUJFbDE5TkhnN0Y0TW5tMHgrazd5S2JEb1NabnJ2eFp6MEdjUUdvSThneUo1RDd1SUxtZVBjN01SWDRTRFI1dDlnR3kzWFExUVRadk5rQVdqMTBOZ2hDRUlBUWhDRUVJUWhDQ0VJUWdCQ0VJUVFoQ0VJSVFoQ0FFSVFoQkNFSVFnaENFSUFUUmdMeTFFZ1RwVllab3EwN2t5RUZncDM2RHRGRlg4cnJSZzhBU3EvRVF0UXpIbXJxc1BvTzgzY1QyNC94bSs2WUJVUWtLbGR5QVNCUnF1Vkg5Qm9HMWdTYmpScE9oT2NnWWhjcFdJRExZc3NwS2dTd3NSak9RSUFvc1J4VG9RVFNscEtzcGlPVVN0VXhMWmNqS2FqVExrTUIyZmtRSE1rUnpVVitDcXRERmNnbi81QklnVDlPeDFaaXVGcjBHQWJlOTdsbWVJUmhrVVJ0a3NaclkvWXNucXhsQnFvR0VVV2d0b3BBZzFUUEV0L24zRW9RZ0JDRUlRUWhDRUlJUXBOc2dIdnI1d3lOSVB6SUVDZ1lFTVFGeURvTVpjaFNRbTgyckdKdTFFOG1QVXRGeUFEYzlBZkhSRHlCdU4wRFFlVU1nbWc0bm1pRWgrbW5hdHdLQ3FoUWdDTzdRQnhEWGdZODVoeDNKRVBGWjYxdlZESG5yU1liNHpuSWxyN2l3aWgzcHpqSjB4aE1ROGUrc0kwZ3pFUEVKMWdLQUZDY2J4RGpYSWtoemtDZnhzZmhVQXpJVjF6QWhpS2tNV2NqL1JRTWlubWlDRUlRZy93eUk3NGtSYUVFZUNXSUxSRmVYSlplaVRaZkxKeFFFYVFheVZabENrV1hWVzFSR2tLWVpncFpQRE9HUU5WMGxEWXF0Q1hMb0dnSk83WmtPWkFEdUJIeUNIT0V1S3dkQm5RWUVJUWhCQ0VJUWdoQ0VJQVFoQ0VFSVFoQ0NuQkpJMVRLZzQxU2QvRHNnYURHRzZuVlpIa0VNZ01BSnl2SlNMNTRUd3dVVitwSWhOWW9jV2dUcHkzUUVreGtpbGdFOTZrQmt3VzZBSEtuNjNSeklkQ2F2QjlHUnVxeC9MVU1jWjRoQ0hxUjlKNVlYYjRqSFE4Y2xTSE1RVG1uckdJaUxBdjAxcnVkS0ZUS3VSeEJtQ0VFSVFwQmpnS0NWZWZCNldkTmxnanNScENsSWpjcEZUVjNXelhQM1FWNjdETEpUNE5aK0hDdTg2ekxzTkZiWjlNQ0NjbDBBZWVzeUNGNlZORU1lbWE3VG9kMmlPV1JwUVRMOWtDWDlycUVkc2hJMVd4Q2syVVc5OGlLWXhVVzkvc3JXQk9GdEwwRUlRaEFiSUNXZWJoQ0VHV0lSeFBWQW9GOTczY0hCRGdaQklyanlSOFFNT1VhR1JIQUxFUG1CWnVDc1grWFZtZjd1MEYyUTR2bWYvQUg4OC96djY5bUdqeGl0Z0tBdjlKdHpCSUpPZEM5QXlqd2gvL0lFZHd3MmJKaE4vaStVT2k0SUtwVDc2N2pkQmpsVVEvSXB3aHprVVpxTC9ianFDZ2lxUGUwUHlJRXFxMjhnUUpBZ1J3T1JPeENFSUFRaENFRUlRaENDRUlRZ0JDRUlRUWhDRUlMWUFRSGxJL1pMU1FuU1Jpa3BRWnFCYkZXV29zQXJYU29GT3ltQ05NMFErQkF1V1Q3TEdzL0xGSGNpaU0waEMxN1VPV1FkNHk0cnY2aExsNURpb3M2N0xONzJFb1FnRzFDeW9BTVJneUJtUUxZbHFucStWcDJJaCsxUjFZbThza1pIaWh4ZVFhd3IxbVc5bldoZEZzeVFtUjJRcXFGWm51bThEeUJsOWx6N0JqSnJFOFN6c0RmeEtkWDJ1czRRNzNzNDZFTDFPNXhZNXZVRHhBOTlNVUt2eVFlUTB4R01ad2hjZXlZWGxIOWw5Z25DQ1RzRUlRaEJDRUlRZ2hCazRrZSt0WWo4QmlEYmRTc0JGNzg1V29aWWpTWWd4NDRqZ1F5dHhtUzFxQTN5MWtwMEN5VHZiemRtbWxkbWhvaXhlbHBaaTZmVkkwR3FnaXlzUnU5QndQYmRaN3JLeFRPd3hJVmZDdVJvMFF1UXRpc1hDWElBQks2d2t1SkZNRlBZaVNCTlFWUUNxMElWcWx4c1ZFcEtrTnBEMW5JcTUwZCtEZUdRWlE4RWJYQWY2ZTZ5d0dObGx4ZDFtN2U5dWxKUzNtV2QwdmNRZ2hDRUlBUWhDRUVJUWhDQ0VJUWdCQ0VJUVFoQ0VJSVFoQ0FFSVFoQkNFSVFnaENFSUFRaENFRStRRGFkamRlTmJqOTFEVWlEUlRBN0FGSmpub0J1Ym9IUnFRcjZVdEluTWZTbHBOUEhHYWlCMXBSSFYyK3AwK2tEWktrTVJwWmxKZytubGdwV2hlcTI3OGIxcDBvelVhQjZpK0ZPVDNzUXVJUDhFcDdiVExQdC9CZzB4V1BjS1ozQVRwbG1IL3Zxb2JJRVZ2M2lnbUExaHAwUWZYNGk0Q3VOOGVjbEIxSEtPUk9UKzh4UnIyRFFldHROUUtkOFRJaFIwekN0M09uTUdXYlpFb3hNVDNnS0J2ai8wMlgyTWtTRFdZekh1YlI2cDdQaWIzSXFub2l6UWtNcE4zS2xpSHdkaUM5MjhuMHZpZDFRYkhLSHFkeVNoNmFUZXMzUVBKREtsOHhsTm4rSjNVQjZwZENORS9EbVFqY2Q1dThFZGZMRnBzaE5ZN25UL2tTQVUrN3VRWndJekZmV1prZ29McEhsRlIrTVFGNDlLLzlnQkRoRHhPTUZlWVpzY3hFRDkwV0x2Y2Y5QzNoN0lmNndCMFdHZUhKTDNzbno1TE9YeXV2c3ZaOEllTXA3QUxKNU01RWpIeDRQQkdrT3N0bWFFTmw3TUVPTVpNaldRSTY4ZS93aWlCR1Fwam15K08xQkVETWdqVVYrZXhERUVFaERrZjg5Q0dJSzVGMWswV3k4SW9oQmtObzU4c21ESU9aQWFvdjg3VUVRZ3lEYmVuZS9uendJWWhSa255T3ordU1WUVF5RFZCNjF2bmtReEN4STVWSHJxd2RCVElOVUdiVys1d2RCaklOVUdMVWtENElZQjZrZ0luZ1F4RHpJZHY5OFpGYlBneUFXUUVyOWlyS1FQUWhpQTZURXFJVThDR0lGcE1UZEwvRG9DWWk4MkpkZkE4UjFpM01ySHM4dDNvZUhRWkNpQ0xLL2ppeXFlK3hCQnRJckRURElBSllCYVRyNUJRZ0krTW4wM2tHaW9iaFAxREJTTzFSenU1c01vb0VVNFZrU3kwMW5nMkVLT2cwR3FGTTRHQ29KUkR0cUxiQkhBWUwyeFlvVHVHVldPcXpSS2NHdmxPSlRycHcwUzFCa210RHNjZzdYbjhTZGxLYVR2RlMvVGdSNzVDQ3ErbnRJOFJ0UDY1d0kzU2xQblZUQlZlUFZEa1pXbzBVdFlkTks4MG9iTkZNQjNmMXFQSEtRbHptSWx3eTF6TFBxbmU1MG5UU25mRjlLaW1LQ3JpSGJYWWFxMVRmWksycGFMMUhMNjJvSG14QUl1STRzdEI0NXlOMDlpTHNNdGR6bkIwU2RYbUFuL0VyekZKN3kvVFhFaStSVlB3UE5OU1NETXpveTJFa3RZYWZWRGg4UDcvWWkvSzUxd0tNQWVaQS90am5JSERVVlJ3U2RYbUNuSEVSdXViMkRwOXlyZWR1Ylo0Zzg2Nm80Unp0MCt0UVNkbHJ0MEN3dURjajczZStzL0hqMWtTRVBVc01lNVA2WDNJUU8rYkFIQWNkRHIvU1FnNWorSHRJVmtPK2oxZ0VQZ3RnRjJiL2ViRloydkNLSWRaQXYxNUdESGdTeERmTHBPbkxZZ3lEMlFmNWNSMHA0RU1RK1NONXh0OCtSTWg0RWFRRmsvM2FXNVR3STBncElNV3JOU25rUXBKME1LVjYybEFkQldnTFpFS1JUUTFiK2ZxNnZPV1IxQldUdmNYbDV6WXQ2ZDI1N3J5K3Zya3FKRU1UK0Y4UE4zbU0wS2lWQ0VQc1o4dUZSVG9RZ0xmeTQrT0ZSU29RZ2xuOSszL3psVVVhRUlIWWZVUDBacjBxS0VNUW15RGVQd3lLOUFBbDZXK1R3eldNMHV0YUxkS1RJQVo5eWRhQU1DRVFueW9BK1h6L0s1VWdQeW9CU05RVHIveGt2bE11TUZzcHRSWThESXZjdkwzY2dYakxVTXM4TWQ5S2M4bFJiU3FvcC9VenFsRjBtZFk2SFMwbEZqdytSVzFSS2l0K2U2VkxTN0FXRnRwUlVLVTJOTWFpTkhzU3BvNm1iQmpGTW5RSHM1SVNnRXk2MkJoN2E2OGo5eXpDUS85Z2dUa0JMRktTMU91VVhkVEh5YXdnODVicnBDUHRwRWE0OHN5Qk8zZU5PUjlCNTZFYXQxcVlqaEU0T0FvYk4vQzRyMUUxSGdQZGdhSjZLNThSZ3lrbGJFM2FrKzZ0U0ltMU8yREgvUGFTcklBZnlRemRxRWNUU3BNOERIakJIQ0dKaFduUVpEeVJDRUNzTEI1VHdBSGUvQkxHeHRFWXBEL2s2UWhBTGk4K1U5QkJITFlLWXpwQUtIcElJUVl5Q2JLcDVDQ0lFTVFsUzJlTzdDRUVNZ3RUdytDWkNFSE1ndFR5KzN2MFN4QmhJVFk4dmQ3OEVNUVZTMitQenFFVVFReUFOUEQ2SkVNUU1TQ09QdjBVSVlnU2tvVWR4SFZtM3Y2SEw2WUkwOXZpVEl3UXhBR0xBNC8rN1g0S1l5QkFESGg5M3Y3Y1BCR2tNc2pYaThYdlVlb2xEY1d2dktJd1R0T1YzbUE1aHB6U01RRk9xcVZ5VUQ1Zi82OGQ2V1o0VWtaY092VUJxQ2J3NGxUc0ZnWmZFWGloM0dxWnlTeDU1Si9GNG9WZHN2Ym8yNFZHSTVGZDJ6VjY0WTlUaXBCRnFHV28yMEozWFhjQU1IeEsvZVh4STdaNjhOVG90aS9tRHB1STZ5MUpVbzZhVXBud050YVNhVGpVTDVkTE01SzdWc1diWGFrMm5GRzkxbmUzV0JtT1gzYUdWRU85Z3kvenV0azZuZWZXbTI1ZGlFY3puTHNjT2JzSStWdkNkSzRYNmpHSDVtbmJlVloybWUwM2dUam5JODJXWFk0MEg2UVNPWmRlYVR1RGVKNy83ZVlDbkNUY1o3dlF3MzROY2R6Y3UxeW00SXduRFpIMkpPcUVicGpCTUlVZ1g0dUhYTzhpb3ExR2NXMUFRN0E0U1hQMmVETnpLR1VJUWdoQ0VJQVFoQ0VFSVFoQ0NFSVFnQkNFSVFRaENFSUlRaENBRUlRaEJDRUlRZ2hDRUlBUWh5T21BckMrdnI0UW9Pdmx5aGVUQUpVaGprQ2dVVi9BTVFsMFprQTh5SkNCSTh3eUJKVlpyVkR5MHJsT1hSWkJ5SUpxVk0vRlNwbkJOelVRUnBDRklpZ3VDY1lab09oSEUzcEJsdHBTVUlDVkI1RGtxbnVmWHVjdnlDTUx2SWVaQWZsNjBFMTBDdVcwaGFvTDhIRjA0clVSODliTXpJUE5Xb2paSTROcVB5TzBReVB6MlJ3c3hudGNGY1IzWGVuNEVYY3FRK2JpTklTRWtTUGtNOFZ1SUh3UXBEOUpHaGhDRUlBUWhDRUVJUWhDQ2ZBWng0UmRGZ3ZRa1E5ekRnZ1NwQytJNjUvQ3hUMVJmamlBTlFNQ1p1N280bDBFaStBUHZudzRFTVE4eWdpQm80YkdyM29DZ25SZTdEUElUZzZBei9aTVpjcHdNNlQwSS9nMTlRSkQyUVFiNXVSTVhreXNlbk1nN2h2NkF6d2wvbkQ2SXBzZ0JnQXlxZzhBbldRQUVQaVk4SFpBV3k0Qk1nS0NIOWFjQ2tnNVJwSGl0UzAyblk0R2NUSWJvTml4WG1SSWkvMmZOVHZBRTRaQjFXaUN0TG9KSmtPN2Y5aEtFSUFRaENFRUlRaENDRUlRZ0JDRUlRUWhDRUlJUTVKUkFmaExrYUNDamluVlpJNEpZQlNsUjkvWWxRMUFRNUNpMXZlNDVpcWdYcGFRbkI5TDMydDU5R2RCSmdmUzgrbjJmSVJYcnNwZ2hka0UwZFcvSHJzdjZCMEZxaEQrR3hhY0VPZkhxOTJPQlJDaDBWU2V3VTJxNyt0MC9UTmozRERsZVhWYTNweU1jQjBUaHplQ1ZKbkFuZ2pRRU1idWZla3dRRGxrbkJxSXZKVVh6UTh5VWtoS0Vjd3dKUWhDQ0VJUWdCQ0hJUDdrOGs4dmxtWmdoQk1FZzV4Znk0a3lveHNFSllCREVCTWdGTEFNU1FWd25Sa1VuRnk1QlRJQ01VS0VjQWtFbitvSVpZaEZrUkJDQ0hIOTVKdlRBOElmOG8rWVBueUFtUUc1UkRjbXQ0OHVmZmxpbVFoQVRJR05ZdVNpQ0RJb09vSkNMSU1jQ09YaGtnaENFSUFRaENFRUlRcEF1Z0tDZi9IMHRpRU1RV3lDRE03bFd0Z0FaU1ZWWm8yS0RlL2xIWmo4Z1NGT1FESmFMWnByQW5RalNFR1NIeWhNdjE1cktSUTVaRmtHdXhCaGRxbXZqMjNjVHBBd0lhQ3RBZUpkRkVJSVFoQ0FFSVFoQlRoamtKMEdPQlZLNUxvc2dWa0ZpdERwVGpFRGdlazR1UWRxdjdYVWR1RHJUT1RPa3Q5WHZ4d2E1UFowTUtTZlliWkNLZFZsZEJ6bUJERUZsYjJOeGRTYUNkSzYydDB6dEtVSHFnd3dHRnRabklraUxHVEk0K2VXWmVnYkNEQ0VJUVFoQ2tOOGdMVVRnRXFRMGlOTktIQUtSVjdxOEdoVlZKM0RyMWFNdGdta1Y1THlWdUxCUWwrWFVyY3Z5VzRpYUlFWHl0eE9qa1E0RUxhejRuTlZZYzNGOFlNM0ZjUnNaNHRjR09YcmtJSm9GUmxQVWt0WmZsWFRjUXR6MkdnU1BQdU1oYWhtT2F3NVp2K2F0eEs4K2c2UjRaZXNZdGNSMVY3WStkdlFqUStRSk8wNE80Z1RnbTAwUzFjd1FnaENFSUFRaENFRUlRaENDRUlRZ0JDRUlRUWhDRUlJUWhDQUVJUWhCQ0VJUWdoQ0VJQVFoQ0VFK2cxeDFOZjVSRUtNeE1uczQzWDdxdXFxVFVGNXpNVXJ1YnVmZGpZZDVEcUxXSnVQNTRzYm84VjQxVmFFeHJCYldkSnJmZHpweWtJelJvVWovQTJBVzFqY3l5NUFWQUFBQUFFbEZUa1N1UW1DQyIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIG9wYWNpdHk9Ii40MiIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwKSIvPjwvc3ZnPg=="),radial-gradient(ellipse 85% 70% at 50% 40%,#3f5f90 0%,#2f4c7a 55%,#233a62 100%)!important;background-size:100% 100%,100% 100%!important;background-repeat:no-repeat,no-repeat!important;background-position:0 0,0 0!important}
 </style>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://ludo-server-p6e0.onrender.com" crossorigin>
+<link rel="preconnect" href="https://ludo-server-p6e0.onrender.com">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js">
 </head>
@@ -433,6 +441,8 @@ input{background:#1b2d4ecc!important;border-color:#8fb0dd66!important;box-shadow
 function mwHide(){var e=document.getElementById("mwLoad");if(!e||e._h)return;e._h=1;window.__mwDone=1;e.style.opacity="0";e.style.pointerEvents="none";setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e)},450)}
 function mwBuild(o,t){if(!o||o.firstChild)return;var bg=document.createElement("div");bg.className="mwg-bg";var row=new Array(43).join("LUDO "),h="";for(var r=0;r<44;r++)h+='<div style="margin-left:'+(r%2?"-2.6em":"0")+'">'+row+"</div>";bg.innerHTML=h;var w=document.createElement("div");w.className="mwg-word";for(var i=0;i<t.length;i++){var s=document.createElement("span");s.className="mwg-l";s.setAttribute("data-l",t.charAt(i));s.style.setProperty("--i",i);s.textContent=t.charAt(i);w.appendChild(s)}o.appendChild(bg);o.appendChild(w)}
 mwBuild(document.getElementById("mwLoad"),"LOADING.....");
+setTimeout(function(){if(window.mwHide)mwHide();},1200);
+window.addEventListener('load',function(){setTimeout(function(){if(window.mwHide)mwHide();},400);});
 </script>
 <div id="shell">
 <div class="topbar">
@@ -446,6 +456,7 @@ mwBuild(document.getElementById("mwLoad"),"LOADING.....");
   <input id="nm" maxlength="14" placeholder="আপনার নাম" aria-label="আপনার নাম">
   <button class="big" id="play">লাইভ অনলাইন প্লেয়ার</button>
   <button class="big alt" id="frd">বন্ধুর সাথে খেলুন</button>
+  <button class="big ghost" id="goPanel">🏠 হোম</button>
   <p class="prov">provided by <b>MostWin88</b></p>
   <details><summary>খেলার নিয়ম</summary>
     <p>৬ উঠলে ঘর থেকে গুটি বের হয় এবং আবার চাল পাবেন। প্রতিপক্ষের গুটিতে উঠলে সেটা ঘরে ফিরে যায় (★ ঘরে কাটা যায় না)। পরপর তিনটি ৬ উঠলে পালা চলে যায়। আগে চার গুটি মাঝখানে পৌঁছালে জয়। ২০ সেকেন্ড কিছু না করলে স্বয়ংক্রিয় চাল হবে।</p>
@@ -748,7 +759,7 @@ function roll(p,v){
   say(p===0?'আপনি ডাইস ঘোরাচ্ছেন...':G.names[p]+' ডাইস ঘোরাচ্ছে...');
   d.classList.remove('roll');void d.offsetWidth;d.classList.add('roll');rattle();
   d._rolling=true;setFace(d,v,true);
-  setTimeout(()=>{d._rolling=false;if(S!==G)return;G.rolling=false;applyRoll(p,v)},1150);
+  setTimeout(()=>{d._rolling=false;d.classList.remove('roll');if(S!==G)return;G.rolling=false;applyRoll(p,v)},1150);
 }
 function applyRoll(p,v){
   const G=S;G.dice=v;G.last[p]=v;G.rolled=true;render();
@@ -786,21 +797,97 @@ function move(p,i){
   };
   tick();
 }
+/* কাটা গুটি যে পথ দিয়ে এসেছে সেদিক দিয়ে উল্টো হেঁটে ঘরে ফিরবে */
+function retreatVictims(victims,onDone){
+  if(!victims.length)return onDone();
+  let remaining=victims.length;
+  victims.forEach(v=>{
+    const {f,k,startR}=v;
+    const e=E[f][k];
+    e.classList.add('retreat');
+    e.style.zIndex=20;
+    const revSteps=[];
+    for(let r=startR-1;r>=0;r--)revSteps.push(r);
+    revSteps.push(-1);
+    const delay=Math.max(20,Math.min(48,Math.round(750/(revSteps.length+1))));
+    let idx=0;
+    const stepBack=()=>{
+      if(!S||S.over){
+        e.classList.remove('retreat');
+        e.style.zIndex='';
+        remaining--;if(remaining<=0)onDone();
+        return;
+      }
+      if(idx>=revSteps.length){
+        e.classList.remove('retreat');
+        e.style.zIndex='';
+        S.pc[f][k]=-1;
+        const [by,bx]=posAt(f,k,-1);
+        e.style.left=(bx/15*100)+'%';
+        e.style.top=(by/15*100)+'%';
+        remaining--;if(remaining<=0)onDone();
+        return;
+      }
+      const r=revSteps[idx];
+      const [y,x]=posAt(f,k,r);
+      e.style.left=(x/15*100)+'%';
+      e.style.top=(y/15*100)+'%';
+      if(idx%2===0)tone(480+(idx%10)*35,260,.035,'sine',.08);
+      idx++;
+      setTimeout(stepBack,delay);
+    };
+    stepBack();
+  });
+}
 function finishMove(p,i,v,n){
   let extra=v===6,cap=false;
   S.pc[p][i]=n;
-  if(n<=50){const a=abs(p,n);
-    if(!SAFE.has(a))foes(p).forEach(f=>S.pc[f].forEach((x,k)=>{if(x>=0&&x<=50&&abs(f,x)===a){S.pc[f][k]=-1;extra=true;cap=true}}))}
-  cap?capSnd():landSnd();
+  const victims=[];
+  if(n<=50){
+    const a=abs(p,n);
+    if(!SAFE.has(a)){
+      foes(p).forEach(f=>S.pc[f].forEach((x,k)=>{
+        if(x>=0&&x<=50&&abs(f,x)===a){
+          victims.push({f,k,startR:x});
+          extra=true;
+          cap=true;
+        }
+      }));
+    }
+  }
+  if(cap){
+    capSnd();
+    say(p===0?'💥 আপনি '+S.names[victims[0].f]+'-এর গুটি কেটেছেন! আবার চালুন':'💥 '+S.names[p]+' আপনার গুটি কেটেছে!');
+  }else{
+    landSnd();
+  }
   if(n===56)extra=true;
-  if(S.net&&S.expect){S.pc[0]=S.expect.me.slice();S.pc[2]=S.expect.opp.slice();S.expect=null}
-  S.rolled=false;S.dice=0;
-  if(S.pc[p].every(x=>x===56)){S.over=true;render();
-    say(p===0?'🎉 আপনি জিতেছেন!':S.names[p]+' জিতেছে');
-    winSnd();
-    if(!S.net)report(p===0?'win':'lose');$('#again').classList.remove('hide');return}
-  if(!extra)S.turn=nextSeat(p);
-  render();next();
+
+  const afterRetreat=()=>{
+    victims.forEach(v=>{S.pc[v.f][v.k]=-1});
+    if(S.net&&S.expect){S.pc[0]=S.expect.me.slice();S.pc[2]=S.expect.opp.slice();S.expect=null}
+    S.rolled=false;S.dice=0;
+    if(S.pc[p].every(x=>x===56)){
+      S.over=true;render();
+      say(p===0?'🎉 আপনি জিতেছেন!':S.names[p]+' জিতেছে');
+      winSnd();
+      if(!S.net)report(p===0?'win':'lose');$('#again').classList.remove('hide');
+      return;
+    }
+    if(!extra)S.turn=nextSeat(p);
+    render();next();
+  };
+
+  if(victims.length>0){
+    S.moving=true;
+    retreatVictims(victims,()=>{
+      if(S)S.moving=false;
+      landSnd();
+      afterRetreat();
+    });
+  }else{
+    afterRetreat();
+  }
 }
 function next(){
   const G=S;if(G.over)return;
@@ -940,19 +1027,22 @@ function cleanSvg(str){
     return ok?new XMLSerializer().serializeToString(r):'';
   }catch(e){return''}
 }
-const loadJs=u=>new Promise((ok,no)=>{const x=document.createElement('script');x.src=u;x.onload=ok;x.onerror=()=>no(new Error('sdk'));document.head.appendChild(x)});
+const loadJs=u=>new Promise((ok,no)=>{const x=document.createElement('script');x.src=u;const to=setTimeout(()=>{no(new Error('timeout'))},3000);x.onload=()=>{clearTimeout(to);ok()};x.onerror=()=>{clearTimeout(to);no(new Error('sdk'))};document.head.appendChild(x)});
 let fbAuth=null;
 async function getToken(){
   try{
     if(!fbAuth){const B='https://www.gstatic.com/firebasejs/9.23.0/';
       await loadJs(B+'firebase-app-compat.js');await loadJs(B+'firebase-auth-compat.js');
       const app=firebase.apps.length?firebase.app():firebase.initializeApp(FB_CFG);fbAuth=firebase.auth(app)}
-    const u=await new Promise(res=>{const off=fbAuth.onAuthStateChanged(x=>{off();res(x)})});
-    if(u)return await u.getIdToken();
+    const u=await Promise.race([
+      new Promise(res=>{const off=fbAuth.onAuthStateChanged(x=>{try{off()}catch(_){}res(x)})}),
+      new Promise(res=>setTimeout(()=>res(null),2000))
+    ]);
+    if(u&&typeof u.getIdToken==='function')return await u.getIdToken();
   }catch(e){}
   return HASH_TOKEN;
 }
-const connMsg=e=>e&&e.message==='login'?'লগইন পাওয়া যায়নি। ইউজার প্যানেল থেকে লগইন করে গেমটি খুলুন':'সার্ভারের সাথে যুক্ত হওয়া যায়নি। একটু পরে আবার চেষ্টা করুন';
+const connMsg=e=>e&&e.message==='login'?'লগইন পাওয়া যায়নি। ইউজার প্যানেল থেকে লগইন করে গেমটি খুলুন':'সার্ভারে সংযোগ হয়নি। স্কিপ বাটন চেপে কম্পিউটারের সাথে খেলতে পারেন!';
 /* Render ফ্রি প্ল্যানে সার্ভার ঘুমিয়ে থাকলে আগেই জাগিয়ে রাখি */
 try{if(LUDO_SERVER.indexOf('YOUR-LUDO')<0)fetch(LUDO_SERVER.replace(/^ws/,'http')+'/health',{mode:'no-cors'}).catch(()=>{})}catch(e){}
 
@@ -963,22 +1053,21 @@ function netEnsure(){
   if(LUDO_SERVER.indexOf('YOUR-LUDO')>=0){return Promise.reject(new Error('server-url'))}
   wsP=(async()=>{
     const token=await getToken();
-    if(!token)throw new Error('login');
     let lastErr=new Error('conn');
-    for(let n=0;n<4;n++){
+    for(let n=0;n<2;n++){
       try{await new Promise((res,rej)=>{
         let ws,done=false;
         const fail=e=>{if(!done){done=true;clearTimeout(to);rej(e)}};
-        const to=setTimeout(()=>{fail(new Error('timeout'));try{ws.close()}catch(e){}},25000);
+        const to=setTimeout(()=>{fail(new Error('timeout'));try{ws.close()}catch(e){}},8000);
         try{ws=new WebSocket(LUDO_SERVER)}catch(e){return fail(e)}
-        ws.onopen=()=>ws.send(JSON.stringify({t:'auth',token,name:($('#nm').value||'').trim().slice(0,14),av:myAv()}));
+        ws.onopen=()=>ws.send(JSON.stringify({t:'auth',token:token||'',name:($('#nm').value||'').trim().slice(0,14),av:myAv()}));
         ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return}
           if(m.t==='ready'&&!done){done=true;clearTimeout(to);Net.ws=ws;Net.ok=true;startHb();onSrv(m);res()}
           else if(m.t==='err'&&m.code==='auth'){fail(new Error('login'))}
           else onSrv(m)};
         ws.onclose=()=>{const was=Net.ok&&Net.ws===ws;if(Net.ws===ws){Net.ok=false;stopHb()}fail(new Error('conn'));if(was)onDrop()};
         ws.onerror=()=>{};
-      });return}catch(e){lastErr=e;if(e.message==='login')break;await new Promise(r=>setTimeout(r,2500))}
+      });return}catch(e){lastErr=e;if(e.message==='login')break;await new Promise(r=>setTimeout(r,1200))}
     }
     throw lastErr;
   })();
@@ -1116,6 +1205,27 @@ function leaveRoom(){if(Net.mode==='room'){Net.send({t:'unroom'});Net.mode='idle
 const shareText=()=>'আমার সাথে লুডু খেলো! রুম কোড: '+Net.code+'\n'+location.origin+location.pathname+'?room='+Net.code;
 $('#frd').onclick=()=>{ls('ludo-name',MYNAME());ferr('');show('friend')};
 $('#fback').onclick=()=>show('home');
+/* হোম বাটন: ইউজার প্যানেলে ফিরে যায়।
+   ইউজার প্যানেলের ঠিকানা এখানে বসান (অথবা পেজ লোডের আগে window.USER_PANEL_URL সেট করুন)।
+   ফাঁকা রাখলে ?panel=... / আগের পেজ (referrer) / ব্রাউজারের পেছনের পেজে যাবে। */
+const USER_PANEL_URL=window.USER_PANEL_URL||'';
+function panelTarget(){
+  if(USER_PANEL_URL)return USER_PANEL_URL;
+  const ok=u=>{try{const x=new URL(u,location.href);return x.origin===location.origin&&x.pathname!==location.pathname?x.href:''}catch(e){return ''}};
+  return ok(Q.get('panel')||'')||ok(Q.get('back')||'')||ok(document.referrer||'');
+}
+$('#goPanel').onclick=()=>{
+  const t=panelTarget(),inFrame=window.parent!==window;
+  emit('ludo-home');emit('ludo-exit');
+  if(inFrame){
+    /* প্যারেন্ট পেজ বার্তা ধরে আইফ্রেম বন্ধ না করলে সরাসরি প্যানেলে নেওয়া হবে */
+    if(t)setTimeout(()=>{try{top.location.href=t}catch(e){location.href=t}},350);
+    return;
+  }
+  if(t)location.href=t;
+  else if(history.length>1)history.back();
+  else location.href='/';
+};
 const fsel=()=>{$$('#fstake button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===FST));$('#fsum').textContent=stakeTxt(FST)};
 $$('#fstake button').forEach(b=>b.onclick=()=>{FST=+b.dataset.v;ls('ludo-fstake',FST);fsel()});
 $('#mk').onclick=()=>{ferr('');fsel();openS('fsheet',true)};
@@ -1157,12 +1267,15 @@ armed=true;if(pre&&window.mwHide)mwHide();})();
   try{if(window.AndroidBridge&&window.AndroidBridge.getUserBalance){const b=Number(window.AndroidBridge.getUserBalance());if(b>0)window.setLudoBalance(b)}}catch(e){}
   let n=0;
   const boot=()=>netEnsure().then(()=>{
+    if(window.mwHide)mwHide();
     /* ব্যালেন্স আনা হয়ে গেছে; খেলা শুরু না হলে সংযোগ বন্ধ করি, যাতে Play চাপলে নামসহ নতুন করে যুক্ত হয় */
     setTimeout(()=>{if(Net.ok&&Net.ws&&!Net.started&&!searching&&Net.mode==='idle'){try{Net.ws.close()}catch(e){}}},1500);
   },e=>{
-    if(e&&(e.message==='login'||e.message==='server-url')){if(window.mwHide)mwHide();if(e.message==='login')toast(connMsg(e));return}
-    if(!window.__mwDone)setTimeout(boot,Math.min(1500*(++n),5000));
+    if(window.mwHide)mwHide();
+    if(e&&e.message==='login')toast(connMsg(e));
   });
+  // Auto-hide loading screen after at most 800ms so game screen is immediately ready
+  setTimeout(()=>{if(window.mwHide)mwHide();},800);
   boot();
 })();
 </script>
