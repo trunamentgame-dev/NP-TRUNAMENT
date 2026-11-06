@@ -720,7 +720,7 @@ $('mRules').onclick=()=>openPg('খেলার নিয়ম ও বাজি
 $('mExit').onclick=()=>{sheet('menuS',false);if(window.AndroidBridge&&window.AndroidBridge.exitToUserPanel) window.AndroidBridge.exitToUserPanel()};
 $('homeBtn').onclick=()=>sheet('homeS',true);
 $('homeN').onclick=()=>sheet('homeS',false);
-$('homeY').onclick=()=>{sheet('homeS',false);goPanel()};
+$('homeY').onclick=()=>{sheet('homeS',false);try{tx({t:'cancel'})}catch(e){}location.href='https://trunamentgame-dev.github.io/NP-TRUNAMENT/'};
 $('homeS').onclick=e=>{if(e.target.id=='homeS')sheet('homeS',false)};
 function goPanel(){const was=LG.on;try{tx({t:'cancel'})}catch(e){}if(window.AndroidBridge&&window.AndroidBridge.exitToUserPanel)window.AndroidBridge.exitToUserPanel();else if(window.CK_HOME)location.href=window.CK_HOME;else if(was)show('home')}
 window.onBackPressed=window.handleBack=window.onBack=function(){goPanel();return true};
