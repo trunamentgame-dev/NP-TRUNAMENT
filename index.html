@@ -3318,7 +3318,108 @@
 
     let pendingGameUrl = null;
 
-    function playGameUrl(url, isLudo) {
+    // --- IP, Device Fingerprint & Game Session Tracking ---
+    async function trackUserDeviceAndIp(uid) {
+      if (!uid || !db) return;
+      try {
+        let deviceId = localStorage.getItem('np_device_fingerprint');
+        if (!deviceId) {
+          deviceId = 'dev_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now().toString(36);
+          localStorage.setItem('np_device_fingerprint', deviceId);
+        }
+
+        const ua = navigator.userAgent || '';
+        let deviceModel = 'Web Browser';
+        if (/android/i.test(ua)) deviceModel = 'Android Phone';
+        else if (/iphone|ipad|ipod/i.test(ua)) deviceModel = 'iOS Device';
+        else if (/windows/i.test(ua)) deviceModel = 'Windows PC';
+        else if (/macintosh|mac os x/i.test(ua)) deviceModel = 'Mac';
+        else if (/linux/i.test(ua)) deviceModel = 'Linux Device';
+        const screenRes = `${window.screen.width}x${window.screen.height}`;
+        const deviceFull = `${deviceModel} (${screenRes})`;
+
+        let userIp = localStorage.getItem('np_last_ip') || '';
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 2500);
+          const res = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+          clearTimeout(timeoutId);
+          if (res.ok) {
+            const ipData = await res.json();
+            if (ipData && ipData.ip) {
+              userIp = String(ipData.ip).trim();
+              localStorage.setItem('np_last_ip', userIp);
+            }
+          }
+        } catch (e) {}
+
+        const now = Date.now();
+        const updates = {
+          lastIp: userIp || 'Unknown',
+          lastDevice: deviceFull,
+          deviceId: deviceId,
+          lastActive: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        if (userIp) {
+          const safeIpKey = userIp.replace(/\./g, '_').replace(/:/g, '_');
+          updates[`ipHistory/${safeIpKey}`] = { ip: userIp, time: now };
+        }
+        updates[`deviceHistory/${deviceId}`] = { device: deviceFull, time: now };
+
+        await db.ref(`users/${uid}`).update(updates);
+
+        // Registry for Multi-Account Detection on Same Device
+        if (deviceId) {
+          await db.ref(`device_registry/${deviceId}/${uid}`).set({
+            name: (state.userData && state.userData.name) || 'User',
+            email: (state.userData && state.userData.email) || '',
+            ip: userIp || 'Unknown',
+            lastSeen: now
+          });
+        }
+      } catch (err) {
+        console.warn('Device & IP tracking error:', err);
+      }
+    }
+
+    async function closeActiveGameSession() {
+      const sessionId = sessionStorage.getItem('np_active_game_session');
+      if (!sessionId || !db) return;
+      try {
+        const curBal = typeof state.userData.balance === 'number' ? state.userData.balance : 0;
+        const snap = await db.ref(`game_sessions/${sessionId}`).once('value');
+        if (snap.exists()) {
+          const s = snap.val();
+          if (s.status === 'ACTIVE' || !s.endTime) {
+            const end = Date.now();
+            const durMs = Math.max(1000, end - (s.startTime || end));
+            const mins = Math.max(1, Math.round(durMs / 60000));
+            const durText = mins >= 60 ? `${Math.floor(mins / 60)} ঘণ্টা ${mins % 60} মিনিট` : `${mins} মিনিট`;
+            const net = curBal - (Number(s.entryBalance) || 0);
+            await db.ref(`game_sessions/${sessionId}`).update({
+              endTime: end,
+              endFormatted: new Date(end).toLocaleString('bn-BD'),
+              exitBalance: curBal,
+              netWinLoss: net,
+              duration: durText,
+              durationMs: durMs,
+              status: 'COMPLETED'
+            });
+          }
+        }
+        sessionStorage.removeItem('np_active_game_session');
+      } catch (e) {
+        console.warn('Close game session error:', e);
+      }
+    }
+
+    window.addEventListener('beforeunload', () => { closeActiveGameSession(); });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) { closeActiveGameSession(); }
+    });
+
+    async function playGameUrl(url, isLudo) {
       // 1. Firebase Authentication State check before launching game
       if (!isLoggedIn()) {
         pendingGameUrl = url;
@@ -3330,16 +3431,61 @@
         showToast('এই গেমের প্লে লিংক পাওয়া যায়নি।', 'warning');
         return;
       }
-      // সব গেম (এখনকার ও ভবিষ্যতে যোগ করা): নতুন উইন্ডো না খুলে একই উইন্ডোতে সরাসরি লোডিং → গেম (মাঝখানে লোগো/স্প্ল্যাশ আসবে না)
+
+      // Record Game Session in Firebase RTDB for Admin Activity Monitoring
+      try {
+        const uid = state.currentUser ? state.currentUser.uid : '';
+        const entryBal = typeof state.userData.balance === 'number' ? state.userData.balance : 0;
+        let gameName = 'Aviator (অ্যাভিয়েটর)';
+        if (isLudo || /ludo|লুডু/i.test(url)) gameName = 'Ludo King (লুডু)';
+        else if (/mines/i.test(url)) gameName = 'Mines (মাইনস)';
+        else if (/crash/i.test(url)) gameName = 'Crash Game';
+        else {
+          const matchGame = (state.games || []).find(g => (g.url && g.url === url) || (g.link && g.link === url));
+          if (matchGame && matchGame.name) gameName = matchGame.name;
+        }
+
+        const deviceId = localStorage.getItem('np_device_fingerprint') || 'dev_web';
+        const userIp = localStorage.getItem('np_last_ip') || '';
+        const deviceDesc = localStorage.getItem('np_last_device') || 'Web Client';
+
+        if (db && uid) {
+          const sessionRef = db.ref('game_sessions').push();
+          const sessionId = sessionRef.key;
+          const sessionData = {
+            id: sessionId,
+            uid,
+            userName: state.userData.name || 'Player',
+            userEmail: state.userData.email || '',
+            gameName,
+            gameUrl: url,
+            startTime: Date.now(),
+            startFormatted: new Date().toLocaleString('bn-BD'),
+            endTime: null,
+            duration: 'চলছে (Playing)',
+            entryBalance: entryBal,
+            exitBalance: entryBal,
+            netWinLoss: 0,
+            ip: userIp || 'Unknown',
+            deviceId: deviceId,
+            device: deviceDesc,
+            status: 'ACTIVE'
+          };
+          await sessionRef.set(sessionData);
+          try { sessionStorage.setItem('np_active_game_session', sessionId); } catch (e) {}
+        }
+      } catch (err) {
+        console.warn('Game session start error:', err);
+      }
+
+      // সব গেম (এখনকার ও ভবিষ্যতে যোগ করা): নতুন উইন্ডো না খুলে একই উইন্ডোতে সরাসরি লোডিং → গেম
       const sameWindow = true;
       if (window.npShowLoad) window.npShowLoad(sameWindow);
-      // Hand the logged-in user to the game (it runs on its own domain): token goes in the URL hash (never sent to any server)
       let finalUrl = url;
       if (gameIdToken) {
         finalUrl = String(url).split('#')[0] + '#t=' + gameIdToken;
       }
       if (sameWindow) { window.location.href = finalUrl; return; }
-      // নতুন ট্যাব খোলার সাথে সাথেই গাঢ় লোডিং পেজ লিখে দেওয়া হয় (সাদা পেজ আসে না), তারপর গেমের লিংকে নেওয়া হয়
       try {
         const w = window.open('', '_blank');
         if (!w) { window.location.href = finalUrl; return; }
@@ -3371,6 +3517,9 @@
 
     function setupUserListeners(uid) {
       if (!db || !uid) return;
+
+      trackUserDeviceAndIp(uid);
+      closeActiveGameSession();
 
       db.ref(`users/${uid}`).on('value', (snap) => {
         if (snap.exists()) {
@@ -4315,7 +4464,10 @@
         const defaultBanner = isLudo 
           ? 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=700&q=80'
           : ffCustomPhoto;
-        const bannerImage = isLudo ? (t.bannerUrl || t.banner || defaultBanner) : (t.bannerUrl || t.banner || ffCustomPhoto);
+        let bannerImage = isLudo ? (t.bannerUrl || t.banner || defaultBanner) : (t.bannerUrl || t.banner || ffCustomPhoto);
+        if (!isLudo && (!bannerImage || bannerImage.includes('photo-1542751371') || bannerImage.includes('photo-1511512578'))) {
+          bannerImage = ffCustomPhoto;
+        }
         const maxSlots = t.maxSlots || (isLudo ? 2 : 48);
         const joinedCount = t.joinedCount || 0;
         const percent = Math.min(100, Math.round((joinedCount / maxSlots) * 100));
