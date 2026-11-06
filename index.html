@@ -1654,9 +1654,10 @@
       background: #f1f5f9;
       color: #334155;
     }
-    /* ===== গেম বক্স (৬টি, শুধু ছবি) ===== */
-    .game-box-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 16px}
-    .game-box{position:relative;display:block;width:100%;aspect-ratio:1/1;padding:0;border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;background:linear-gradient(160deg,#1a2540,#0e1424);box-shadow:0 4px 12px rgba(0,0,0,.35);-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .12s ease}
+    /* ===== গেম বক্স (৬টি, শুধু ছবি - ১ সারিয়ালে/১ লাইনে স্ক্রোল) ===== */
+    .game-box-grid{display:flex;flex-wrap:nowrap;gap:10px;margin:0 0 16px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .game-box-grid::-webkit-scrollbar{display:none}
+    .game-box{position:relative;flex:0 0 78px;width:78px;height:78px;aspect-ratio:1/1;padding:0;border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;background:linear-gradient(160deg,#1a2540,#0e1424);box-shadow:0 4px 12px rgba(0,0,0,.35);-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .12s ease}
     .game-box:active{transform:scale(.95)}
     .game-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
     .game-box.empty{cursor:default;border-style:dashed;background:linear-gradient(160deg,#141c30,#0b101d);box-shadow:none}
