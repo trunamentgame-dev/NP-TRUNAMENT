@@ -371,6 +371,11 @@ function bake(){
    g=X.createRadialGradient(c[0]-3,c[1]-3,1,c[0],c[1],11);g.addColorStop(0,'#e3a468');g.addColorStop(1,'#bf7c45');
    X.fillStyle=g;X.strokeStyle='#a2622f';X.lineWidth=1.4;X.beginPath();X.arc(c[0],c[1],10,0,7);X.fill();X.stroke()})};
  cap(75,55,325,55);cap(75,345,325,345);cap(55,75,55,325);cap(345,75,345,325);
+ // মাঝের গোল চিহ্ন
+ X.strokeStyle='#7a4a2a';X.lineWidth=1.4;X.beginPath();X.arc(200,200,58,0,7);X.stroke();
+ X.lineWidth=1;X.beginPath();X.arc(200,200,52,0,7);X.stroke();
+ X.lineWidth=1.2;X.beginPath();X.arc(200,200,18,0,7);X.stroke();
+ X.fillStyle='#b8321e';X.strokeStyle='#7a1d10';X.lineWidth=1;X.beginPath();X.arc(200,200,5,0,7);X.fill();X.stroke();
  // পকেট (গোল, গাঢ় বাদামি গর্ত + হালকা কিনারা)
  PK.forEach(p=>{
   const R=PR-3;
