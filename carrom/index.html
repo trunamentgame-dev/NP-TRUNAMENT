@@ -43,9 +43,9 @@ body.ingame{overflow:hidden;height:100vh;height:100dvh;min-height:0;padding:max(
 .cn{display:inline-block;vertical-align:-3px;width:17px;height:17px;margin-right:5px;border-radius:50%;border:1px solid #0007}
 .cn.lt{background:repeating-linear-gradient(8deg,#f0d29a 0 3px,#d6b06c 3px 4px);box-shadow:0 2px 0 #8f6428,0 3px 4px #0006}
 .cn.dk{background:repeating-linear-gradient(8deg,#6f4527 0 3px,#4a2a14 3px 4px);box-shadow:0 2px 0 #22110a,0 3px 4px #0006}
-.betp{font-size:.6rem;line-height:1.2;color:var(--ac);font-weight:700}.betp i{display:block;font-style:normal;font-size:.95rem;color:#fff}
+.betp{font-size:.6rem;line-height:1.2;color:var(--ac);font-weight:700}.betp i{display:block;font-style:normal;font-size:.95rem;color:#fff}.betp.free{font-size:0}.betp.free i{display:none}.betp.free::after{content:"ফ্রি ম্যাচ";font-size:.72rem;color:var(--ac);font-weight:800}
 #mid{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
-canvas{width:min(96vw,440px,calc(100dvh - 290px));aspect-ratio:1;touch-action:none;filter:drop-shadow(0 0 16px #3aa0ff88) drop-shadow(0 10px 20px #000a)}
+canvas{width:min(96vw,440px,calc(100dvh - 290px));aspect-ratio:1;touch-action:none;border-radius:2.4%;box-shadow:0 0 16px #3aa0ff88,0 10px 20px #000a}
 #status{padding:5px 16px;border-radius:999px;background:#050c22cc;border:1px solid #ffffff2a;font-weight:600;font-size:.9rem;min-height:30px}
 #sl{-webkit-appearance:none;appearance:none;width:min(86vw,320px);height:16px;border-radius:10px;background:linear-gradient(180deg,#2a1204,#6a3210);box-shadow:inset 0 2px 4px #000c,0 1px 0 #ffffff33;outline:0;margin:8px 0;touch-action:none}
 #sl::-webkit-slider-thumb{-webkit-appearance:none;width:50px;height:50px;border-radius:50%;border:3px solid #6b3a08;background:radial-gradient(circle,#ffe3a0 0 12%,#a8631a 13% 16%,#e6ad5c 17% 52%,#b9741f 53% 58%,#f0c27a 59%);box-shadow:0 5px 10px #000b,inset 0 0 0 2px #ffffff66;cursor:grab}
@@ -54,8 +54,8 @@ canvas{width:min(96vw,440px,calc(100dvh - 290px));aspect-ratio:1;touch-action:no
 .bar{display:flex;gap:10px}.bar button{padding:7px 18px;font-size:.85rem;border-radius:12px}
 .foot{padding:0}
 /* sheet */
-.scrim{position:fixed;inset:0;background:#06142ccc;backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s}
-.scrim.open{opacity:1;pointer-events:auto}
+.scrim{position:fixed;inset:0;background:#06142ccc;backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:50;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
+.scrim.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .25s}
 .sheet{width:min(100%,480px);max-height:92dvh;overflow-y:auto;background:linear-gradient(180deg,#1b3f86,#0c2050);border-top:2px solid #6db4ff88;border-radius:26px 26px 0 0;padding:10px 20px max(22px,env(safe-area-inset-bottom));box-shadow:0 -12px 40px #000a,0 -2px 24px #3aa0ff55;transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;gap:12px;text-align:center}
 .scrim.open .sheet{transform:none}
 .grab{width:44px;height:5px;border-radius:3px;background:#ffffff55;margin:0 auto}
@@ -103,6 +103,7 @@ html{background:#02060f}
  <div class="bal">ব্যালেন্স: ৳<span id="bal">--</span></div>
  <p class="note" id="cs"></p>
  <button class="big" id="play">অনলাইনে খেলুন</button>
+ <button class="ghost" id="free" style="font-size:1rem;padding:12px 26px">🤖 কম্পিউটারের সাথে ফ্রি খেলুন<br><small style="opacity:.75;font-size:.72rem">বাজি ছাড়া • টাকা কাটবে না</small></button>
  <p class="prov">provided by <b>MostWin88</b></p>
  <details><summary>খেলার নিয়ম</summary><p>স্ট্রাইকার টেনে ছেড়ে দিন। নিজের রঙের গুটি পকেটে ফেললে আবার চাল পাবেন। স্ট্রাইকার পকেটে গেলে ফাউল, পালা চলে যাবে। প্রতিটি গুটি ৩ পয়েন্ট, রানী (লাল) ৫ পয়েন্ট। আগে ২৭ পয়েন্ট পেলে জয়। বাজির টাকা আপনার ওয়ালেট থেকে কাটা হয়; Real Player ম্যাচে বিজয়ী মোট পুলের ৯০% পায় (১০% হাউস ফি)।</p></details>
 </div>
@@ -133,6 +134,7 @@ html{background:#02060f}
  <div class="opts" id="stake"></div>
  <div class="sum" id="sum"></div>
  <button class="big" id="go">খেলা শুরু</button>
+ <button class="ghost" id="free2">🤖 কম্পিউটারের সাথে ফ্রি খেলুন <small style="opacity:.75">(বাজি ছাড়া)</small></button>
  <button class="ghost" id="mk">🔒 প্রাইভেট রুম তৈরি করুন</button>
  <div style="display:flex;gap:8px"><input id="rc" maxlength="6" placeholder="রুম কোড" aria-label="রুম কোড" style="flex:1;text-transform:uppercase"><button class="ghost" id="jn">যোগ দিন</button></div>
 </div></div>
@@ -167,7 +169,7 @@ if(TOKEN&&!(BR&&BR.getAuthToken))ss('ck-tk',TOKEN);try{history.replaceState(null
 let bal=0,bonus=0,bet=100,opp='',avMe='',avOp='',mt,ws,view='p',coins=[],s={x:200,y:345,r:17,out:false,vx:0,vy:0},turn='p',phase='over',sc={p:0,b:0},aim=null,rec=[],on=false;
 const fx=v=>view=='b'?400-v:v,STK=[50,100,250,500,750,1000];
 function refresh(){const b=(Number(bal)||0).toFixed(2);const z=Number(bonus)||0;$('bal').textContent=b+(z?' + 🎁৳'+z.toFixed(2):'')}
-const tx=o=>{if(ws&&ws.readyState==1)ws.send(JSON.stringify(o))};
+const tx=o=>{if(LG.on&&(o.t=='shoot'||o.t=='cancel'))return LG.tx(o);if(ws&&ws.readyState==1)ws.send(JSON.stringify(o))};
 let retry=0,stopped=false,hb=null,lastRx=0,first=true,tm=null;const NT0=$('nt').textContent;
 const cs=(t,c)=>{const e=$('cs');e.textContent=t;e.style.color=c||''};
 const inGame=()=>!$('game').classList.contains('hide');
@@ -197,21 +199,27 @@ function on_(m){
  else if(m.t=='err'){alert(m.msg);if(!$('find').classList.contains('hide'))show('home')}
  else if(m.t=='queue'){clearInterval(mt);$('nt').textContent=NT0;sheet('cpS',false);show('find');$('fi').textContent='বাজি ৳'+m.stake;const f=()=>$('cd').textContent=Math.max(0,Math.ceil((m.endsAt-Date.now())/1000));f();mt=setInterval(f,250)}
  else if(m.t=='nomatch'){clearInterval(mt);sheet('cpS',true)}
- else if(m.t=='match'){clearInterval(mt);sheet('cpS',false);view=m.side;opp=m.opp;bet=m.stake;sc={p:0,b:0};avMe=ls('ck-av')||cartoon();ls('ck-av',avMe);avOp=cartoon();
-  $('n0').textContent=m.me;$('n1').textContent=opp;$('a0').innerHTML=avMe;$('a1').innerHTML=avOp;$('bt').textContent=m.stake;$('pot').textContent=m.pot;
+ else if(m.t=='match'){clearInterval(mt);sheet('cpS',false);LP.stop();view=m.side;opp=m.opp;if(!m.free)bet=m.stake;sc={p:0,b:0};avMe=ls('ck-av')||cartoon();ls('ck-av',avMe);avOp=cartoon();
+  $('n0').textContent=m.me;$('n1').textContent=opp;$('a0').innerHTML=avMe;$('a1').innerHTML=avOp;$('bt').textContent=m.stake;$('pot').textContent=m.pot;document.querySelector('.betp').classList.toggle('free',!!m.free);
   const tg=m.oppBot?'🤖 Computer Player':'👤 Real Player';document.querySelector('#d1 .tg').textContent=tg;
   $('vsL').innerHTML='<div class="vcard" style="--rc:#4fc3f7"><div class="vph">'+avMe+'</div><div class="vnm">'+m.me+'</div><small class="sub">আপনি</small></div>';
   $('vsR').innerHTML='<div class="vcard" style="--rc:#ff8a65"><div class="vph">'+avOp+'</div><div class="vnm">'+opp+'</div><small class="sub">'+tg+'</small></div>';
-  $('vsInfo').textContent='বাজি ৳'+m.stake+' • জিতলে ৳'+m.pot+' • ম্যাচ ID '+m.id;
+  $('vsInfo').textContent=m.free?'🎮 ফ্রি ম্যাচ • কোনো বাজি নেই':'বাজি ৳'+m.stake+' • জিতলে ৳'+m.pot+' • ম্যাচ ID '+m.id;
   if(m.re){show('game')}else{$('vs').classList.remove('out');$('vs').classList.add('on');setTimeout(()=>{show('game');$('vs').classList.add('out')},2300);setTimeout(()=>$('vs').classList.remove('on','out'),3100)}}
- else if(m.t=='start'){coins=m.coins.map(c=>({id:c.id,c:c.c,x:200,y:200,r:11.5}))}
- else if(m.t=='f'){const by={};m.c.forEach(a=>by[a[0]]=a);coins=coins.filter(o=>by[o.id]);coins.forEach(o=>{const a=by[o.id];o.x=fx(a[1]);o.y=fx(a[2])});s.x=fx(m.s[0]);s.y=fx(m.s[1]);s.out=!!m.s[2]}
- else if(m.t=='turn'){const a=m.turn;turn=a==view?'p':'b';phase='place';sc={p:m.sc[view],b:m.sc[view=='p'?'b':'p']};upd();s={x:200,y:turn=='p'?345:55,r:17,out:false,vx:0,vy:0};
+ else if(m.t=='start'){LP.stop();RAW={ok:false,c:[]};coins=m.coins.map(c=>({id:c.id,c:c.c,x:200,y:200,r:11.5}))}
+ else if(m.t=='f'){
+  if(m.e){RAW={ok:true,c:m.c.map(a=>({id:a[0],x:a[1],y:a[2]}))}}else RAW.ok=false;
+  if(LP.armed&&LP.rx(m))return;
+  const by={};m.c.forEach(a=>by[a[0]]=a);coins=coins.filter(o=>by[o.id]);
+  coins.forEach(o=>{const a=by[o.id],px=fx(a[1]),py=fx(a[2]);if(o.k&&!m.d){o.tx=px;o.ty=py}else{o.x=o.tx=px;o.y=o.ty=py;o.k=1}});
+  const sx=fx(m.s[0]),sy=fx(m.s[1]);if(s.k&&!m.d){s.tx=sx;s.ty=sy}else{s.x=s.tx=sx;s.y=s.ty=sy;s.k=1}
+  s.out=!!m.s[2]}
+ else if(m.t=='turn'){LP.guard();const a=m.turn;turn=a==view?'p':'b';phase='place';sc={p:m.sc[view],b:m.sc[view=='p'?'b':'p']};upd();s={x:200,y:turn=='p'?345:55,r:17,out:false,vx:0,vy:0};
   $('sl').value=.5;$('sl').disabled=turn!='p';$('d0').classList.toggle('act',turn=='p');$('d1').classList.toggle('act',turn=='b');
   $('status').textContent=m.foul?'ফাউল! পালা বদল':turn=='p'?'আপনার পালা: স্লাইডার সরান, স্ট্রাইকার টেনে ছাড়ুন':opp+' খেলছে...'}
- else if(m.t=='end'){phase='over';$('d0').classList.remove('act');$('d1').classList.remove('act');
+ else if(m.t=='end'){LP.stop();phase='over';$('d0').classList.remove('act');$('d1').classList.remove('act');
   $('rt').textContent=m.draw?'🤝 ম্যাচ ড্র':m.win?'🏆 আপনি জিতেছেন!':'😔 '+opp+' জিতেছে';
-  $('rd').textContent=m.win?('ওয়ালেটে +৳'+(m.prize||m.bonus||0)):(m.why=='reserve-refund'?'টাকা ফেরত দেওয়া হয়েছে':'হেরেছেন -৳'+m.stake);sheet('res',true)}}
+  $('rd').textContent=m.free?'ফ্রি প্র্যাকটিস ম্যাচ • কোনো টাকা কাটা বা যোগ হয়নি':m.win?('ওয়ালেটে +৳'+(m.prize||m.bonus||0)):(m.why=='reserve-refund'?'টাকা ফেরত দেওয়া হয়েছে':'হেরেছেন -৳'+m.stake);sheet('res',true)}}
 $('play').onclick=()=>{if(!on)return alert(TOKEN?'সার্ভারের সাথে যুক্ত হচ্ছে, কিছুক্ষণ অপেক্ষা করুন…':'User Panel থেকে লগইন করে Play চাপুন');stakes();sheet('sheet',true)};
 $('go').onclick=()=>{sheet('sheet',false);tx({t:'find',stake:bet})};
 $('mk').onclick=()=>{sheet('sheet',false);tx({t:'room',stake:bet})};
@@ -220,21 +228,21 @@ $('cancel').onclick=()=>{clearInterval(mt);tx({t:'cancel'});show('home')};
 $('cpY').onclick=()=>{sheet('cpS',false);tx({t:'cpu'})};$('cpN').onclick=()=>{sheet('cpS',false);tx({t:'wait'})};
 $('home2').onclick=()=>{sheet('res',false);show('home')};
 $('again').onclick=()=>{sheet('res',false);show('home');stakes();sheet('sheet',true)};
-$('sl').oninput=e=>{if(turn=='p'&&phase=='place'){s.x=90+e.target.value*220;$('status').textContent=blocked()?'❌ এখানে গুটি আছে, স্ট্রাইকার অন্য জায়গায় সরান':'আপনার পালা: স্লাইডার সরান, স্ট্রাইকার টেনে ছাড়ুন'}};
-function shoot(a,v){phase='move';$('sl').disabled=true;$('status').textContent='';tx({t:'shoot',x:fx(s.x),a:view=='b'?a+Math.PI:a,v})}
+$('sl').oninput=e=>{if(turn=='p'&&phase=='place'){s.x=90+e.target.value*220;s.tx=s.x;s.ty=s.y;$('status').textContent=blocked()?'❌ এখানে গুটি আছে, স্ট্রাইকার অন্য জায়গায় সরান':'আপনার পালা: স্লাইডার সরান, স্ট্রাইকার টেনে ছাড়ুন'}};
+function shoot(a,v){phase='move';$('sl').disabled=true;$('status').textContent='';const x=fx(s.x),aa=view=='b'?a+Math.PI:a;tx({t:'shoot',x,a:aa,v});LP.begin(x,aa,v)}
 function cartoon(){const bg=rnd(['#ff8a65','#4fc3f7','#81c784','#ba68c8','#ffd54f','#4db6ac']),sk=rnd(['#ffd9b3','#f2b98c','#d99a6c','#9a6540']),h=rnd(['#1d1d1d','#4a2c12','#8a5a2b','#b5382a']),sh=rnd(['#e53935','#1e88e5','#43a047','#fdd835','#8e24aa']),v=Math.random()*3|0;
  const hr=['<path d="M16 29C15 12 49 12 48 29 43 21 21 21 16 29Z" fill="'+h+'"/>','<path d="M16 29L17 13 24 21 32 10 40 21 47 13 48 29C43 22 21 22 16 29Z" fill="'+h+'"/>','<path d="M15 27C15 10 49 10 49 27Z" fill="'+sh+'"/><rect x="13" y="25" width="30" height="4" rx="2" fill="'+sh+'"/>'][v];
  return '<svg viewBox="0 0 64 64"><rect width="64" height="64" fill="'+bg+'"/><ellipse cx="32" cy="66" rx="24" ry="15" fill="'+sh+'"/><circle cx="32" cy="32" r="16" fill="'+sk+'"/>'+hr+'<circle cx="26" cy="33" r="2.2" fill="#222"/><circle cx="38" cy="33" r="2.2" fill="#222"/><path d="M25 38Q32 45 39 38" stroke="#5a2a1a" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'}
 const show=id=>{['home','find','game'].forEach(s=>$(s).classList.toggle('hide',s!==id));document.body.classList.toggle('ingame',id=='game')};
 function stakes(){const c=$('stake');c.innerHTML='';[50,100,250,500,750,1000].forEach(b=>{const e=document.createElement('button');e.className='opt';e.innerHTML='<b>৳'+b+'</b><small>জিতলে ৳'+pay(b)+'</small>';e.disabled=bal<b;e.setAttribute('aria-pressed',b==bet);e.onclick=()=>{bet=b;stakes()};c.appendChild(e)});$('sum').textContent='বাজি ৳'+bet+' • জিতলে ৳'+pay(bet)}
 const pay=b=>Math.round(b*1.8);
-const C=$('c'),X=C.getContext('2d'),PR=19,PK=[[11,11],[389,11],[11,389],[389,389]]; // board geometry (same as server)
+const C=$('c'),X0=C.getContext('2d'),PR=19,PK=[[11,11],[389,11],[11,389],[389,389]];let X=X0; // board geometry (same as server)
 const sheet=(el,on)=>$(el).classList.toggle('open',on);
 $('sheet').onclick=e=>{if(e.target.id=='sheet')sheet('sheet',false)};
 function upd(){$('s0').textContent=sc.p;$('s1').textContent=sc.b;$('bt').textContent=bet;$('pot').textContent=pay(bet)}
 function pos(e){const r=C.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*440-20,y:(e.clientY-r.top)/r.height*440-20}}
 C.onpointerdown=e=>{if(turn!='p'||phase!='place')return;const p=pos(e);if(Math.hypot(p.x-s.x,p.y-s.y)<50){aim=p;C.setPointerCapture(e.pointerId)}};
-C.onpointermove=e=>{if(aim)aim=pos(e)};
+C.onpointermove=e=>{if(aim)aim=pos(e)};C.onpointercancel=()=>{aim=null};
 C.onpointerup=()=>{if(!aim)return;if(blocked()){aim=null;$('status').textContent='❌ এখানে গুটি আছে, স্ট্রাইকার অন্য জায়গায় সরান';return}const dx=s.x-aim.x,dy=s.y-aim.y,l=Math.hypot(dx,dy);aim=null;if(l<10)return;shoot(Math.atan2(dy,dx),Math.min(l,110)/110*26)};
 function blocked(){return coins.some(o=>Math.hypot(o.x-s.x,o.y-s.y)<s.r+o.r-.5)}
 function disc(o,cols){
@@ -266,9 +274,11 @@ function guide(a){
   const dp=dx*nx+dy*ny,tx=dx-dp*nx,ty=dy-dp*ny;X.setLineDash([3,4]);X.strokeStyle='rgba(120,220,255,.85)';X.lineWidth=1.4;X.beginPath();X.moveTo(gx,gy);X.lineTo(gx+tx*45,gy+ty*45);X.stroke();X.setLineDash([]);
   for(const p of PK){const px=p[0]-hit.x,py=p[1]-hit.y;if(px*nx+py*ny>0&&Math.abs(px*ny-py*nx)<PR-3){X.strokeStyle='#4cff7a';X.lineWidth=3;X.beginPath();X.arc(p[0],p[1],PR+4,0,7);X.stroke()}}}
  X.restore()}
-function draw(){
- X.setTransform(C.width/440,0,0,C.height/440,0,0);
- X.clearRect(0,0,440,440);
+/* ===== রেন্ডারিং: বোর্ড একবারই আঁকা হয়, গুটি আগে থেকে তৈরি ছবি হিসেবে বসে (ফোনে দ্রুত) ===== */
+let BG=null;
+function bake(){
+ BG=document.createElement('canvas');BG.width=C.width;BG.height=C.height;
+ const prev=X;X=BG.getContext('2d');X.setTransform(C.width/440,0,0,C.height/440,0,0);
  let g;
  X.fillStyle='#2e1305';X.beginPath();X.roundRect(0,0,440,440,10);X.fill();
  g=X.createLinearGradient(0,0,0,440);g.addColorStop(0,'#8a4516');g.addColorStop(1,'#6a3210');
@@ -298,13 +308,176 @@ function draw(){
  X.fillStyle=red;X.beginPath();X.arc(200,200,6,0,7);X.fill();
  PK.forEach(p=>{const r=X.createRadialGradient(p[0],p[1],2,p[0],p[1],PR+3);r.addColorStop(0,'#000');r.addColorStop(.8,'#1a0a00');r.addColorStop(1,'#3a1c08');X.fillStyle=r;X.beginPath();X.arc(p[0],p[1],PR+2,0,7);X.fill()});
  X.fillStyle='rgba(0,0,0,.18)';X.fillRect(0,0,400,6);X.fillRect(0,0,6,400);
- coins.forEach(o=>disc(o,o.c=='w'?['#f0d29a','#c89a52','#8f6428']:o.c=='b'?['#6f4527','#3c200f','#22110a']:['#cf4a2c','#8a2414','#561206']));
- if(!s.out)disc(s,['#e6ad5c','#b9741f','#7a4a10']);
+ X.restore();X=prev}
+const COL={w:['#f0d29a','#c89a52','#8f6428'],b:['#6f4527','#3c200f','#22110a'],r:['#cf4a2c','#8a2414','#561206'],s:['#e6ad5c','#b9741f','#7a4a10']},SPR={};
+function spr(k,r){const key=k+r;if(SPR[key])return SPR[key];
+ const q=C.width/440,n=Math.ceil(2*(r+4)*q),h=n/(2*q),cv=document.createElement('canvas');cv.width=cv.height=n;
+ const prev=X;X=cv.getContext('2d');X.setTransform(q,0,0,q,0,0);disc({x:h,y:h,r,g:.6},COL[k]);X=prev;return SPR[key]={cv,h,w:n/q}}
+function put(o,k){const p=spr(k,o.r);X.drawImage(p.cv,o.x-p.h,o.y-p.h,p.w,p.w)}
+function draw(){
+ const q=C.width/440;if(!BG)bake();
+ X.setTransform(1,0,0,1,0,0);X.clearRect(0,0,C.width,C.height);X.drawImage(BG,0,0);
+ X.setTransform(q,0,0,q,0,0);X.save();X.translate(20,20);
+ coins.forEach(o=>put(o,o.c=='w'||o.c=='b'?o.c:'r'));
+ if(!s.out)put(s,'s');
  if(phase=='place'&&turn=='p'&&blocked()){X.strokeStyle='#ff3b3b';X.lineWidth=3;X.beginPath();X.arc(s.x,s.y,s.r+3,0,7);X.stroke();X.beginPath();X.moveTo(s.x-8,s.y-8);X.lineTo(s.x+8,s.y+8);X.moveTo(s.x+8,s.y-8);X.lineTo(s.x-8,s.y+8);X.stroke()}
  if(aim&&phase=='place'){const ddx=s.x-aim.x,ddy=s.y-aim.y,l=Math.min(Math.hypot(ddx,ddy),110),a=Math.atan2(ddy,ddx);if(l>10&&!blocked())guide(a);X.strokeStyle='#ff5252';X.lineWidth=4;X.beginPath();X.moveTo(s.x,s.y);X.lineTo(s.x-Math.cos(a)*l,s.y-Math.sin(a)*l);X.stroke()}
  X.restore();
 }
-(function loop(){draw();requestAnimationFrame(loop)})();
+function ease(o,f){const dx=o.tx-o.x,dy=o.ty-o.y;if(!(Math.abs(dx)>0||Math.abs(dy)>0))return;if(Math.abs(dx)<.03&&Math.abs(dy)<.03){o.x=o.tx;o.y=o.ty;return}o.x+=dx*f;o.y+=dy*f}
+let _lt=0;
+function loop(t){const dt=_lt?Math.min(100,t-_lt):16;_lt=t;
+ LP.update(dt);const f=1-Math.exp(-dt/42);
+ for(const o of coins)if(o.tx!==undefined)ease(o,f);
+ if(s.tx!==undefined)ease(s,f);
+ draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+
+/* ===== শেয়ার্ড ফিজিক্স: server.js-এর stepFrame হুবহু (একই ফল পেতে) ===== */
+/*ENG-START*/
+const PHY=(()=>{
+const W=400,RC=11.5,RS=17,SUB=4,FRIC=0.9944540337321224,E_COIN=0.88,E_WALL=0.8;
+function stepFrame(g) {
+  const out = g.shot.coins;
+  for (let k = 0; k < SUB; k++) {
+    const bs = g.coins.slice(); if (g.st && !g.st.out) bs.push(g.st);
+    for (const b of bs) {
+      b.x += b.vx / SUB; b.y += b.vy / SUB;
+      if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx) * E_WALL; } else if (b.x > W - b.r) { b.x = W - b.r; b.vx = -Math.abs(b.vx) * E_WALL; }
+      if (b.y < b.r) { b.y = b.r; b.vy = Math.abs(b.vy) * E_WALL; } else if (b.y > W - b.r) { b.y = W - b.r; b.vy = -Math.abs(b.vy) * E_WALL; }
+    }
+    for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) {
+      const a = bs[i], b = bs[j], dx = b.x - a.x, dy = b.y - a.y, rr = a.r + b.r, d2 = dx * dx + dy * dy;
+      if (d2 >= rr * rr || d2 === 0) continue;
+      const d = Math.sqrt(d2), nx = dx / d, ny = dy / d, ov = rr - d, im = 1 / a.m + 1 / b.m;
+      a.x -= nx * ov / a.m / im; a.y -= ny * ov / a.m / im; b.x += nx * ov / b.m / im; b.y += ny * ov / b.m / im;
+      const vn = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+      if (vn < 0) { const J = -(1 + E_COIN) * vn / im; a.vx -= J * nx / a.m; a.vy -= J * ny / a.m; b.vx += J * nx / b.m; b.vy += J * ny / b.m; }
+    }
+    for (const b of bs) {
+      if (PK.some(p => Math.hypot(b.x - p[0], b.y - p[1]) < PR)) {
+        if (b === g.st) { g.st.out = true; g.st.vx = g.st.vy = 0; } else { g.coins.splice(g.coins.indexOf(b), 1); out.push(b); }
+      }
+    }
+    for (const b of g.coins) { b.vx *= FRIC; b.vy *= FRIC; }
+    if (g.st && !g.st.out) { g.st.vx *= FRIC; g.st.vy *= FRIC; }
+  }
+  let moving = false;
+  const all = g.st && !g.st.out ? g.coins.concat([g.st]) : g.coins;
+  for (const b of all) { if (Math.hypot(b.vx, b.vy) < 0.06) b.vx = b.vy = 0; else moving = true; }
+  return moving;
+}
+
+return{step:stepFrame}})();
+/* ===== দ্রুত শট: ছাড়ার সাথে সাথে ফোনেই শট চালিয়ে দেখায়, সার্ভারের ফ্রেম মিলিয়ে নেয় ===== */
+let RAW={ok:false,c:[]};
+const LP={armed:false,sim:false,got:0,tk:0,acc:0,g:null,hist:[],map:null,cpre:null};
+(function(){
+ const snap=()=>{const g=LP.g;return{c:g.coins.map(o=>[o.id,o.x,o.y]),s:[g.st.x,g.st.y,g.st.out?1:0]}};
+ const stepOnce=()=>{const mv=PHY.step(LP.g);LP.tk++;const end=!mv||LP.tk>1500;if(LP.tk%2==0||end)LP.hist.push(snap());if(end)LP.sim=false};
+ const close=(a,b)=>Math.abs(a-b)<1.5;
+ const same=(sc,hc)=>{if(sc.length!==hc.length)return false;for(let i=0;i<sc.length;i++){const a=sc[i],b=hc[i];if(a[0]!==b[0]||!close(a[1],b[1])||!close(a[2],b[2]))return false}return true};
+ function show(){const g=LP.g,al=new Set();
+  for(const c of g.coins){al.add(c.id);const o=LP.map.get(c.id);if(o){o.x=o.tx=fx(c.x);o.y=o.ty=fx(c.y);o.k=1}}
+  if(coins.length!==g.coins.length)coins=coins.filter(o=>al.has(o.id));
+  const t=g.st;s.x=s.tx=fx(t.x);s.y=s.ty=fx(t.y);s.out=t.out;s.k=1}
+ LP.begin=function(x,a,v){
+  LP.stop();if(!RAW.ok||LG.on||!coins.length)return;
+  const y=view=='p'?345:55,cs=RAW.c.map(o=>({id:o.id,x:o.x,y:o.y,vx:0,vy:0,r:11.5,m:1}));
+  const free=xx=>!cs.some(c=>Math.hypot(c.x-xx,c.y-y)<17+c.r+0.5);
+  x=Math.min(310,Math.max(90,x));
+  if(!free(x)){for(let d=2;d<=220;d+=2){if(x+d<=310&&free(x+d)){x+=d;break}if(x-d>=90&&free(x-d)){x-=d;break}}}
+  v=Math.min(26,v);
+  LP.g={coins:cs,st:{x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:17,m:2.5,out:false},shot:{coins:[]}};
+  LP.map=new Map(coins.map(o=>[o.id,o]));LP.cpre=coins.map(o=>({...o}));
+  LP.armed=true;LP.sim=true;LP.got=0;LP.tk=0;LP.acc=0;LP.hist=[]};
+ LP.update=function(dt){if(!LP.armed||!LP.sim)return;LP.acc+=Math.min(dt,100);let n=0;while(LP.acc>=16&&LP.sim&&n<10){LP.acc-=16;stepOnce();n++}show()};
+ LP.rx=function(m){ // true = frame matches our prediction (ignore it); false = we diverged, follow the server
+  if(m.e&&m.s[0]===200&&m.s[1]===345&&m.s[2]===1){ // shot over: exact final positions
+   while(LP.sim)stepOnce();const ok=same(m.c,LP.hist[LP.hist.length-1].c);LP.armed=false;LP.sim=false;
+   if(ok){show();s.out=true;return true}return false}
+  const j=++LP.got;while(LP.hist.length<j&&LP.sim)stepOnce();
+  const h=LP.hist[Math.min(j,LP.hist.length)-1];
+  if(h&&same(m.c,h.c)&&close(m.s[0],h.s[0])&&close(m.s[1],h.s[1])&&(m.s[2]|0)===h.s[2])return true;
+  LP.armed=false;LP.sim=false;return false};
+ LP.guard=function(){if(LP.armed&&!LP.got&&LP.cpre)coins=LP.cpre;LP.armed=false;LP.sim=false}; // server never answered the shot: undo it
+ LP.stop=function(){LP.armed=false;LP.sim=false};
+})();
+/* ===== ফ্রি প্র্যাকটিস: কম্পিউটারের সাথে (বাজি ছাড়া, সার্ভার/ওয়ালেট লাগে না) ===== */
+const LG=window.__lg={on:false};
+(function(){
+ const W=400,RC=11.5,RS=17,WIN=27;
+function newGame() {
+  const coins = [{ id: 1, o: 'q', x: 200, y: 200, vx: 0, vy: 0, r: RC, m: 1 }];
+  const d = 23.4;
+  const ring = (rad, off) => { for (let i = 0; i < 6; i++) { const a = (off + i * 60) * Math.PI / 180; coins.push({ id: coins.length + 1, o: i % 2 ? 'b' : 'p', x: 200 + rad * Math.cos(a), y: 200 + rad * Math.sin(a), vx: 0, vy: 0, r: RC, m: 1 }); } };
+  ring(d, 0); ring(d * Math.sqrt(3), 30); ring(d * 2, 0);
+  return { coins, st: null, shot: { coins: [] } };
+}
+
+function segDist(px, py, ax, ay, bx, by) { const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy; let t = l2 ? ((px - ax) * dx + (py - ay) * dy) / l2 : 0; t = Math.max(0, Math.min(1, t)); return Math.hypot(px - (ax + t * dx), py - (ay + t * dy)); }
+const spotFree = (g, x, y) => !g.coins.some(c => Math.hypot(c.x - x, c.y - y) < RS + c.r + 0.5);
+function pickShot(g, side, noise) {
+  const by = side === 'p' ? 345 : 55;
+  let mine = g.coins.filter(c => c.o === side || c.o === 'q'); if (!mine.length) mine = g.coins.slice();
+  const xs = []; for (let x = 90; x <= 310; x += 10) if (spotFree(g, x, by)) xs.push(x);
+  let best = null;
+  for (const x of xs) for (const c of mine) for (const p of PK) {
+    let ux = p[0] - c.x, uy = p[1] - c.y; const cp = Math.hypot(ux, uy); ux /= cp; uy /= cp;
+    const gx = c.x - ux * (RS + c.r), gy = c.y - uy * (RS + c.r);
+    if (gx < RS || gx > W - RS || gy < RS || gy > W - RS) continue;
+    const dx = gx - x, dy = gy - by, dist = Math.hypot(dx, dy); if (dist < 1) continue;
+    const cut = dx / dist * ux + dy / dist * uy; if (cut < 0.4) continue;
+    let ok = true;
+    for (const o of g.coins) { if (o === c) continue; if (segDist(o.x, o.y, x, by, gx, gy) < RS + o.r - 1 || segDist(o.x, o.y, c.x, c.y, p[0], p[1]) < 2 * o.r - 1) { ok = false; break; } }
+    if (!ok) continue;
+    const sc = cut * 100 - dist * 0.04 - cp * 0.06 + (c.o === 'q' ? 6 : 0) + Math.random() * 8;
+    if (!best || sc > best.sc) best = { sc, x, a: Math.atan2(dy, dx), v: Math.min(24, Math.max(7, (dist + cp) * 0.03 + 5)) };
+  }
+  if (!best) {
+    const x = xs.length ? xs[Math.random() * xs.length | 0] : 200, c = mine[Math.random() * mine.length | 0] || { x: 200, y: 200 };
+    best = { x, a: Math.atan2(c.y - by, c.x - x), v: 10 + Math.random() * 8 };
+  }
+  best.a += (Math.random() - .5) * 2 * noise; best.v *= 1 + (Math.random() - .5) * 0.1;
+  return best;
+}
+
+ let g=null,sc=null,turn='p',shots=0,busy=true,loop=null,T=[];
+ const after=(f,ms)=>{T.push(setTimeout(()=>{if(LG.on&&g)f()},ms))};
+ const clr=()=>{T.forEach(clearTimeout);T=[];clearInterval(loop);loop=null};
+ const frame=()=>on_({t:'f',d:1,c:g.coins.map(c=>[c.id,c.x,c.y]),s:g.st?[g.st.x,g.st.y,g.st.out?1:0]:[200,345,1]});
+ function doShot(side,x,a,v){
+  busy=true;shots++;const y=side==='p'?345:55;
+  x=Math.min(310,Math.max(90,x));
+  if(!spotFree(g,x,y)){for(let d=2;d<=220;d+=2){if(x+d<=310&&spotFree(g,x+d,y)){x+=d;break}if(x-d>=90&&spotFree(g,x-d,y)){x-=d;break}}}
+  g.st={x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:RS,m:2.5,out:false};g.shot={coins:[]};
+  let n=0;clearInterval(loop);
+  loop=setInterval(()=>{if(!LG.on||!g)return;const mv=PHY.step(g);n++;frame();if(!mv||n>1500){clearInterval(loop);loop=null;endShot(side)}},16)}
+ function endShot(side){
+  const foul=!!(g.st&&g.st.out);let own=false;
+  for(const c of g.shot.coins){if(c.o==='q'){sc[side]+=5;own=true}else{sc[c.o]+=3;if(c.o===side)own=true}}
+  g.st=null;frame();
+  const sp=sc.p,sb=sc.b;
+  if(sp>=WIN||sb>=WIN||!g.coins.length||shots>=120){LG.on=false;clr();on_({t:'end',win:sp>sb,draw:sp===sb,free:true,stake:0,prize:0});return}
+  turn=own&&!foul?side:(side==='p'?'b':'p');
+  after(()=>beginTurn(foul),600)}
+ function beginTurn(foul){
+  busy=turn==='b';on_({t:'turn',turn,sc:{p:sc.p,b:sc.b},foul:!!foul});
+  if(turn==='b')after(()=>{const sh=pickShot(g,'b',0.03);doShot('b',sh.x,sh.a,sh.v)},900+Math.random()*700)}
+ LG.begin=function(){
+  if(LG.on||inGame()||!$('find').classList.contains('hide'))return;
+  clr();LP.stop();LG.on=true;g=newGame();sc={p:0,b:0};turn='p';shots=0;busy=true;
+  const me=($('nm').value||'').trim()||'আপনি',op=rnd(NAMES);
+  on_({t:'match',side:'p',me,opp:op,oppBot:true,stake:0,pot:0,id:'FREE',re:0,free:true});
+  after(()=>{on_({t:'start',coins:g.coins.map(c=>({id:c.id,c:c.o==='q'?'r':c.o==='p'?'w':'b'}))});frame();beginTurn(false)},2600)};
+ LG.tx=function(o){
+  if(o.t=='shoot'){if(LG.on&&g&&turn==='p'&&!busy&&[o.x,o.a,o.v].every(Number.isFinite)&&o.v>=1.5)doShot('p',o.x,o.a,Math.min(26,o.v))}
+  else if(o.t=='cancel')LG.stop()};
+ LG.stop=function(){LG.on=false;g=null;clr()};
+})();
+/*ENG-END*/
+$('free').onclick=$('free2').onclick=()=>{sheet('sheet',false);LG.begin()};
+
 const openPg=(ti,h)=>{$('pgT').textContent=ti;$('pgB').innerHTML=h;sheet('menuS',false);sheet('pg',true)};
 $('menuBtn').onclick=()=>sheet('menuS',true);
 $('mX').onclick=()=>sheet('menuS',false);$('pgX').onclick=()=>sheet('pg',false);
@@ -313,7 +486,7 @@ $('pg').onclick=e=>{if(e.target.id=='pg')sheet('pg',false)};
 $('mRules').onclick=()=>openPg('খেলার নিয়ম ও বাজি/প্রাইজ','<h3>🎯 কীভাবে খেলবেন</h3><ul><li>স্ট্রাইকার স্লাইডার দিয়ে বেস লাইনে বসান, টেনে ছেড়ে দিন।</li><li>নিজের গুটি পকেটে ফেললে আবার চাল পাবেন, স্ট্রাইকার পকেটে গেলে ফাউল ও পালা বদল।</li><li>প্রতিটি গুটি ৩ পয়েন্ট, রানী (লাল) ৫ পয়েন্ট। আগে ২৭ পয়েন্ট পেলে জয়।</li></ul><h3>💰 বাজি ও প্রাইজ</h3><ul><li>বাজির টাকা ম্যাচ খোঁজা শুরুর সময় ওয়ালেট থেকে কাটা হয়; বাতিল করলে বা ম্যাচ না হলে ফেরত পাবেন।</li><li>Real Player ম্যাচে দুজনের বাজি মিলিয়ে পুলের ৯০% বিজয়ী পায়, ১০% হাউস ফি।</li><li>২০ সেকেন্ডে Real Player না পেলে Computer Player-এর সঙ্গে খেলতে পারেন। Computer Player ম্যাচেও আপনার বাজি যায় ও Computer-এর সমান বাজি ধরা হয় (যেমন ৫০ + ৫০ = ১০০)। জিতলে ৯০ টাকা আপনার মূল ওয়ালেটে যোগ হয়, হারলে বাজির টাকা যায়।</li></ul>');
 $('exitBtn').onclick=()=>{if(window.AndroidBridge&&window.AndroidBridge.exitToUserPanel) window.AndroidBridge.exitToUserPanel()};
 $('mExit').onclick=()=>{sheet('menuS',false);if(window.AndroidBridge&&window.AndroidBridge.exitToUserPanel) window.AndroidBridge.exitToUserPanel()};
-function goPanel(){try{tx({t:'cancel'})}catch(e){}if(window.AndroidBridge&&window.AndroidBridge.exitToUserPanel)window.AndroidBridge.exitToUserPanel();else if(window.CK_HOME)location.href=window.CK_HOME}
+function goPanel(){const was=LG.on;try{tx({t:'cancel'})}catch(e){}if(window.AndroidBridge&&window.AndroidBridge.exitToUserPanel)window.AndroidBridge.exitToUserPanel();else if(window.CK_HOME)location.href=window.CK_HOME;else if(was)show('home')}
 window.onBackPressed=window.handleBack=window.onBack=function(){goPanel();return true};
 try{history.pushState({ck:1},'',location.href);window.addEventListener('popstate',()=>{history.pushState({ck:1},'',location.href);goPanel()})}catch(e){}
 if(BR&&BR.getUserName) $('nm').value=BR.getUserName(); // preview only; replaced by the server-verified name on connect
