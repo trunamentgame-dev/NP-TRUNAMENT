@@ -565,15 +565,20 @@ mwBuild(document.getElementById("mwLoad"),"LOADING.....");
     <div class="app-wrapper">
       <!-- Direct Play Header: Clean Aviator, Real Balance, Sound -->
       <header>
-        <div class="logo" aria-label="Aviator">
-          <div class="logo-badge">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
-            </svg>
-          </div>
-          <div class="logo-text">
-            <span class="logo-word">Aviator</span>
-            <span class="logo-swoosh"></span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button type="button" onclick="window.history.length > 1 ? window.history.back() : (window.location.href = 'user_index__8__cd3b4f5f.html')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:6px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" title="হোমে ফিরুন" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="logo" aria-label="Aviator">
+            <div class="logo-badge">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <span class="logo-word">Aviator</span>
+              <span class="logo-swoosh"></span>
+            </div>
           </div>
         </div>
         <div class="header-right">
@@ -901,7 +906,59 @@ mwBuild(document.getElementById("mwLoad"),"LOADING.....");
               maximumFractionDigits: 2
             });
           }
+
+          // Live session exit balance sync with Firebase RTDB
+          try {
+            const activeSessionId = sessionStorage.getItem('np_active_game_session') || localStorage.getItem('np_active_game_session');
+            if (rtdb && activeSessionId && isBalanceLoaded) {
+              rtdb.ref('game_sessions/' + activeSessionId).transaction(curr => {
+                if (!curr) return curr;
+                const entry = typeof curr.entryBalance === 'number' ? curr.entryBalance : currentBalance;
+                const exitBal = currentBalance;
+                const net = Math.round((exitBal - entry) * 100) / 100;
+                curr.exitBalance = exitBal;
+                curr.netWinLoss = net;
+                curr.lastActiveTime = Date.now();
+                return curr;
+              }).catch(() => {});
+            }
+          } catch(e) {}
         }
+
+        // Close game session on exit or unload
+        function closeAviatorSession() {
+          try {
+            const activeSessionId = sessionStorage.getItem('np_active_game_session') || localStorage.getItem('np_active_game_session');
+            if (rtdb && activeSessionId) {
+              rtdb.ref('game_sessions/' + activeSessionId).transaction(curr => {
+                if (!curr) return curr;
+                const endTime = Date.now();
+                const start = curr.startTime || endTime;
+                const diffSec = Math.max(1, Math.round((endTime - start) / 1000));
+                let durationStr = diffSec + ' সে.';
+                if (diffSec >= 60) {
+                  const mins = Math.floor(diffSec / 60);
+                  const secs = diffSec % 60;
+                  durationStr = mins + ' মি. ' + (secs > 0 ? secs + ' সে.' : '');
+                }
+                const entry = typeof curr.entryBalance === 'number' ? curr.entryBalance : currentBalance;
+                const exitBal = typeof currentBalance === 'number' ? currentBalance : entry;
+                const net = Math.round((exitBal - entry) * 100) / 100;
+                curr.endTime = endTime;
+                curr.endFormatted = new Date(endTime).toLocaleString('bn-BD');
+                curr.duration = durationStr;
+                curr.exitBalance = exitBal;
+                curr.netWinLoss = net;
+                curr.status = 'COMPLETED';
+                return curr;
+              }).catch(() => {});
+            }
+          } catch(e) {}
+        }
+        window.addEventListener('beforeunload', closeAviatorSession);
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) closeAviatorSession();
+        });
 
         function showGameMsg(text) {
           try {
