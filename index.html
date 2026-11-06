@@ -3258,8 +3258,17 @@
       if (gameIdToken) {
         finalUrl = String(url).split('#')[0] + '#t=' + gameIdToken;
       }
+      // নতুন ট্যাব খোলার সাথে সাথেই গাঢ় লোডিং পেজ লিখে দেওয়া হয় (সাদা পেজ আসে না), তারপর গেমের লিংকে নেওয়া হয়
       try {
-        window.open(finalUrl, '_blank', 'noopener,noreferrer');
+        const w = window.open('', '_blank');
+        if (!w) { window.location.href = finalUrl; return; }
+        try { w.opener = null; } catch (e) {}
+        try {
+          w.document.open();
+          w.document.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050811"><meta name="referrer" content="no-referrer"><title>Loading</title><style>html,body{margin:0;height:100%;background:#050811}body{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);overflow:hidden}.t{display:flex;white-space:nowrap;font-family:"Arial Black",Impact,sans-serif;font-weight:900;font-size:clamp(22px,8.4vw,46px);letter-spacing:.03em}.t span{display:inline-block;color:#fcd34d;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:p 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.11s)}@keyframes p{0%,60%,100%{transform:scale(.8);opacity:.55}25%{transform:scale(1.35);opacity:1}}@media (prefers-reduced-motion:reduce){.t span{animation:none}}</style></head><body><div class="t">' + 'LOADING.....'.split('').map(function (c, i) { return '<span style="--i:' + i + '">' + c + '</span>'; }).join('') + '</div></body></html>');
+          w.document.close();
+        } catch (e) {}
+        w.location.replace(finalUrl);
       } catch (e) {
         window.location.href = finalUrl;
       }
@@ -5604,9 +5613,9 @@
 
   <style>
     /* Play Now লোডিং পেজ (শুধু লেখা, কোনো ছবি/লোগো নেই) */
-    .npld{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);opacity:0;transition:opacity .25s ease}
+    .npld{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);opacity:1;transition:opacity .25s ease}
     .npld.npld-on{display:flex}
-    .npld.npld-show{opacity:1}
+    .npld.npld-fade{opacity:0}
     .npld-txt{display:flex;flex-wrap:nowrap;justify-content:center;align-items:baseline;max-width:100%;padding:0 8px;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-weight:900;font-size:clamp(22px,8.4vw,46px);letter-spacing:.03em}
     .npld-ch{display:inline-block;color:#fcd34d;transform-origin:50% 60%;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:npldg-pulse 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.11s)}
     @keyframes npldg-pulse{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
@@ -5619,15 +5628,14 @@
     function hide() {
       if (!el) return;
       clearTimeout(t1); clearTimeout(t2);
-      el.classList.remove('npld-show');
-      t2 = setTimeout(function () { el.classList.remove('npld-on'); }, 260);
+      el.classList.add('npld-fade');
+      t2 = setTimeout(function () { el.classList.remove('npld-on'); el.classList.remove('npld-fade'); }, 260);
     }
     window.npShowLoad = function () {
       if (!el) return;
       clearTimeout(t1); clearTimeout(t2);
+      el.classList.remove('npld-fade');
       el.classList.add('npld-on');
-      void el.offsetWidth;
-      el.classList.add('npld-show');
       t1 = setTimeout(hide, 1800); // গেম নতুন ট্যাবে খোলে; প্যানেলে ফিরলে লোডিং আর থাকবে না
     };
     window.addEventListener('pageshow', hide);
@@ -5645,6 +5653,116 @@
     ping();
     setInterval(ping, 4 * 60 * 1000);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) ping(); });
+  })();
+  </script>
+
+  <!-- ===== APP INSTALL TOP POPUP (শুধু ব্রাউজার/লিংক দিয়ে ঢুকলে দেখাবে, অ্যাপের ভেতরে নয়) ===== -->
+  <style>
+    #npInstallBanner{position:fixed;top:0;left:0;right:0;z-index:99990;display:flex;justify-content:center;
+      padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 0;transform:translateY(-140%);
+      transition:transform .45s cubic-bezier(.2,.9,.3,1);pointer-events:none;font-family:var(--font-bengali,sans-serif)}
+    #npInstallBanner.show{transform:translateY(0)}
+    #npInstallBanner .npi-box{pointer-events:auto;width:100%;max-width:460px;display:flex;align-items:center;gap:10px;
+      padding:10px 10px 10px 12px;border-radius:16px;background:var(--bg-card,#141b2d);color:var(--text-primary,#f8fafc);
+      border:1px solid var(--color-primary,#f59e0b);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 18px var(--color-primary-glow,rgba(245,158,11,.35))}
+    #npInstallBanner .npi-ico{flex:0 0 42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,#f59e0b,#d97706);color:#0f172a;font-weight:800;font-family:var(--font-esports,sans-serif);overflow:hidden}
+    #npInstallBanner .npi-ico img{width:100%;height:100%;object-fit:cover;display:block}
+    #npInstallBanner .npi-txt{flex:1;min-width:0}
+    #npInstallBanner .npi-title{font-size:14.5px;font-weight:700;line-height:1.25}
+    #npInstallBanner .npi-sub{font-size:12px;color:var(--text-secondary,#94a3b8);line-height:1.35;margin-top:2px}
+    #npInstallBanner .npi-btn{flex:0 0 auto;border:0;cursor:pointer;padding:9px 16px;border-radius:10px;font-weight:700;font-size:13.5px;
+      font-family:inherit;background:var(--color-primary,#f59e0b);color:#0f172a}
+    #npInstallBanner .npi-btn:active{transform:scale(.96)}
+    #npInstallBanner .npi-x{flex:0 0 auto;border:0;background:transparent;color:var(--text-muted,#64748b);font-size:20px;line-height:1;
+      cursor:pointer;padding:4px 6px}
+  </style>
+  <div id="npInstallBanner" role="dialog" aria-label="অ্যাপ ইনস্টল">
+    <div class="npi-box">
+      <div class="npi-ico"><img src="./icon-192.png" alt="" onerror="this.parentNode.textContent='NP'"></div>
+      <div class="npi-txt">
+        <div class="npi-title">NP TOURNAMENT অ্যাপ ইনস্টল করুন</div>
+        <div class="npi-sub" id="npInstallSub">আপনার ফোনে ইনস্টল করে আরও দ্রুত খেলুন</div>
+      </div>
+      <button type="button" class="npi-btn" id="npInstallBtn">ইনস্টল</button>
+      <button type="button" class="npi-x" id="npInstallClose" aria-label="বন্ধ করুন">×</button>
+    </div>
+  </div>
+  <script>
+  (function () {
+    var banner = document.getElementById('npInstallBanner');
+    var sub = document.getElementById('npInstallSub');
+    var btn = document.getElementById('npInstallBtn');
+    var closeBtn = document.getElementById('npInstallClose');
+    if (!banner) return;
+
+    // অ্যাপের ভেতর থেকে খেললে (ইনস্টল করা অ্যাপ / Android WebView) পপআপ দেখাবে না
+    function isInsideApp() {
+      try {
+        var mq = function (q) { return window.matchMedia && window.matchMedia(q).matches; };
+        if (mq('(display-mode: standalone)') || mq('(display-mode: fullscreen)') || mq('(display-mode: minimal-ui)')) return true;
+        if (window.navigator.standalone === true) return true;
+        if (document.referrer && document.referrer.indexOf('android-app://') === 0) return true;
+        if (window.Android) return true;
+        if (/; wv\)/i.test(navigator.userAgent)) return true;
+        if (window.isPwaInstalled) return true;
+      } catch (e) {}
+      return false;
+    }
+    function dismissedThisSession() {
+      try { return sessionStorage.getItem('np_install_dismissed') === '1'; } catch (e) { return false; }
+    }
+    function hide(remember) {
+      banner.classList.remove('show');
+      if (remember) { try { sessionStorage.setItem('np_install_dismissed', '1'); } catch (e) {} }
+    }
+    function show() {
+      if (isInsideApp() || dismissedThisSession()) return;
+      banner.classList.add('show');
+    }
+
+    btn.addEventListener('click', function () {
+      var p = window.pwaDeferredPrompt;
+      if (p) {
+        // সরাসরি ডিভাইসে ইনস্টল প্রম্পট
+        try {
+          p.prompt();
+          p.userChoice.then(function (r) {
+            window.pwaDeferredPrompt = null;
+            if (r && r.outcome === 'accepted') hide(false);
+          });
+        } catch (e) { window.pwaDeferredPrompt = null; }
+        return;
+      }
+      // প্রম্পট সাপোর্ট না থাকলে (iPhone/Safari ইত্যাদি) নির্দেশনা দেখাও
+      var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      sub.textContent = ios
+        ? 'Safari-তে Share (⬆️) চাপুন → "Add to Home Screen" সিলেক্ট করুন'
+        : 'ব্রাউজারের মেনু (⋮) চাপুন → "Install app" বা "Add to Home screen" সিলেক্ট করুন';
+    });
+    closeBtn.addEventListener('click', function () { hide(true); });
+
+    // head-এর ইনস্টল ইঞ্জিন এই হুকগুলো কল করে
+    window.npAppInstaller = {
+      onPromptReady: function () {},
+      onInstallSuccess: function () { hide(false); }
+    };
+
+    // ইউজার লগইন করে প্যানেলে ঢুকলে পপআপ আসবে
+    var tries = 0;
+    (function attach() {
+      try {
+        if (window.firebase && firebase.apps && firebase.apps.length) {
+          var first = true;
+          firebase.auth().onAuthStateChanged(function (user) {
+            if (user) { setTimeout(show, first ? 1200 : 400); } else { hide(false); }
+            first = false;
+          });
+          return;
+        }
+      } catch (e) {}
+      if (++tries < 50) setTimeout(attach, 300);
+    })();
   })();
   </script>
 </body>
