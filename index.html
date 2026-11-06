@@ -1654,6 +1654,13 @@
       background: #f1f5f9;
       color: #334155;
     }
+    /* ===== গেম বক্স (৬টি, শুধু ছবি) ===== */
+    .game-box-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 16px}
+    .game-box{position:relative;display:block;width:100%;aspect-ratio:1/1;padding:0;border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;background:linear-gradient(160deg,#1a2540,#0e1424);box-shadow:0 4px 12px rgba(0,0,0,.35);-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .12s ease}
+    .game-box:active{transform:scale(.95)}
+    .game-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+    .game-box.empty{cursor:default;border-style:dashed;background:linear-gradient(160deg,#141c30,#0b101d);box-shadow:none}
+    .game-box.empty:active{transform:none}
   </style>
 </head>
 <body data-theme="dark">
@@ -2200,18 +2207,8 @@
         </div>
       </div>
 
-      <!-- Bengali Important Notice Box -->
-      <div class="notice-card-bengali">
-        <svg class="icon" style="color: var(--notice-accent); margin-top: 2px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <div>
-          <div class="notice-card-title" id="pinnedNoticeTitle">⚠️ টুর্নামেন্ট নিয়মাবলী ও গুরুত্বপূর্ণ নোটিশ:</div>
-          <div class="notice-card-body" id="pinnedNoticeBody">
-            ১. এমুলেটর বা হ্যাক সম্পূর্ণ নিষিদ্ধ। ধরা পড়লে আজীবন ব্যান।<br>
-            ২. রুম আইডি ও পাসওয়ার্ড কাউকে শেয়ার করা সম্পূর্ণ নিষেধ।<br>
-            ৩. আপনার ফ্রি ফায়ার UID ও নাম প্রোফাইলে সঠিক রাখুন।
-          </div>
-        </div>
-      </div>
+      <!-- Game Boxes: ৬টি বক্স (শুধু ছবি, কোনো লেখা নেই), বক্সে ক্লিক করলে সরাসরি গেম খোলে -->
+      <div id="gameBoxGrid" class="game-box-grid" aria-label="Games"></div>
 
       <!-- Game Selector Switch Bar -->
       <div class="game-switch-bar" id="gameSwitchBar">
@@ -3090,6 +3087,7 @@
 
       // Popular & Crash Games
       setupGamesListener();
+      setupGameBoxesListener();
     }
 
     // --- Popular & Crash Games Engine ---
@@ -3135,6 +3133,85 @@
         status: 'Active'
       }
     ];
+
+    // --- Game Boxes (৬টি): অ্যাডমিন Firebase-এর `gameBoxes` নোডে বসালে সেটা দেখাবে; না থাকলে চালু গেমগুলো থেকে নিজে নিজে ভরে ---
+    let gameBoxesData = null;
+    let gamesForBoxes = [];
+
+    function normalizeBoxSlot(g) {
+      if (!g || typeof g !== 'object') return null;
+      const status = String(g.status || g.state || '').trim().toLowerCase();
+      if (g.active === false || g.isActive === false || status === 'inactive' || status === 'false') return null;
+      const url = g.url || g.gameUrl || g.link || '';
+      const image = g.image || g.imageUrl || g.banner || g.img || '';
+      if (!url && !image) return null;
+      return { url: String(url), image: String(image) };
+    }
+
+    function renderGameBoxes() {
+      const grid = document.getElementById('gameBoxGrid');
+      if (!grid) return;
+
+      let slots = [];
+      if (gameBoxesData) {
+        const val = gameBoxesData;
+        if (Array.isArray(val)) {
+          slots = val.map(normalizeBoxSlot);
+        } else if (typeof val === 'object') {
+          const keys = Object.keys(val).sort((a, b) => {
+            const na = Number(a), nb = Number(b);
+            return (isNaN(na) || isNaN(nb)) ? String(a).localeCompare(String(b)) : na - nb;
+          });
+          slots = keys.map(k => normalizeBoxSlot(val[k]));
+        }
+      }
+      if (!slots.some(Boolean)) {
+        slots = (gamesForBoxes || []).map(normalizeBoxSlot);
+      }
+
+      grid.innerHTML = '';
+      for (let i = 0; i < 6; i++) {
+        const slot = slots[i];
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        if (slot && slot.url && slot.url !== '#') {
+          btn.className = 'game-box';
+          if (slot.image) {
+            const img = document.createElement('img');
+            img.alt = '';
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.referrerPolicy = 'no-referrer';
+            img.onerror = function () { this.style.display = 'none'; };
+            img.src = slot.image;
+            btn.appendChild(img);
+          }
+          btn.onclick = function () { window.app.playGameUrl(slot.url); };
+        } else {
+          btn.className = 'game-box empty';
+          btn.tabIndex = -1;
+          btn.setAttribute('aria-hidden', 'true');
+        }
+        grid.appendChild(btn);
+      }
+    }
+
+    function setupGameBoxesListener() {
+      try {
+        const cached = localStorage.getItem('NP_CACHED_GAMEBOXES');
+        if (cached) { gameBoxesData = JSON.parse(cached); }
+      } catch (e) {}
+      renderGameBoxes();
+      if (!db) return;
+      db.ref('gameBoxes').on('value', (snap) => {
+        gameBoxesData = snap.exists() ? snap.val() : null;
+        try {
+          if (gameBoxesData) localStorage.setItem('NP_CACHED_GAMEBOXES', JSON.stringify(gameBoxesData));
+          else localStorage.removeItem('NP_CACHED_GAMEBOXES');
+        } catch (e) {}
+        renderGameBoxes();
+      }, () => { renderGameBoxes(); });
+    }
 
     function setupGamesListener() {
       const loading = document.getElementById('gamesLoadingState');
@@ -3195,6 +3272,8 @@
     }
 
     function renderGamesCards(games) {
+      gamesForBoxes = Array.isArray(games) ? games : [];
+      try { renderGameBoxes(); } catch (e) {}
       const empty = document.getElementById('gamesEmptyState');
       const error = document.getElementById('gamesErrorState');
       const track = document.getElementById('gamesScrollTrack');
