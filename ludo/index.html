@@ -410,7 +410,7 @@ input{background:#1b2d4ecc!important;border-color:#8fb0dd66!important;box-shadow
 /* ===== বার্তা (toast) ===== */
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#1b2d4ef2;color:#fff;border:1px solid #e6c36a88;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;z-index:99;max-width:86%;text-align:center;box-shadow:0 6px 18px #0008;font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif}
 /* ===== লোডিং পেজ (ক্যারামের মতো) ===== */
-/* Home -> loading screen (CRAMBOD tilted background + LOADING..... letter animation) */
+/* Home -> loading screen (LUDO tilted background + LOADING..... letter animation) */
 /* shared by #mwLoad (game open) and #mwGo (home) */
 .mwg{display:none;position:fixed;inset:0;z-index:100000;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 80% 45% at 50% -8%,#2f7bff88,transparent 70%),radial-gradient(circle at 100% 100%,#8b3dff55,transparent 50%),radial-gradient(circle at 0 90%,#00e0ff33,transparent 45%),linear-gradient(180deg,#0b1d46,#050c22);--cy:9.6s;font-family:Georgia,"Times New Roman",serif;touch-action:none}
 #mwGo.on,.mwg.on{display:flex}
@@ -431,7 +431,7 @@ input{background:#1b2d4ecc!important;border-color:#8fb0dd66!important;box-shadow
 <div id="mwLoad" class="mwg on" aria-label="Loading"></div>
 <script>
 function mwHide(){var e=document.getElementById("mwLoad");if(!e||e._h)return;e._h=1;window.__mwDone=1;e.style.opacity="0";e.style.pointerEvents="none";setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e)},450)}
-function mwBuild(o,t){if(!o||o.firstChild)return;var bg=document.createElement("div");bg.className="mwg-bg";var row=new Array(27).join("CRAMBOD "),h="";for(var r=0;r<44;r++)h+='<div style="margin-left:'+(r%2?"-2.6em":"0")+'">'+row+"</div>";bg.innerHTML=h;var w=document.createElement("div");w.className="mwg-word";for(var i=0;i<t.length;i++){var s=document.createElement("span");s.className="mwg-l";s.setAttribute("data-l",t.charAt(i));s.style.setProperty("--i",i);s.textContent=t.charAt(i);w.appendChild(s)}o.appendChild(bg);o.appendChild(w)}
+function mwBuild(o,t){if(!o||o.firstChild)return;var bg=document.createElement("div");bg.className="mwg-bg";var row=new Array(43).join("LUDO "),h="";for(var r=0;r<44;r++)h+='<div style="margin-left:'+(r%2?"-2.6em":"0")+'">'+row+"</div>";bg.innerHTML=h;var w=document.createElement("div");w.className="mwg-word";for(var i=0;i<t.length;i++){var s=document.createElement("span");s.className="mwg-l";s.setAttribute("data-l",t.charAt(i));s.style.setProperty("--i",i);s.textContent=t.charAt(i);w.appendChild(s)}o.appendChild(bg);o.appendChild(w)}
 mwBuild(document.getElementById("mwLoad"),"LOADING.....");
 </script>
 <div id="shell">
