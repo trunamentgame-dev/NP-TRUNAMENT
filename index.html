@@ -3214,6 +3214,7 @@
           const category = escapeHtml(g.category || 'ক্র্যাশ গেম');
           const imageUrl = escapeHtml(g.image || g.imageUrl || g.banner || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=400&q=80');
           const targetUrl = escapeHtml(g.url || g.gameUrl || g.link || '#');
+          const isLudoGame = /ludo|ludu|lodu|লুডু/i.test([g.name, g.title, g.id, g.category, g.url, g.gameUrl, g.link].join(' '));
 
           return `
             <div style="flex: 0 0 135px; max-width: 135px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 7px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.3); scroll-snap-align: start; transition: transform 0.2s ease;">
@@ -3229,7 +3230,7 @@
                   ${category}
                 </div>
               </div>
-              <button type="button" class="btn btn-primary btn-block btn-sm" style="padding: 5px 6px; font-size: 11px; font-weight: 800; border-radius: var(--radius-sm); letter-spacing: 0.3px; gap: 4px;" onclick="window.app.playGameUrl('${targetUrl}')">
+              <button type="button" class="btn btn-primary btn-block btn-sm" style="padding: 5px 6px; font-size: 11px; font-weight: 800; border-radius: var(--radius-sm); letter-spacing: 0.3px; gap: 4px;" onclick="window.app.playGameUrl('${targetUrl}', ${isLudoGame})">
                 <span>▶ Play Now</span>
               </button>
             </div>
@@ -3240,7 +3241,7 @@
 
     let pendingGameUrl = null;
 
-    function playGameUrl(url) {
+    function playGameUrl(url, isLudo) {
       // 1. Firebase Authentication State check before launching game
       if (!isLoggedIn()) {
         pendingGameUrl = url;
@@ -3252,12 +3253,15 @@
         showToast('এই গেমের প্লে লিংক পাওয়া যায়নি।', 'warning');
         return;
       }
-      if (window.npShowLoad) window.npShowLoad();
+      // সব গেম (এখনকার ও ভবিষ্যতে যোগ করা): নতুন উইন্ডো না খুলে একই উইন্ডোতে সরাসরি লোডিং → গেম (মাঝখানে লোগো/স্প্ল্যাশ আসবে না)
+      const sameWindow = true;
+      if (window.npShowLoad) window.npShowLoad(sameWindow);
       // Hand the logged-in user to the game (it runs on its own domain): token goes in the URL hash (never sent to any server)
       let finalUrl = url;
       if (gameIdToken) {
         finalUrl = String(url).split('#')[0] + '#t=' + gameIdToken;
       }
+      if (sameWindow) { window.location.href = finalUrl; return; }
       // নতুন ট্যাব খোলার সাথে সাথেই গাঢ় লোডিং পেজ লিখে দেওয়া হয় (সাদা পেজ আসে না), তারপর গেমের লিংকে নেওয়া হয়
       try {
         const w = window.open('', '_blank');
@@ -5631,12 +5635,12 @@
       el.classList.add('npld-fade');
       t2 = setTimeout(function () { el.classList.remove('npld-on'); el.classList.remove('npld-fade'); }, 260);
     }
-    window.npShowLoad = function () {
+    window.npShowLoad = function (keep) {
       if (!el) return;
       clearTimeout(t1); clearTimeout(t2);
       el.classList.remove('npld-fade');
       el.classList.add('npld-on');
-      t1 = setTimeout(hide, 1800); // গেম নতুন ট্যাবে খোলে; প্যানেলে ফিরলে লোডিং আর থাকবে না
+      t1 = setTimeout(hide, keep ? 20000 : 1800); // গেম নতুন ট্যাবে খোলে; প্যানেলে ফিরলে লোডিং আর থাকবে না
     };
     window.addEventListener('pageshow', hide);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) hide(); });
