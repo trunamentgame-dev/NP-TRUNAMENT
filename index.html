@@ -3258,17 +3258,8 @@
       if (gameIdToken) {
         finalUrl = String(url).split('#')[0] + '#t=' + gameIdToken;
       }
-      // নতুন ট্যাব খোলার সাথে সাথেই গাঢ় লোডিং পেজ লিখে দেওয়া হয় (সাদা পেজ আসে না), তারপর গেমের লিংকে নেওয়া হয়
       try {
-        const w = window.open('', '_blank');
-        if (!w) { window.location.href = finalUrl; return; }
-        try { w.opener = null; } catch (e) {}
-        try {
-          w.document.open();
-          w.document.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050811"><meta name="referrer" content="no-referrer"><title>Loading</title><style>html,body{margin:0;height:100%;background:#050811}body{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);overflow:hidden}.t{display:flex;white-space:nowrap;font-family:"Arial Black",Impact,sans-serif;font-weight:900;font-size:clamp(22px,8.4vw,46px);letter-spacing:.03em}.t span{display:inline-block;color:#fcd34d;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:p 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.11s)}@keyframes p{0%,60%,100%{transform:scale(.8);opacity:.55}25%{transform:scale(1.35);opacity:1}}@media (prefers-reduced-motion:reduce){.t span{animation:none}}</style></head><body><div class="t">' + 'LOADING.....'.split('').map(function (c, i) { return '<span style="--i:' + i + '">' + c + '</span>'; }).join('') + '</div></body></html>');
-          w.document.close();
-        } catch (e) {}
-        w.location.replace(finalUrl);
+        window.open(finalUrl, '_blank', 'noopener,noreferrer');
       } catch (e) {
         window.location.href = finalUrl;
       }
@@ -5613,9 +5604,9 @@
 
   <style>
     /* Play Now লোডিং পেজ (শুধু লেখা, কোনো ছবি/লোগো নেই) */
-    .npld{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);opacity:1;transition:opacity .25s ease}
+    .npld{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);opacity:0;transition:opacity .25s ease}
     .npld.npld-on{display:flex}
-    .npld.npld-fade{opacity:0}
+    .npld.npld-show{opacity:1}
     .npld-txt{display:flex;flex-wrap:nowrap;justify-content:center;align-items:baseline;max-width:100%;padding:0 8px;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-weight:900;font-size:clamp(22px,8.4vw,46px);letter-spacing:.03em}
     .npld-ch{display:inline-block;color:#fcd34d;transform-origin:50% 60%;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:npldg-pulse 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.11s)}
     @keyframes npldg-pulse{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
@@ -5628,14 +5619,15 @@
     function hide() {
       if (!el) return;
       clearTimeout(t1); clearTimeout(t2);
-      el.classList.add('npld-fade');
-      t2 = setTimeout(function () { el.classList.remove('npld-on'); el.classList.remove('npld-fade'); }, 260);
+      el.classList.remove('npld-show');
+      t2 = setTimeout(function () { el.classList.remove('npld-on'); }, 260);
     }
     window.npShowLoad = function () {
       if (!el) return;
       clearTimeout(t1); clearTimeout(t2);
-      el.classList.remove('npld-fade');
       el.classList.add('npld-on');
+      void el.offsetWidth;
+      el.classList.add('npld-show');
       t1 = setTimeout(hide, 1800); // গেম নতুন ট্যাবে খোলে; প্যানেলে ফিরলে লোডিং আর থাকবে না
     };
     window.addEventListener('pageshow', hide);
