@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="bn">
   <head>
@@ -540,9 +539,31 @@
         justify-content: center;
         flex-shrink: 0;
       }
+      /* ===== লোডিং পেজ (ক্যারামের মতো) ===== */
+/* shared by #mwLoad (game open) and #mwGo (home) */
+.mwg{display:none;position:fixed;inset:0;z-index:100000;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 80% 45% at 50% -8%,#2f7bff88,transparent 70%),radial-gradient(circle at 100% 100%,#8b3dff55,transparent 50%),radial-gradient(circle at 0 90%,#00e0ff33,transparent 45%),linear-gradient(180deg,#0b1d46,#050c22);--cy:9.6s;font-family:Georgia,"Times New Roman",serif;touch-action:none}
+#mwGo.on,.mwg.on{display:flex}
+#mwLoad{transition:opacity .4s ease}
+#mwGo::after,.mwg::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,transparent 35%,rgba(2,6,20,.75) 100%)}
+.mwg-bg{position:absolute;left:50%;top:50%;width:190vmax;height:190vmax;transform:translate(-50%,-50%) rotate(-30deg);display:flex;flex-direction:column;justify-content:center;gap:.9em;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-style:italic;font-size:clamp(16px,4.6vw,26px);font-weight:900;letter-spacing:.15em;white-space:nowrap;color:rgba(251,191,36,.09);filter:blur(1.5px);pointer-events:none;-webkit-user-select:none;user-select:none}
+.mwg-word{position:relative;z-index:2;display:flex;flex-wrap:nowrap;align-items:baseline;justify-content:center;max-width:100%;padding:0 8px;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-size:min(8.4vw,44px,6.2vh);font-weight:900;line-height:1;letter-spacing:.03em}
+.mwg-l{display:inline-block;color:#fcd34d;transform-origin:50% 60%;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:mwg-z 1.6s ease-in-out infinite;animation-delay:calc(var(--i) * .11s)}
+@keyframes mwg-z{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
+@media (prefers-reduced-motion:reduce){.mwg .mwg-l{animation:none!important;opacity:1;transform:none;filter:none}}
+#mwLoad{background:radial-gradient(ellipse 75% 45% at 10% 105%,#ef444466,transparent 70%),radial-gradient(ellipse 80% 45% at 50% -8%,#7f1d1d66,transparent 70%),radial-gradient(circle at 100% 20%,#ef444422,transparent 45%),linear-gradient(180deg,#16080c,#050309)}
+.mwg-fly{position:absolute;inset:0;z-index:1;pointer-events:none}
+.mwg-fly svg{width:100%;height:100%;display:block}
+.mwg-note{position:absolute;z-index:3;left:0;right:0;bottom:16%;text-align:center;padding:0 24px;color:#fde68a;font:600 15px/1.5 "Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;text-shadow:0 2px 6px rgba(0,0,0,.7)}
     </style>
+    <link rel="preconnect" href="https://crash-backend-7on6.onrender.com" crossorigin />
   </head>
   <body>
+    <div id="mwLoad" class="mwg on" aria-label="Loading"></div>
+    <script>
+function mwHide(){var e=document.getElementById("mwLoad");if(!e||e._h)return;e._h=1;window.__mwDone=1;e.style.opacity="0";e.style.pointerEvents="none";setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e)},450)}
+function mwBuild(o,t){if(!o||o.firstChild)return;var bg=document.createElement("div");bg.className="mwg-bg";var pl='<svg viewBox="0 0 24 24" width="1.5em" height="1.5em" fill="currentColor" style="display:inline-block;vertical-align:-.3em;margin:0 .7em;color:rgba(239,68,68,.55);filter:drop-shadow(0 0 4px rgba(239,68,68,.8));transform:rotate(45deg)"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',row=new Array(25).join("AVIATOR "+pl),h="";for(var r=0;r<44;r++)h+='<div style="margin-left:'+(r%2?"-2.6em":"0")+'">'+row+"</div>";bg.innerHTML=h;var w=document.createElement("div");w.className="mwg-word";for(var i=0;i<t.length;i++){var s=document.createElement("span");s.className="mwg-l";s.setAttribute("data-l",t.charAt(i));s.style.setProperty("--i",i);s.textContent=t.charAt(i);w.appendChild(s)}o.appendChild(bg);var f=document.createElement("div");f.className="mwg-fly";f.innerHTML='<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="mwtr" gradientUnits="userSpaceOnUse" x1="0" y1="790" x2="430" y2="240"><stop offset="0" stop-color="#ef4444" stop-opacity="0"/><stop offset="1" stop-color="#ff5a5a" stop-opacity=".95"/></linearGradient></defs><path id="mwfp" d="M-30 790 C 120 780, 240 640, 430 240" fill="none" stroke="url(#mwtr)" stroke-width="5" stroke-linecap="round" pathLength="1000" stroke-dasharray="1000" stroke-dashoffset="1000"><animate attributeName="stroke-dashoffset" values="1000;0;0" keyTimes="0;.85;1" dur="3.6s" repeatCount="indefinite"/></path><g style="filter:drop-shadow(0 0 7px #ef4444)"><animateMotion dur="3.6s" repeatCount="indefinite" rotate="auto" calcMode="linear" keyPoints="0;1;1" keyTimes="0;.85;1"><mpath href="#mwfp"/></animateMotion><path fill="#ef4444" stroke="#ffb4b4" stroke-width=".5" transform="rotate(45) scale(2.6) translate(-12 -12)" d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></g></svg>';o.appendChild(f);o.appendChild(w)}
+mwBuild(document.getElementById("mwLoad"),"LOADING.....");
+    </script>
     <div class="app-wrapper">
       <!-- Direct Play Header: Clean Aviator, Real Balance, Sound -->
       <header>
@@ -874,6 +895,7 @@
         function updateBalanceUI(bal) {
           isBalanceLoaded = true;
           currentBalance = typeof bal === 'number' ? bal : Number(bal || 0);
+          if (window.mwHide) mwHide(); // ব্যালেন্স এসে গেছে, লোডিং পেজ সরাও
           const el = document.getElementById('headerBalance');
           if (el) {
             el.innerText = '৳' + currentBalance.toLocaleString('en-US', {
@@ -1193,6 +1215,26 @@
         if (window.parent && window.parent !== window) {
           window.parent.postMessage({ type: 'AVITOR_READY' }, '*');
         }
+
+        // লোডিং পেজ থাকা পর্যন্ত দ্রুত বারবার ব্যালেন্স আনার চেষ্টা; লগইন না পেলে লোডিং পেজেই বার্তা (গেমে ঢোকা যাবে না)
+        (function () {
+          let tries = 0;
+          const iv = setInterval(() => {
+            if (window.__mwDone) { clearInterval(iv); return; }
+            tries++;
+            if (currentUid) { fetchUserBalance(currentUid); }
+            else { try { detectUserSession(); } catch (e) {} }
+            if (tries === 6 && !currentUid) {
+              const o = document.getElementById('mwLoad');
+              if (o && !o.querySelector('.mwg-note')) {
+                const n = document.createElement('div');
+                n.className = 'mwg-note';
+                n.textContent = 'লগইন পাওয়া যায়নি। ইউজার প্যানেল থেকে লগইন করে গেমটি খুলুন';
+                o.appendChild(n);
+              }
+            }
+          }, 1500);
+        })();
 
         // Periodically keep balance fresh (and on window refocus)
         setInterval(() => { if (currentUid) fetchUserBalance(currentUid); }, 12000);
