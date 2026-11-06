@@ -6,6 +6,7 @@
   <title>NP TOURNAMENT BD - Free Fire Esports</title>
   <meta name="description" content="বাংলাদেশের সবচেয়ে বিশ্বস্ত ও প্রফেশনাল ফ্রি ফায়ার টুর্নামেন্ট প্ল্যাটফর্ম - NP TOURNAMENT BD">
   <meta name="theme-color" content="#090d16" id="theme-color-meta">
+  <style>html{background:#050811}</style>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
@@ -1492,6 +1493,11 @@
       animation: slideUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    @keyframes npAuthPop {
+      from { transform: scale(0.94); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
     @keyframes slideUpModal {
       from { transform: translateY(100%); }
       to { transform: translateY(0); }
@@ -2078,17 +2084,6 @@
           <input type="text" class="form-input" id="gateSignupName" required placeholder="যেমন: মিজানুর রহমান" autocomplete="name">
         </div>
 
-        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-          <div class="form-group">
-            <label class="form-label" style="font-size: 12px;">ফ্রি ফায়ার IGN *</label>
-            <input type="text" class="form-input" id="gateSignupFfIgn" required placeholder="NP_GAMER_BD">
-          </div>
-          <div class="form-group">
-            <label class="form-label" style="font-size: 12px;">ফ্রি ফায়ার UID *</label>
-            <input type="number" class="form-input" id="gateSignupFfUid" required placeholder="1234567890">
-          </div>
-        </div>
-
         <div class="form-group" style="margin-bottom: 12px;">
           <label class="form-label" style="font-size: 12px;">ইমেইল অ্যাড্রেস *</label>
           <input type="email" class="form-input" id="gateSignupEmail" required placeholder="player@gmail.com" autocomplete="email">
@@ -2452,11 +2447,8 @@
   <!-- ==================== MODALS ==================== -->
 
   <!-- 1. USER LOGIN & SIGNUP POPUP (Exact Reference Photo Design) -->
-  <div class="modal-overlay" id="modalAuth" style="align-items: flex-end; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
-    <div class="modal-sheet" style="max-width: 480px; width: 100%; border-top-left-radius: 28px; border-top-right-radius: 28px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; padding: 14px 20px 24px 20px; background: #0f1624; border: 1px solid rgba(255, 255, 255, 0.08); border-bottom: none; box-shadow: 0 -10px 40px rgba(0,0,0,0.85); box-sizing: border-box; overflow-y: auto; max-height: 92vh;">
-      
-      <!-- Top Drag Handle -->
-      <div style="width: 44px; height: 4px; background: #26334d; border-radius: 9999px; margin: 0 auto 16px auto;"></div>
+  <div class="modal-overlay" id="modalAuth" style="align-items: center; padding: 16px; box-sizing: border-box; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+    <div class="modal-sheet" style="max-width: 480px; width: 100%; border-radius: 24px; padding: 20px 20px 22px 20px; background: #0f1624; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 40px rgba(0,0,0,0.85); box-sizing: border-box; overflow-y: auto; max-height: 88vh; animation: npAuthPop 0.22s ease;">
       
       <!-- Header with Title & Circular Close Button (as in reference photo) -->
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
@@ -2491,17 +2483,6 @@
               <input type="text" class="form-input" id="authUsername" placeholder="username" style="width: 100%; height: 44px; background: #131b2c; border: 1px solid #1f2b44; border-radius: 12px; padding: 0 14px; color: #ffffff; font-size: 13.5px; outline: none; box-sizing: border-box;">
             </div>
           </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Free Fire IGN *</label>
-              <input type="text" class="form-input" id="authFfIgn" placeholder="গেম নাম" style="width: 100%; height: 44px; background: #131b2c; border: 1px solid #1f2b44; border-radius: 12px; padding: 0 14px; color: #ffffff; font-size: 13.5px; outline: none; box-sizing: border-box;">
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Free Fire UID *</label>
-              <input type="number" class="form-input" id="authFfUid" placeholder="গেম আইডি" style="width: 100%; height: 44px; background: #131b2c; border: 1px solid #1f2b44; border-radius: 12px; padding: 0 14px; color: #ffffff; font-size: 13.5px; outline: none; box-sizing: border-box;">
-            </div>
-          </div>
         </div>
 
         <!-- Primary Input: Username / Email (Matches photo 1 & 2 light blue/white filled rounded bar) -->
@@ -2514,6 +2495,12 @@
         <div class="form-group" style="margin-bottom: 8px;">
           <label class="form-label" id="lblFormPassword" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; display: block;">পাসওয়ার্ড *</label>
           <input type="password" class="form-input" id="authPassword" required placeholder="•••••••••" minlength="6" autocomplete="current-password" style="width: 100%; height: 48px; background: #e8f0fe; border: 1.5px solid transparent; border-radius: 14px; padding: 0 16px; color: #0f172a; font-size: 16px; letter-spacing: 2px; outline: none; box-sizing: border-box; transition: all 0.2s ease;">
+        </div>
+
+        <!-- Confirm Password (signup only) -->
+        <div class="form-group" id="signupConfirmWrap" style="margin-bottom: 14px; display: none;">
+          <label class="form-label" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; display: block;">কনফার্ম পাসওয়ার্ড *</label>
+          <input type="password" class="form-input" id="authConfirmPassword" placeholder="•••••••••" minlength="6" autocomplete="new-password" style="width: 100%; height: 48px; background: #e8f0fe; border: 1.5px solid transparent; border-radius: 14px; padding: 0 16px; color: #0f172a; font-size: 16px; letter-spacing: 2px; outline: none; box-sizing: border-box; transition: all 0.2s ease;">
         </div>
 
         <!-- Forgot Password link aligned to right (Orange colored) -->
@@ -3264,6 +3251,7 @@
         showToast('এই গেমের প্লে লিংক পাওয়া যায়নি।', 'warning');
         return;
       }
+      if (window.npShowLoad) window.npShowLoad();
       // Hand the logged-in user to the game (it runs on its own domain): token goes in the URL hash (never sent to any server)
       let finalUrl = url;
       if (gameIdToken) {
@@ -3718,8 +3706,6 @@
       e.preventDefault();
       const rawUsername = document.getElementById('gateSignupUsername').value.trim();
       const name = document.getElementById('gateSignupName').value.trim();
-      const ffIgn = document.getElementById('gateSignupFfIgn').value.trim();
-      const ffUid = document.getElementById('gateSignupFfUid').value.trim();
       const rawEmail = document.getElementById('gateSignupEmail').value.trim();
       const pass = document.getElementById('gateSignupPassword').value;
       const confirmPass = document.getElementById('gateSignupConfirmPassword').value;
@@ -3772,8 +3758,8 @@
             username: cleanUsername,
             name,
             email,
-            ffIgn: ffIgn || 'Player',
-            ffUid: ffUid || '000000000',
+            ffIgn: '',
+            ffUid: '',
             balance: 0,
             status: 'ACTIVE',
             dpUrl: '',
@@ -3930,6 +3916,8 @@
       }
 
       if (signupWrap) signupWrap.style.display = isLogin ? 'none' : 'block';
+      const confirmWrap = document.getElementById('signupConfirmWrap');
+      if (confirmWrap) confirmWrap.style.display = isLogin ? 'none' : 'block';
       if (forgotLink) forgotLink.style.display = isLogin ? 'flex' : 'none';
       if (header) header.innerText = isLogin ? 'লগইন করুন' : 'নতুন অ্যাকাউন্ট তৈরি';
       if (btn) btn.innerText = isLogin ? 'লগইন করুন' : 'লগইন করুন';
@@ -3964,8 +3952,19 @@
             const name = (document.getElementById('authName').value || '').trim() || emailInput.split('@')[0];
             const usernameInput = (document.getElementById('authUsername').value || '').trim();
             const cleanUser = usernameInput ? usernameInput.toLowerCase().replace(/[^a-z0-9_]/g, '') : emailInput.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '');
-            const ffIgn = (document.getElementById('authFfIgn').value || '').trim() || name;
-            const ffUid = (document.getElementById('authFfUid').value || '').trim() || '000000000';
+            const confirmPass = document.getElementById('authConfirmPassword').value;
+            if (!usernameInput || !(document.getElementById('authName').value || '').trim()) {
+              showToast('ইউজারনেম ও পূর্ণ নাম লিখুন', 'error');
+              btn.disabled = false;
+              btn.innerText = 'অ্যাকাউন্ট তৈরি করুন';
+              return;
+            }
+            if (password !== confirmPass) {
+              showToast('পাসওয়ার্ড ও কনফার্ম পাসওয়ার্ড মেলেনি!', 'error');
+              btn.disabled = false;
+              btn.innerText = 'অ্যাকাউন্ট তৈরি করুন';
+              return;
+            }
             const email = emailInput.includes('@') ? emailInput : `${cleanUser}@npapp.local`;
 
             if (db && cleanUser) {
@@ -3985,8 +3984,8 @@
                 username: cleanUser,
                 name,
                 email,
-                ffIgn,
-                ffUid,
+                ffIgn: '',
+                ffUid: '',
                 balance: 0,
                 status: 'ACTIVE',
                 role: 'USER',
@@ -5525,6 +5524,52 @@
         window.app.openSupportModal();
       }
     });
+  })();
+  </script>
+
+  <style>
+    /* Play Now লোডিং পেজ (শুধু লেখা, কোনো ছবি/লোগো নেই) */
+    .npld{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);opacity:0;transition:opacity .25s ease}
+    .npld.npld-on{display:flex}
+    .npld.npld-show{opacity:1}
+    .npld-txt{display:flex;flex-wrap:nowrap;justify-content:center;align-items:baseline;max-width:100%;padding:0 8px;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-weight:900;font-size:clamp(22px,8.4vw,46px);letter-spacing:.03em}
+    .npld-ch{display:inline-block;color:#fcd34d;transform-origin:50% 60%;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:npldg-pulse 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.11s)}
+    @keyframes npldg-pulse{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
+    @media (prefers-reduced-motion:reduce){.npld .npld-ch{animation:none;opacity:1;transform:none;filter:none}.npld{transition-duration:.01s}}
+  </style>
+  <div class="npld" id="npLoad" role="status" aria-label="Loading"><div class="npld-txt" aria-hidden="true"><span class="npld-ch" style="--i:0">L</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">A</span><span class="npld-ch" style="--i:3">D</span><span class="npld-ch" style="--i:4">I</span><span class="npld-ch" style="--i:5">N</span><span class="npld-ch" style="--i:6">G</span><span class="npld-ch" style="--i:7">.</span><span class="npld-ch" style="--i:8">.</span><span class="npld-ch" style="--i:9">.</span><span class="npld-ch" style="--i:10">.</span><span class="npld-ch" style="--i:11">.</span></div></div>
+  <script>
+  (function () {
+    var el = document.getElementById('npLoad'), t1 = null, t2 = null;
+    function hide() {
+      if (!el) return;
+      clearTimeout(t1); clearTimeout(t2);
+      el.classList.remove('npld-show');
+      t2 = setTimeout(function () { el.classList.remove('npld-on'); }, 260);
+    }
+    window.npShowLoad = function () {
+      if (!el) return;
+      clearTimeout(t1); clearTimeout(t2);
+      el.classList.add('npld-on');
+      void el.offsetWidth;
+      el.classList.add('npld-show');
+      t1 = setTimeout(hide, 1800); // গেম নতুন ট্যাবে খোলে; প্যানেলে ফিরলে লোডিং আর থাকবে না
+    };
+    window.addEventListener('pageshow', hide);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) hide(); });
+  })();
+  </script>
+  <script>
+  /* Crazy Time সার্ভার আগে থেকে জাগিয়ে রাখা (Render ঘুমিয়ে গেলে ব্যালেন্স আসতে দেরি হয়) */
+  (function () {
+    var CT_PING = 'https://crazytime-backend.onrender.com/health'; // ← আপনার Crazy Time সার্ভারের ঠিকানা (https দিয়ে)
+    function ping() {
+      if (document.hidden) return;
+      try { fetch(CT_PING, { mode: 'no-cors', cache: 'no-store' }).catch(function () {}); } catch (e) {}
+    }
+    ping();
+    setInterval(ping, 4 * 60 * 1000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) ping(); });
   })();
   </script>
 </body>
