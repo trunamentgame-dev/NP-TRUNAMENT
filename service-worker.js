@@ -1,14 +1,19 @@
 /**
  * NP TOURNAMENT BD - Service Worker for PWA Installation & Offline Shell
+ * v4: প্যানেলের পেজ (index.html) ডিভাইসে সেভ থাকে; খুললে সাথে সাথে সেভ করা পেজ দেখায়,
+ *     আর ব্যাকগ্রাউন্ডে নতুন ভার্সন এনে সেভ করে রাখে (পরের বার নতুনটা দেখায়)।
+ *     Firebase SDK ও ফন্ট ফাইলও ডিভাইসে সেভ থাকে, তাই বারবার ডাউনলোড হয় না।
  */
 
-const CACHE_NAME = 'np-tournament-pwa-v3';
+const CACHE_NAME = 'np-tournament-pwa-v4';
+const SCOPE = new URL('./', self.registration.scope).href;
 const ASSETS_TO_CACHE = [
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
 ];
+const SHELL_URLS = [SCOPE, SCOPE + 'index.html', SCOPE + 'manifest.json', SCOPE + 'icon-192.png', SCOPE + 'icon-512.png'];
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -40,6 +45,41 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Firebase SDK (versioned file) ও ফন্ট ফাইল: একবার সেভ হলে আর ডাউনলোড হয় না
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const hit = await cache.match(request);
+  if (hit) return hit;
+  const res = await fetch(request);
+  if (res && (res.ok || res.type === 'opaque')) {
+    cache.put(request, res.clone()).catch(() => {});
+  }
+  return res;
+}
+
+// প্যানেলের পেজ: সেভ করা কপি সাথে সাথে দেখায়, ব্যাকগ্রাউন্ডে নতুন কপি এনে সেভ করে
+async function staleWhileRevalidate(event, url) {
+  const request = event.request;
+  const cache = await caches.open(CACHE_NAME);
+  const key = url.origin + url.pathname;
+  let cached = await cache.match(key);
+  if (!cached && request.mode === 'navigate') cached = await cache.match(SCOPE + 'index.html');
+
+  const update = fetch(request).then((res) => {
+    if (res && res.status === 200 && res.type === 'basic') {
+      cache.put(key, res.clone()).catch(() => {});
+    }
+    return res;
+  }).catch(() => null);
+
+  if (cached) {
+    event.waitUntil(update);
+    return cached;
+  }
+  const net = await update;
+  return net || new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/plain' } });
+}
+
 self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
@@ -56,7 +96,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network first with cache fallback for static shell
+  // Firebase SDK scripts + font files: cache first
+  if ((url.hostname === 'www.gstatic.com' && url.pathname.startsWith('/firebasejs/')) || url.hostname === 'fonts.gstatic.com') {
+    event.respondWith(cacheFirst(event.request));
+    return;
+  }
+
+  // Panel shell (index.html, manifest, icons): show saved copy instantly, refresh in background
+  if (url.origin === self.location.origin && SHELL_URLS.includes(url.origin + url.pathname)) {
+    event.respondWith(staleWhileRevalidate(event, url));
+    return;
+  }
+
+  // Everything else (e.g. games in sub-folders): network first with cache fallback
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
@@ -68,13 +120,13 @@ self.addEventListener('fetch', (event) => {
         }
         return networkResponse;
       })
-      .catch(() => {
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) return cachedResponse;
-          if (event.request.mode === 'navigate') {
-            return caches.match('./index.html') || caches.match('./');
-          }
-        });
+      .catch(async () => {
+        const cachedResponse = await caches.match(event.request);
+        if (cachedResponse) return cachedResponse;
+        if (event.request.mode === 'navigate') {
+          return (await caches.match('./index.html')) || (await caches.match('./')) || new Response('Offline', { status: 503 });
+        }
+        return new Response('', { status: 504 });
       })
   );
 });
