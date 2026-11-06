@@ -1,4 +1,38 @@
-
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LODU TRUNAMENT</title>
+<style>
+:root{--bg:#143b78;--card:#1f5198;--tx:#f4f7ff;--mut:#a9c3ea;--ac:#ffd23f;--c0:#1fa6fb;--c1:#ec1c24;--c2:#0a9a47;--c3:#f7d200;--y0:#1fa6fb;--y1:#ec1c24;--y2:#0a9a47;--y3:#c9a50c}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg) repeating-linear-gradient(45deg,#ffffff10 0 22px,transparent 22px 44px);color:var(--tx);font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))}
+.hide{display:none!important}
+.screen{width:100%;max-width:460px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+h1{font-size:2.3rem;font-weight:700;letter-spacing:-.5px}
+.sub{color:var(--mut)}
+.lbl{font-weight:600;margin-top:4px}
+button{font:inherit;cursor:pointer;border:0;border-radius:14px;padding:13px 24px;font-weight:600;background:var(--ac);color:#2a2100}
+button.ghost{background:transparent;color:var(--tx);border:1.5px solid var(--mut)}
+button:focus-visible,input:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.big{font-size:1.2rem;padding:16px 34px}
+.seg{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.seg button{background:var(--card);color:var(--tx);border:2px solid transparent;padding:10px 18px}
+.seg button[aria-pressed=true]{border-color:var(--ac);background:#2c66b8}
+input{font:inherit;padding:12px 16px;border-radius:12px;border:1.5px solid var(--mut);background:var(--card);color:var(--tx);width:min(100%,280px);text-align:center}
+details{max-width:340px;color:var(--mut);text-align:left;font-size:.92rem}summary{cursor:pointer;text-align:center}
+.note{font-size:.88rem;color:var(--mut);max-width:340px}
+.ring{width:120px;height:120px;border-radius:50%;border:6px solid #ffffff33;border-top-color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:700;animation:spin 1.2s linear infinite}
+.ring span{animation:spin 1.2s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bar{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.arena{width:min(94vw,460px);display:flex;flex-direction:column;gap:10px}
+.drow{display:flex;justify-content:space-between}
+.dp{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:12px;background:#ffffff26;border:2px solid #9fd4ff55}
+.dp.off{visibility:hidden}
+.dp.act{border-color:var(--ac);background:#ffffff45}
+.pin svg{width:24px;height:32px;display:block}
 .die{position:relative;flex:none;width:50px;height:50px;padding:0;border:0;background:none;perspective:340px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .die:disabled{opacity:1;cursor:default}
 .die.ready{animation:ready 1s infinite}
