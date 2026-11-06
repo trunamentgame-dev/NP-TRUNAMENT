@@ -1659,6 +1659,15 @@
     .game-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
     .game-box.empty{cursor:default;border-style:dashed;background:linear-gradient(160deg,#141c30,#0b101d);box-shadow:none}
     .game-box.empty:active{transform:none}
+
+    /* Page / Action Loading styles */
+    .npld{position:fixed;inset:0;z-index:999990;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);opacity:1;transition:opacity .28s ease}
+    .npld.npld-on{display:flex}
+    .npld.npld-fade{opacity:0;pointer-events:none}
+    .npld-txt{display:flex;flex-wrap:nowrap;justify-content:center;align-items:baseline;max-width:100%;padding:0 8px;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-weight:900;font-size:clamp(22px,8.4vw,46px);letter-spacing:.03em}
+    .npld-ch{display:inline-block;color:#fcd34d;transform-origin:50% 60%;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:npldg-pulse 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.11s)}
+    @keyframes npldg-pulse{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
+    @media (prefers-reduced-motion:reduce){.npld .npld-ch{animation:none;opacity:1;transform:none;filter:none}.npld{transition-duration:.01s}}
   </style>
 </head>
 <body data-theme="dark">
@@ -2000,6 +2009,27 @@
     particleBox.appendChild(fragment);
   }
 
+  window.isPageFullyLoaded = false;
+  window.isIntroFinished = false;
+
+  window.tryRevealPage = function () {
+    if (window.isPageFullyLoaded && window.isIntroFinished) {
+      const loader = document.getElementById('pageLoadingScreen');
+      if (loader) {
+        loader.classList.add('npld-fade');
+        setTimeout(function () {
+          loader.classList.remove('npld-on');
+          loader.style.display = 'none';
+        }, 280);
+      }
+    }
+  };
+
+  window.markPageLoaded = function () {
+    window.isPageFullyLoaded = true;
+    if (window.tryRevealPage) window.tryRevealPage();
+  };
+
   // Hide intro after 1.35 seconds
   window.setTimeout(function () {
     intro.classList.add('np-intro-hide');
@@ -2007,6 +2037,8 @@
     // Remove intro after smooth fade-out
     window.setTimeout(function () {
       intro.remove();
+      window.isIntroFinished = true;
+      if (window.tryRevealPage) window.tryRevealPage();
     }, 150);
 
   }, 1350);
@@ -2015,7 +2047,13 @@
 </script>
 
 <!-- End NP TOURNAMENT BD Intro -->
-  <!-- ==================== END INTRO ANIMATION ==================== -->
+<!-- ==================== PAGE LOADING SCREEN (ইনট্রোর পর পেজ লোড না হওয়া পর্যন্ত দৃশ্যমান) ==================== -->
+<div id="pageLoadingScreen" class="npld npld-on" role="status" aria-label="Loading">
+  <div class="npld-txt" aria-hidden="true">
+    <span class="npld-ch" style="--i:0">L</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">A</span><span class="npld-ch" style="--i:3">D</span><span class="npld-ch" style="--i:4">I</span><span class="npld-ch" style="--i:5">N</span><span class="npld-ch" style="--i:6">G</span><span class="npld-ch" style="--i:7">.</span><span class="npld-ch" style="--i:8">.</span><span class="npld-ch" style="--i:9">.</span><span class="npld-ch" style="--i:10">.</span><span class="npld-ch" style="--i:11">.</span>
+  </div>
+</div>
+<!-- ==================== END INTRO ANIMATION & LOADER ==================== -->
 
 
   <div class="toast-container" id="toastContainer"></div>
@@ -2187,11 +2225,6 @@
       </div>
 
       <div id="gamesSectionWrapper" style="margin-bottom: 16px;">
-        <div id="gamesLoadingState" style="text-align: center; padding: 20px 14px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-muted); font-size: 13px;">
-          <div style="font-weight: 700; color: var(--color-primary); margin-bottom: 4px;">⚡ গেমস লোড হচ্ছে...</div>
-          <div style="font-size: 11px;">Firebase Realtime Database থেকে গেমস ডেটা লোড হচ্ছে</div>
-        </div>
-
         <div id="gamesErrorState" style="display: none; text-align: center; padding: 14px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: var(--radius-md); color: #f87171; font-size: 12px; margin-bottom: 10px;">
           গেমস লোড করতে সমস্যা হয়েছে।
         </div>
@@ -2254,7 +2287,7 @@
       <div id="tournamentsFeed">
         <div class="empty-state">
           <div class="empty-title">টুর্নামেন্ট লোড হচ্ছে...</div>
-          <div class="empty-desc">ফায়ারবেস রিয়েলটাইম ডাটাবেজ থেকে ম্যাচ সংগ্রহ করা হচ্ছে।</div>
+          <div class="empty-desc">ম্যাচ সংগ্রহ করা হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...</div>
         </div>
       </div>
 
@@ -3212,32 +3245,33 @@
     }
 
     function setupGamesListener() {
-      const loading = document.getElementById('gamesLoadingState');
       const error = document.getElementById('gamesErrorState');
       const empty = document.getElementById('gamesEmptyState');
 
+      let hasRenderedCache = false;
       try {
         const cachedG = localStorage.getItem('NP_CACHED_GAMES');
         if (cachedG) {
           const parsedG = JSON.parse(cachedG);
           if (Array.isArray(parsedG) && parsedG.length > 0) {
             renderGamesCards(parsedG);
-            if (loading) loading.style.display = 'none';
+            hasRenderedCache = true;
           }
         }
       } catch (e) {}
 
-      if (!db) {
+      if (!hasRenderedCache) {
         renderGamesCards(DEMO_GAMES);
+      }
+
+      if (!db) {
         return;
       }
 
-      if (loading && (!state.games || state.games.length === 0)) loading.style.display = 'block';
       if (error) error.style.display = 'none';
       if (empty) empty.style.display = 'none';
 
       db.ref('games').on('value', (snapshot) => {
-        if (loading) loading.style.display = 'none';
 
         let gamesList = [];
         if (snapshot.exists()) {
@@ -3834,6 +3868,7 @@
             setupUserListeners(user.uid);
             resetUserInactivityTimer();
             checkTournamentRulesModal();
+            if (window.markPageLoaded) window.markPageLoaded();
 
           } else {
             state.currentUser = null;
@@ -3869,12 +3904,14 @@
 
             // Prompt exact reference photo login popup
             showAuthModal('login');
+            if (window.markPageLoaded) window.markPageLoaded();
           }
         });
       } else {
         if (appRoot) appRoot.style.display = 'none';
         showAuthModal('login');
         updateAuthStateUI();
+        if (window.markPageLoaded) window.markPageLoaded();
       }
     }
 
@@ -4290,7 +4327,7 @@
           btn.innerText = state.authMode === 'login' ? 'লগইন করুন' : 'লগইন করুন';
         }
       } else {
-        showToast('Firebase প্রস্তুত নয়', 'error');
+        showToast('সার্ভার প্রস্তুত নয়, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন', 'error');
         btn.disabled = false;
       }
     }
@@ -4583,7 +4620,7 @@
       }
 
       if (!db) {
-        showToast('Firebase সংযোগ সক্রিয় নেই।', 'error');
+        showToast('সার্ভার সংযোগ সক্রিয় নেই।', 'error');
         return;
       }
 
@@ -5592,6 +5629,13 @@
       setupFirebaseListeners();
       updateDepositMethodDetails();
       updateWithdrawMethodDetails();
+
+      window.addEventListener('load', function () {
+        if (window.markPageLoaded) window.markPageLoaded();
+      });
+      setTimeout(function () {
+        if (window.markPageLoaded) window.markPageLoaded();
+      }, 2000);
 
       // Listen for close message from inside support_center.html iframe
       window.addEventListener('message', function (event) {
