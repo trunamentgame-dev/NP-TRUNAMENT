@@ -1672,57 +1672,388 @@
 </head>
 <body data-theme="dark">
 
-  <!-- ==================== NP LOGO SPLASH (শুধু NP লোগো, প্যানেল পুরো লোড না হওয়া পর্যন্ত অ্যানিমেট হবে) ==================== -->
+  <!-- ==================== NP TOURNAMENT BD - INTRO ANIMATION ==================== -->
+<!-- NP TOURNAMENT BD - Smooth Gaming Intro Animation -->
+
 <style>
-  html{background:#050811}
-  #pageLoadingScreen{z-index:999990;background:#050811;opacity:1;transition:opacity .25s ease}
-  #pageLoadingScreen .np-splash-logo{
-    margin:0;font-family:Arial,Helvetica,sans-serif;font-size:clamp(100px,23vw,190px);line-height:.95;
-    font-weight:1000;letter-spacing:-10px;padding-right:10px;
-    background:linear-gradient(180deg,#ffffff 5%,#dce7f5 42%,#8296b0 72%,#ffffff 100%);
-    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-    animation:npSplashPulse 1.3s ease-in-out infinite;will-change:transform,filter;
+  #np-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #050811;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .15s ease, visibility .15s ease;
+    isolation: isolate;
   }
-  @keyframes npSplashPulse{
-    0%,100%{transform:scale(.9);opacity:.75;filter:drop-shadow(0 0 8px #168cff55)}
-    50%{transform:scale(1.06);opacity:1;filter:drop-shadow(0 0 26px #168cffcc)}
+
+  #np-intro.np-intro-hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
-  @media (prefers-reduced-motion:reduce){#pageLoadingScreen .np-splash-logo{animation:none}}
+
+  #np-intro .np-energy {
+    position: absolute;
+    width: 42%;
+    height: 2px;
+    top: 50%;
+    background: linear-gradient(
+      90deg, transparent, #168cff, #d9f3ff, transparent
+    );
+    box-shadow: 0 0 12px #168cff, 0 0 30px #087bff;
+    opacity: 0;
+  }
+
+  #np-intro .np-energy-left {
+    left: 0;
+    transform: translateX(-100%);
+    animation: npEnergyLeft .85s .05s ease-out forwards;
+  }
+
+  #np-intro .np-energy-right {
+    right: 0;
+    transform: translateX(100%);
+    animation: npEnergyRight .85s .05s ease-out forwards;
+  }
+
+  #np-intro .np-brand {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 24px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #np-intro .np-logo {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: clamp(100px, 23vw, 190px);
+    line-height: .95;
+    font-weight: 1000;
+    letter-spacing: -10px;
+    color: #f8fbff;
+
+    background: linear-gradient(
+      180deg,
+      #ffffff 5%,
+      #dce7f5 42%,
+      #8296b0 72%,
+      #ffffff 100%
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    filter: drop-shadow(0 0 12px #8ecaff55);
+
+    opacity: 0;
+    transform: translateY(55px) scale(.78);
+
+    animation: npLogoReveal .8s .05s cubic-bezier(.16,1,.3,1) forwards;
+  }
+
+  #np-intro .np-brand-name {
+    margin-top: 20px;
+    color: #eaf5ff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: clamp(16px, 4vw, 27px);
+    font-weight: 800;
+    letter-spacing: clamp(3px, 1.2vw, 8px);
+    text-shadow: 0 0 16px #168cff80;
+
+    opacity: 0;
+    transform: translateY(15px);
+
+    animation: npNameReveal .45s .45s ease forwards;
+  }
+
+  #np-intro .np-underline {
+    width: 0;
+    max-width: 280px;
+    height: 2px;
+    margin: 18px auto 0;
+
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #168cff,
+      #ffffff,
+      #168cff,
+      transparent
+    );
+
+    box-shadow: 0 0 12px #168cff;
+
+    animation: npLineReveal .4s .55s ease forwards;
+  }
+
+  /* Large Provider Credit */
+  #np-intro .np-provider {
+    margin: 16px auto 0 auto;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: clamp(13px, 3.5vw, 17px);
+    font-weight: 700;
+    letter-spacing: clamp(1px, 0.4vw, 2px);
+    line-height: 1.5;
+    color: #b8c9df;
+    white-space: nowrap;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+
+    opacity: 0;
+    transform: translateY(8px);
+
+    animation: npNameReveal .4s .65s ease forwards;
+  }
+
+  #np-intro .np-provider span {
+    color: #48aaff;
+    font-size: 1.15em;
+    font-weight: 900;
+    text-shadow: 0 0 12px #168cff88;
+  }
+
+  #np-intro .np-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  #np-intro .np-particle {
+    position: absolute;
+    bottom: -10px;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #a9ddff;
+    box-shadow: 0 0 7px 2px #168cff88;
+
+    animation: npParticleRise
+      var(--duration)
+      linear
+      var(--delay)
+      infinite;
+
+    left: var(--left);
+    opacity: 0;
+  }
+
+  @keyframes npLogoReveal {
+    0% {
+      opacity: 0;
+      transform: translateY(55px) scale(.78);
+    }
+
+    65% {
+      opacity: 1;
+      transform: translateY(-4px) scale(1.03);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes npNameReveal {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes npLineReveal {
+    to {
+      width: 80%;
+    }
+  }
+
+  @keyframes npEnergyLeft {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+
+    35% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: .8;
+      transform: translateX(20%);
+    }
+  }
+
+  @keyframes npEnergyRight {
+    0% {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+
+    35% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: .8;
+      transform: translateX(-20%);
+    }
+  }
+
+  @keyframes npParticleRise {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+
+    15% {
+      opacity: .8;
+    }
+
+    85% {
+      opacity: .5;
+    }
+
+    100% {
+      transform: translateY(-105vh);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #np-intro *,
+    #np-intro *::before,
+    #np-intro *::after {
+      animation-duration: .01ms !important;
+      animation-delay: 0ms !important;
+    }
+  }
 </style>
-<div id="pageLoadingScreen" class="npld npld-on" role="status" aria-label="NP">
-  <h1 class="np-splash-logo" aria-hidden="true">NP</h1>
+
+<div id="np-intro" aria-label="NP Tournament BD intro">
+
+  <div class="np-particles" id="np-particles"></div>
+
+  <div class="np-energy np-energy-left"></div>
+  <div class="np-energy np-energy-right"></div>
+
+  <div class="np-brand">
+
+    <h1 class="np-logo">NP</h1>
+
+    <div class="np-brand-name">
+      NP TOURNAMENT BD
+    </div>
+
+    <div class="np-underline"></div>
+
+    <div class="np-provider">
+      Provided by <span>Mostwin88</span>
+    </div>
+
+  </div>
 </div>
+
 <script>
 (function () {
-  var loadDone = (document.readyState === 'complete');
-  var authDone = false, revealed = false;
+  const intro = document.getElementById('np-intro');
 
-  function reveal() {
-    if (revealed) return;
-    revealed = true;
-    var loader = document.getElementById('pageLoadingScreen');
-    if (!loader) return;
-    loader.classList.add('npld-fade');
-    setTimeout(function () {
-      loader.classList.remove('npld-on');
-      loader.style.display = 'none';
-    }, 280);
+  if (!intro) return;
+
+  const particleBox = document.getElementById('np-particles');
+
+  // Lightweight particles without external libraries
+  if (
+    particleBox &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    const particleCount = window.innerWidth < 600 ? 12 : 22;
+    const fragment = document.createDocumentFragment();
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('span');
+
+      particle.className = 'np-particle';
+
+      particle.style.setProperty(
+        '--left',
+        Math.random() * 100 + '%'
+      );
+
+      particle.style.setProperty(
+        '--duration',
+        (3 + Math.random() * 4) + 's'
+      );
+
+      particle.style.setProperty(
+        '--delay',
+        (-Math.random() * 6) + 's'
+      );
+
+      fragment.appendChild(particle);
+    }
+
+    particleBox.appendChild(fragment);
   }
-  function check() { if (loadDone && authDone) reveal(); }
 
   window.isPageFullyLoaded = false;
-  // kind: 'load' = পেজ লোড শেষ, 'force' = সেফটি টাইমআউট, বাকি (লগইন স্টেট জানা হলে) = auth
-  window.markPageLoaded = function (kind) {
-    if (kind === 'load') loadDone = true;
-    else if (kind === 'force') { loadDone = true; authDone = true; }
-    else authDone = true;
-    window.isPageFullyLoaded = loadDone && authDone;
-    check();
+  window.isIntroFinished = false;
+
+  window.tryRevealPage = function () {
+    if (window.isPageFullyLoaded && window.isIntroFinished) {
+      const loader = document.getElementById('pageLoadingScreen');
+      if (loader) {
+        loader.classList.add('npld-fade');
+        setTimeout(function () {
+          loader.classList.remove('npld-on');
+          loader.style.display = 'none';
+        }, 280);
+      }
+    }
   };
-  window.addEventListener('load', function () { loadDone = true; check(); });
+
+  window.markPageLoaded = function () {
+    window.isPageFullyLoaded = true;
+    if (window.tryRevealPage) window.tryRevealPage();
+  };
+
+  // Hide intro after 1.35 seconds
+  window.setTimeout(function () {
+    intro.classList.add('np-intro-hide');
+
+    // Remove intro after smooth fade-out
+    window.setTimeout(function () {
+      intro.remove();
+      window.isIntroFinished = true;
+      if (window.tryRevealPage) window.tryRevealPage();
+    }, 150);
+
+  }, 1350);
+
 })();
 </script>
-<!-- ==================== END NP LOGO SPLASH ==================== -->
+
+<!-- End NP TOURNAMENT BD Intro -->
+<!-- ==================== PAGE LOADING SCREEN (ইনট্রোর পর পেজ লোড না হওয়া পর্যন্ত দৃশ্যমান) ==================== -->
+<div id="pageLoadingScreen" class="npld npld-on" role="status" aria-label="Loading">
+  <div class="npld-txt" aria-hidden="true">
+    <span class="npld-ch" style="--i:0">L</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">A</span><span class="npld-ch" style="--i:3">D</span><span class="npld-ch" style="--i:4">I</span><span class="npld-ch" style="--i:5">N</span><span class="npld-ch" style="--i:6">G</span><span class="npld-ch" style="--i:7">.</span><span class="npld-ch" style="--i:8">.</span><span class="npld-ch" style="--i:9">.</span><span class="npld-ch" style="--i:10">.</span><span class="npld-ch" style="--i:11">.</span>
+  </div>
+</div>
+<!-- ==================== END INTRO ANIMATION & LOADER ==================== -->
 
 
   <div class="toast-container" id="toastContainer"></div>
@@ -3135,11 +3466,11 @@
         return;
       }
 
-      // গেম পেজে সঙ্গে সঙ্গে নিয়ে যাওয়া হবে; সেশন রেকর্ড ব্যাকগ্রাউন্ডে হবে (অপেক্ষা করা হবে না)
+      // Record Game Session in Firebase RTDB for Admin Activity Monitoring
       try {
         const uid = state.currentUser ? state.currentUser.uid : '';
         const entryBal = typeof state.userData.balance === 'number' ? state.userData.balance : 0;
-        let gameName = 'Aviator (অ্যাভিয়েটর)';
+        let gameName = 'Aviator (অ্যাভিয়েটর)';
         if (isLudo || /ludo|লুডু/i.test(url)) gameName = 'Ludo King (লুডু)';
         else if (/mines/i.test(url)) gameName = 'Mines (মাইনস)';
         else if (/crash/i.test(url)) gameName = 'Crash Game';
@@ -3154,7 +3485,7 @@
 
         if (db && uid) {
           const sessionRef = db.ref('game_sessions').push();
-          const sessionId = sessionRef.key; // লোকালি সঙ্গে সঙ্গে তৈরি হয়
+          const sessionId = sessionRef.key;
           const sessionData = {
             id: sessionId,
             uid,
@@ -3174,19 +3505,34 @@
             device: deviceDesc,
             status: 'ACTIVE'
           };
+          await sessionRef.set(sessionData);
           try { sessionStorage.setItem('np_active_game_session', sessionId); } catch (e) {}
-          sessionRef.set(sessionData).catch(function (e) { console.warn('Game session start error:', e); }); // await নেই
         }
       } catch (err) {
         console.warn('Game session start error:', err);
       }
 
-      // সব গেম: একই উইন্ডোতে সঙ্গে সঙ্গে গেম পেজ
+      // সব গেম (এখনকার ও ভবিষ্যতে যোগ করা): নতুন উইন্ডো না খুলে একই উইন্ডোতে সরাসরি লোডিং → গেম
+      const sameWindow = true;
+      if (window.npShowLoad) window.npShowLoad(sameWindow);
       let finalUrl = url;
       if (gameIdToken) {
         finalUrl = String(url).split('#')[0] + '#t=' + gameIdToken;
       }
-      window.location.href = finalUrl;
+      if (sameWindow) { window.location.href = finalUrl; return; }
+      try {
+        const w = window.open('', '_blank');
+        if (!w) { window.location.href = finalUrl; return; }
+        try { w.opener = null; } catch (e) {}
+        try {
+          w.document.open();
+          w.document.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050811"><meta name="referrer" content="no-referrer"><title>Loading</title><style>html,body{margin:0;height:100%;background:#050811}body{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);overflow:hidden}.t{display:flex;white-space:nowrap;font-family:"Arial Black",Impact,sans-serif;font-weight:900;font-size:clamp(22px,8.4vw,46px);letter-spacing:.03em}.t span{display:inline-block;color:#fcd34d;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:p 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.11s)}@keyframes p{0%,60%,100%{transform:scale(.8);opacity:.55}25%{transform:scale(1.35);opacity:1}}@media (prefers-reduced-motion:reduce){.t span{animation:none}}</style></head><body><div class="t">' + 'LOADING.....'.split('').map(function (c, i) { return '<span style="--i:' + i + '">' + c + '</span>'; }).join('') + '</div></body></html>');
+          w.document.close();
+        } catch (e) {}
+        w.location.replace(finalUrl);
+      } catch (e) {
+        window.location.href = finalUrl;
+      }
     }
 
     function openGameLoginPrompt() {
@@ -5285,11 +5631,11 @@
       updateWithdrawMethodDetails();
 
       window.addEventListener('load', function () {
-        if (window.markPageLoaded) window.markPageLoaded('load');
+        if (window.markPageLoaded) window.markPageLoaded();
       });
       setTimeout(function () {
-        if (window.markPageLoaded) window.markPageLoaded('force');
-      }, 8000); // সেফটি: নেট খুব স্লো হলেও স্প্ল্যাশ আটকে থাকবে না
+        if (window.markPageLoaded) window.markPageLoaded();
+      }, 2000);
 
       // Listen for close message from inside support_center.html iframe
       window.addEventListener('message', function (event) {
