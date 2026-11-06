@@ -466,13 +466,10 @@
     .hero-slide-item {
       min-width: 100%;
       box-sizing: border-box;
-      min-height: 185px;
-      padding: 12px 14px 18px 14px;
+      height: 190px;
+      padding: 0;
       position: relative;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -2445,15 +2442,15 @@
   <!-- ==================== MODALS ==================== -->
 
   <!-- 1. USER LOGIN & SIGNUP POPUP (Exact Reference Photo Design) -->
-  <div class="modal-overlay" id="modalAuth" style="align-items: center; padding: 16px; box-sizing: border-box; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
-    <div class="modal-sheet" style="max-width: 480px; width: 100%; border-radius: 24px; padding: 20px 20px 22px 20px; background: #0f1624; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 40px rgba(0,0,0,0.85); box-sizing: border-box; overflow-y: auto; max-height: 88vh; animation: npAuthPop 0.22s ease;">
+  <div class="modal-overlay" id="modalAuth" style="align-items: center; padding: 16px; box-sizing: border-box; background: rgba(5, 8, 17, 0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);">
+    <div class="modal-sheet" style="max-width: 460px; width: 100%; border-radius: 24px; padding: 22px 20px 24px 20px; background: #111827; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 12px 35px rgba(0,0,0,0.5); box-sizing: border-box; overflow-y: auto; max-height: 88vh; animation: npAuthPop 0.22s ease;">
       
       <!-- Header with Title & Circular Close Button (as in reference photo) -->
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
         <h2 id="authModalHeader" style="margin: 0; font-size: 20px; font-weight: 800; color: #ffffff; font-family: var(--font-bengali); letter-spacing: -0.2px;">
           লগইন করুন
         </h2>
-        <button type="button" id="authModalCloseBtn" onclick="window.app.closeModal('modalAuth')" aria-label="Close" style="width: 32px; height: 32px; border-radius: 50%; background: #1a2336; border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; transition: all 0.2s ease;">
+        <button type="button" id="authModalCloseBtn" onclick="window.app.closeModal('modalAuth')" aria-label="Close" style="width: 32px; height: 32px; border-radius: 50%; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.14); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; transition: all 0.2s ease;">
           ✕
         </button>
       </div>
@@ -3614,37 +3611,14 @@
       }
     }
 
-    // --- PHOTO 4: Hero Slider ---
-    // স্লাইডারের ছবির ওপরের সব লেখা সরানো হয়েছে।
-    // শুধু তিনটি পরিসংখ্যানের বক্স: ‘1,250+ — ম্যাচ সম্পন্ন’, ‘৳৩.৫ লাখ+ — পুরস্কার বিতরণ’, ‘24.5k+ — অ্যাক্টিভ গেমার্স’।
-    // স্লাইডারের ছবি স্বাভাবিক, পরিষ্কার ও স্পষ্ট; opacity কমবে না, blur বা অপ্রয়োজনীয় overlay থাকবে না।
+    // --- Hero Slider: শুধু স্লাইডার ছবি থাকবে, ওপরের কোনো লেখা বা স্ট্যাটস বক্স থাকবে না ---
     function initHeroSlider() {
       const track = document.getElementById('heroSlidesTrack');
       const dotsContainer = document.getElementById('heroSliderDots');
       if (!track) return;
 
-      const isBn = state.currentLang === 'bn';
-      const lblMatches = isBn ? 'ম্যাচ সম্পন্ন' : 'Matches Done';
-      const lblPrizes = isBn ? 'পুরস্কার বিতরণ' : 'Prizes Paid';
-      const lblGamers = isBn ? 'অ্যাক্টিভ গেমার্স' : 'Active Gamers';
-
-      track.innerHTML = state.banners.map((b, idx) => `
-        <div class="hero-slide-item" style="background-image: url('${b.img || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}');">
-          <div class="hero-stats-row">
-            <div class="hero-stat-col">
-              <div class="hero-stat-val">1,250+</div>
-              <div class="hero-stat-lbl">${lblMatches}</div>
-            </div>
-            <div class="hero-stat-col">
-              <div class="hero-stat-val">৳৩.৫ লাখ+</div>
-              <div class="hero-stat-lbl">${lblPrizes}</div>
-            </div>
-            <div class="hero-stat-col">
-              <div class="hero-stat-val">24.5k+</div>
-              <div class="hero-stat-lbl">${lblGamers}</div>
-            </div>
-          </div>
-        </div>
+      track.innerHTML = state.banners.map((b) => `
+        <div class="hero-slide-item" style="background-image: url('${b.img || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80'}');"></div>
       `).join('');
 
       if (dotsContainer) {
