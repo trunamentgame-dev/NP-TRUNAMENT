@@ -4311,9 +4311,11 @@
 
       feed.innerHTML = filtered.map(t => {
         const isLudo = (t.gameName || '').toLowerCase().includes('ludo');
+        const ffCustomPhoto = 'https://i.postimg.cc/fW9ht5RM/54f31449f5f91cf0cc223cc635cd5952jpg.jpg';
         const defaultBanner = isLudo 
           ? 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=700&q=80'
-          : 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=80';
+          : ffCustomPhoto;
+        const bannerImage = isLudo ? (t.bannerUrl || t.banner || defaultBanner) : (t.bannerUrl || t.banner || ffCustomPhoto);
         const maxSlots = t.maxSlots || (isLudo ? 2 : 48);
         const joinedCount = t.joinedCount || 0;
         const percent = Math.min(100, Math.round((joinedCount / maxSlots) * 100));
@@ -4339,7 +4341,7 @@
         return `
           <div class="tournament-card">
             <div class="tournament-banner-box">
-              <img src="${t.bannerUrl || t.banner || defaultBanner}" class="tournament-banner-img" alt="${t.title}" loading="lazy">
+              <img src="${bannerImage}" class="tournament-banner-img" alt="${t.title}" loading="lazy" onerror="this.src='${ffCustomPhoto}'">
               <span class="tournament-badge-status ${statusBadgeClass}">${status}</span>
               <span class="tournament-badge-type">${isLudo ? '🎲 Ludo' : '🔥 Free Fire'} • ${escapeHtml(t.gameMode || t.type || 'Solo')} • ${escapeHtml(t.map || (isLudo ? 'Classic Board' : 'Bermuda'))}</span>
             </div>
