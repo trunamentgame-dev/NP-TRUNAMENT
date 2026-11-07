@@ -3859,20 +3859,28 @@ body[data-theme="light"] .pp-howto div{color:#475569}
   <!-- ==================== JAVASCRIPT APPLICATION CODE ==================== -->
   <script src="./firebase-config.js"></script>
   <script>
-  function npTurnoverLeft(){
-    try {
-      var u = (typeof state !== 'undefined' && state.userData) ? state.userData : {};
-      var req = parseFloat(u.turnoverRequired) || 0;
-      var done = parseFloat(u.turnoverDone !== undefined ? u.turnoverDone : u.turnoverCompleted) || 0;
-      return Math.max(0, Math.round((req - done) * 100) / 100);
-    } catch(e) { return 0; }
-  }
-  function npRenderTurnover(){
-    var b = document.getElementById('turnoverBox');
+  function npTurnoverSet(){
     var u = (typeof state !== 'undefined' && state.userData) ? state.userData : {};
     var req = parseFloat(u.turnoverRequired) || 0;
     var done = parseFloat(u.turnoverDone !== undefined ? u.turnoverDone : u.turnoverCompleted) || 0;
-    var left = npTurnoverLeft();
+    var left = Math.max(0, Math.round((req - done) * 100) / 100);
+    var pending = false;
+    try {
+      var pr = window.npPromoTurnover ? window.npPromoTurnover() : null;
+      if (pr && pr.req > 0) {
+        var pl = Math.max(0, Math.round((pr.req - pr.done) * 100) / 100);
+        if (pl > left) { req = pr.req; done = pr.done; left = pl; pending = pr.pending; }
+      }
+    } catch (e) {}
+    return { req: req, done: done, left: left, pending: pending };
+  }
+  function npTurnoverLeft(){
+    try { return npTurnoverSet().left; } catch(e) { return 0; }
+  }
+  function npRenderTurnover(){
+    var b = document.getElementById('turnoverBox');
+    var ts = npTurnoverSet();
+    var req = ts.req, done = ts.done, left = ts.left;
     var p = req > 0 ? Math.min(100, Math.round(done / req * 100)) : 100;
 
     if (b) {
@@ -3886,7 +3894,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           barEl.style.width = p + '%';
           barEl.style.background = left > 0 ? '#f59e0b' : '#10b981';
         }
-        if (noteEl) noteEl.textContent = left > 0 ? 'উইথড্র করতে আরও ৳' + left + ' টার্নওভার বাকি (' + p + '% সম্পন্ন)' : '✅ টার্নওভার সম্পন্ন, এখন উইথড্র করতে পারবেন';
+        if (noteEl) noteEl.textContent = left > 0 ? 'উইথড্র করতে আরও ৳' + left + ' টার্নওভার বাকি (' + p + '% সম্পন্ন)' + (ts.pending ? ' • প্রোমো টার্নওভার প্রথম গেম শুরুর ১০ মিনিট পর সক্রিয় হবে' : '') : '✅ টার্নওভার সম্পন্ন, এখন উইথড্র করতে পারবেন';
       } else {
         if (txtEl) txtEl.textContent = 'শর্ত নেই (০%)';
         if (barEl) {
@@ -7407,7 +7415,19 @@ body[data-theme="light"] .pp-howto div{color:#475569}
   function live(p) { var n = Date.now(); return !!p && p.active !== false && p.active !== 'false' && p.active !== 0 && (!p.startAt || n >= p.startAt) && (!p.endAt || n <= p.endAt) && !(ADMUID && p.adminOff && p.adminOff[ADMUID] === true); }
   function offers() { return Object.keys(P).filter(function (k) { return live(P[k]); }).sort(function (a, b) { return (+P[a].minDeposit || 0) - (+P[b].minDeposit || 0); }); }
   function bonusTxt(p) { return p.bonusType === 'fixed' ? tk(p.bonusValue) + ' বোনাস' : (+p.bonusValue) + '% বোনাস'; }
+  window.npPromoTurnover = function () {
+    var req = 0, done = 0, pending = false;
+    Object.keys(CL).forEach(function (id) {
+      var c = CL[id], t = +c.turnover || 0, st = c.status;
+      if (!t) return;
+      req += t;
+      done += st === 'completed' ? t : Math.min(+c.done || 0, t);
+      if (st !== 'active' && st !== 'completed') pending = true;
+    });
+    return { req: req, done: done, pending: pending };
+  };
   function renderSummary() {
+    try { if (typeof npRenderTurnover === 'function') npRenderTurnover(); } catch (e) {}
     var box = $('promoSummaryBox'); if (!box) return;
     var logged = typeof state !== 'undefined' && state.currentUser;
     box.style.display = logged ? 'block' : 'none'; if (!logged) return;
