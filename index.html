@@ -1840,6 +1840,11 @@ select.pp-input option{background:#111d33;color:#fff}
 @media(max-width:350px){.pp-grid{gap:7px}.pp-card{padding:10px 3px 9px}.pp-account-number{font-size:20px}.pp-ring{width:80px;height:80px}.pp-timer-clock{font-size:23px}}
 </style>
 
+<style id="npBalFit">
+.wallet-balance-val,.pp-balance-value{overflow:hidden;white-space:nowrap;max-width:100%}
+#walletBalanceVal,#helperWalletBal,#ppDepBalance{display:inline-block;max-width:100%;white-space:nowrap}
+.wallet-balance-row>div:first-child{min-width:0;flex:1 1 auto;overflow:hidden}
+</style>
 <style id="npThemeFix">
 /* wallet: admin promotions strip (inside dark wallet card) */
 #walletPromoStrip{display:none;margin:10px 0 4px}
@@ -3859,6 +3864,19 @@ body[data-theme="light"] .pp-howto div{color:#475569}
   <!-- ==================== JAVASCRIPT APPLICATION CODE ==================== -->
   <script src="./firebase-config.js"></script>
   <script>
+  // whole-taka display + shrink-to-fit (never widens its box)
+  function npMoney(n){ n = parseFloat(n); if (!isFinite(n)) n = 0; return String(Math.floor(n + 1e-9)); }
+  function npFit(el, maxPx, minPx){
+    try {
+      if (!el) return;
+      var box = el.parentElement; if (!box) return;
+      var size = maxPx; el.style.fontSize = size + 'px';
+      var limit = box.clientWidth || box.getBoundingClientRect().width;
+      if (!limit) { setTimeout(function(){ npFit(el, maxPx, minPx); }, 300); return; }
+      var avail = limit - (el.dataset.pad ? +el.dataset.pad : 0);
+      while (el.scrollWidth > avail && size > minPx) { size -= 1; el.style.fontSize = size + 'px'; }
+    } catch (e) {}
+  }
   function npTurnoverSet(){
     var u = (typeof state !== 'undefined' && state.userData) ? state.userData : {};
     var req = parseFloat(u.turnoverRequired) || 0;
@@ -3894,7 +3912,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           barEl.style.width = p + '%';
           barEl.style.background = left > 0 ? '#f59e0b' : '#10b981';
         }
-        if (noteEl) noteEl.textContent = left > 0 ? 'উইথড্র করতে আরও ৳' + left + ' টার্নওভার বাকি (' + p + '% সম্পন্ন)' + (ts.pending ? ' • প্রোমো টার্নওভার প্রথম গেম শুরুর ১০ মিনিট পর সক্রিয় হবে' : '') : '✅ টার্নওভার সম্পন্ন, এখন উইথড্র করতে পারবেন';
+        if (noteEl) noteEl.textContent = left > 0 ? 'উইথড্র করতে আরও ৳' + left + ' টার্নওভার বাকি (' + p + '% সম্পন্ন)' : '✅ টার্নওভার সম্পন্ন, এখন উইথড্র করতে পারবেন';
       } else {
         if (txtEl) txtEl.textContent = 'শর্ত নেই (০%)';
         if (barEl) {
@@ -5101,7 +5119,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       setT('ppDepositValue', amt); setT('ppBonusValue', bonus); setT('ppTurnoverValue', turnover); setT('ppTotalValue', amt + bonus);
 
       const bal = $pp('ppDepBalance');
-      if (bal && state.userData) bal.textContent = state.userData.balance;
+      if (bal && state.userData) { bal.textContent = npMoney(state.userData.balance); npFit(bal, 34, 14); }
 
       const st = $pp('ppStatusMessage');
       if (st) {
@@ -5679,12 +5697,13 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       if (isLogged) {
         if (headerUserArea) {
           headerUserArea.innerHTML = `
-            <div onclick="window.app.switchView('viewWallet')" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; background:var(--bg-card); border:1px solid var(--border-gold); padding:5px 14px; border-radius:var(--radius-full); box-shadow:0 2px 8px rgba(0,0,0,0.35);" title="আমার ওয়ালেট ব্যালেন্স">
-              <span style="font-family:var(--font-esports); font-weight:800; color:var(--color-primary); font-size:15px; letter-spacing:0.5px;">৳ ${state.userData.balance}</span>
+            <div onclick="window.app.switchView('viewWallet')" style="cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; width:118px; max-width:118px; min-width:0; overflow:hidden; white-space:nowrap; box-sizing:border-box; flex-shrink:0; background:var(--bg-card); border:1px solid var(--border-gold); padding:5px 10px; border-radius:var(--radius-full); box-shadow:0 2px 8px rgba(0,0,0,0.35);" title="আমার ওয়ালেট ব্যালেন্স">
+              <span id="headerBalSpan" style="white-space:nowrap; display:inline-block; max-width:100%; font-family:var(--font-esports); font-weight:800; color:var(--color-primary); font-size:15px; letter-spacing:0.5px;">৳ ${npMoney(state.userData.balance)}</span>
             </div>
           `;
         }
 
+        try { var hb = document.getElementById('headerBalSpan'); if (hb) { hb.parentElement.style.width='118px'; hb.dataset.pad='20'; npFit(hb, 15, 8); } } catch (e) {}
         if (pName) pName.innerText = state.userData.name;
         if (pEmail) pEmail.innerText = state.userData.email;
         if (pStatus) {
@@ -5694,8 +5713,8 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         }
         if (pFfIgn) pFfIgn.innerText = state.userData.ffIgn || 'দেওয়া হয়নি';
         if (pFfUid) pFfUid.innerText = state.userData.ffUid || 'দেওয়া হয়নি';
-        if (walletBal) walletBal.innerText = state.userData.balance;
-        if (helperWalletBal) helperWalletBal.innerText = state.userData.balance;
+        if (walletBal) { walletBal.innerText = npMoney(state.userData.balance); npFit(walletBal, 32, 14); }
+        if (helperWalletBal) { helperWalletBal.innerText = npMoney(state.userData.balance); npFit(helperWalletBal, 34, 14); }
         try { npRenderTurnover(); } catch (e) {}
 
         if (pAvatarBox) {
@@ -6420,7 +6439,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       }
       applySettings();
       try { npRenderTurnover(); } catch (e) {}
-      document.getElementById('helperWalletBal').innerText = state.userData.balance;
+      document.getElementById('helperWalletBal').innerText = npMoney(state.userData.balance); npFit(document.getElementById('helperWalletBal'), 34, 14);
       openModal('modalWithdraw');
     }
 
@@ -6507,7 +6526,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         db.ref(`users/${state.currentUser.uid}/balance`).once('value', (snap) => {
           if (snap.exists()) {
             state.userData.balance = snap.val();
-            document.getElementById('walletBalanceVal').innerText = state.userData.balance;
+            document.getElementById('walletBalanceVal').innerText = npMoney(state.userData.balance); npFit(document.getElementById('walletBalanceVal'), 32, 14);
             showToast('ব্যালেন্স রিফ্রেশ সম্পন্ন হয়েছে!', 'success');
           }
         });
@@ -7447,7 +7466,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     rows.sort(function (a, b) { return (+b.c.createdAt || 0) - (+a.c.createdAt || 0); });
     $('promoSummaryList').innerHTML = rows.slice(0, 4).map(function (r) {
       var extra = '';
-      if (r.st === 'pending') extra = r.c.activateAt ? ' — ' + Math.max(0, Math.ceil((r.c.activateAt - Date.now()) / 60000)) + ' মিনিট পর সক্রিয়' : ' — প্রথম গেম শুরুর ১০ মিনিট পর সক্রিয়';
+      if (r.st === 'pending') extra = '';
       else if (r.st === 'active' || r.st === 'completed') extra = ' — ' + tk(r.d) + ' / ' + tk(r.t);
       return '<div>' + esc(r.c.promoName || 'প্রোমো') + ': ' + (label[r.st] || esc(r.st)) + extra + '</div>';
     }).join('');
@@ -7518,7 +7537,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     if (!p) { out.textContent = 'একটি অফার বেছে নিন'; return; }
     if (a < +p.minDeposit || a > +p.maxDeposit) { out.style.color = '#f87171'; out.textContent = 'এই অফারে ডিপোজিট ' + tk(p.minDeposit) + ' – ' + tk(p.maxDeposit) + ' এর মধ্যে হতে হবে'; return; }
     var c = calc(p, a);
-    out.textContent = 'বোনাস ' + tk(c.b) + ' • টার্নওভার ' + tk(c.t) + ' (অ্যাডমিন অনুমোদনের পর, প্রথম গেম শুরুর ১০ মিনিটে অ্যাক্টিভ)';
+    out.textContent = 'বোনাস ' + tk(c.b) + ' • টার্নওভার ' + tk(c.t);
   };
   function chip() {
     var c = $('promoChosenChip');
