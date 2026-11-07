@@ -284,6 +284,7 @@ header{flex:none;padding:calc(6px + env(safe-area-inset-top)) 12px 6px}
 .spot small{font-size:9px;margin-top:0}
 .provably-fair-tag{flex:none;padding:5px 14px}
 #fairLine{flex:none;padding:0 14px 5px!important;font-size:7px!important;line-height:1.25!important}
+#fairLine{display:none!important}  /* hash/seed লেখা লুকানো (সার্ভার থেকে ডেটা আসছে, শুধু স্ক্রিনে দেখানো বন্ধ) */
 /* zoom */
 .rig{transform-origin:50% 50%;transition:transform .9s cubic-bezier(.22,.8,.24,1);will-change:transform}
 .result-badge{bottom:auto;top:var(--rby,50%);transform:translate(-50%,-50%) scale(.4);font-size:20px}
@@ -450,7 +451,7 @@ function ptrStep(now){
   el.style.setProperty('--pa',PT.a.toFixed(2)+'deg');requestAnimationFrame(ptrStep);
 }
 function spinTo(seg,dur){
-  const n=S.layout.length,st=2*Math.PI/n,TAU=2*Math.PI,base=-((seg+.5)*st)+(Math.random()-.5)*st*.6,from=S.rot;
+  const n=S.layout.length,st=2*Math.PI/n,TAU=2*Math.PI,base=-((seg+.5)*st)+(Math.random()-.5)*st*.24,from=S.rot;
   const d=(((base-from)%TAU)+TAU)%TAU,to=from+d+TAU*6,t0=performance.now();let lastTick=0;
   (function f(now){const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,4);S.rot=from+(to-from)*e;
     const k=Math.floor(S.rot/st);if(k!==lastTick){lastTick=k;if(p<.95)beep(900,.02,.015);ptrKick()}if(p<1)requestAnimationFrame(f);else{const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}})(t0);
@@ -571,7 +572,10 @@ function fitWheel(){
   const a=document.querySelector('.arena-box');if(!a)return;
   const cs=getComputedStyle(a),pt=parseFloat(cs.paddingTop)||0,pb=parseFloat(cs.paddingBottom)||0;
   const ah=a.clientHeight-pt-pb-22,aw=a.clientWidth;
-  a.style.setProperty('--ws',Math.max(120,Math.min(aw*.74,ah*.84))+'px');
+  const wsOld=Math.max(120,Math.min(aw*.74,ah*.84));      /* আগের মাপ: zoom-এর মাপ ঠিক রাখতে */
+  const wsNew=Math.max(wsOld,Math.min(aw*.9,ah));         /* এখন: বক্সের ফাঁকা জায়গা পর্যন্ত বড় */
+  a.dataset.ws0=wsOld;
+  a.style.setProperty('--ws',wsNew+'px');
   const pn=document.querySelector('.panels-container');if(pn)a.style.setProperty('--ext',Math.max(0,pn.offsetTop+pn.offsetHeight-a.offsetTop-a.offsetHeight));
 }
 function zoomIn(){
@@ -583,7 +587,7 @@ function zoomIn(){
   const arenaTop=a.offsetTop+2;
   const curY=a.offsetTop+rig.offsetTop+st.offsetTop+w/2;
   const avail=cardTop-arenaTop-6;
-  const R=avail/(1.08+16/w),sc=Math.max(1,Math.min(ZOOM_MAX,2*R/w));
+  const R=avail/(1.08+16/w),sc=Math.max(1,Math.min(ZOOM_MAX*((parseFloat(a.dataset.ws0)||w)/w),2*R/w));
   /* zoom আগের মতোই; চাকা উপরে উঠে উপরের ফাঁক ভরবে (মাথা উপরের কিনারা পর্যন্ত) */
   const ext=(sc*w/2)*(1.08+16/w);
   const tgtY=Math.min(cardTop,arenaTop+6+ext);
