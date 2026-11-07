@@ -3898,6 +3898,13 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         if (pl > left) { req = pr.req; done = pr.done; left = pl; pending = pr.pending; }
       }
     } catch (e) {}
+    try {
+      if (u.balance !== undefined) {
+        var npBal = parseFloat(u.balance) || 0;
+        var npMinW = (state.settings && parseFloat(state.settings.minWithdraw)) || 100;
+        if (npBal < npMinW) { req = 0; done = 0; left = 0; pending = false; }
+      }
+    } catch (e) {}
     return { req: req, done: done, left: left, pending: pending };
   }
   function npTurnoverLeft(){
