@@ -3464,13 +3464,27 @@
   <!-- ==================== JAVASCRIPT APPLICATION CODE ==================== -->
   <script src="./firebase-config.js"></script>
   <script>
-  function npTurnoverLeft(){try{var u=state.userData||{};return Math.max(0,Math.round(((+u.turnoverRequired||0)-(+u.turnoverDone||0))*100)/100)}catch(e){return 0}}
-  function npRenderTurnover(){var b=document.getElementById('turnoverBox');if(!b)return;var u=state.userData||{},req=+u.turnoverRequired||0,done=+u.turnoverDone||0;
-    if(req<=0){b.style.display='none';return}
-    var left=npTurnoverLeft(),p=Math.min(100,Math.round(done/req*100));b.style.display='block';
-    document.getElementById('turnoverTxt').textContent='৳'+Math.min(done,req)+' / ৳'+req;
-    document.getElementById('turnoverBar').style.width=p+'%';
-    document.getElementById('turnoverNote').textContent=left>0?'উইথড্র করতে আরও ৳'+left+' টার্নওভার বাকি ('+p+'% সম্পন্ন)':'✅ টার্নওভার সম্পন্ন, এখন উইথড্র করতে পারবেন';}
+  function npTurnoverLeft(){
+    try {
+      var u = state.userData || {};
+      var req = parseFloat(u.turnoverRequired) || 0;
+      var done = parseFloat(u.turnoverDone !== undefined ? u.turnoverDone : u.turnoverCompleted) || 0;
+      return Math.max(0, Math.round((req - done) * 100) / 100);
+    } catch(e) { return 0; }
+  }
+  function npRenderTurnover(){
+    var b = document.getElementById('turnoverBox');
+    if (!b) return;
+    var u = state.userData || {};
+    var req = parseFloat(u.turnoverRequired) || 0;
+    var done = parseFloat(u.turnoverDone !== undefined ? u.turnoverDone : u.turnoverCompleted) || 0;
+    if (req <= 0) { b.style.display = 'none'; return; }
+    var left = npTurnoverLeft(), p = Math.min(100, Math.round(done / req * 100));
+    b.style.display = 'block';
+    document.getElementById('turnoverTxt').textContent = '৳' + Math.min(done, req) + ' / ৳' + req;
+    document.getElementById('turnoverBar').style.width = p + '%';
+    document.getElementById('turnoverNote').textContent = left > 0 ? 'উইথড্র করতে আরও ৳' + left + ' টার্নওভার বাকি (' + p + '% সম্পন্ন)' : '✅ টার্নওভার সম্পন্ন, এখন উইথড্র করতে পারবেন';
+  }
   </script>
   <script>
     /**
@@ -4203,8 +4217,9 @@
             ffIgn: data.ffIgn || 'Not Set',
             ffUid: data.ffUid || data.gameUid || '000000000',
             balance: typeof data.balance === 'number' ? data.balance : 0,
-            turnoverRequired: typeof data.turnoverRequired === 'number' ? data.turnoverRequired : 0,
-            turnoverDone: typeof data.turnoverDone === 'number' ? data.turnoverDone : 0,
+            turnoverRequired: parseFloat(data.turnoverRequired) || 0,
+            turnoverDone: parseFloat(data.turnoverDone !== undefined ? data.turnoverDone : data.turnoverCompleted) || 0,
+            turnoverCompleted: parseFloat(data.turnoverCompleted !== undefined ? data.turnoverCompleted : data.turnoverDone) || 0,
             status: data.status || 'ACTIVE',
             dpUrl: data.dpUrl || '',
             dpWidth: data.dpWidth || '75px',
@@ -5381,6 +5396,10 @@
         updates[`tournaments/${tournamentId}/joinedCount`] = newCount;
         updates[`users/${uid}/balance`] = newBal;
         updates[`users/${uid}/joinedMatches/${tournamentId}`] = true;
+        const curTurnoverDone = parseFloat(freshUser.turnoverDone !== undefined ? freshUser.turnoverDone : freshUser.turnoverCompleted) || 0;
+        const newTurnoverDone = curTurnoverDone + entryFee;
+        updates[`users/${uid}/turnoverDone`] = newTurnoverDone;
+        updates[`users/${uid}/turnoverCompleted`] = newTurnoverDone;
         updates[`transactions/${trxKey}`] = {
           trxId: trxKey,
           uid,
