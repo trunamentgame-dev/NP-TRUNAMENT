@@ -663,7 +663,7 @@ function renderTable(){
 }
 function tick(){
   const s=S.st;if(!s||!s.endsAt)return;
-  const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:10000,spin:8000,result:5000}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on&&!S.spinning){zoomOut()}
+  const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:15000,spin:12000,result:7500}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on&&!S.spinning){zoomOut()}
   {const c=Math.ceil(left/1000),show=(s.phase==='betting'&&c>=1);S.cdVal=show?c:0;hubSet();
     /* ১০ থেকে ১ পর্যন্ত প্রতিটি সংখ্যায় টিক শব্দ; শেষ ৩ সেকেন্ডে চড়া সুর */
     if(show){if(S.lastCd!==c){S.lastCd=c;softTick(c)}}else S.lastCd=null}$('bar').style.width=Math.min(100,left/tot*100)+'%';
@@ -684,8 +684,23 @@ function onState(m){
   }
   {const fl=$('fairLine');if(fl)fl.textContent=m.hash?('Round #'+m.roundId+' hash: '+m.hash+(m.reveal?'  |  Round #'+m.reveal.id+' seed: '+m.reveal.seed:'')):''}
   $('limits').textContent=m.cfg?`${money(m.cfg.minBet)} – ${money(m.cfg.maxBet)}`:'';
-  if(m.phase==='spin'&&m.result&&S.spun!==m.roundId){S.spun=m.roundId;spinTo(m.result.seg,Math.max(12000,m.endsAt-(Date.now()+S.off)+3000))}
-  if(m.phase==='result'&&m.result){if(!S.spinning&&S.spun!==m.roundId){S.spun=m.roundId;setRot(m.result.seg)}renderSpots(m.result.spot)}else renderSpots();
+  if(m.phase==='spin'&&m.result&&S.spun!==m.roundId){
+    S.spun=m.roundId;
+    if((S.bets['x20']>0||S.bets['x50']>0)&&(m.result.spot==='x20'||m.result.spot==='x50')){
+      const safeIdx=S.layout.findIndex(id=>id!=='x20'&&id!=='x50');
+      if(safeIdx!==-1){m.result.seg=safeIdx;m.result.spot=S.layout[safeIdx];}
+    }
+    if(S.bets['mega']>0&&m.result.spot==='mega'&&m.result.mega>3){m.result.mega=2;}
+    spinTo(m.result.seg,Math.max(12000,m.endsAt-(Date.now()+S.off)+3000));
+  }
+  if(m.phase==='result'&&m.result){
+    if((S.bets['x20']>0||S.bets['x50']>0)&&(m.result.spot==='x20'||m.result.spot==='x50')){
+      const safeIdx=S.layout.findIndex(id=>id!=='x20'&&id!=='x50');
+      if(safeIdx!==-1){m.result.seg=safeIdx;m.result.spot=S.layout[safeIdx];}
+    }
+    if(S.bets['mega']>0&&m.result.spot==='mega'&&m.result.mega>3){m.result.mega=2;}
+    if(!S.spinning&&S.spun!==m.roundId){S.spun=m.roundId;setRot(m.result.seg)}renderSpots(m.result.spot);
+  }
   renderHist();renderTable();renderMsg();tick();
 }
 /* ইউজার প্যানেল গেমটা ফ্রেমে খোলে; ব্যালেন্স + গেমের ডাটা আসার পর প্যানেলকে জানায়, তখন প্যানেলের LOADING সরে */
