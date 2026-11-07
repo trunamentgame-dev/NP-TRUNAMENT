@@ -386,7 +386,34 @@ const resLabel=(spot,mega)=>spot==='mega'?'MEGA '+mega+'x':labelOf(spot);
 const MIN_WIN_POP=500;
 function paintRB(rb,spot){const c=colorOf(spot);rb.style.background=c;rb.style.borderColor='#fff';rb.style.boxShadow='0 0 26px '+c;rb.style.color=(spot==='mega'||spot==='x50')?'#1a1200':'#fff'}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2300)}
-function beep(f,d,v){if(!S.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v||.05;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function beep(f,d,v){
+  /* নরম ঘণ্টার মতো সুর: ক্লিক নেই, সুন্দর ফেড-আউট। বেট, এরর, জয়ের সব শব্দ এটা দিয়ে বাজে */
+  if(!S.sound)return;
+  try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+    const t=AC.currentTime,out=AC.createGain(),lp=AC.createBiquadFilter();
+    lp.type='lowpass';lp.frequency.value=3200;lp.Q.value=.5;
+    out.gain.setValueAtTime(.0001,t);out.gain.linearRampToValueAtTime(v||.05,t+.006);out.gain.exponentialRampToValueAtTime(.0001,t+d);
+    [[1,1],[2,.25],[3,.07]].forEach(([m,a])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f*m;g.gain.value=a;o.connect(g);g.connect(out);o.start(t);o.stop(t+d+.03)});
+    out.connect(lp);lp.connect(AC.destination);
+  }catch(e){}
+}
+/* চাকার পেগ-টিক: কাঠ/প্লাস্টিকের ছোট খট শব্দ (নয়েজ ক্লিক + ছোট বডি); ধীর হলে একটু জোরালো, দ্রুত হলে খুব হালকা */
+let NB,lastPeg=0;
+function pegTick(sp){
+  if(!S.sound)return;const now=performance.now();if(now-lastPeg<26)return;lastPeg=now;
+  try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+    if(!NB){NB=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);const dd=NB.getChannelData(0);for(let i=0;i<dd.length;i++)dd[i]=Math.random()*2-1}
+    const t=AC.currentTime,slow=Math.max(0,Math.min(1,1-sp/40)),v=.012+.03*slow;
+    const src=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();
+    src.buffer=NB;bp.type='bandpass';bp.frequency.value=2400+Math.random()*300;bp.Q.value=2.2;
+    g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+.035);
+    src.connect(bp);bp.connect(g);g.connect(AC.destination);src.start(t,Math.random()*.5);src.stop(t+.04);
+    const o=AC.createOscillator(),og=AC.createGain();o.type='sine';
+    o.frequency.setValueAtTime(1500,t);o.frequency.exponentialRampToValueAtTime(900,t+.03);
+    og.gain.setValueAtTime(v*.8,t);og.gain.exponentialRampToValueAtTime(.0001,t+.04);
+    o.connect(og);og.connect(AC.destination);o.start(t);o.stop(t+.045);
+  }catch(e){}
+}
 function softTick(c){
   /* ক্লাসিক কাউন্টডাউন: ১০–৪ নরম ঘড়ির টিক (ঘণ্টার মতো গোল সুর, ধীরে ধীরে সামান্য জোরালো);
      ৩-২-১ তিনটি ধাপে চড়া সুরের নরম চাইম, শেষ ১ এ সবচেয়ে উঁচু ও একটু লম্বা */
@@ -410,7 +437,7 @@ function softTick(c){
   }catch(e){}
 }
 function confetti(){const cf=$('cf'),cols=['#fbbf24','#ef4444','#3b82f6','#a855f7','#10b981','#fff'];let h='';for(let i=0;i<46;i++)h+=`<i style="left:${Math.random()*100}%;background:${cols[i%6]};animation-duration:${1.8+Math.random()*1.8}s;animation-delay:${Math.random()*.5}s"></i>`;cf.innerHTML=h;setTimeout(()=>cf.innerHTML='',4200)}
-function winPop(w){confetti();$('popAmt').textContent=money(w);$('pop').classList.add('on');[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.18,.07),i*120));clearTimeout(popT);popT=setTimeout(()=>$('pop').classList.remove('on'),3500)}
+function winPop(w){confetti();$('popAmt').textContent=money(w);$('pop').classList.add('on');[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,i===3?1.1:.55,.06),i*130));clearTimeout(popT);popT=setTimeout(()=>$('pop').classList.remove('on'),3500)}
 if($('btnBets'))$('btnBets').onclick=()=>{renderTable();$('betPop').classList.add('on')};
 $('betClose').onclick=()=>$('betPop').classList.remove('on');
 $('betPop').onclick=e=>{if(e.target.id==='betPop')$('betPop').classList.remove('on')};
@@ -448,28 +475,42 @@ function draw(t){
 }
 let lastDraw=0;(function loop(t){if(t-lastDraw>33){lastDraw=t;draw(t)}requestAnimationFrame(loop)})(0);
 
-/* কাঁটার দোলা: স্প্রিং-ফিজিক্স। চাকার প্রতিটি ঘরের পেগ কাঁটায় ধাক্কা দিলে কাঁটা হালকা সরে আবার ফিরে আসে */
-const PT={a:0,v:0,run:false,t:0};
-function ptrKick(){PT.v-=230;if(!PT.run){PT.run=true;PT.t=performance.now();requestAnimationFrame(ptrStep)}}
+/* কাঁটার দোলা (রিয়েল পেগ-ফিজিক্স): চাকার প্রতিটি ঘরের দাগ (পেগ) কাঁটাকে ঠেলে সরায়, দাগ পার হলেই কাঁটা স্প্রিংয়ে ঝট করে ফিরে আসে।
+   ধীর হলে স্পষ্ট দেখা যায় কাঁটা দাগের সাথে সরে সরে এক ঘর থেকে আরেক ঘরে যাচ্ছে; দ্রুত হলে হালকা কাঁপে */
+const PT={a:0,v:0,run:false,t:0,tg:0};const PT_MAX=19;
+function ptrGo(){if(!PT.run){PT.run=true;PT.t=performance.now();requestAnimationFrame(ptrStep)}}
 function ptrStep(now){
   const el=document.querySelector('.ptr');if(!el){PT.run=false;return}
   const dt=Math.min(.033,(now-PT.t)/1000||.016);PT.t=now;
-  PT.v+=(-1100*PT.a-26*PT.v)*dt;PT.a+=PT.v*dt;
-  if(PT.a<-24){PT.a=-24;if(PT.v<0)PT.v=0}if(PT.a>24){PT.a=24;if(PT.v>0)PT.v=0}
-  if(Math.abs(PT.a)<.05&&Math.abs(PT.v)<1){PT.a=0;PT.v=0;PT.run=false;el.style.setProperty('--pa','0deg');return}
+  PT.v+=(-1100*PT.a-30*PT.v)*dt;PT.a+=PT.v*dt;
+  /* দাগ কাঁটাকে ঠেলছে: কাঁটা ওই কোণের চেয়ে বেশি ফিরতে পারে না */
+  if(PT.tg<0&&PT.a>PT.tg){PT.a=PT.tg;if(PT.v>0)PT.v=0}
+  else if(PT.tg>0&&PT.a<PT.tg){PT.a=PT.tg;if(PT.v<0)PT.v=0}
+  if(PT.a<-24)PT.a=-24;if(PT.a>24)PT.a=24;
+  if(!PT.tg&&Math.abs(PT.a)<.05&&Math.abs(PT.v)<1){PT.a=0;PT.v=0;PT.run=false;el.style.setProperty('--pa','0deg');return}
   el.style.setProperty('--pa',PT.a.toFixed(2)+'deg');requestAnimationFrame(ptrStep);
 }
 function spinTo(seg,dur){
   const n=S.layout.length,st=2*Math.PI/n,TAU=2*Math.PI,base=-((seg+.5)*st)+(Math.random()-.5)*st*.24,from=S.rot;
-  const d=(((base-from)%TAU)+TAU)%TAU,to=from+d+TAU*6,t0=performance.now();let lastTick=0;
+  const d=(((base-from)%TAU)+TAU)%TAU,to=from+d+TAU*6,t0=performance.now();let lastTick=Math.floor(from/st),prevRot=from,prevT=t0,dirv=1;
   /* শেষ দিকে চাকা ধীরে ধীরে এগিয়ে একটু পিছিয়ে আবার সামনে আসে (২-৩টা ঘর বদলায়), তারপর জেতা ঘরের ঠিক মাঝে থামে */
   const settle=dur>2500,setDur=settle?1700:0,mainDur=dur-setDur,A=settle?1.1*st:0,OM=6.6,LAM=.142*OM,mainTo=to+A;
-  function finish(){const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}
+  function finish(){PT.tg=0;ptrGo();const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}
   (function f(now){const el=Math.max(0,now-t0);let done=false;
     if(el<mainDur){const p=el/mainDur,e=1-Math.pow(1-p,4);S.rot=from+(mainTo-from)*e}
     else if(settle&&el<dur){const tau=(el-mainDur)/1000,s=(el-mainDur)/setDur;S.rot=to+A*Math.exp(-LAM*tau)*Math.cos(OM*tau)*(1-s*s*s)}
     else{S.rot=to;done=true}
-    const k=Math.floor(S.rot/st);if(k!==lastTick){lastTick=k;if(!done)beep(900,.02,.015);ptrKick()}
+    const dts=Math.max(.001,(now-prevT)/1000),dr=S.rot-prevRot,speed=Math.abs(dr)/st/dts; /* সেকেন্ডে কয়টা দাগ পার হচ্ছে */
+    if(Math.abs(dr)>1e-6)dirv=dr>0?1:-1;
+    if(!done){
+      const u=S.rot/st,dd=u-Math.round(u),C=.35,amp=PT_MAX*Math.max(.2,Math.min(1,16/Math.max(speed,1)));
+      let tg=0;
+      if(dirv>0&&dd<0&&dd>-C)tg=-amp*(1+dd/C);        /* সামনে ঘুরছে: দাগ কাঁটাকে ডানে ঠেলে */
+      else if(dirv<0&&dd>0&&dd<C)tg=amp*(1-dd/C);     /* পিছনে ঘুরছে: দাগ কাঁটাকে বামে ঠেলে */
+      PT.tg=tg;ptrGo();
+    }
+    const k=Math.floor(S.rot/st);if(k!==lastTick){lastTick=k;if(!done)pegTick(speed)}
+    prevRot=S.rot;prevT=now;
     if(!done)requestAnimationFrame(f);else finish()})(t0);
 }
 
@@ -482,7 +523,7 @@ function renderSpots(win){
     return `<button class="spot ${b?'mine':''} ${win===s.id?'win':''}" style="--c:${c}" data-id="${s.id}" ${open?'':'disabled'}>${s.label}<small>${b?money(b):(s.m?s.m+'x রিটার্ন':'৩x–৪০x')}</small></button>`}).join('');
   $('spots').className='spots'+(S.spots.length===5?' five':'');
   $('clr').disabled=!open;const ab=$('allBtn');if(ab)ab.disabled=!open;
-  $('spots').querySelectorAll('.spot').forEach(b=>b.onclick=()=>{beep(660,.05,.04);ws.send(JSON.stringify({t:'bet',spot:b.dataset.id,amount:S.chip}))});
+  $('spots').querySelectorAll('.spot').forEach(b=>b.onclick=()=>{beep(660,.12,.035);ws.send(JSON.stringify({t:'bet',spot:b.dataset.id,amount:S.chip}))});
   $('clr').onclick=()=>ws.send(JSON.stringify({t:'clear'}));
 }
 function totalBet(){return Object.values(S.bets).reduce((a,b)=>a+(+b||0),0)}
@@ -504,7 +545,7 @@ function betAll(){
   if(!(S.st&&S.st.phase==='betting'))return toast('বেটিং বন্ধ আছে');
   const a=S.chip,n=S.spots.length;if(!a||!n)return;
   if((S.bal||0)<a*n)return toast('ব্যালেন্স যথেষ্ট নয়');
-  beep(660,.05,.04);
+  beep(660,.12,.035);
   S.spots.forEach((s,i)=>setTimeout(()=>ws.send(JSON.stringify({t:'bet',spot:s.id,amount:a})),i*40));
 }
 function renderChips(){
@@ -560,7 +601,7 @@ function handle(m){
   else if(m.t==='state')onState(m);
   else if(m.t==='bal'){S.bal=m.balance;$('headerBalance').textContent=money2(m.balance);npCheckReady()}
   else if(m.t==='bets'){const old=S.bets||{};S.bets=m.bets;renderSpots();renderTable();renderMsg();let i=0;for(const id in m.bets){const d=(m.bets[id]||0)-(old[id]||0);if(d>0)floatAt(id,d,i++)}}
-  else if(m.t==='err'){toast(m.msg);beep(200,.15,.05)}
+  else if(m.t==='err'){toast(m.msg);beep(220,.3,.04)}
   else if(m.t==='settle'){
     if(m.stake>0){S.res={round:m.roundId,stake:m.stake,win:m.win};renderMsg();S.log.unshift({id:m.roundId,stake:m.stake,win:m.win,spot:m.spot,mega:m.mega});S.log=S.log.slice(0,30);renderTable();
       if(m.win>=MIN_WIN_POP)winPop(m.win);else if(m.win>0){}else toast(`এই রাউন্ডে হেরেছেন ${money(m.stake)}`)}}
