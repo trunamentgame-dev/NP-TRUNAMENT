@@ -1678,6 +1678,87 @@
     @keyframes npldg-pulse{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
     @media (prefers-reduced-motion:reduce){.npld .npld-ch{animation:none;opacity:1;transform:none;filter:none}.npld{transition-duration:.01s}}
   </style>
+<style id="npPayUI">
+/* ===== Deposit / Withdraw premium UI (design only) ===== */
+#modalDeposit .modal-sheet,#modalWithdraw .modal-sheet,#modalDepositPromo .modal-sheet{
+  background:radial-gradient(ellipse at 50% -15%,#263553 0%,transparent 55%),linear-gradient(180deg,#080e1c,#060913 75%);
+  border:1px solid #293851;color:#fff;max-width:480px;padding-left:14px;padding-right:14px}
+#modalDeposit .modal-handle,#modalWithdraw .modal-handle,#modalDepositPromo .modal-handle{background:#34435b}
+#modalDeposit .modal-title,#modalWithdraw .modal-title,#modalDepositPromo .modal-title{color:#fff}
+#modalDeposit .modal-close-btn,#modalWithdraw .modal-close-btn,#modalDepositPromo .modal-close-btn{background:#1b2d49;border:1px solid #344c70;color:#dce8ff}
+.pp-title{position:relative;justify-content:center!important;text-align:center;margin-bottom:18px!important}
+.pp-title .modal-close-btn{position:absolute;right:0;top:0}
+.pp-title h1{font-size:23px;font-weight:900;letter-spacing:2px;color:#fff;line-height:1.1}
+.pp-title p{margin-top:5px;font-size:10px;letter-spacing:2px;color:#94a6c5;font-weight:400}
+.pp-balance{padding:16px;border-radius:14px;background:linear-gradient(120deg,#172e55,#101d36);border:1px solid #2c456d;margin-bottom:20px;box-shadow:0 8px 22px #0003}
+.pp-balance-label{color:#aabbd6;font-size:11px;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
+.pp-balance-value{font-size:27px;font-weight:900;color:#39e6a0;font-family:var(--font-esports,inherit)}
+.pp-sec-title{font-size:13px;font-weight:800;letter-spacing:.6px;color:#e8efff;margin-bottom:13px}
+.pp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.pp-card{position:relative;min-width:0;padding:10px 7px;border:1.5px solid #293b5a;border-radius:12px;background:#111d33;text-align:center;cursor:pointer;transition:.2s}
+.pp-card.active{border-color:#ffcb49;background:#192b48;box-shadow:0 0 12px #ffcb4930}
+.pp-card:active{transform:scale(.97)}
+.pp-logo{width:100%;height:43px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pp-logo img{display:block;width:auto;height:auto;max-width:88%;max-height:38px;object-fit:contain}
+.pp-name{font-size:11px;font-weight:900;letter-spacing:.6px;margin-top:7px;color:#fff}
+.pp-hint{font-size:9px;color:#8291a7;margin-top:3px}
+.pp-badge{position:absolute;top:-9px;right:-7px;min-width:43px;max-width:65px;padding:5px 6px;border-radius:20px;background:linear-gradient(135deg,#ffe36a,#ff9825);color:#321900;font-size:10px;font-weight:900;text-align:center;box-shadow:0 2px 8px #0007;z-index:5}
+.pp-account{margin-top:16px;padding:15px;border-radius:12px;background:#111d33;border:1px solid #293e60}
+.pp-account-label{font-size:11px;color:#a9bad4;margin-bottom:9px}
+.pp-account-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pp-account-number{font-size:19px;font-weight:900;letter-spacing:1px;color:#fff}
+.pp-copy{border:0;border-radius:7px;background:#29466e;color:#fff;padding:9px 13px;font-size:11px;font-weight:800;cursor:pointer}
+.pp-account-type{margin-top:8px;font-size:10px;color:#8295b5}
+.pp-form{margin-top:16px;padding:16px;border-radius:13px;background:#111d33;border:1px solid #293e60}
+.pp-label{display:block;font-size:11px;font-weight:800;letter-spacing:.4px;color:#c4d0e4;margin-bottom:8px}
+.pp-input{display:block;width:100%;height:46px;padding:0 12px;margin-bottom:16px;border:1px solid #304666;border-radius:8px;outline:none;background:#0b1427;color:#fff;font-size:14px;font-family:inherit}
+.pp-input:focus{border-color:#ffc94b}
+.pp-promo{padding:14px;margin-bottom:16px;border-radius:10px;background:linear-gradient(135deg,#172b4a,#14213b);border:1px solid #3a5277}
+.pp-promo-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:10px}
+.pp-promo-head strong{font-size:13px;color:#fff}
+.pp-active{color:#69efa0;font-size:9px;font-weight:900;white-space:nowrap}
+.pp-pill{background:linear-gradient(135deg,#ffe36a,#ff9825);color:#321900;font-weight:900;font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.pp-promo-desc{color:#b9c8df;font-size:11px;line-height:1.9}
+.pp-promo-desc b{color:#ffdc75}
+.pp-quick{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:-7px;margin-bottom:16px}
+.pp-quick.four{grid-template-columns:repeat(4,1fr);margin-top:10px}
+.pp-quick button{padding:9px 2px;border:1px solid #344c70;border-radius:7px;background:#1b2d49;color:#dce8ff;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit}
+.pp-quick button:active{background:#ffca49;color:#241700}
+.pp-calc{padding:14px;border-radius:10px;background:#0a1427;border:1px solid #304568}
+.pp-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;font-size:12px;color:#b9c8dd}
+.pp-val{color:#fff;font-weight:800;text-align:right}
+.pp-bonus{color:#62efa0}
+.pp-total{border-top:1px solid #304568;padding-top:12px;margin-top:3px;margin-bottom:0;font-size:14px;font-weight:900}
+.pp-total .pp-val{color:#ffda69;font-size:19px}
+.pp-status{display:none;margin-top:12px;padding:10px;border-radius:7px;font-size:11px;line-height:1.6}
+.pp-status.success{display:block;background:#103525;color:#7af0a8}
+.pp-status.warning{display:block;background:#392b13;color:#ffda85}
+.pp-submit{width:100%;min-height:49px;margin-top:17px;border:1px solid #ffe4a0;border-radius:10px;background:linear-gradient(110deg,#b97916,#ffd86f 48%,#e6a32c);color:#261800;font-size:15px;font-weight:900;letter-spacing:.7px;cursor:pointer;box-shadow:0 6px 20px #e9aa3430,inset 0 1px #fff8;font-family:inherit}
+.pp-submit:active{transform:scale(.98)}
+.pp-submit:disabled{cursor:not-allowed}
+.pp-notice{margin-top:15px;text-align:center;font-size:10px;color:#8292ad;line-height:1.8}
+.pp-notice-box{display:flex;gap:9px;padding:11px;border-radius:9px;background:#17243a;border:1px solid #30425e;color:#aebdd0;font-size:10px;line-height:1.7;margin-top:13px}
+.pp-limit{margin-top:-6px;margin-bottom:6px;font-size:10px;color:#8493a9;line-height:1.6}
+.pp-summary{background:linear-gradient(145deg,#0a1424,#101d30);border:1px solid #293b53;border-radius:11px;padding:13px;margin-top:14px}
+.pp-summary-title{color:#b7c5d8;font-size:10px;font-weight:800;letter-spacing:1px;margin-bottom:10px}
+.pp-srow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;font-size:11px;color:#9aa9bd}
+.pp-srow strong{color:#fff}
+.pp-srow.total{border-top:1px solid #33425a;margin-top:5px;padding-top:11px;color:#f2d18a}
+.pp-srow.total strong{color:#ffd36a;font-size:15px}
+/* hidden controls that keep the original logic working */
+.pp-hidden{display:none!important}
+#depositBonusCalcPreview{display:none!important}
+#withdrawTurnoverAlertBox{border-radius:10px!important}
+/* promotion popup list */
+.pp-offer{cursor:pointer;margin:0 0 10px;padding:13px;border-radius:12px;border:1.5px solid #3a5277;background:linear-gradient(135deg,#172b4a,#14213b);position:relative}
+.pp-offer.on{border-color:#ffcb49;box-shadow:0 0 12px #ffcb4930}
+.pp-offer-name{font-weight:800;font-size:13px;color:#fff;padding-right:62px}
+.pp-offer-desc{font-size:11px;color:#b9c8df;line-height:1.9;margin-top:6px}
+.pp-offer-desc b{color:#ffdc75}
+#modalDepositPromo .form-input{background:#0b1427;border:1px solid #304666;color:#fff;height:46px}
+@media(max-width:350px){.pp-grid{gap:7px}.pp-card{padding:9px 4px}.pp-account-number{font-size:16px}}
+</style>
+
 <style>
   .np-lang-seg{display:inline-flex;gap:2px;padding:2px;border-radius:999px;background:rgba(148,163,184,.16);border:1px solid rgba(255,255,255,.12);flex-shrink:0}
   .np-lang-seg button{border:0;background:transparent;color:#94a3b8;font-weight:700;font-size:11px;line-height:1;padding:6px 10px;border-radius:999px;cursor:pointer;min-width:34px;font-family:inherit}
@@ -3180,83 +3261,102 @@
   <div class="modal-overlay" id="modalDeposit">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
-      <div class="modal-title">
-        <span id="lblDepositHeader">টাকা যোগ করুন (Add Money)</span>
+      <div class="modal-title pp-title">
+        <div>
+          <h1>MOSTWIN88</h1>
+          <p id="lblDepositHeader">PREMIUM DEPOSIT CENTER</p>
+        </div>
         <button class="modal-close-btn" onclick="window.app.closeModal('modalDeposit')">✕</button>
       </div>
 
-      <div class="notice-card-bengali">
-        <svg class="icon" style="color: var(--notice-accent);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        <div>
-          <div class="notice-card-title">বাংলাদেশ পেমেন্ট নির্দেশনা:</div>
-          <div class="notice-card-body">
-            নিচের অফিসিয়াল নাম্বারে Send Money করে TrxID ও প্রেরক নাম্বার লিখে সাবমিট করুন। অ্যাডমিন অনুমোদনের পর ব্যালেন্স অ্যাকাউন্টে যুক্ত হবে।
-          </div>
+      <div class="pp-balance">
+        <div class="pp-balance-label">AVAILABLE WALLET BALANCE</div>
+        <div class="pp-balance-value">৳<span id="ppDepBalance">0</span></div>
+      </div>
+
+      <div class="pp-sec-title">SELECT PAYMENT METHOD</div>
+      <div class="pp-grid">
+        <div class="pp-card active" data-kind="deposit" data-method="bKash" onclick="window.npPickMethod('deposit','bKash')">
+          <span class="pp-badge" data-pp-badge>10%</span>
+          <div class="pp-logo"><img data-pp-logo="bKash" src="https://i.postimg.cc/K4hz9m0W/Whats-App-Image-2026-10-23-at-4-14-08-PM.jpg" alt="bKash" onerror="this.style.display='none'"></div>
+          <div class="pp-name">bKASH</div>
+        </div>
+        <div class="pp-card" data-kind="deposit" data-method="Nagad" onclick="window.npPickMethod('deposit','Nagad')">
+          <span class="pp-badge" data-pp-badge>10%</span>
+          <div class="pp-logo"><img data-pp-logo="Nagad" src="https://i.postimg.cc/QtVHC4B2/Whats-App-Image-2026-10-23-at-4-14-08-PM-%281%29.jpg" alt="Nagad" onerror="this.style.display='none'"></div>
+          <div class="pp-name">NAGAD</div>
+        </div>
+        <div class="pp-card" data-kind="deposit" data-method="Rocket" onclick="window.npPickMethod('deposit','Rocket')">
+          <span class="pp-badge" data-pp-badge>10%</span>
+          <div class="pp-logo"><img data-pp-logo="Rocket" src="https://i.postimg.cc/BnGLpByx/Whats-App-Image-2026-10-23-at-4-14-08-PM-%282%29.jpg" alt="Rocket" onerror="this.style.display='none'"></div>
+          <div class="pp-name">ROCKET</div>
         </div>
       </div>
 
-      <!-- Deposit Bonus Offer Box -->
-      <div id="depositBonusNoticeBox" style="display:none; background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(5, 150, 105, 0.1)); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 20px;">🎁</span>
-            <b style="color: #34d399; font-size: 13px;">ডিপোজিট বোনাস অফার চালু আছে!</b>
-          </div>
-          <span class="badge" style="background:#10b981; color:#fff; font-weight:700; font-size:12px; padding:3px 8px; border-radius:6px;" id="depositBonusBadge">10% বোনাস</span>
+      <div class="pp-account">
+        <div class="pp-account-label">Payment Number</div>
+        <div class="pp-account-row">
+          <div class="pp-account-number" id="adminPaymentNumber">01712-345678</div>
+          <button type="button" class="pp-copy" onclick="window.app.copyText(document.getElementById('adminPaymentNumber').innerText)">COPY</button>
         </div>
-        <div style="font-size: 11px; color: #cbd5e1; margin-top: 5px;" id="depositBonusNote">
-          ডিপোজিট করলেই সাথে সাথে ব্যালেন্সে বোনাস যুক্ত হবে।
-        </div>
-        <div id="depositBonusCalcPreview" style="display:none; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.15); font-size: 12px; color: #fbbf24; font-weight: 600;">
-        </div>
+        <div class="pp-account-type">Account Type: Personal &nbsp;•&nbsp; সর্বনিম্ন ডিপোজিট: ৳<span id="minDepositAmountLabel">50</span> টাকা</div>
       </div>
 
-      <form id="depositForm" onsubmit="window.app.handleDepositSubmit(event)">
-        <div class="form-group">
-          <label class="form-label">পেমেন্ট মেথড নির্বাচন করুন</label>
-          <select class="form-select" id="depositMethod" onchange="window.app.updateDepositMethodDetails()">
-            <option value="bKash">bKash (বিকাশ Personal)</option>
-            <option value="Nagad">Nagad (নগদ Personal)</option>
-            <option value="Rocket">Rocket (রকেট Personal)</option>
-          </select>
-          <div class="payment-logo-badge" id="depositMethodLogoWrap">
-            <img id="depositMethodLogo" src="https://i.postimg.cc/K4hz9m0W/Whats-App-Image-2026-10-23-at-4-14-08-PM.jpg" alt="Payment Method Logo" onerror="this.style.display='none'">
-            <span id="depositMethodText" style="font-weight:700; font-size:13px; color:var(--text-primary);">bKash Personal</span>
+      <form id="depositForm" class="pp-form" onsubmit="window.app.handleDepositSubmit(event)">
+
+        <!-- original logic control (kept, hidden) -->
+        <select class="pp-hidden" id="depositMethod" onchange="window.app.updateDepositMethodDetails()">
+          <option value="bKash">bKash (বিকাশ Personal)</option>
+          <option value="Nagad">Nagad (নগদ Personal)</option>
+          <option value="Rocket">Rocket (রকেট Personal)</option>
+        </select>
+        <div class="pp-hidden" id="depositMethodLogoWrap"></div>
+
+        <!-- Deposit Bonus Offer Box -->
+        <div class="pp-promo" id="depositBonusNoticeBox" style="display:none;">
+          <div class="pp-promo-head">
+            <strong>🎁 DEPOSIT PROMOTION</strong>
+            <span class="pp-active">● ACTIVE OFFER</span>
           </div>
+          <div style="margin-bottom:8px"><span class="pp-pill" id="depositBonusBadge">10% বোনাস</span></div>
+          <div class="pp-promo-desc" id="depositBonusNote">ডিপোজিট করলেই সাথে সাথে ব্যালেন্সে বোনাস যুক্ত হবে।</div>
+          <div id="depositBonusCalcPreview" style="display:none;"></div>
         </div>
 
-        <div class="room-cred-box" style="margin-bottom: 14px;">
-          <div class="room-cred-row">
-            <span style="font-size: 12px; color: var(--text-secondary);">টাকা পাঠানোর নম্বর:</span>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <strong style="color: var(--color-primary); font-family: var(--font-esports); font-size:16px;" id="adminPaymentNumber">01712-345678</strong>
-              <span class="copy-chip" onclick="window.app.copyText(document.getElementById('adminPaymentNumber').innerText)">কপি</span>
-            </div>
-          </div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-            সর্বনিম্ন ডিপোজিট: ৳<span id="minDepositAmountLabel">50</span> টাকা
-          </div>
+        <label class="pp-label" for="depositAmount">DEPOSIT AMOUNT (৳)</label>
+        <input type="number" class="pp-input" id="depositAmount" required placeholder="Enter deposit amount" min="20" oninput="window.app.updateDepositBonusPreview()">
+
+        <div class="pp-quick">
+          <button type="button" onclick="window.npSetDepAmount(50)">50</button>
+          <button type="button" onclick="window.npSetDepAmount(100)">100</button>
+          <button type="button" onclick="window.npSetDepAmount(300)">300</button>
+          <button type="button" onclick="window.npSetDepAmount(500)">500</button>
+          <button type="button" onclick="window.npSetDepAmount(1000)">1000</button>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">টাকার পরিমাণ (BDT ৳)</label>
-          <input type="number" class="form-input" id="depositAmount" required placeholder="50" min="20" oninput="window.app.updateDepositBonusPreview()">
+        <label class="pp-label" for="depositSenderNumber">SENDER NUMBER</label>
+        <input type="tel" class="pp-input" id="depositSenderNumber" required placeholder="017XXXXXXXX">
+
+        <label class="pp-label" for="depositTrxId">TRANSACTION ID</label>
+        <input type="text" class="pp-input" id="depositTrxId" required placeholder="BKA910283X" style="text-transform: uppercase;">
+
+        <div class="pp-calc">
+          <div class="pp-row"><span>Deposit Amount</span><span class="pp-val" id="ppDepositValue">৳0.00</span></div>
+          <div class="pp-row"><span>Promotion Bonus</span><span class="pp-val pp-bonus" id="ppBonusValue">৳0.00</span></div>
+          <div class="pp-row"><span>Turnover Requirement</span><span class="pp-val" id="ppTurnoverValue">৳0.00</span></div>
+          <div class="pp-row pp-total"><span>Total Receive</span><span class="pp-val" id="ppTotalValue">৳0.00</span></div>
+          <div id="ppStatusMessage" class="pp-status"></div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">যে নম্বর থেকে টাকা পাঠিয়েছেন</label>
-          <input type="tel" class="form-input" id="depositSenderNumber" required placeholder="017XXXXXXXX">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">ট্রানজেকশন আইডি (TrxID)</label>
-          <input type="text" class="form-input" id="depositTrxId" required placeholder="BKA910283X" style="text-transform: uppercase;">
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-block" id="btnSubmitDeposit">
+        <button type="submit" class="pp-submit" id="btnSubmitDeposit">
           <span>ডিপোজিট রিকোয়েস্ট পাঠান</span>
         </button>
       </form>
+
+      <div class="pp-notice">
+        নিচের অফিসিয়াল নাম্বারে Send Money করে TrxID ও প্রেরক নাম্বার লিখে সাবমিট করুন। অ্যাডমিন অনুমোদনের পর ব্যালেন্স অ্যাকাউন্টে যুক্ত হবে।
+        <br>Provided by MostWin88
+      </div>
     </div>
   </div>
 
@@ -3279,53 +3379,86 @@
   <div class="modal-overlay" id="modalWithdraw">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
-      <div class="modal-title">
-        <span id="lblWithdrawHeader">উইথড্র রিকোয়েস্ট (Withdraw)</span>
+      <div class="modal-title pp-title">
+        <div>
+          <h1>PREMIUM WITHDRAW</h1>
+          <p id="lblWithdrawHeader">উইথড্র রিকোয়েস্ট (Withdraw)</p>
+        </div>
         <button class="modal-close-btn" onclick="window.app.closeModal('modalWithdraw')">✕</button>
       </div>
 
-      <div class="notice-card-bengali">
-        <svg class="icon" style="color: var(--notice-accent);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        <div>
-          <div class="notice-card-title">উইথড্র সংক্রান্ত নিয়মাবলী:</div>
-          <div class="notice-card-body">
-            সর্বনিম্ন উইথড্র ৳<span id="minWithdrawAmountLabel">100</span> টাকা। অ্যাডমিন ভেরিফাই করে ১ ঘণ্টার মধ্যে পেমেন্ট পাঠিয়ে দিবেন।
-          </div>
-        </div>
+      <div class="pp-balance">
+        <div class="pp-balance-label">AVAILABLE WALLET BALANCE</div>
+        <div class="pp-balance-value">৳ <span id="helperWalletBal">0</span></div>
+        <div style="color:#75869f;font-size:10px;margin-top:3px">Your available withdrawal balance</div>
       </div>
 
       <!-- Turnover Alert Box in Withdraw Modal -->
       <div id="withdrawTurnoverAlertBox" style="margin-bottom: 14px; padding: 10px 14px; border-radius: 12px; font-size: 12px; border: 1px solid rgba(255,255,255,0.15);"></div>
 
-      <form id="withdrawForm" onsubmit="window.app.handleWithdrawSubmit(event)">
-        <div class="form-group">
-          <label class="form-label">পেমেন্ট মেথড</label>
-          <select class="form-select" id="withdrawMethod" onchange="window.app.updateWithdrawMethodDetails()">
-            <option value="bKash">bKash (বিকাশ)</option>
-            <option value="Nagad">Nagad (নগদ)</option>
-            <option value="Rocket">Rocket (রকেট)</option>
-          </select>
-          <div class="payment-logo-badge" id="withdrawMethodLogoWrap">
-            <img id="withdrawMethodLogo" src="https://i.postimg.cc/K4hz9m0W/Whats-App-Image-2026-10-23-at-4-14-08-PM.jpg" alt="Payment Method Logo" onerror="this.style.display='none'">
-            <span id="withdrawMethodText" style="font-weight:700; font-size:13px; color:var(--text-primary);">bKash</span>
+      <form id="withdrawForm" class="pp-form" style="margin-top:0" onsubmit="window.app.handleWithdrawSubmit(event)">
+
+        <div class="pp-sec-title">SELECT PAYMENT METHOD</div>
+
+        <!-- original logic control (kept, hidden) -->
+        <select class="pp-hidden" id="withdrawMethod" onchange="window.app.updateWithdrawMethodDetails()">
+          <option value="bKash">bKash (বিকাশ)</option>
+          <option value="Nagad">Nagad (নগদ)</option>
+          <option value="Rocket">Rocket (রকেট)</option>
+        </select>
+        <div class="pp-hidden" id="withdrawMethodLogoWrap"></div>
+
+        <div class="pp-grid" style="margin-bottom:16px">
+          <div class="pp-card active" data-kind="withdraw" data-method="bKash" onclick="window.npPickMethod('withdraw','bKash')">
+            <div class="pp-logo"><img data-pp-logo="bKash" src="https://i.postimg.cc/K4hz9m0W/Whats-App-Image-2026-10-23-at-4-14-08-PM.jpg" alt="bKash" onerror="this.style.display='none'"></div>
+            <div class="pp-name">bKash</div>
+            <div class="pp-hint">Mobile Banking</div>
+          </div>
+          <div class="pp-card" data-kind="withdraw" data-method="Nagad" onclick="window.npPickMethod('withdraw','Nagad')">
+            <div class="pp-logo"><img data-pp-logo="Nagad" src="https://i.postimg.cc/QtVHC4B2/Whats-App-Image-2026-10-23-at-4-14-08-PM-%281%29.jpg" alt="Nagad" onerror="this.style.display='none'"></div>
+            <div class="pp-name">Nagad</div>
+            <div class="pp-hint">Mobile Banking</div>
+          </div>
+          <div class="pp-card" data-kind="withdraw" data-method="Rocket" onclick="window.npPickMethod('withdraw','Rocket')">
+            <div class="pp-logo"><img data-pp-logo="Rocket" src="https://i.postimg.cc/BnGLpByx/Whats-App-Image-2026-10-23-at-4-14-08-PM-%282%29.jpg" alt="Rocket" onerror="this.style.display='none'"></div>
+            <div class="pp-name">Rocket</div>
+            <div class="pp-hint">Mobile Banking</div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">টাকা গ্রহণের ফোন নম্বর</label>
-          <input type="tel" class="form-input" id="withdrawNumber" required placeholder="017XXXXXXXX">
+        <label class="pp-label" for="withdrawNumber">YOUR RECEIVING ACCOUNT NUMBER</label>
+        <input type="tel" class="pp-input" id="withdrawNumber" required placeholder="Enter your personal number">
+
+        <label class="pp-label" for="withdrawAmount">WITHDRAW AMOUNT</label>
+        <input type="number" class="pp-input" id="withdrawAmount" required placeholder="Enter amount" min="50" oninput="window.npWdCalc()">
+
+        <div class="pp-quick four" style="margin-top:-6px">
+          <button type="button" onclick="window.npSetWdAmount(500)">৳500</button>
+          <button type="button" onclick="window.npSetWdAmount(1000)">৳1,000</button>
+          <button type="button" onclick="window.npSetWdAmount(2000)">৳2,000</button>
+          <button type="button" onclick="window.npSetWdAmount(5000)">৳5,000</button>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">উইথড্র টাকার পরিমাণ (BDT ৳)</label>
-          <input type="number" class="form-input" id="withdrawAmount" required placeholder="100" min="50">
-          <div class="form-helper">আপনার বর্তমান ব্যালেন্স: ৳<span id="helperWalletBal">0</span></div>
+        <div class="pp-limit">Minimum: ৳<span id="minWithdrawAmountLabel">100</span></div>
+
+        <div class="pp-summary">
+          <div class="pp-summary-title">WITHDRAWAL SUMMARY</div>
+          <div class="pp-srow"><span>Withdraw Amount</span><strong id="ppWdAmount">৳0.00</strong></div>
+          <div class="pp-srow"><span>Withdraw Fee</span><strong id="ppWdFee">৳0.00</strong></div>
+          <div class="pp-srow total"><span>Total Deduction</span><strong id="ppWdTotal">৳0.00</strong></div>
         </div>
 
-        <button type="submit" class="btn btn-accent btn-block" id="btnSubmitWithdraw">
+        <div class="pp-notice-box">
+          <span style="font-size:16px">ⓘ</span>
+          <span>সর্বনিম্ন উইথড্র শর্ত মানলে অ্যাডমিন ভেরিফাই করে ১ ঘণ্টার মধ্যে পেমেন্ট পাঠিয়ে দিবেন। জমা দেওয়ার আগে আপনার পার্সোনাল রিসিভিং নাম্বারটি যাচাই করে নিন।</span>
+        </div>
+
+        <button type="submit" class="pp-submit" id="btnSubmitWithdraw">
           <span>উইথড্র কনফার্ম করুন</span>
         </button>
       </form>
+
+      <div class="pp-notice" style="letter-spacing:1px">© 2026 MOSTWIN88</div>
     </div>
   </div>
 
@@ -4532,6 +4665,7 @@
     }
 
     function updateDepositBonusPreview() {
+      try { npDepCalc(); } catch (e) {}
       const isBonusOn = state.settings.depositBonusEnabled === true || String(state.settings.depositBonusEnabled) === 'true';
       let bonusPct = (typeof state.settings.depositBonusPercent !== 'undefined') ? parseFloat(state.settings.depositBonusPercent) : 10;
       let turnoverMult = parseFloat(state.settings.turnoverMultiplier) || 1;
@@ -4568,10 +4702,130 @@
       previewEl.innerHTML = `🎁 প্রমোশন: <b>+৳${calcBonus}</b> (${bonusPct}% বোনাস) | মোট ব্যালেন্স: <b>৳${amt + calcBonus}</b><br><span style="color:#94a3b8; font-size:11px;">🎯 টার্নওভার প্রয়োজন হবে: <b>৳${calcTurnover}</b> (${turnoverMult}x)</span>`;
     }
 
+    // ===== Premium Deposit/Withdraw UI helpers (design only; logic untouched) =====
+    function npBonusConf() {
+      const st = state.settings || {};
+      const on = st.depositBonusEnabled === true || String(st.depositBonusEnabled) === 'true';
+      const pct = (typeof st.depositBonusPercent !== 'undefined') ? parseFloat(st.depositBonusPercent) : 10;
+      const minB = (typeof st.minDepositForBonus !== 'undefined') ? parseFloat(st.minDepositForBonus) : 100;
+      const maxB = (typeof st.maxBonusAmount !== 'undefined') ? parseFloat(st.maxBonusAmount) : 500;
+      const mult = parseFloat(st.turnoverMultiplier) || 1;
+      const tiers = Array.isArray(st.depositBonusTiers) ? st.depositBonusTiers : [];
+      return { on, pct, minB, maxB, mult, tiers };
+    }
+
+    function npSyncCards(kind, method) {
+      document.querySelectorAll('.pp-card[data-kind="' + kind + '"]').forEach(c => {
+        c.classList.toggle('active', c.dataset.method === method);
+      });
+    }
+
+    function npApplyMethodLogos() {
+      const st = state.settings || {};
+      const map = { bKash: st.bkashLogo, Nagad: st.nagadLogo, Rocket: st.rocketLogo };
+      document.querySelectorAll('img[data-pp-logo]').forEach(img => {
+        const u = map[img.dataset.ppLogo];
+        if (u && img.getAttribute('src') !== u) { img.style.display = ''; img.setAttribute('src', u); }
+      });
+    }
+
+    function npPickMethod(kind, method) {
+      const sel = document.getElementById(kind === 'deposit' ? 'depositMethod' : 'withdrawMethod');
+      if (!sel) return;
+      sel.value = method;
+      if (kind === 'deposit') updateDepositMethodDetails(); else updateWithdrawMethodDetails();
+    }
+
+    function npSetDepAmount(v) {
+      const i = document.getElementById('depositAmount');
+      if (i) { i.value = v; updateDepositBonusPreview(); }
+    }
+
+    function npSetWdAmount(v) {
+      const i = document.getElementById('withdrawAmount');
+      if (i) { i.value = v; npWdCalc(); }
+    }
+
+    function npWdCalc() {
+      const i = document.getElementById('withdrawAmount');
+      const amt = Math.max(0, parseFloat(i ? i.value : 0) || 0);
+      const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = '৳' + v.toFixed(2); };
+      set('ppWdAmount', amt); set('ppWdFee', 0); set('ppWdTotal', amt);
+    }
+
+    function npDepCalc() {
+      const c = npBonusConf();
+      const inp = document.getElementById('depositAmount');
+      const amt = Math.max(0, parseFloat(inp ? inp.value : 0) || 0);
+      const minDep = state.settings.minDeposit || 50;
+
+      let bonusPct = c.pct, mult = c.mult, matched = null;
+      if (c.tiers.length > 0) {
+        const sorted = [...c.tiers].sort((a, b) => (parseFloat(b.minDeposit) || 0) - (parseFloat(a.minDeposit) || 0));
+        matched = sorted.find(t => amt >= (parseFloat(t.minDeposit) || 0)) || null;
+        if (matched) { bonusPct = parseFloat(matched.bonusPercent) || 0; mult = parseFloat(matched.turnoverMultiplier) || 1; }
+      }
+
+      let bonus = 0, eligible = false;
+      if (c.on && (matched || (bonusPct > 0 && amt >= c.minB))) {
+        eligible = true;
+        bonus = Math.round((amt * bonusPct) / 100);
+        if (c.maxB > 0 && bonus > c.maxB) bonus = c.maxB;
+      }
+      const turnover = eligible ? Math.round((amt + bonus) * mult) : 0;
+
+      // percentage badges on payment cards
+      let badgePct = 0;
+      if (c.on) {
+        if (matched) badgePct = parseFloat(matched.bonusPercent) || 0;
+        else if (c.tiers.length > 0) badgePct = Math.max.apply(null, c.tiers.map(t => parseFloat(t.bonusPercent) || 0));
+        else badgePct = c.pct;
+      }
+      document.querySelectorAll('[data-pp-badge]').forEach(b => {
+        b.style.display = badgePct > 0 ? '' : 'none';
+        b.textContent = badgePct + '%';
+      });
+
+      const setT = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = '৳' + v.toFixed(2); };
+      setT('ppDepositValue', amt); setT('ppBonusValue', bonus); setT('ppTurnoverValue', turnover); setT('ppTotalValue', amt + bonus);
+
+      const bal = document.getElementById('ppDepBalance');
+      if (bal && state.userData) bal.textContent = state.userData.balance;
+
+      const st = document.getElementById('ppStatusMessage');
+      if (st) {
+        st.className = 'pp-status'; st.textContent = '';
+        if (amt > 0 && amt < minDep) {
+          st.classList.add('warning'); st.textContent = 'সর্বনিম্ন ডিপোজিট ৳' + minDep + ' টাকা।';
+        } else if (amt > 0 && eligible) {
+          st.classList.add('success'); st.textContent = 'Promotion applied successfully! (' + bonusPct + '% বোনাস)';
+        } else if (amt > 0 && c.on && !matched && bonusPct > 0 && amt < c.minB) {
+          st.classList.add('warning'); st.textContent = 'বোনাস পেতে সর্বনিম্ন ৳' + c.minB + ' ডিপোজিট করুন।';
+        }
+      }
+    }
+
+    document.addEventListener('reset', function (e) {
+      const id = e.target && e.target.id;
+      if (id !== 'depositForm' && id !== 'withdrawForm') return;
+      setTimeout(function () {
+        try {
+          if (id === 'depositForm') { npSyncCards('deposit', document.getElementById('depositMethod').value); updateDepositMethodDetails(); npDepCalc(); }
+          else { npSyncCards('withdraw', document.getElementById('withdrawMethod').value); updateWithdrawMethodDetails(); npWdCalc(); }
+        } catch (err) {}
+      }, 0);
+    });
+
+    window.npPickMethod = npPickMethod;
+    window.npSetDepAmount = npSetDepAmount;
+    window.npSetWdAmount = npSetWdAmount;
+    window.npWdCalc = npWdCalc;
+
     function updateDepositMethodDetails() {
       const methodElem = document.getElementById('depositMethod');
       if (!methodElem) return;
       const method = methodElem.value;
+      try { npSyncCards('deposit', method); npApplyMethodLogos(); } catch (e) {}
       const numElem = document.getElementById('adminPaymentNumber');
       if (numElem) {
         if (method === 'bKash') numElem.innerText = state.settings.bkashNumber || '01712-345678';
@@ -4616,6 +4870,7 @@
       const methodElem = document.getElementById('withdrawMethod');
       if (!methodElem) return;
       const method = methodElem.value;
+      try { npSyncCards('withdraw', method); npApplyMethodLogos(); } catch (e) {}
       const logoWrap = document.getElementById('withdrawMethodLogoWrap');
       if (logoWrap) {
         let logoUrl = '';
@@ -6800,7 +7055,7 @@
     var ks = offers();
     el.innerHTML = ks.length ? ks.map(function (k) {
       var p = P[k], on = pick === k;
-      return '<div onclick="npPromoPick(\'' + k + '\')" style="cursor:pointer;margin:0 0 8px;padding:10px 12px;border-radius:12px;border:1.5px solid ' + (on ? '#10b981' : 'rgba(255,255,255,.2)') + ';background:' + (on ? 'rgba(16,185,129,.15)' : 'rgba(255,255,255,.05)') + '"><div style="font-weight:800;font-size:14px">🎁 ' + esc(p.name) + '</div><div style="font-size:12px;color:#cbd5e1;margin-top:3px">ডিপোজিট ' + tk(p.minDeposit) + ' – ' + tk(p.maxDeposit) + ' • ' + bonusTxt(p) + ' • টার্নওভার ' + (+p.turnoverMultiplier) + 'x' + (p.endAt ? ' • শেষ: ' + new Date(+p.endAt).toLocaleDateString() : '') + '</div></div>';
+      return '<div class="pp-offer' + (on ? ' on' : '') + '" onclick="npPromoPick(\'' + k + '\')">' + '<span class="pp-badge" style="top:10px;right:10px">' + (p.bonusType === 'fixed' ? tk(p.bonusValue) : (+p.bonusValue) + '%') + '</span>' + '<div class="pp-offer-name">🎁 ' + esc(p.name) + '</div>' + '<div class="pp-offer-desc">' + bonusTxt(p) + '<br>Minimum Deposit: <b>' + tk(p.minDeposit) + '</b><br>Maximum Deposit: <b>' + tk(p.maxDeposit) + '</b><br>Turnover: <b>' + (+p.turnoverMultiplier) + 'x</b>' + (p.endAt ? '<br>শেষ: ' + new Date(+p.endAt).toLocaleDateString() : '') + '</div></div>';
     }).join('') : '<div style="text-align:center;color:#94a3b8;padding:14px;font-size:13px">এখন কোনো অ্যাক্টিভ অফার নেই</div>';
   }
   window.npPromoPick = function (k) { pick = k; renderOffers(); window.npPromoPreview(); };
