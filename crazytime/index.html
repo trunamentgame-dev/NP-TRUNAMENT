@@ -584,7 +584,9 @@ function zoomIn(){
   const curY=a.offsetTop+rig.offsetTop+st.offsetTop+w/2;
   const avail=cardTop-arenaTop-6;
   const R=avail/(1.08+16/w),sc=Math.max(1,Math.min(ZOOM_MAX,2*R/w));
-  const tgtY=cardTop;
+  /* zoom আগের মতোই; চাকা উপরে উঠে উপরের ফাঁক ভরবে (মাথা উপরের কিনারা পর্যন্ত) */
+  const ext=(sc*w/2)*(1.08+16/w);
+  const tgtY=Math.min(cardTop,arenaTop+6+ext);
   rig.style.transform='translate(0,'+(tgtY-curY).toFixed(1)+'px) scale('+sc.toFixed(3)+')';
   a.style.setProperty('--rby',(cardTop-a.offsetTop-34).toFixed(1)+'px');
   a.classList.add('zm');document.body.classList.add('zmx');Z.on=true;
