@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NP TOURNAMENT BD - Free Fire Esports</title>
-  <meta name="description" content="বাংলাদেশের সবচেয়ে বিশ্বস্ত ও প্রফেশনাল ফ্রি ফায়ার টুর্নামেন্ট প্ল্যাটফর্ম - NP TOURNAMENT BD">
+  <meta name="description" content="Bangladesh's most trusted and professional Free Fire tournament platform - NP TOURNAMENT BD">
   <meta name="theme-color" content="#090d16" id="theme-color-meta">
   <style>html{background:#050811}</style>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1678,6 +1678,527 @@
     @keyframes npldg-pulse{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
     @media (prefers-reduced-motion:reduce){.npld .npld-ch{animation:none;opacity:1;transform:none;filter:none}.npld{transition-duration:.01s}}
   </style>
+<style>
+  .np-lang-seg{display:inline-flex;gap:2px;padding:2px;border-radius:999px;background:rgba(148,163,184,.16);border:1px solid rgba(255,255,255,.12);flex-shrink:0}
+  .np-lang-seg button{border:0;background:transparent;color:#94a3b8;font-weight:700;font-size:11px;line-height:1;padding:6px 10px;border-radius:999px;cursor:pointer;min-width:34px;font-family:inherit}
+  .np-lang-seg button.on{background:#f59e0b;color:#000}
+</style>
+<script>
+(function (root) {
+  'use strict';
+
+  /* ================= NP i18n: default English, Bangla on demand =================
+     - Whole app is written in Bangla in the source; in English mode every Bangla
+       text (static + dynamic) is translated on the fly and restored when the user
+       switches back to Bangla.
+     - Elements/attributes marked data-no-i18n are never translated. */
+
+  var KEY = 'NP_APP_LANG';
+  var HAS_BN = /[\u0980-\u09FF]/;
+  var HAS_LETTER = /[\u0980-\u09E5\u09F0\u09F1\u09F4-\u09FF]/;
+
+  function nd(s) {
+    return s.replace(/[\u09E6-\u09EF]/g, function (c) { return String(c.charCodeAt(0) - 0x09E6); });
+  }
+  function norm(s) { return nd(String(s).normalize('NFC')).replace(/\s+/g, ' ').trim(); }
+
+  // [bangla, english, flag]  flag: 'x' = whole-text match only, 'p' = force phrase (substring) match
+  var PAIRS = [
+    // ---- Login / Sign-up gate & modal ----
+    ['লগইন (Sign In)', 'Sign In'],
+    ['নতুন অ্যাকাউন্ট (Sign Up)', 'Sign Up'],
+    ['ইউজারনেম বা ইমেইল (Username / Email) *', 'Username or Email *'],
+    ['পাসওয়ার্ড *', 'Password *', 'x'],
+    ['পাসওয়ার্ড ভুলে গেছেন?', 'Forgot password?'],
+    ['🔐 একাউন্টে লগইন করুন', '🔐 Log in to your account'],
+    ['🏠 হোম পেজে ফিরে যান', '🏠 Back to Home'],
+    ['ইউজারনেম (Username - ইউনিক আইডি) *', 'Username (unique ID) *'],
+    ['লগইন করার জন্য ব্যবহার হবে (ইংরেজি ছোট অক্ষর ও সংখ্যা, ৩-২০ অক্ষর)', 'Used for login (lowercase English letters & numbers, 3-20 characters)'],
+    ['আপনার পূর্ণ নাম *', 'Your full name *'],
+    ['ইমেইল অ্যাড্রেস *', 'Email address *'],
+    ['পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর) *', 'Password (at least 6 characters) *'],
+    ['কনফার্ম পাসওয়ার্ড *', 'Confirm password *', 'x'],
+    ['🚀 নতুন প্লেয়ার অ্যাকাউন্ট খুলুন', '🚀 Create new player account'],
+    ['যেমন: gamer_rafi বা player@gmail.com', 'e.g. gamer_rafi or player@gmail.com'],
+    ['যেমন: gamer_rafi99', 'e.g. gamer_rafi99'],
+    ['যেমন: মিজানুর রহমান', 'e.g. Mizanur Rahman'],
+    ['আপনার নাম', 'Your name', 'x'],
+    ['পূর্ণ নাম *', 'Full name *', 'x'],
+    ['ইউজারনেম *', 'Username *', 'x'],
+    ['ইউজারনেম বা ইমেইল *', 'Username or Email *', 'x'],
+    ['লগইন করুন', 'Log In', 'x'],
+    ['লগইন', 'Login', 'x'],
+    ['নতুন অ্যাকাউন্ট', 'New Account', 'x'],
+    ['নতুন অ্যাকাউন্ট তৈরি', 'Create New Account', 'x'],
+    ['অ্যাকাউন্ট তৈরি করুন', 'Create Account', 'x'],
+    ['লগইন প্রয়োজন', 'Login Required', 'x'],
+    ['গেম খেলতে হলে প্রথমে আপনার অ্যাকাউন্টে লগইন করুন।', 'To play games, please log in to your account first.'],
+    ['বাতিল', 'Cancel', 'x'],
+
+    // ---- Maintenance / notice / home ----
+    ['🔧 রক্ষণাবেক্ষণ চলছে (App Maintenance)', '🔧 App Maintenance in Progress'],
+    ['বর্তমানে সার্ভার আপডেট ও টুর্নামেন্ট ডেটাবেজ রক্ষণাবেক্ষণের কাজ চলছে। সাময়িক অসুবিধার জন্য আমরা আন্তরিকভাবে দুঃখিত। কিছুক্ষণ পর আবার চেষ্টা করুন।', 'Server update and tournament database maintenance is in progress. We sincerely apologize for the inconvenience. Please try again after a while.'],
+    ['নোটিশ', 'Notice', 'x'],
+    ['🔥 স্বাগতম NP TOURNAMENT BD-তে! ফ্রি ফায়ার টুর্নামেন্ট রুম আইডি ও পাসওয়ার্ড ম্যাচ শুরুর ১০ মিনিট আগে অ্যাপে প্রদান করা হবে। যেকোনো সমস্যায় আমাদের সাপোর্ট নাম্বারে যোগাযোগ করুন। সততার সাথে খেলুন এবং নগদ পুরস্কার জিতুন!', '🔥 Welcome to NP TOURNAMENT BD! Free Fire tournament Room ID & Password will be provided in the app 10 minutes before the match starts. Contact our support number for any issue. Play fair and win cash prizes!'],
+    ['🎮 জনপ্রিয় গেমস ও ক্র্যাশ গেমস', '🎮 Popular & Crash Games'],
+    ['লাইভ', 'Live', 'x'],
+    ['গেমস লোড করতে সমস্যা হয়েছে।', 'There was a problem loading games.'],
+    ['বর্তমানে কোনো সক্রিয় গেম পাওয়া যায়নি।', 'No active games found right now.'],
+    ['⚡ সব গেম', '⚡ All Games'],
+    ['🎲 Ludo (লুডু)', '🎲 Ludo'],
+    ['🏆 টুর্নামেন্ট সমূহ', '🏆 All Tournaments'],
+    ['⏳ আসন্ন ম্যাচ (Upcoming)', '⏳ Upcoming'],
+    ['🔴 লাইভ ম্যাচ (Live)', '🔴 Live Matches'],
+    ['✅ সম্পন্ন ম্যাচ (Completed)', '✅ Completed'],
+    ['🎮 সব ফরম্যাট', '🎮 All Formats'],
+    ['Solo (১ জন)', 'Solo (1 Player)'],
+    ['Duo (২ জন)', 'Duo (2 Players)'],
+    ['Squad (৪ জন)', 'Squad (4 Players)'],
+    ['2 Player (লুডু ২ জন)', '2 Player (Ludo)'],
+    ['4 Player (লুডু ৪ জন)', '4 Player (Ludo)'],
+    ['টুর্নামেন্ট লোড হচ্ছে...', 'Loading tournaments...'],
+    ['ম্যাচ সংগ্রহ করা হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...', 'Fetching matches, please wait...'],
+    ['NP TOURNAMENT BD একটি স্বাধীন ই-স্পোর্টস কমিউনিটি প্ল্যাটফর্ম। এটি Garena বা Free Fire-এর অফিসিয়াল কোনো অংশ নয়।', 'NP TOURNAMENT BD is an independent e-sports community platform. It is not an official part of Garena or Free Fire.'],
+    ['আমার অংশগ্রহণকৃত ম্যাচ', 'My Joined Matches'],
+    ['🏠 হোম পেজ', '🏠 Home'],
+    ['রুম তথ্য সংক্রান্ত জরুরি বার্তা:', 'Important Room Information:'],
+    ['ম্যাচ শুরুর ১০ মিনিট পূর্বে রুম আইডি ও পাসওয়ার্ড এখানে প্রদর্শিত হবে। কোনো সমস্যায় সাপোর্টে মেসেজ দিন।', 'Room ID and Password will be shown here 10 minutes before the match starts. Message support if you have any problem.'],
+    ['ম্যাচ সম্পন্ন', 'Matches Done'],
+    ['পুরস্কার বিতরণ', 'Prizes Paid'],
+    ['অ্যাক্টিভ গেমার্স', 'Active Gamers'],
+    ['⚠️ টুর্নামেন্ট নিয়মাবলী ও গুরুত্বপূর্ণ নোটিশ:', '⚠️ Tournament Rules & Important Notice:'],
+    ['বাংলাদেশের সবচেয়ে বিশ্বস্ত ও প্রফেশনাল ফ্রি ফায়ার ইস্পোর্টস টুর্নামেন্ট প্ল্যাটফর্ম।', "Bangladesh's most trusted and professional Free Fire esports tournament platform."],
+    ['প্রতিদিন সোলো, ডুও এবং স্কোয়াড টুর্নামেন্টে অংশগ্রহণ করুন!', 'Join Solo, Duo and Squad tournaments every day!'],
+    ['স্বয়ংক্রিয় রুম আইডি ও দ্রুত উইথড্র পেমেন্ট সিস্টেম।', 'Automatic Room ID and fast withdraw payment system.'],
+    ['ক্র্যাশ গেম', 'Crash Game'],
+    ['জনপ্রিয় গেম', 'Popular Game'],
+    ['আর্কেড গেম', 'Arcade Game'],
+    ['এই গেমের প্লে লিংক পাওয়া যায়নি।', 'Play link for this game was not found.'],
+    ['Aviator (অ্যাভিয়েটর)', 'Aviator'],
+    ['Ludo King (লুডু)', 'Ludo King'],
+    ['Mines (মাইনস)', 'Mines'],
+    ['চলছে (Playing)', 'Playing'],
+
+    // ---- Wallet ----
+    ['আমার ওয়ালেট (Wallet)', 'My Wallet'],
+    ['বর্তমান ব্যালেন্স', 'Current Balance'],
+    ['রিফ্রেশ', 'Refresh', 'x'],
+    ['টাকা যোগ করুন', 'Add Money'],
+    ['উইথড্র রিকোয়েস্ট', 'Withdraw Request'],
+    ['পেমেন্ট নিরাপত্তা সতর্কতা:', 'Payment Security Warning:'],
+    ['বিকাশ, নগদ বা রকেটের কোনো পিন (PIN) বা ওটিপি (OTP) কাউকে দেবেন না। শুধুমাত্র সঠিক TrxID সাবমিট করবেন।', 'Never share any PIN or OTP of bKash, Nagad or Rocket with anyone. Submit only the correct TrxID.'],
+    ['লেনদেন হিস্ট্রি', 'Transaction History'],
+    ['টাকা যোগ করুন (Add Money)', 'Add Money'],
+    ['বাংলাদেশ পেমেন্ট নির্দেশনা:', 'Bangladesh Payment Instructions:'],
+    ['নিচের অফিসিয়াল নাম্বারে Send Money করে TrxID ও প্রেরক নাম্বার লিখে সাবমিট করুন। অ্যাডমিন অনুমোদনের পর ব্যালেন্স অ্যাকাউন্টে যুক্ত হবে।', 'Send Money to the official number below, then enter the TrxID and sender number and submit. Balance will be added after admin approval.'],
+    ['পেমেন্ট মেথড নির্বাচন করুন', 'Select Payment Method'],
+    ['bKash (বিকাশ Personal)', 'bKash (Personal)'],
+    ['Nagad (নগদ Personal)', 'Nagad (Personal)'],
+    ['Rocket (রকেট Personal)', 'Rocket (Personal)'],
+    ['টাকা পাঠানোর নম্বর:', 'Number to send money to:'],
+    ['কপি', 'Copy', 'x'],
+    ['সর্বনিম্ন ডিপোজিট: ৳', 'Minimum deposit: ৳'],
+    ['টাকা', 'BDT', 'x'],
+    ['টাকার পরিমাণ (BDT ৳)', 'Amount (BDT ৳)'],
+    ['যে নম্বর থেকে টাকা পাঠিয়েছেন', 'Number you sent money from'],
+    ['ট্রানজেকশন আইডি (TrxID)', 'Transaction ID (TrxID)'],
+    ['ডিপোজিট রিকোয়েস্ট পাঠান', 'Submit Deposit Request'],
+    ['উইথড্র রিকোয়েস্ট (Withdraw)', 'Withdraw Request'],
+    ['উইথড্র সংক্রান্ত নিয়মাবলী:', 'Withdrawal Rules:'],
+    ['সর্বনিম্ন উইথড্র ৳', 'Minimum withdraw ৳'],
+    ['টাকা। অ্যাডমিন ভেরিফাই করে ১ ঘণ্টার মধ্যে পেমেন্ট পাঠিয়ে দিবেন।', 'BDT. Admin will verify and send the payment within 1 hour.'],
+    ['পেমেন্ট মেথড', 'Payment Method', 'x'],
+    ['bKash (বিকাশ)', 'bKash'],
+    ['Nagad (নগদ)', 'Nagad'],
+    ['Rocket (রকেট)', 'Rocket'],
+    ['টাকা গ্রহণের ফোন নম্বর', 'Phone number to receive money'],
+    ['উইথড্র টাকার পরিমাণ (BDT ৳)', 'Withdraw Amount (BDT ৳)'],
+    ['আপনার বর্তমান ব্যালেন্স: ৳', 'Your current balance: ৳'],
+    ['উইথড্র কনফার্ম করুন', 'Confirm Withdrawal'],
+    ['সর্বনিম্ন ডিপোজিট', 'Minimum deposit', 'p'],
+    ['সর্বনিম্ন উইথড্র', 'Minimum withdraw', 'p'],
+    ['ডিপোজিট হিস্ট্রি', 'Deposit History'],
+    ['উইথড্র হিস্ট্রি', 'Withdraw History'],
+    ['গেম হিস্ট্রি', 'Game History'],
+    ['গত ৭ দিনের হিস্ট্রি দেখানো হচ্ছে', 'Showing history of the last 7 days'],
+    ['কোনো লেনদেন হিস্ট্রি নেই', 'No transaction history'],
+    ['এই বিভাগে গত ৭ দিনে কোনো লেনদেন নেই।', 'No transactions in this section in the last 7 days.'],
+    ['ডিপোজিট রিকোয়েস্ট', 'Deposit Request', 'p'],
+    ['🕒 পেন্ডিং', '🕒 Pending'],
+    ['⚙️ প্রসেসিং চলছে', '⚙️ Processing'],
+    ['✅ সম্পন্ন', '✅ Completed'],
+    ['❌ বাতিল', '❌ Rejected'],
+    ['সম্প্রতি', 'Recently', 'x'],
+    ['ডিপোজিট', 'Deposit', 'x'],
+    ['উইথড্র', 'Withdraw', 'x'],
+    ['টাকা যোগ করার পূর্বে অনুগ্রহ করে লগইন করুন।', 'Please log in before adding money.'],
+    ['প্রেরক নাম্বার ও TrxID সঠিক ভাবে লিখুন।', 'Enter the sender number and TrxID correctly.'],
+    ['সাবমিট হচ্ছে...', 'Submitting...'],
+    ['✅ ডিপোজিট রিকোয়েস্ট সফলভাবে সাবমিট হয়েছে! অ্যাডমিন প্যানেলে যাচাই করে কিছুক্ষণের মধ্যে টাকা যুক্ত হবে।', '✅ Deposit request submitted successfully! Money will be added shortly after admin verification.'],
+    ['ডিপোজিট ব্যর্থ:', 'Deposit failed:'],
+    ['উইথড্র করার পূর্বে অনুগ্রহ করে লগইন করুন।', 'Please log in before withdrawing.'],
+    ['প্রসেসিং হচ্ছে...', 'Processing...'],
+    ['✅ উইথড্র আবেদন গৃহীত হয়েছে! অ্যাডমিন ভেরিফাই করে পেমেন্ট পাঠিয়ে দেবেন।', '✅ Withdrawal request received! Admin will verify and send the payment.'],
+    ['উইথড্র আবেদন ব্যর্থ:', 'Withdrawal request failed:'],
+    ['ব্যালেন্স রিফ্রেশ সম্পন্ন হয়েছে!', 'Balance refreshed!'],
+    ['ব্যালেন্স রিফ্রেশ সম্পন্ন।', 'Balance refreshed.'],
+    ['পর্যাপ্ত ব্যালেন্স নেই! প্রয়োজন', 'Insufficient balance! Required', 'p'],
+    [', আপনার ব্যালেন্স', ', your balance', 'p'],
+    ['দয়া করে টাকা যোগ করুন।', 'Please add money.', 'p'],
+    ['আপনার পর্যাপ্ত ব্যালেন্স নেই! বর্তমান ব্যালেন্স', 'You have insufficient balance! Current balance', 'p'],
+    ['পর্যাপ্ত ব্যালেন্স নেই! বর্তমান ব্যালেন্স', 'Insufficient balance! Current balance', 'p'],
+
+    // ---- Profile ----
+    ['ইউজার', 'User', 'x'],
+    ['অ্যাকাউন্ট স্ট্যাটাস:', 'Account Status:'],
+    ['প্রোফাইল, DP ও FF UID এডিট করুন', 'Edit Profile, DP & FF UID'],
+    ['থিম পরিবর্তন (Light / Dark)', 'Theme (Light / Dark)'],
+    ['অ্যাপের কালার মোড পরিবর্তন করুন', 'Change the app color mode'],
+    ['সাপোর্ট হেল্পলাইন (Support)', 'Support Helpline'],
+    ['কল করুন ❯', 'Call ❯'],
+    ['টুর্নামেন্ট নিয়ম ও ফেয়ার-প্লে', 'Tournament Rules & Fair Play'],
+    ['হ্যাক ও স্ক্রিপ্ট বিরোধী কঠোর নীতিমালা', 'Strict anti-hack & anti-script policy'],
+    ['লগআউট (Logout)', 'Logout'],
+    ['হোম', 'Home', 'x'],
+    ['ম্যাচ', 'Matches', 'x'],
+    ['ওয়ালেট', 'Wallet', 'x'],
+    ['প্রোফাইল', 'Profile', 'x'],
+    ['প্রোফাইল, DP ও FF UID আপডেট', 'Update Profile, DP & FF UID'],
+    ['আপনার পূর্ণ নাম', 'Your full name'],
+    ['ফ্রি ফায়ার ইন-গেম নাম (IGN)', 'Free Fire In-Game Name (IGN)'],
+    ['ফ্রি ফায়ার UID (গেম আইডি)', 'Free Fire UID (Game ID)'],
+    ['প্রোফাইল পিকচার (DP Image URL)', 'Profile Picture (DP Image URL)'],
+    ['আপনার অবতার বা প্রোফাইল ছবির সরাসরি ওয়েব ইমেজ লিংক।', 'Direct web image link of your avatar or profile picture.'],
+    ['প্রোফাইল পিকচার সাইজ / উইথ (DP Width / Size)', 'Profile Picture Size (DP Width / Size)'],
+    ['ছোট (Small - 60px)', 'Small - 60px'],
+    ['মাধ্যম (Medium - 75px)', 'Medium - 75px'],
+    ['বড় (Large - 100px)', 'Large - 100px'],
+    ['সংরক্ষণ করুন (Save Profile)', 'Save Profile'],
+    ['দেওয়া হয়নি', 'Not provided', 'x'],
+    ['Guest Player (লগইন করুন)', 'Guest Player (Log in)'],
+    ['লগইন করে আপনার প্রোফাইল ও ওয়ালেট দেখুন', 'Log in to see your profile and wallet'],
+    ['প্রোফাইল তথ্য সফলভাবে সেভ হয়েছে!', 'Profile saved successfully!'],
+    ['আপডেট ব্যর্থ:', 'Update failed:'],
+    ['আপনি কি নিশ্চিত যে অ্যাকাউন্ট থেকে লগআউট করতে চান?', 'Are you sure you want to log out?'],
+    ['সফলভাবে লগআউট সম্পন্ন হয়েছে।', 'Logged out successfully.'],
+    ['ডার্ক থিম সক্রিয়', 'Dark theme active'],
+    ['লাইট থিম সক্রিয়', 'Light theme active'],
+    ['ব্যক্তিগত তথ্য ও ব্যালেন্স দেখতে অনুগ্রহ করে লগইন করুন।', 'Please log in to view your personal info and balance.'],
+
+    // ---- Modals ----
+    ['ম্যাচ বিস্তারিত', 'Match Details'],
+    ['তথ্য', 'Info', 'x'],
+    ['টুর্নামেন্ট নিয়মাবলী ও গুরুত্বপূর্ণ নোটিশ:', 'Tournament Rules & Important Notice:'],
+    ['১. এমুলেটর বা হ্যাক সম্পূর্ণ নিষিদ্ধ। ধরা পড়লে আজীবন ব্যান।', '1. Emulators and hacks are strictly prohibited. Permanent ban if caught.'],
+    ['২. রুম আইডি ও পাসওয়ার্ড কাউকে শেয়ার করা সম্পূর্ণ নিষেধ।', '2. Sharing Room ID & Password with anyone is strictly forbidden.'],
+    ['৩. আপনার ফ্রি ফায়ার UID ও নাম প্রোফাইলে সঠিক রাখুন।', '3. Keep your Free Fire UID and name correct in your profile.'],
+    ['ঠিক আছে (OK)', 'OK'],
+    ['🔔 নোটিফিকেশন', '🔔 Notifications'],
+    ['অ্যাডমিন প্রেরিত সকল নোটিফিকেশন', 'All notifications sent by admin'],
+    ['✓ সব পঠিত করুন', '✓ Mark All as Read'],
+    ['সাপোর্ট সেন্টার (Support Center)', 'Support Center'],
+    ['সাপোর্ট সেন্টার লোড হচ্ছে...', 'Loading Support Center...'],
+    ['সাপোর্ট পেজ লোড করা যায়নি', 'Could not load the support page'],
+    ['ফাইলটি একই GitHub রিপোজিটরিতে', 'Make sure a file named'],
+    ['নামে আছে কি না নিশ্চিত করুন।', 'exists in the same GitHub repository.'],
+    ['🔄 আবার চেষ্টা করুন', '🔄 Try Again'],
+    ['ব্রাউজারে খুলুন ↗', 'Open in Browser ↗'],
+    ['অ্যাপ থেকে বের হতে চান?', 'Do you want to exit the app?'],
+    ['হ্যাঁ, বের হব', 'Yes, Exit'],
+    ['না, ফিরে যাব', 'No, Stay'],
+    ['নোটিফিকেশন / Notifications', 'Notifications'],
+    ['রিফ্রেশ (Refresh)', 'Refresh'],
+    ['বন্ধ করুন (Close)', 'Close'],
+    ['বন্ধ করুন', 'Close', 'x'],
+    ['অ্যাপ ইনস্টল', 'Install App', 'x'],
+    ['নতুন নোটিফিকেশন এসেছে', 'New notification received'],
+    ['📢 নতুন নোটিশ:', '📢 New Notice:', 'p'],
+    ['📢 নতুন নোটিশ', '📢 New Notice'],
+    ['🔔 নতুন নোটিফিকেশন:', '🔔 New notification:', 'p'],
+    ['কোনো নোটিফিকেশন নেই', 'No notifications'],
+    ['টুর্নামেন্ট, ম্যাচ ও অ্যাকাউন্টের জরুরি নোটিফিকেশন এখানে প্রদর্শিত হবে।', 'Important notifications about tournaments, matches and your account will appear here.'],
+    ['অপঠিত', 'Unread', 'x'],
+    ['পঠিত', 'Read', 'x'],
+    ['✓ পঠিত', '✓ Read', 'x'],
+    ['ট্যাপ করে পঠিত করুন', 'Tap to mark as read'],
+    ['সব নোটিফিকেশন পঠিত হিসেবে চিহ্নিত করা হয়েছে', 'All notifications marked as read'],
+    ['কপি হয়েছে:', 'Copied:', 'p'],
+    ['কপি করতে নিচের টেক্সটটি কপি করুন:', 'Copy the text below:'],
+    ['ত্রুটি:', 'Error:', 'p'],
+
+    // ---- Tournaments ----
+    ['কোনো টুর্নামেন্ট পাওয়া যায়নি', 'No Tournaments Found'],
+    ['বর্তমানে কোনো লুডু টুর্নামেন্ট নেই। শীঘ্রই নতুন লুডু ২ প্লেয়ার ও ৪ প্লেয়ার ম্যাচ শুরু হবে!', 'No Ludo matches right now. New matches starting soon!'],
+    ['শীঘ্রই নতুন টুর্নামেন্ট স্লট উন্মুক্ত করা হবে। আমাদের সাথেই থাকুন!', 'New tournament slots opening soon. Stay tuned!'],
+    ['১ম স্থান প্রাইজ', '1st Prize'],
+    ['প্রতি কিল', 'Per Kill', 'x'],
+    ['এন্ট্রি ফি', 'Entry Fee', 'x'],
+    ['মোট প্রাইজ', 'Total Prize', 'x'],
+    ['স্লট বুকিং', 'Slots Booked', 'x'],
+    ['নিয়ম ও তথ্য', 'Rules & Info'],
+    ['✓ অংশগ্রহণ করেছেন', '✓ Joined'],
+    ['স্লট ফুল', 'Slot Full', 'x'],
+    ['জয়েন করুন', 'Join', 'p'],
+    ['ম্যাচের সময় নির্ধারিত', 'Schedule TBA'],
+    ['টুর্নামেন্টে অংশগ্রহণের জন্য অনুগ্রহ করে আগে লগইন করুন!', 'Please log in first to join the tournament!'],
+    ['আপনার অ্যাকাউন্ট স্থগিত থাকায় টুর্নামেন্টে যোগ দিতে পারবেন না।', 'You cannot join tournaments while your account is suspended.'],
+    ['অ্যাডমিন কর্তৃক টুর্নামেন্ট জয়েনিং সাময়িক স্থগিত রাখা হয়েছে।', 'Tournament joining is temporarily paused by admin.'],
+    ['আপনি ইতিমধ্যে এই টুর্নামেন্টে যুক্ত হয়েছেন!', 'You have already joined this tournament!'],
+    ['সার্ভার সংযোগ সক্রিয় নেই।', 'Server connection is not active.'],
+    ['স্লট বুকিং ও ব্যালেন্স প্রসেসিং হচ্ছে...', 'Processing slot booking and balance...'],
+    ['টুর্নামেন্টটি খুঁজে পাওয়া যায়নি!', 'Tournament not found!'],
+    ['আপনি ইতিমধ্যে এই টুর্নামেন্টে নিবন্ধিত আছেন!', 'You are already registered in this tournament!'],
+    ['দুঃখিত! এই টুর্নামেন্টের সবকটি স্লট পূর্ণ হয়ে গেছে।', 'Sorry! All slots of this tournament are full.'],
+    ['🎉 টুর্নামেন্টে অংশগ্রহণ সফল হয়েছে! আপনার স্লট নিশ্চিত হয়েছে।', '🎉 Successfully joined the tournament! Your slot is confirmed.'],
+    ['টুর্নামেন্টে জয়েন করতে সমস্যা হয়েছে:', 'Problem joining the tournament:'],
+    ['আপনি কোনো ম্যাচে এখনও যুক্ত হননি', 'You have not joined any match yet'],
+    ['হোম পেজ থেকে যেকোনো ফ্রি ফায়ার টুর্নামেন্টে জয়েন করে স্লট নিশ্চিত করুন।', 'Join any Free Fire tournament from the home page to confirm your slot.'],
+    ['🟢 রুম প্রকাশিত', '🟢 Room Published'],
+    ['⏳ প্রকাশের অপেক্ষায়', '⏳ Waiting to be Published'],
+    ['🕒 শুরুর সময়:', '🕒 Start time:'],
+    ['নির্ধারিত সময়ে', 'At scheduled time'],
+    ['ম্যাপ:', 'Map:', 'x'],
+    ['🔑 ফ্রি ফায়ার কাস্টম রুম আইডি ও পাসওয়ার্ড:', '🔑 Free Fire Custom Room ID & Password:'],
+    ['অপেক্ষমান', 'Waiting', 'x'],
+    ['কপি ID', 'Copy ID'],
+    ['কপি Pass', 'Copy Pass'],
+    ['রুম ক্রেডেনশিয়াল প্রকাশ করা হয়েছে। সময়মতো ফ্রি ফায়ার কাস্টম রুমে প্রবেশ করুন।', 'Room credentials have been published. Enter the Free Fire custom room on time.'],
+    ['অ্যাডমিন কর্তৃক এখনো রুম আইডি ও পাসওয়ার্ড প্রকাশ করা হয়নি। ম্যাচ শুরুর ১০-১৫ মিনিট পূর্বে অ্যাডমিন পাবলিশ করলে তা স্বয়ংক্রিয়ভাবে এখানে দৃশ্যমান হবে। অনুগ্রহ করে অপেক্ষা করুন।', 'Admin has not published the Room ID and Password yet. They will appear here automatically when admin publishes them 10-15 minutes before the match starts. Please wait.'],
+    ['টুর্নামেন্টের বিস্তারিত নিয়ম', 'Detailed Tournament Rules'],
+    ['টুর্নামেন্টের বিস্তারিত দেখতে দয়া করে লগইন করুন।', 'Please log in to view tournament details.'],
+    ['🟢 কাস্টম রুম ক্রেডেনশিয়াল (Live)', '🟢 Custom Room Credentials (Live)'],
+    ['প্রকাশিত', 'Published', 'x'],
+    ['ম্যাচ শুরুর ১০-১৫ মিনিট পূর্বে অ্যাডমিন রুম আইডি ও পাসওয়ার্ড প্রকাশ করলে স্বয়ংক্রিয়ভাবে এখানে দেখা যাবে। অনুগ্রহ করে অপেক্ষা করুন।', 'Room ID and Password will appear here automatically when admin publishes them 10-15 minutes before the match starts. Please wait.'],
+    ['রুম অ্যাক্সেস লক:', 'Room Access Locked:'],
+    ['রুম আইডি ও পাসওয়ার্ড শুধুমাত্র এই টুর্নামেন্টে অংশগ্রহণকারী প্লেয়ারদের জন্য প্রকাশ করা হয়। টুর্নামেন্টে যোগ দিতে হোম পেজ থেকে স্লট বুক করুন।', 'Room ID and Password are published only for players who joined this tournament. To join, book a slot from the home page.'],
+    ['গেম:', 'Game:', 'x'],
+    ['মোড:', 'Mode:', 'x'],
+    ['টাইপ:', 'Type:', 'x'],
+    ['ম্যাচের সময়:', 'Match Time:'],
+    ['এন্ট্রি ফি:', 'Entry Fee:'],
+    ['মোট প্রাইজ:', 'Total Prize:'],
+    ['প্রতি কিল বোনাস:', 'Per Kill Bonus:'],
+    ['টুর্নামেন্টের নিয়মাবলী:', 'Tournament Rules:'],
+    ['হ্যাকিং বা চিটিং সম্পূর্ণরূপে নিষিদ্ধ। ম্যাচ শুরুর ১০ মিনিট পূর্বে রুম আইডি ও পাসওয়ার্ড দেওয়া হবে।', 'Hacking or cheating is strictly prohibited. Room ID and Password will be given 10 minutes before the match starts.'],
+    ['কোনো প্রকার হ্যাক, মোড APK বা হেডশট কনফিগ ফাইল ব্যবহার করা সম্পূর্ণ নিষিদ্ধ।', 'Using any kind of hack, mod APK or headshot config file is strictly prohibited.'],
+    ['সোলো টুর্নামেন্টে টিম-আপ করা শাস্তিযোগ্য অপরাধ।', 'Teaming up in Solo tournaments is a punishable offense.'],
+    ['রুম আইডি ও পাসওয়ার্ড কারো সাথে শেয়ার করা নিষেধ।', 'Sharing Room ID and Password with anyone is forbidden.'],
+    ['টুর্নামেন্ট ফলাফল ঘোষণার পর সর্বোচ্চ ১ ঘণ্টার মধ্যে বিজয়ীদের ওয়ালেটে পুরস্কার জমা হবে।', 'Prizes will be credited to winners\u2019 wallets within 1 hour after the results are announced.'],
+    ['কোনো অভিযোগ থাকলে ম্যাচ চলাকালীন স্ক্রিন রেকর্ড সংরক্ষণ করতে হবে।', 'If you have any complaint, you must keep a screen recording of the match.'],
+
+    // ---- Login / register messages ----
+    ['সংযোগে দেরি হচ্ছে, ইন্টারনেট চেক করে আবার চেষ্টা করুন', 'Connection is slow, check your internet and try again'],
+    ['ইউজারনেম অথবা ইমেইল এবং পাসওয়ার্ড প্রদান করুন', 'Please enter your username or email and password'],
+    ['যাচাই হচ্ছে...', 'Verifying...'],
+    ['যাচাই করা হচ্ছে...', 'Verifying...'],
+    ['সফলভাবে লগইন হয়েছে! স্বাগতম।', 'Logged in successfully! Welcome.'],
+    ['লগইন সফল হয়েছে! স্বাগতম।', 'Login successful! Welcome.'],
+    ['ভুল ইউজারনেম/ইমেইল অথবা পাসওয়ার্ড! তথ্য যাচাই করে পুনরায় চেষ্টা করুন।', 'Wrong username/email or password! Please check and try again.'],
+    ['ভুল ইউজারনেম/ইমেইল অথবা পাসওয়ার্ড!', 'Wrong username/email or password!'],
+    ['লগইন ব্যর্থ:', 'Login failed:'],
+    ['🎉 অভিনন্দন! অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।', '🎉 Congratulations! Account created successfully.'],
+    ['রেজিস্ট্রেশন ত্রুটি:', 'Registration error:'],
+    ['আপনার নিবন্ধিত ইমেইল এড্রেস লিখুন:', 'Enter your registered email address:'],
+    ['আপনার অ্যাকাউন্টের রেজিস্টার্ড ইমেইল এড্রেস লিখুন:', 'Enter your account\u2019s registered email address:'],
+    ['পাসওয়ার্ড রিসেট লিংক আপনার ইমেইলে পাঠানো হয়েছে।', 'Password reset link has been sent to your email.'],
+    ['রিসেট ত্রুটি:', 'Reset error:'],
+    ['ইউজারনেম/ইমেইল এবং পাসওয়ার্ড লিখুন', 'Enter username/email and password'],
+    ['অ্যাডমিন কর্তৃক নতুন রেজিস্ট্রেশন সাময়িক বন্ধ রাখা হয়েছে।', 'New registration is temporarily disabled by admin.'],
+    ['ইউজারনেম ও পূর্ণ নাম লিখুন', 'Enter username and full name'],
+    ['পাসওয়ার্ড ও কনফার্ম পাসওয়ার্ড মেলেনি!', 'Password and confirm password do not match!'],
+    ['সঠিক ইউজারনেম প্রদান করুন (কমপক্ষে ৩ অক্ষর)', 'Enter a valid username (at least 3 characters)'],
+    ['সবগুলো আবশ্যক ফিল্ড পূরণ করুন', 'Fill in all required fields'],
+    ['অ্যাকাউন্ট তৈরি হচ্ছে...', 'Creating account...'],
+    ['দুঃখিত!', 'Sorry!', 'p'],
+    ['ইউজারনেমটি আগে থেকেই রয়েছে।', 'is already taken.', 'p'],
+    ['অন্য একটি দিন।', 'Please choose another.', 'p'],
+    ['ইউজারনেমটি ইতিমধ্যে নেওয়া হয়েছে।', 'is already taken.', 'p'],
+    ['অন্য একটি ইউনিক নাম দিন।', 'Please choose another unique name.', 'p'],
+    ['এই ইমেইল দিয়ে ইতিমধ্যে অ্যাকাউন্ট খোলা আছে!', 'An account already exists with this email!'],
+    ['সার্ভার প্রস্তুত নয়, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন', 'Server is not ready, please try again in a moment'],
+    ['⚠️ আপনার অ্যাকাউন্টটি সাময়িক স্থগিত (Suspended) করা হয়েছে।', '⚠️ Your account has been temporarily suspended.'],
+    ['১ ঘণ্টা কোনো কাজ না করায় স্বয়ংক্রিয়ভাবে লগআউট হয়েছে। আবার লগইন করুন।', 'You were automatically logged out after 1 hour of inactivity. Please log in again.'],
+
+    // ---- Time words ----
+    ['ঘণ্টা', 'hr', 'x'],
+    ['মিনিট', 'min', 'x'],
+
+    // ---- Install banner ----
+    ['NP TOURNAMENT অ্যাপ ইনস্টল করুন', 'Install NP TOURNAMENT App'],
+    ['আপনার ফোনে ইনস্টল করে আরও দ্রুত খেলুন', 'Install on your phone and play faster'],
+    ['ইনস্টল', 'Install', 'x'],
+    ['Safari-তে Share (⬆️) চাপুন → "Add to Home Screen" সিলেক্ট করুন', 'In Safari tap Share (⬆️) → select "Add to Home Screen"'],
+    ['ব্রাউজারের মেনু (⋮) চাপুন → "Install app" বা "Add to Home screen" সিলেক্ট করুন', 'Tap the browser menu (⋮) → select "Install app" or "Add to Home screen"']
+  ];
+
+  var EXACT = Object.create(null);
+  var PHR = [];
+  PAIRS.forEach(function (p) {
+    var k = norm(p[0]), v = p[1], f = p[2] || '';
+    EXACT[k] = v;
+    if (f === 'p' || (f !== 'x' && k.length >= 7)) PHR.push([k, v]);
+  });
+  PHR.sort(function (a, b) { return b[0].length - a[0].length; });
+
+  var RX = [
+    [/আপনি কি ৳([\d.,]+) এন্ট্রি ফি দিয়ে "(.*)" টুর্নামেন্টে অংশগ্রহণ করতে চান\?/g, 'Join the "$2" tournament with an entry fee of ৳$1?'],
+    [/^(\d+) টি \((\d+) অপঠিত\)$/, '$1 ($2 unread)'],
+    [/^(\d+) টি$/, '$1 items'],
+    [/(\d+)\s*ঘণ্টা/g, '$1 hr'],
+    [/(\d+)\s*মিনিট/g, '$1 min'],
+    [/(\d)\s*টাকা/g, '$1 BDT']
+  ];
+
+  // Translate one string (keeps leading/trailing whitespace). Returns same string if nothing matches.
+  function translate(str) {
+    if (typeof str !== 'string' || !HAS_BN.test(str)) return str;
+    var m = str.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    var lead = m[1], core = m[2], trail = m[3];
+    var n = norm(core);
+    if (EXACT[n] !== undefined) return lead + EXACT[n] + trail;
+    var out = n, changed = false, i;
+    for (i = 0; i < PHR.length; i++) {
+      if (out.indexOf(PHR[i][0]) > -1) { out = out.split(PHR[i][0]).join(PHR[i][1]); changed = true; }
+    }
+    for (i = 0; i < RX.length; i++) {
+      var o2 = out.replace(RX[i][0], RX[i][1]);
+      if (o2 !== out) { out = o2; changed = true; }
+    }
+    if (changed) return lead + out.replace(/\u0964/g, '.') + trail;
+    if (!HAS_LETTER.test(core)) return lead + nd(core) + trail; // only Bangla digits / symbols
+    return str;
+  }
+
+  root.NPI18N_translate = translate;
+  if (typeof document === 'undefined') return; // node test mode
+
+  /* ---------------- DOM layer ---------------- */
+  var lang = 'en';
+  try { lang = localStorage.getItem(KEY) === 'bn' ? 'bn' : 'en'; } catch (e) {}
+
+  var ATTRS = ['placeholder', 'title', 'aria-label', 'alt'];
+  var tmap = new Map();   // text node -> {orig, tr}
+  var amap = new Map();   // element -> {attr: {orig, tr}}
+
+  function skipEl(el) {
+    if (!el || el.nodeType !== 1) return false;
+    var tag = el.nodeName;
+    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEXTAREA' || tag === 'NOSCRIPT') return true;
+    return !!(el.closest && el.closest('[data-no-i18n]'));
+  }
+
+  function procText(node) {
+    var v = node.nodeValue;
+    var r = tmap.get(node);
+    if (r && v !== r.tr) { tmap.delete(node); r = null; }
+    if (lang !== 'en' || !v || !HAS_BN.test(v)) return;
+    var p = node.parentNode;
+    if (!p || skipEl(p)) return;
+    var t = translate(v);
+    if (t !== v) { tmap.set(node, { orig: v, tr: t }); node.nodeValue = t; }
+  }
+
+  function procAttr(el, name) {
+    var v = el.getAttribute(name);
+    var rec = amap.get(el);
+    if (rec && rec[name] && v !== rec[name].tr) { delete rec[name]; }
+    if (lang !== 'en' || !v || !HAS_BN.test(v)) return;
+    if (skipEl(el)) return;
+    var t = translate(v);
+    if (t !== v) {
+      rec = amap.get(el) || {};
+      rec[name] = { orig: v, tr: t };
+      amap.set(el, rec);
+      el.setAttribute(name, t);
+    }
+  }
+
+  function scan(root0) {
+    if (!root0) return;
+    if (root0.nodeType === 3) { procText(root0); return; }
+    if (root0.nodeType !== 1 && root0.nodeType !== 9 && root0.nodeType !== 11) return;
+    if (root0.nodeType === 1) {
+      if (skipEl(root0)) return;
+      ATTRS.forEach(function (a) { if (root0.hasAttribute(a)) procAttr(root0, a); });
+    }
+    var w = document.createTreeWalker(root0, NodeFilter.SHOW_TEXT, null);
+    var n, list = [];
+    while ((n = w.nextNode())) list.push(n);
+    list.forEach(procText);
+    if (root0.querySelectorAll) {
+      root0.querySelectorAll('[placeholder],[title],[aria-label],[alt]').forEach(function (el) {
+        ATTRS.forEach(function (a) { if (el.hasAttribute(a)) procAttr(el, a); });
+      });
+    }
+  }
+
+  function restoreAll() {
+    tmap.forEach(function (r, node) { if (node.isConnected && node.nodeValue === r.tr) node.nodeValue = r.orig; });
+    tmap.clear();
+    amap.forEach(function (rec, el) {
+      Object.keys(rec).forEach(function (a) { if (el.isConnected && el.getAttribute(a) === rec[a].tr) el.setAttribute(a, rec[a].orig); });
+    });
+    amap.clear();
+  }
+
+  var mo = new MutationObserver(function (list) {
+    list.forEach(function (m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function (n) { scan(n); });
+      } else if (m.type === 'characterData') {
+        procText(m.target);
+      } else if (m.type === 'attributes') {
+        procAttr(m.target, m.attributeName);
+      }
+    });
+    if (tmap.size > 6000) tmap.forEach(function (r, n) { if (!n.isConnected) tmap.delete(n); });
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  function syncPills() {
+    document.querySelectorAll('[data-np-lang]').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-np-lang') === lang);
+    });
+  }
+
+  function setLang(l) {
+    l = l === 'bn' ? 'bn' : 'en';
+    var changed = l !== lang;
+    lang = l;
+    try { localStorage.setItem(KEY, l); } catch (e) {}
+    document.documentElement.lang = l;
+    if (l === 'en') { if (document.body) scan(document.body); } else { restoreAll(); }
+    syncPills();
+    return changed;
+  }
+
+  root.NPI18N = {
+    translate: translate,
+    lang: function () { return lang; },
+    setLang: setLang,
+    scan: scan
+  };
+  root.npT = function (s) { return lang === 'en' ? translate(String(s)) : s; };
+  root.npLocale = function () { return lang === 'bn' ? 'bn-BD' : 'en-GB'; };
+
+  ['alert', 'confirm', 'prompt'].forEach(function (name) {
+    var orig = root[name];
+    if (typeof orig !== 'function') return;
+    root[name] = function (msg) {
+      var a = Array.prototype.slice.call(arguments);
+      if (lang === 'en' && typeof msg === 'string') a[0] = translate(msg);
+      return orig.apply(root, a);
+    };
+  });
+
+  document.documentElement.lang = lang;
+  document.addEventListener('DOMContentLoaded', function () {
+    if (lang === 'en' && document.body) scan(document.body);
+    syncPills();
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
 </head>
 <body data-theme="dark">
 
@@ -2096,6 +2617,7 @@
     <div style="width: 100%; max-width: 440px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 26px 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden;">
       
       <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #f59e0b, #ef4444, #f59e0b);"></div>
+      <div class="np-lang-seg" data-no-i18n style="position:absolute;top:12px;right:12px;z-index:3"><button type="button" data-np-lang="en" onclick="window.app.setLanguage('en')">EN</button><button type="button" data-np-lang="bn" onclick="window.app.setLanguage('bn')">বাংলা</button></div>
 
       <div style="text-align: center; margin-bottom: 20px;">
         <div style="width: 52px; height: 52px; margin: 0 auto 10px; background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; color: #000; box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35);">
@@ -2457,11 +2979,11 @@
           <div class="tx-left">
             <div class="tx-icon-box tx-entry">🌐</div>
             <div>
-              <div class="tx-title" id="menuLangText">ভাষা পরিবর্তন (বাংলা / English)</div>
-              <div class="tx-date" id="menuLangSub">বর্তমান ভাষা: বাংলা (English করতে ট্যাপ করুন)</div>
+              <div class="tx-title" id="menuLangText" data-no-i18n>ভাষা পরিবর্তন (বাংলা / English)</div>
+              <div class="tx-date" id="menuLangSub" data-no-i18n>বর্তমান ভাষা: বাংলা (English করতে ট্যাপ করুন)</div>
             </div>
           </div>
-          <span style="font-size:12px; color:var(--color-primary); font-weight:700;" id="menuLangBadge">বাংলা ❯</span>
+          <span style="font-size:12px; color:var(--color-primary); font-weight:700;" id="menuLangBadge" data-no-i18n>বাংলা ❯</span>
         </div>
 
         <!-- Support Helpline (অ্যাডমিন প্যানেল থেকে সেট করা নাম্বার; খালি থাকলে লুকানো থাকে) -->
@@ -2528,6 +3050,7 @@
         <h2 id="authModalHeader" style="margin: 0; font-size: 20px; font-weight: 800; color: #ffffff; font-family: var(--font-bengali); letter-spacing: -0.2px;">
           লগইন করুন
         </h2>
+        <div class="np-lang-seg" data-no-i18n style="margin-left:auto;margin-right:10px"><button type="button" data-np-lang="en" onclick="window.app.setLanguage('en')">EN</button><button type="button" data-np-lang="bn" onclick="window.app.setLanguage('bn')">বাংলা</button></div>
         <button type="button" id="authModalCloseBtn" onclick="window.app.closeModal('modalAuth')" aria-label="Close" style="width: 32px; height: 32px; border-radius: 50%; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.14); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; transition: all 0.2s ease;">
           ✕
         </button>
@@ -2975,7 +3498,7 @@
     }
 
     const state = {
-      currentLang: localStorage.getItem('NP_APP_LANG') || 'bn',
+      currentLang: localStorage.getItem('NP_APP_LANG') === 'bn' ? 'bn' : 'en',
       currentUser: null,
       userData: {
         uid: '',
@@ -3070,7 +3593,7 @@
       // 1. Android Native Notification Panel Bridge (triggers Android Notification shade with SMS-style sound & vibration)
       try {
         if (window.Android && typeof window.Android.showSystemNotification === 'function') {
-          window.Android.showSystemNotification(title, body || 'নতুন নোটিফিকেশন এসেছে');
+          window.Android.showSystemNotification(title, body || (window.npT ? window.npT('নতুন নোটিফিকেশন এসেছে') : 'নতুন নোটিফিকেশন এসেছে'));
         }
       } catch (e) {
         console.warn('Android bridge notification error:', e);
@@ -3082,7 +3605,7 @@
           if (navigator.serviceWorker && navigator.serviceWorker.ready) {
             navigator.serviceWorker.ready.then(reg => {
               reg.showNotification(title, {
-                body: body || 'নতুন নোটিফিকেশন এসেছে',
+                body: body || (window.npT ? window.npT('নতুন নোটিফিকেশন এসেছে') : 'নতুন নোটিফিকেশন এসেছে'),
                 icon: './icon-192.png',
                 badge: './icon-192.png',
                 vibrate: [200, 100, 200]
@@ -3478,7 +4001,7 @@
             const net = curBal - (Number(s.entryBalance) || 0);
             await db.ref(`game_sessions/${sessionId}`).update({
               endTime: end,
-              endFormatted: new Date(end).toLocaleString('bn-BD'),
+              endFormatted: new Date(end).toLocaleString(window.npLocale ? window.npLocale() : 'bn-BD'),
               exitBalance: curBal,
               netWinLoss: net,
               duration: durText,
@@ -3539,7 +4062,7 @@
             gameName,
             gameUrl: url,
             startTime: Date.now(),
-            startFormatted: new Date().toLocaleString('bn-BD'),
+            startFormatted: new Date().toLocaleString(window.npLocale ? window.npLocale() : 'bn-BD'),
             endTime: null,
             duration: 'চলছে (Playing)',
             entryBalance: entryBal,
@@ -4792,7 +5315,7 @@
           amount: entryFee,
           beforeBal: freshBal,
           afterBal: newBal,
-          date: new Date().toLocaleString('bn-BD'),
+          date: new Date().toLocaleString(window.npLocale ? window.npLocale() : 'bn-BD'),
           timestamp: firebase.database.ServerValue.TIMESTAMP,
           tournamentId,
           tournamentTitle: t.title,
@@ -5020,7 +5543,7 @@
             amount,
             beforeBal: state.userData.balance,
             afterBal: newBal,
-            date: new Date().toLocaleString('bn-BD'),
+            date: new Date().toLocaleString(window.npLocale ? window.npLocale() : 'bn-BD'),
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             note: `Withdrawal request of ৳${amount} to ${receiverNumber} (${method})`
           };
@@ -5162,7 +5685,7 @@
                 <div class="tx-icon-box ${isDep ? 'tx-deposit' : 'tx-withdraw'}">${isDep ? '↓' : '↑'}</div>
                 <div>
                   <div class="tx-title">${isDep ? 'ডিপোজিট' : 'উইথড্র'} রিকোয়েস্ট${r.method ? ' (' + escapeHtml(String(r.method)) + ')' : ''}</div>
-                  <div class="tx-date">${it.ts ? new Date(it.ts).toLocaleString('bn-BD') : 'সম্প্রতি'}</div>
+                  <div class="tx-date">${it.ts ? new Date(it.ts).toLocaleString(window.npLocale ? window.npLocale() : 'bn-BD') : 'সম্প্রতি'}</div>
                   ${noteText ? `<div class="tx-date" style="margin-top:2px;">${escapeHtml(String(noteText))}</div>` : ''}
                 </div>
               </div>
@@ -5508,7 +6031,8 @@
     };
 
     function applyLanguage(lang) {
-      state.currentLang = lang || 'bn';
+      state.currentLang = lang === 'bn' ? 'bn' : 'en';
+      if (window.NPI18N) window.NPI18N.setLang(state.currentLang);
       const isBn = state.currentLang === 'bn';
       const t = USER_TRANSLATIONS[isBn ? 'bn' : 'en'];
 
@@ -5583,6 +6107,12 @@
       renderTournamentsFeed();
       renderMyMatchesFeed();
       initHeroSlider();
+    }
+
+    function setLanguage(lang) {
+      state.currentLang = lang === 'bn' ? 'bn' : 'en';
+      localStorage.setItem('NP_APP_LANG', state.currentLang);
+      applyLanguage(state.currentLang);
     }
 
     function toggleLanguage() {
@@ -5920,6 +6450,7 @@
       closeModal,
       toggleTheme,
       toggleLanguage,
+      setLanguage,
       copyText,
       goToSlide,
       playGameUrl,
