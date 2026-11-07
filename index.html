@@ -3591,6 +3591,18 @@
         saveUserCache();
       });
 
+      // ইউজারের নিজের ডিপোজিট/উইথড্র রিকোয়েস্ট (স্ট্যাটাস দেখানোর জন্য, শুধু গত ৭ দিন দেখানো হয়)
+      db.ref('depositRequests').orderByChild('uid').equalTo(uid).limitToLast(30).on('value', (snap) => {
+        const val = snap.val() || {};
+        npDepReqs = Object.keys(val).map(k => ({ id: k, ...val[k] }));
+        renderTxHistoryFeed();
+      }, () => {});
+      db.ref('withdrawalRequests').orderByChild('uid').equalTo(uid).limitToLast(30).on('value', (snap) => {
+        const val = snap.val() || {};
+        npWdReqs = Object.keys(val).map(k => ({ id: k, ...val[k] }));
+        renderTxHistoryFeed();
+      }, () => {});
+
       db.ref('notifications').on('value', (snap) => {
         let list = [];
         if (snap.exists()) {
@@ -3898,6 +3910,8 @@
             state.transactions = [];
             state.notifications = [];
             state.userReads = {};
+            npDepReqs = [];
+            npWdReqs = [];
             updateNotificationsUI();
             updateAuthStateUI();
             renderTxHistoryFeed();
@@ -3945,6 +3959,65 @@
       }
     }
 
+    // ===== FAST LOGIN HELPERS (username lookup) =====
+    // আগে ইউজারনেম খোঁজা হতো মেইন Firebase সকেটে, যেখানে আগে থেকেই অনেক বড় ডাটা (games, tournaments, banners...) লোড হচ্ছিল,
+    // তাই লগইন/সাইনআপে ক্লিক করলে অনেকক্ষণ আটকে থাকত। এখন আলাদা দ্রুত REST রিকোয়েস্ট ব্যবহার হয়, আর ইউজারনেম→ইমেইল ডিভাইসে মনে রাখা হয়।
+    function npWithTimeout(promise, ms) {
+      return new Promise((resolve, reject) => {
+        const t = setTimeout(() => reject(new Error('সংযোগে দেরি হচ্ছে, ইন্টারনেট চেক করে আবার চেষ্টা করুন')), ms);
+        promise.then(v => { clearTimeout(t); resolve(v); }, e => { clearTimeout(t); reject(e); });
+      });
+    }
+
+    async function npFetchUsernameRecord(cleanUser) {
+      const wrap = (data) => ({ exists: () => data !== null && data !== undefined, val: () => data });
+      try {
+        const base = String(FIREBASE_CONFIG.databaseURL || '').replace(/\/$/, '');
+        const controller = new AbortController();
+        const tid = setTimeout(() => controller.abort(), 6000);
+        const res = await fetch(`${base}/usernames/${encodeURIComponent(cleanUser)}.json`, { signal: controller.signal, cache: 'no-store' });
+        clearTimeout(tid);
+        if (res.ok) {
+          const data = await res.json();
+          return wrap(data);
+        }
+      } catch (e) { /* REST ব্যর্থ হলে নিচে আগের পদ্ধতিতে চেষ্টা হবে */ }
+      const snap = await npWithTimeout(db.ref(`usernames/${cleanUser}`).once('value'), 12000);
+      return wrap(snap.exists() ? snap.val() : null);
+    }
+
+    async function npResolveLoginEmail(userInput) {
+      if (userInput.includes('@')) return { email: userInput, fromCache: false, cleanUser: '' };
+      const cleanUser = userInput.toLowerCase().replace(/[^a-z0-9_]/g, '');
+      try {
+        const cached = localStorage.getItem('np_uname_' + cleanUser);
+        if (cached) return { email: cached, fromCache: true, cleanUser };
+      } catch (e) {}
+      let email = `${cleanUser}@npapp.local`;
+      const snap = await npFetchUsernameRecord(cleanUser);
+      if (snap.exists() && snap.val() && snap.val().email) email = snap.val().email;
+      return { email, fromCache: false, cleanUser };
+    }
+
+    async function npSmartSignIn(userInput, pass) {
+      let r = await npResolveLoginEmail(userInput);
+      try {
+        await auth.signInWithEmailAndPassword(r.email, pass);
+      } catch (err) {
+        const bad = err && (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password');
+        if (r.fromCache && bad) {
+          // মনে রাখা ইমেইল পুরনো হয়ে থাকতে পারে — একবার নতুন করে খুঁজে দেখি
+          try { localStorage.removeItem('np_uname_' + r.cleanUser); } catch (e) {}
+          const fresh = await npResolveLoginEmail(userInput);
+          if (fresh.email !== r.email) {
+            await auth.signInWithEmailAndPassword(fresh.email, pass);
+            r = fresh;
+          } else { throw err; }
+        } else { throw err; }
+      }
+      if (r.cleanUser) { try { localStorage.setItem('np_uname_' + r.cleanUser, r.email); } catch (e) {} }
+    }
+
     async function handleGateLoginSubmit(e) {
       e.preventDefault();
       const userInput = document.getElementById('gateLoginEmail').value.trim();
@@ -3965,17 +4038,7 @@
 
       if (auth && db) {
         try {
-          let resolvedEmail = userInput;
-          if (!userInput.includes('@')) {
-            const cleanUser = userInput.toLowerCase().replace(/[^a-z0-9_]/g, '');
-            const snap = await db.ref(`usernames/${cleanUser}`).once('value');
-            if (snap.exists() && snap.val() && snap.val().email) {
-              resolvedEmail = snap.val().email;
-            } else {
-              resolvedEmail = `${cleanUser}@npapp.local`;
-            }
-          }
-          await auth.signInWithEmailAndPassword(resolvedEmail, pass);
+          await npSmartSignIn(userInput, pass);
           returnToHomeFromGate();
           showToast('সফলভাবে লগইন হয়েছে! স্বাগতম।', 'success');
         } catch (err) {
@@ -4025,7 +4088,7 @@
 
       if (auth && db) {
         try {
-          const uSnap = await db.ref(`usernames/${cleanUsername}`).once('value');
+          const uSnap = await npFetchUsernameRecord(cleanUsername);
           if (uSnap.exists()) {
             showGateAlert(`দুঃখিত! "${cleanUsername}" ইউজারনেমটি ইতিমধ্যে নেওয়া হয়েছে। অন্য একটি ইউনিক নাম দিন।`);
             if (btn) {
@@ -4260,7 +4323,7 @@
             const email = emailInput.includes('@') ? emailInput : `${cleanUser}@npapp.local`;
 
             if (db && cleanUser) {
-              const uSnap = await db.ref(`usernames/${cleanUser}`).once('value');
+              const uSnap = await npFetchUsernameRecord(cleanUser);
               if (uSnap.exists()) {
                 showToast(`দুঃখিত! "${cleanUser}" ইউজারনেমটি আগে থেকেই রয়েছে। অন্য একটি দিন।`, 'error');
                 btn.disabled = false;
@@ -4298,17 +4361,7 @@
             if (appRoot) appRoot.style.display = 'block';
             closeModal('modalAuth');
           } else {
-            let resolvedEmail = emailInput;
-            if (!emailInput.includes('@') && db) {
-              const cleanUser = emailInput.toLowerCase().replace(/[^a-z0-9_]/g, '');
-              const snap = await db.ref(`usernames/${cleanUser}`).once('value');
-              if (snap.exists() && snap.val() && snap.val().email) {
-                resolvedEmail = snap.val().email;
-              } else {
-                resolvedEmail = `${cleanUser}@npapp.local`;
-              }
-            }
-            await auth.signInWithEmailAndPassword(resolvedEmail, password);
+            await npSmartSignIn(emailInput, password);
             showToast('লগইন সফল হয়েছে! স্বাগতম।', 'success');
             const appRoot = document.getElementById('app-root');
             if (appRoot) appRoot.style.display = 'block';
@@ -4942,41 +4995,109 @@
       }
     }
 
+    // --- লেনদেন হিস্ট্রি: শুধু গত ৭ দিন দেখানো হয় + ডিপোজিট/উইথড্র রিকোয়েস্টের স্ট্যাটাস ---
+    let npDepReqs = [];
+    let npWdReqs = [];
+    const NP_HISTORY_MS = 7 * 24 * 60 * 60 * 1000;
+
+    function npItemTs(o) {
+      const t = o && (o.timestamp || o.createdAt || o.time);
+      return typeof t === 'number' ? t : 0;
+    }
+
+    function npWithin7Days(o) {
+      const t = npItemTs(o);
+      return !t || (Date.now() - t) <= NP_HISTORY_MS;
+    }
+
+    function npReqStatusInfo(status) {
+      const v = String(status || '').trim().toLowerCase();
+      if (v === 'pending' || v === 'waiting') return { label: '🕒 পেন্ডিং — অ্যাডমিনের যাচাইয়ের অপেক্ষায়', color: '#f59e0b' };
+      if (['processing', 'in_progress', 'in progress', 'review', 'under review', 'under_review'].includes(v)) return { label: '⚙️ প্রসেসিং চলছে', color: '#3b82f6' };
+      if (['approved', 'completed', 'complete', 'success', 'successful', 'paid', 'done', 'accepted'].includes(v)) return { label: '✅ সম্পন্ন হয়েছে', color: '#10b981' };
+      if (['rejected', 'cancelled', 'canceled', 'failed', 'declined', 'refunded'].includes(v)) return { label: '❌ বাতিল হয়েছে', color: '#ef4444' };
+      return { label: escapeHtml(String(status || 'Pending')), color: '#94a3b8' };
+    }
+
     function renderTxHistoryFeed() {
       const feed = document.getElementById('txHistoryFeed');
       if (!feed) return;
 
-      if (state.transactions.length === 0) {
+      // ৭ দিনের পুরনো লেনদেন আর দেখানো হয় না; একই উইথড্রের রিকোয়েস্ট কার্ড থাকলে ডুপ্লিকেট লাইন লুকানো হয়
+      const txList = (state.transactions || []).filter(npWithin7Days).filter(tx => {
+        if (tx.type !== 'WITHDRAW_REQUEST') return true;
+        return !npWdReqs.some(r => Number(r.amount) === Number(tx.amount) && Math.abs(npItemTs(r) - npItemTs(tx)) < 120000);
+      });
+
+      const reqs = [
+        ...npDepReqs.map(r => ({ ...r, _kind: 'deposit' })),
+        ...npWdReqs.map(r => ({ ...r, _kind: 'withdraw' }))
+      ].filter(npWithin7Days).sort((a, b) => npItemTs(b) - npItemTs(a));
+
+      if (txList.length === 0 && reqs.length === 0) {
         feed.innerHTML = `
           <div class="empty-state">
             <div class="empty-title">কোনো লেনদেন হিস্ট্রি নেই</div>
-            <div class="empty-desc">ডিপোজিট, উইথড্র ও টুর্নামেন্ট জয়েনিংয়ের বিবরণ এখানে প্রদর্শিত হবে।</div>
+            <div class="empty-desc">ডিপোজিট, উইথড্র ও টুর্নামেন্ট জয়েনিংয়ের বিবরণ এখানে প্রদর্শিত হবে (শুধু গত ৭ দিনের)।</div>
           </div>
         `;
         return;
       }
 
-      feed.innerHTML = state.transactions.map(tx => {
-        const isDep = tx.type && (tx.type.includes('DEPOSIT') || tx.type.includes('CREDIT') || tx.type.includes('PRIZE'));
-        return `
-          <div class="tx-item">
-            <div class="tx-left">
-              <div class="tx-icon-box ${isDep ? 'tx-deposit' : 'tx-withdraw'}">
-                ${isDep ? '↓' : '↑'}
+      const headStyle = 'font-size:12px; font-weight:700; color:var(--text-secondary); margin:6px 2px 8px;';
+
+      const reqHtml = reqs.length === 0 ? '' : `
+        <div style="${headStyle}">ডিপোজিট / উইথড্র রিকোয়েস্ট স্ট্যাটাস (গত ৭ দিন)</div>
+        ${reqs.map(r => {
+          const isDep = r._kind === 'deposit';
+          const st = npReqStatusInfo(r.status);
+          const t = npItemTs(r);
+          const noteText = r.adminNote || r.rejectReason || r.reason || '';
+          return `
+            <div class="tx-item">
+              <div class="tx-left">
+                <div class="tx-icon-box ${isDep ? 'tx-deposit' : 'tx-withdraw'}">${isDep ? '↓' : '↑'}</div>
+                <div>
+                  <div class="tx-title">${isDep ? 'ডিপোজিট' : 'উইথড্র'} রিকোয়েস্ট${r.method ? ' (' + escapeHtml(String(r.method)) + ')' : ''}</div>
+                  <div class="tx-date">${t ? new Date(t).toLocaleString('bn-BD') : 'সম্প্রতি'}</div>
+                  ${noteText ? `<div class="tx-date" style="margin-top:2px;">${escapeHtml(String(noteText))}</div>` : ''}
+                </div>
               </div>
-              <div>
-                <div class="tx-title">${escapeHtml(tx.note || tx.type)}</div>
-                <div class="tx-date">${tx.date || 'সম্প্রতি'}</div>
+              <div style="text-align:right;">
+                <div class="t-val" style="font-size:15px; color:${isDep ? '#10b981' : '#ef4444'};">${isDep ? '+' : '-'} ৳ ${escapeHtml(String(r.amount))}</div>
+                <div style="font-size:11px; font-weight:700; margin-top:3px; color:${st.color};">${st.label}</div>
               </div>
             </div>
-            <div style="text-align:right;">
-              <div class="t-val" style="font-size:15px; color:${isDep ? '#10b981' : '#ef4444'};">
-                ${isDep ? '+' : '-'} ৳ ${tx.amount}
+          `;
+        }).join('')}
+      `;
+
+      const txHtml = txList.length === 0 ? '' : `
+        ${reqs.length ? `<div style="${headStyle} margin-top:14px;">লেনদেন (গত ৭ দিন)</div>` : ''}
+        ${txList.map(tx => {
+          const isDep = tx.type && (tx.type.includes('DEPOSIT') || tx.type.includes('CREDIT') || tx.type.includes('PRIZE'));
+          return `
+            <div class="tx-item">
+              <div class="tx-left">
+                <div class="tx-icon-box ${isDep ? 'tx-deposit' : 'tx-withdraw'}">
+                  ${isDep ? '↓' : '↑'}
+                </div>
+                <div>
+                  <div class="tx-title">${escapeHtml(tx.note || tx.type)}</div>
+                  <div class="tx-date">${tx.date || 'সম্প্রতি'}</div>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <div class="t-val" style="font-size:15px; color:${isDep ? '#10b981' : '#ef4444'};">
+                  ${isDep ? '+' : '-'} ৳ ${tx.amount}
+                </div>
               </div>
             </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('')}
+      `;
+
+      feed.innerHTML = reqHtml + txHtml;
     }
 
     // --- Helpers & Modals ---
