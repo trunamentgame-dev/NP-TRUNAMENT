@@ -436,6 +436,7 @@ function softTick(c){
     out.connect(lp);lp.connect(AC.destination);
   }catch(e){}
 }
+function goChime(){beep(784,.5,.05);setTimeout(()=>beep(1175,.9,.06),110)}
 function confetti(){const cf=$('cf'),cols=['#fbbf24','#ef4444','#3b82f6','#a855f7','#10b981','#fff'];let h='';for(let i=0;i<46;i++)h+=`<i style="left:${Math.random()*100}%;background:${cols[i%6]};animation-duration:${1.8+Math.random()*1.8}s;animation-delay:${Math.random()*.5}s"></i>`;cf.innerHTML=h;setTimeout(()=>cf.innerHTML='',4200)}
 function winPop(w){confetti();$('popAmt').textContent=money(w);$('pop').classList.add('on');[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,i===3?1.1:.55,.06),i*130));clearTimeout(popT);popT=setTimeout(()=>$('pop').classList.remove('on'),3500)}
 if($('btnBets'))$('btnBets').onclick=()=>{renderTable();$('betPop').classList.add('on')};
@@ -473,7 +474,7 @@ function draw(t){
   const gl=x.createLinearGradient(0,R*.15,0,R*1.05);gl.addColorStop(0,'rgba(255,255,255,.2)');gl.addColorStop(.55,'rgba(255,255,255,.03)');gl.addColorStop(1,'rgba(255,255,255,0)');
   x.beginPath();x.ellipse(R,R*.66,wr*.8,wr*.52,0,0,7);x.fillStyle=gl;x.fill();
 }
-let lastDraw=0;(function loop(t){if(t-lastDraw>33){lastDraw=t;draw(t)}requestAnimationFrame(loop)})(0);
+let lastDraw=0;(function loop(t){if(t-lastDraw>(S.spinning?10:33)){lastDraw=t;draw(t)}requestAnimationFrame(loop)})(0);
 
 /* কাঁটার দোলা (রিয়েল পেগ-ফিজিক্স): চাকার প্রতিটি ঘরের দাগ (পেগ) কাঁটাকে ঠেলে সরায়, দাগ পার হলেই কাঁটা স্প্রিংয়ে ঝট করে ফিরে আসে।
    ধীর হলে স্পষ্ট দেখা যায় কাঁটা দাগের সাথে সরে সরে এক ঘর থেকে আরেক ঘরে যাচ্ছে; দ্রুত হলে হালকা কাঁপে */
@@ -492,22 +493,24 @@ function ptrStep(now){
 }
 function spinTo(seg,dur){
   const n=S.layout.length,st=2*Math.PI/n,TAU=2*Math.PI,base=-((seg+.5)*st)+(Math.random()-.5)*st*.24,from=S.rot;
-  const d=(((base-from)%TAU)+TAU)%TAU,to=from+d+TAU*6,t0=performance.now();let lastTick=Math.floor(from/st),prevRot=from,prevT=t0,dirv=1;
-  /* ওঠানামা বন্ধ: চাকা শুধু সামনে ঘুরে ধীরে ধীরে মসৃণভাবে জেতা ঘরের মাঝে থামে (settle=true করলে আবার শেষে ওঠানামা চালু হবে) */
-  const settle=false,setDur=settle?1700:0,mainDur=dur-setDur,A=settle?1.1*st:0,OM=6.6,LAM=.142*OM,mainTo=to+A;
-  function finish(){PT.tg=0;ptrGo();const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}
-  (function f(now){const el=Math.max(0,now-t0);let done=false;
-    if(el<mainDur){const p=el/mainDur,e=1-Math.pow(1-p,4);S.rot=from+(mainTo-from)*e}
-    else if(settle&&el<dur){const tau=(el-mainDur)/1000,s=(el-mainDur)/setDur;S.rot=to+A*Math.exp(-LAM*tau)*Math.cos(OM*tau)*(1-s*s*s)}
+  const d=(((base-from)%TAU)+TAU)%TAU,t0=performance.now();let lastTick=Math.floor(from/st),prevRot=from,prevT=t0,dirv=1;
+  /* শুধু এক দিকে ঘোরে, কখনো উল্টো নয়। শুরুতে ০.৬ সেকেন্ডে মসৃণভাবে গতি ওঠে, তারপর ধীরে ধীরে কমে জেতা ঘরের মাঝে থামে।
+     সর্বোচ্চ গতি VCAP-এ আটকানো, তাই খুব দ্রুত ঘুরে উল্টো ঘুরছে বলে ভুল দেখায় না (wagon-wheel ইফেক্ট) */
+  const VCAP=6.5,tu=Math.min(.6,dur/4000),T=dur/1000,K=tu/2+(T-tu)/3;
+  const N=Math.max(0,Math.floor((VCAP*K-d)/TAU)),D=d+TAU*N,Vm=D/K,to=from+D;
+  S.spinning=true;
+  if(dur>6500){S.goUntil=Date.now()+1000;goChime()}   /* ১০…১ এর পর "GO" */
+  function finish(){S.spinning=false;PT.tg=0;ptrGo();const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}
+  (function f(now){const t=Math.max(0,now-t0)/1000;let done=false;
+    if(t<tu)S.rot=from+Vm*(t/2-tu/(2*Math.PI)*Math.sin(Math.PI*t/tu));
+    else if(t<T){const q=(t-tu)/(T-tu);S.rot=from+Vm*tu/2+Vm*(T-tu)/3*(1-Math.pow(1-q,3))}
     else{S.rot=to;done=true}
+    if(S.rot<prevRot)S.rot=prevRot;                    /* কোনো অবস্থাতেই পিছনে যাবে না */
     const dts=Math.max(.001,(now-prevT)/1000),dr=S.rot-prevRot,speed=Math.abs(dr)/st/dts; /* সেকেন্ডে কয়টা দাগ পার হচ্ছে */
-    if(Math.abs(dr)>1e-6)dirv=dr>0?1:-1;
     if(!done){
       const u=S.rot/st,dd=u-Math.round(u),C=.35,amp=PT_MAX*Math.max(.2,Math.min(1,16/Math.max(speed,1)));
-      let tg=0;
-      if(dirv>0&&dd<0&&dd>-C)tg=-amp*(1+dd/C);        /* সামনে ঘুরছে: দাগ কাঁটাকে ডানে ঠেলে */
-      else if(dirv<0&&dd>0&&dd<C)tg=amp*(1-dd/C);     /* পিছনে ঘুরছে: দাগ কাঁটাকে বামে ঠেলে */
-      PT.tg=tg;ptrGo();
+      PT.tg=(dd<0&&dd>-C)?-amp*(1+dd/C):0;              /* দাগ কাঁটাকে ডানে ঠেলে, পার হলে ছেড়ে দেয় */
+      ptrGo();
     }
     const k=Math.floor(S.rot/st);if(k!==lastTick){lastTick=k;if(!done)pegTick(speed)}
     prevRot=S.rot;prevT=now;
@@ -576,7 +579,7 @@ function renderTable(){
 function tick(){
   const s=S.st;if(!s||!s.endsAt)return;
   const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:15000,spin:8000,result:5000}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on){zoomOut()}
-  {const c=Math.ceil(left/1000),show=(s.phase==='betting'&&c>=1&&c<=10);$('tm').textContent=show?c:'';
+  {const c=Math.ceil(left/1000),show=(s.phase==='betting'&&c>=1&&c<=10);$('tm').textContent=show?c:((S.goUntil||0)>Date.now()?'GO':'');
     /* ১০ থেকে ১ পর্যন্ত প্রতিটি সংখ্যায় টিক শব্দ; শেষ ৩ সেকেন্ডে চড়া সুর */
     if(show){if(S.lastCd!==c){S.lastCd=c;softTick(c)}}else S.lastCd=null}$('bar').style.width=(left/tot*100)+'%';
 }
