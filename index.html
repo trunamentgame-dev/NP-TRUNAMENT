@@ -4083,6 +4083,28 @@
       // সব গেম (এখনকার ও ভবিষ্যতে যোগ করা): নতুন উইন্ডো না খুলে একই উইন্ডোতে সরাসরি লোডিং → গেম
       const sameWindow = true;
       if (window.npShowLoad) window.npShowLoad(sameWindow);
+
+      // লোডিং চলা অবস্থাতেই: (১) তাজা টোকেন (২) ইউজারের লেটেস্ট ব্যালেন্স (৩) গেম সার্ভার জাগানো
+      // — এগুলো তৈরি হওয়ার পরেই গেমে যাবে (প্রতিটির সর্বোচ্চ অপেক্ষা সীমা আছে, তাই আটকে থাকবে না)
+      const npWait = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
+      try {
+        const tasks = [];
+        if (auth && auth.currentUser) {
+          tasks.push(npWait(auth.currentUser.getIdToken(true).then(t => { gameIdToken = t; }).catch(() => {}), 5000));
+          if (db) {
+            tasks.push(npWait(db.ref('users/' + auth.currentUser.uid + '/balance').once('value').then(snap => {
+              const b = snap.val();
+              if (typeof b === 'number' && state.userData) state.userData.balance = b;
+            }).catch(() => {}), 5000));
+          }
+        }
+        if (/crazytime/i.test(String(url))) {
+          tasks.push(npWait(fetch('https://crazytime-backend.onrender.com/health', { mode: 'no-cors', cache: 'no-store' }).catch(() => {}), 12000));
+        }
+        await Promise.all(tasks);
+      } catch (e) {}
+      if (window.npShowLoad) window.npShowLoad(true); // লোডিং টাইমার আবার ২০ সেকেন্ড
+
       let finalUrl = url;
       if (gameIdToken) {
         finalUrl = String(url).split('#')[0] + '#t=' + gameIdToken;
