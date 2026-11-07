@@ -1840,6 +1840,80 @@ select.pp-input option{background:#111d33;color:#fff}
 @media(max-width:350px){.pp-grid{gap:7px}.pp-card{padding:10px 3px 9px}.pp-account-number{font-size:20px}.pp-ring{width:80px;height:80px}.pp-timer-clock{font-size:23px}}
 </style>
 
+<style id="npThemeFix">
+/* wallet: admin promotions strip (inside dark wallet card) */
+#walletPromoStrip{display:none;margin:10px 0 4px}
+.np-ws-title{font-size:12px;font-weight:800;color:#fcd34d;margin-bottom:6px}
+.np-ws-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:12px;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(255,255,255,.04));border:1px solid rgba(245,158,11,.4);cursor:pointer}
+.np-ws-item>div{min-width:0}
+.np-ws-item b{display:block;font-size:13px;color:#fff}
+.np-ws-item span{display:block;font-size:10.5px;color:#cbd5e1;margin-top:2px;line-height:1.5}
+.np-ws-item em{font-style:normal;flex:none;font-weight:900;font-size:12px;padding:4px 10px;border-radius:99px;background:linear-gradient(135deg,#ffe36a,#ff9825);color:#321900}
+
+/* Deposit / Withdraw / Promotion popups follow the LIGHT theme */
+body[data-theme="light"] #modalDeposit,body[data-theme="light"] #modalWithdraw,body[data-theme="light"] #modalDepositPromo{--pp-line:#e2e8f0}
+body[data-theme="light"] #modalDeposit .modal-sheet,body[data-theme="light"] #modalWithdraw .modal-sheet,body[data-theme="light"] #modalDepositPromo .modal-sheet{background:radial-gradient(ellipse 80% 38% at 50% -6%,rgba(245,158,11,.14) 0%,transparent 70%),linear-gradient(180deg,#ffffff,#f1f5f9 80%);border:1px solid #e2e8f0;border-bottom:0;border-top:1px solid rgba(217,119,6,.45);color:#0f172a;box-shadow:0 -14px 40px rgba(15,23,42,.18)}
+body[data-theme="light"] #modalDeposit .modal-handle,body[data-theme="light"] #modalWithdraw .modal-handle,body[data-theme="light"] #modalDepositPromo .modal-handle{background:#cbd5e1}
+body[data-theme="light"] #modalDeposit .modal-close-btn,body[data-theme="light"] #modalWithdraw .modal-close-btn,body[data-theme="light"] #modalDepositPromo .modal-close-btn{background:#f1f5f9;border:1px solid #cbd5e1;color:#334155}
+body[data-theme="light"] #modalDeposit .modal-title,body[data-theme="light"] #modalWithdraw .modal-title,body[data-theme="light"] #modalDepositPromo .modal-title{color:#0f172a}
+body[data-theme="light"] .pp-title h1{background:linear-gradient(180deg,#d97706,#92400e);-webkit-background-clip:text;background-clip:text;color:transparent}
+body[data-theme="light"] .pp-title p{color:#64748b}
+body[data-theme="light"] .pp-title p:before,body[data-theme="light"] .pp-title p:after{background:linear-gradient(90deg,transparent,#94a3b8)}
+body[data-theme="light"] .pp-balance{background:linear-gradient(125deg,#fff7e0,#ffedc2 70%);border:1px solid #f3d58a;box-shadow:0 8px 20px rgba(217,119,6,.12)}
+body[data-theme="light"] .pp-balance-label{color:#92702a}
+body[data-theme="light"] .pp-balance-value{color:#059669;text-shadow:none}
+body[data-theme="light"] .pp-stepper .s b{background:#fff;border-color:#cbd5e1;color:#64748b}
+body[data-theme="light"] .pp-stepper .s span{color:#64748b}
+body[data-theme="light"] .pp-stepper .s.active span{color:#b45309}
+body[data-theme="light"] .pp-stepper .s.done b{color:#b45309;background:#fff7e0;border-color:#e6a32c}
+body[data-theme="light"] .pp-stepper .s.done span{color:#92702a}
+body[data-theme="light"] .pp-stepper em{background:#e2e8f0}
+body[data-theme="light"] .pp-panel,body[data-theme="light"] .pp-account{background:#fff;border:1px solid #e2e8f0;box-shadow:0 6px 18px rgba(15,23,42,.07)}
+body[data-theme="light"] .pp-step{color:#92400e}
+body[data-theme="light"] .pp-label,body[data-theme="light"] .pp-account-label,body[data-theme="light"] .pp-summary-title{color:#475569}
+body[data-theme="light"] .pp-input,body[data-theme="light"] #modalDepositPromo .form-input{background-color:#f8fafc;border:1px solid #cbd5e1;color:#0f172a}
+body[data-theme="light"] .pp-input::placeholder{color:#94a3b8}
+body[data-theme="light"] select.pp-input{color-scheme:light;background-image:linear-gradient(45deg,transparent 50%,#d97706 50%),linear-gradient(135deg,#d97706 50%,transparent 50%)}
+body[data-theme="light"] select.pp-input option{background:#fff;color:#0f172a}
+body[data-theme="light"] .pp-amt b{color:#b45309}
+body[data-theme="light"] .pp-limit,body[data-theme="light"] .pp-hint,body[data-theme="light"] .pp-account-type{color:#64748b}
+body[data-theme="light"] .pp-card{background:#fff;border-color:#cbd5e1}
+body[data-theme="light"] .pp-card.active{background:#fffbeb;border-color:#e6a32c;box-shadow:0 0 0 3px rgba(245,158,11,.14),0 8px 20px rgba(245,158,11,.18)}
+body[data-theme="light"] .pp-name{color:#0f172a}
+body[data-theme="light"] .pp-promo,body[data-theme="light"] .pp-offer{background:linear-gradient(135deg,#fff7e0,#fff 65%);border-color:#f0cf85}
+body[data-theme="light"] .pp-offer{border-color:#cbd5e1}
+body[data-theme="light"] .pp-offer.on{border-color:#e6a32c}
+body[data-theme="light"] .pp-promo-head strong,body[data-theme="light"] .pp-offer-name{color:#0f172a}
+body[data-theme="light"] .pp-promo-desc,body[data-theme="light"] .pp-offer-desc{color:#475569}
+body[data-theme="light"] .pp-promo-desc b,body[data-theme="light"] .pp-offer-desc b{color:#b45309}
+body[data-theme="light"] .pp-active{color:#059669}
+body[data-theme="light"] .pp-quick button{background:#f1f5f9;border-color:#cbd5e1;color:#0f172a}
+body[data-theme="light"] .pp-calc,body[data-theme="light"] .pp-summary{background:#f8fafc;border:1px solid #e2e8f0}
+body[data-theme="light"] .pp-row,body[data-theme="light"] .pp-srow{color:#475569;border-bottom-color:#e2e8f0}
+body[data-theme="light"] .pp-val,body[data-theme="light"] .pp-srow strong{color:#0f172a}
+body[data-theme="light"] .pp-bonus{color:#059669}
+body[data-theme="light"] .pp-total,body[data-theme="light"] .pp-srow.total{color:#92400e;border-top-color:#e6c97a}
+body[data-theme="light"] .pp-total .pp-val,body[data-theme="light"] .pp-srow.total strong{color:#b45309}
+body[data-theme="light"] .pp-status.success{background:#d1fae5;color:#047857;border-color:#6ee7b7}
+body[data-theme="light"] .pp-status.warning{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+body[data-theme="light"] .pp-back{background:#f1f5f9;border-color:#cbd5e1;color:#334155}
+body[data-theme="light"] .pp-notice{color:#64748b}
+body[data-theme="light"] .pp-notice-box{background:#f8fafc;border-color:#e2e8f0;color:#475569}
+body[data-theme="light"] .pp-timer{background:linear-gradient(135deg,#fff7e0,#fff 65%);border-color:#f0cf85}
+body[data-theme="light"] .pp-ring .bg{stroke:#e2e8f0}
+body[data-theme="light"] .pp-timer-clock{color:#b45309}
+body[data-theme="light"] .pp-timer-label{color:#92400e}
+body[data-theme="light"] .pp-timer-note{color:#475569}
+body[data-theme="light"] .pp-timer.low .pp-timer-clock{color:#dc2626}
+body[data-theme="light"] .pp-account-row{background:#f8fafc;border-color:rgba(217,119,6,.5)}
+body[data-theme="light"] .pp-account-number{color:#0f172a}
+body[data-theme="light"] .pp-send-amt{background:#fffbeb;border-color:#f0cf85}
+body[data-theme="light"] .pp-send-amt span{color:#92702a}
+body[data-theme="light"] .pp-send-amt b{color:#b45309}
+body[data-theme="light"] .pp-send-sub{color:#475569}
+body[data-theme="light"] .pp-send-sub b{color:#059669}
+body[data-theme="light"] .pp-howto div{color:#475569}
+</style>
 <style>
   .np-lang-seg{display:inline-flex;gap:2px;padding:2px;border-radius:999px;background:rgba(148,163,184,.16);border:1px solid rgba(255,255,255,.12);flex-shrink:0}
   .np-lang-seg button{border:0;background:transparent;color:#94a3b8;font-weight:700;font-size:11px;line-height:1;padding:6px 10px;border-radius:999px;cursor:pointer;min-width:34px;font-family:inherit}
@@ -3062,6 +3136,8 @@ select.pp-input option{background:#111d33;color:#fff}
           <span>ডিপোজিট করলেই পাচ্ছেন <strong><span id="walletBonusPercentLabel">10%</span> ক্যাশ বোনাস</strong>!</span>
         </div>
 
+        <div id="walletPromoStrip"></div>
+
         <div id="turnoverBox" style="margin:10px 0 4px;padding:12px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:12px;background:rgba(0,0,0,0.35)">
           <div style="display:flex;justify-content:space-between;font-size:12px;color:#cbd5e1;font-weight:700;">
             <span>🎯 উইথড্র টার্নওভার প্রগ্রেস</span>
@@ -3071,15 +3147,6 @@ select.pp-input option{background:#111d33;color:#fff}
             <div id="turnoverBar" style="height:100%;width:0;background:#10b981;transition:width .3s"></div>
           </div>
           <div id="turnoverNote" style="font-size:11px;color:#cbd5e1;margin-top:6px;font-weight:500;"></div>
-        </div>
-
-        <div id="promoSummaryBox" style="display:none;margin:8px 0 4px;padding:12px 14px;border:1px solid rgba(251,191,36,0.35);border-radius:12px;background:rgba(0,0,0,0.35)">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:#cbd5e1;font-weight:700;">
-            <span>🎁 প্রোমো বোনাস ও টার্নওভার</span>
-            <button type="button" class="btn btn-primary" style="padding:6px 12px;font-size:12px;" onclick="window.npOpenPromo()">DEPOSIT PROMOTION</button>
-          </div>
-          <div id="promoSummaryGrid" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"></div>
-          <div id="promoSummaryList" style="margin-top:8px;font-size:11px;color:#cbd5e1;line-height:1.7"></div>
         </div>
 
         <div class="wallet-action-row">
@@ -3378,7 +3445,7 @@ select.pp-input option{background:#111d33;color:#fff}
           <div class="pp-sec pp-panel">
             <div class="pp-step"><i>1</i>Deposit Promotion</div>
             <select class="pp-input" id="ppPromoSelect" style="margin-bottom:0" onchange="window.npPromoChange()">
-              <option value="">— প্রমোশন সিলেক্ট করুন —</option>
+              <option value="__none" selected>NO BONUS (বোনাস ছাড়া)</option>
             </select>
             <div class="pp-promo" id="ppPromoInfo" style="display:none;margin-top:12px">
               <div class="pp-promo-head">
@@ -4911,16 +4978,15 @@ select.pp-input option{background:#111d33;color:#fff}
       const cur = el.value;
       const list = window.npPromoList ? window.npPromoList() : [];
       const c = npBonusConf();
-      let h = '<option value="">— প্রমোশন সিলেক্ট করুন —</option>';
+      let h = '<option value="__none">NO BONUS (বোনাস ছাড়া)</option>';
       list.forEach(o => {
         const t = o.bonusType === 'fixed' ? ppTk(o.bonusValue) : (+o.bonusValue) + '%';
         h += '<option value="' + escapeHtml(o.id) + '">🎁 ' + escapeHtml(o.name) + ' — ' + t + ' BONUS</option>';
       });
       if (c.on && (c.pct > 0 || c.tiers.length > 0)) h += '<option value="__std">🎁 STANDARD DEPOSIT BONUS</option>';
-      h += '<option value="__none">NO BONUS</option>';
       el.innerHTML = h;
-      const ok = Array.prototype.some.call(el.options, o => o.value === cur);
-      el.value = ok ? cur : '';
+      const ok = cur && Array.prototype.some.call(el.options, o => o.value === cur);
+      el.value = ok ? cur : '__none';
       npDepRefresh();
     }
 
@@ -5011,7 +5077,7 @@ select.pp-input option{background:#111d33;color:#fff}
       // promotion info box
       const box = $pp('ppPromoInfo');
       if (box) {
-        box.style.display = sp ? 'block' : 'none';
+        box.style.display = (sp && sp.kind !== 'none') ? 'block' : 'none';
         if (sp) { $pp('ppPromoTitle').textContent = infoTitle; $pp('ppPromoDesc').innerHTML = infoDesc; }
       }
 
@@ -5118,7 +5184,7 @@ select.pp-input option{background:#111d33;color:#fff}
         const el = $pp('ppPromoSelect'); if (!el) return;
         const sel = window.npPromoGetSel ? window.npPromoGetSel() : null;
         if (sel) { npBuildPromoOptions(); el.value = sel.id; }
-        else if (el.value && el.value !== '__std' && el.value !== '__none') el.value = '';
+        else if (!el.value || (el.value !== '__std' && el.value !== '__none')) el.value = '__none';
         npDepRefresh();
       } catch (e) {}
     };
@@ -7336,7 +7402,7 @@ select.pp-input option{background:#111d33;color:#fff}
   var tk = function (n) { return '৳' + Math.round(Number(n) || 0); };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function calc(p, a) { var b = p.bonusType === 'fixed' ? (+p.bonusValue || 0) : Math.round(a * (+p.bonusValue || 0) / 100); return { b: b, t: Math.round((a + b) * (+p.turnoverMultiplier || 0)) }; }
-  function live(p) { var n = Date.now(); return !!p && p.active === true && (!p.startAt || n >= p.startAt) && (!p.endAt || n <= p.endAt) && !(ADMUID && p.adminOff && p.adminOff[ADMUID] === true); }
+  function live(p) { var n = Date.now(); return !!p && p.active !== false && p.active !== 'false' && p.active !== 0 && (!p.startAt || n >= p.startAt) && (!p.endAt || n <= p.endAt) && !(ADMUID && p.adminOff && p.adminOff[ADMUID] === true); }
   function offers() { return Object.keys(P).filter(function (k) { return live(P[k]); }).sort(function (a, b) { return (+P[a].minDeposit || 0) - (+P[b].minDeposit || 0); }); }
   function bonusTxt(p) { return p.bonusType === 'fixed' ? tk(p.bonusValue) + ' বোনাস' : (+p.bonusValue) + '% বোনাস'; }
   function renderSummary() {
@@ -7372,7 +7438,20 @@ select.pp-input option{background:#111d33;color:#fff}
       return '<div class="pp-offer' + (on ? ' on' : '') + '" onclick="npPromoPick(\'' + k + '\')">' + '<span class="pp-badge" style="top:10px;right:10px">' + (p.bonusType === 'fixed' ? tk(p.bonusValue) : (+p.bonusValue) + '%') + '</span>' + '<div class="pp-offer-name">🎁 ' + esc(p.name) + '</div>' + '<div class="pp-offer-desc">' + bonusTxt(p) + '<br>Minimum Deposit: <b>' + tk(p.minDeposit) + '</b><br>Maximum Deposit: <b>' + tk(p.maxDeposit) + '</b><br>Turnover: <b>' + (+p.turnoverMultiplier) + 'x</b>' + (p.endAt ? '<br>শেষ: ' + new Date(+p.endAt).toLocaleDateString() : '') + '</div></div>';
     }).join('') : '<div style="text-align:center;color:#94a3b8;padding:14px;font-size:13px">এখন কোনো অ্যাক্টিভ অফার নেই</div>';
   }
-  var _ro = renderOffers; renderOffers = function () { _ro(); try { window.npOnPromoUpdate && window.npOnPromoUpdate(); } catch (e) {} };
+  function renderWalletStrip() {
+    var el = $('walletPromoStrip'); if (!el) return;
+    var ks = (typeof state !== 'undefined' && state.currentUser) ? offers() : [];
+    if (!ks.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.innerHTML = '<div class="np-ws-title">🎁 চলমান ডিপোজিট অফার</div>' + ks.map(function (k) {
+      var p = P[k];
+      return '<div class="np-ws-item" onclick="npWalletPromoGo(\'' + k + '\')"><div><b>' + esc(p.name) + '</b><span>Min ' + tk(p.minDeposit) + ' • Max ' + tk(p.maxDeposit) + ' • ' + (+p.turnoverMultiplier || 0) + 'x টার্নওভার' + (p.endAt ? ' • শেষ ' + new Date(+p.endAt).toLocaleDateString() : '') + '</span></div><em>' + (p.bonusType === 'fixed' ? tk(p.bonusValue) : (+p.bonusValue) + '%') + '</em></div>';
+    }).join('');
+  }
+  window.npWalletPromoGo = function (id) {
+    try { if (window.npPromoSetSel) window.npPromoSetSel(id); window.app.openDepositModal(); } catch (e) {}
+  };
+  var _ro = renderOffers; renderOffers = function () { try { renderWalletStrip(); } catch (e) {} _ro(); try { window.npOnPromoUpdate && window.npOnPromoUpdate(); } catch (e) {} };
   window.npPromoPick = function (k) { pick = k; renderOffers(); window.npPromoPreview(); };
   window.npPromoPreview = function () {
     var out = $('promoPreview'); if (!out) return;
