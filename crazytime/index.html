@@ -388,16 +388,25 @@ function paintRB(rb,spot){const c=colorOf(spot);rb.style.background=c;rb.style.b
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2300)}
 function beep(f,d,v){if(!S.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v||.05;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
 function softTick(c){
-  /* নরম কাউন্টডাউন: sine সুর + ধীরে ওঠা/ধীরে নামা (fade); ১০ থেকে ১ যত কাছে আসে, শব্দ আস্তে আস্তে একটু বাড়ে */
+  /* ক্লাসিক কাউন্টডাউন: ১০–৪ নরম ঘড়ির টিক (ঘণ্টার মতো গোল সুর, ধীরে ধীরে সামান্য জোরালো);
+     ৩-২-১ তিনটি ধাপে চড়া সুরের নরম চাইম, শেষ ১ এ সবচেয়ে উঁচু ও একটু লম্বা */
   if(!S.sound)return;
   try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
-    const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();
-    const f=520+(10-c)*18, v=.012+(10-c)*.0035, d=c<=3?.32:.22;
-    o.type='sine';o.frequency.value=f;
-    g.gain.setValueAtTime(.0001,t);
-    g.gain.exponentialRampToValueAtTime(v,t+.05);
-    g.gain.exponentialRampToValueAtTime(.0001,t+d);
-    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02);
+    const t=AC.currentTime,last=c<=3;
+    const f=last?({3:784,2:880,1:1047})[c]:523.25;               /* সুর: ১০–৪ একই নিচু সুর; ৩,২,১ ধাপে ওপরে */
+    const v=last?(.05+(3-c)*.012):(.016+(10-c)*.0035);            /* জোর: আস্তে আস্তে বাড়ে */
+    const d=last?(c===1?.7:.45):.2;                               /* দৈর্ঘ্য */
+    const out=AC.createGain(),lp=AC.createBiquadFilter();
+    lp.type='lowpass';lp.frequency.value=3200;lp.Q.value=.5;
+    out.gain.setValueAtTime(.0001,t);
+    out.gain.linearRampToValueAtTime(v,t+.008);                   /* নরম আক্রমণ, ক্লিক নেই */
+    out.gain.exponentialRampToValueAtTime(.0001,t+d);
+    [[1,1],[2,.28],[3,.08]].forEach(([m,a])=>{                    /* মূল সুর + হালকা হারমোনিক = ঘণ্টার মতো গাঢ় */
+      const o=AC.createOscillator(),g=AC.createGain();
+      o.type='sine';o.frequency.value=f*m;g.gain.value=a;
+      o.connect(g);g.connect(out);o.start(t);o.stop(t+d+.03);
+    });
+    out.connect(lp);lp.connect(AC.destination);
   }catch(e){}
 }
 function confetti(){const cf=$('cf'),cols=['#fbbf24','#ef4444','#3b82f6','#a855f7','#10b981','#fff'];let h='';for(let i=0;i<46;i++)h+=`<i style="left:${Math.random()*100}%;background:${cols[i%6]};animation-duration:${1.8+Math.random()*1.8}s;animation-delay:${Math.random()*.5}s"></i>`;cf.innerHTML=h;setTimeout(()=>cf.innerHTML='',4200)}
@@ -453,9 +462,17 @@ function ptrStep(now){
 function spinTo(seg,dur){
   const n=S.layout.length,st=2*Math.PI/n,TAU=2*Math.PI,base=-((seg+.5)*st)+(Math.random()-.5)*st*.24,from=S.rot;
   const d=(((base-from)%TAU)+TAU)%TAU,to=from+d+TAU*6,t0=performance.now();let lastTick=0;
-  (function f(now){const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,4);S.rot=from+(to-from)*e;
-    const k=Math.floor(S.rot/st);if(k!==lastTick){lastTick=k;if(p<.95)beep(900,.02,.015);ptrKick()}if(p<1)requestAnimationFrame(f);else{const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}})(t0);
+  /* শেষ দিকে চাকা ধীরে ধীরে এগিয়ে একটু পিছিয়ে আবার সামনে আসে (২-৩টা ঘর বদলায়), তারপর জেতা ঘরের ঠিক মাঝে থামে */
+  const settle=dur>2500,setDur=settle?1700:0,mainDur=dur-setDur,A=settle?1.1*st:0,OM=6.6,LAM=.142*OM,mainTo=to+A;
+  function finish(){const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}
+  (function f(now){const el=Math.max(0,now-t0);let done=false;
+    if(el<mainDur){const p=el/mainDur,e=1-Math.pow(1-p,4);S.rot=from+(mainTo-from)*e}
+    else if(settle&&el<dur){const tau=(el-mainDur)/1000,s=(el-mainDur)/setDur;S.rot=to+A*Math.exp(-LAM*tau)*Math.cos(OM*tau)*(1-s*s*s)}
+    else{S.rot=to;done=true}
+    const k=Math.floor(S.rot/st);if(k!==lastTick){lastTick=k;if(!done)beep(900,.02,.015);ptrKick()}
+    if(!done)requestAnimationFrame(f);else finish()})(t0);
 }
+
 function setRot(seg){S.rot=-((seg+.5)*(2*Math.PI/S.layout.length));draw()}
 
 /* bet ui */
