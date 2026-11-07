@@ -595,10 +595,10 @@ function renderTable(){
 }
 function tick(){
   const s=S.st;if(!s||!s.endsAt)return;
-  const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:15000,spin:8000,result:5000}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on){zoomOut()}
+  const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:10000,spin:8000,result:5000}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on){zoomOut()}
   {const c=Math.ceil(left/1000),show=(s.phase==='betting'&&c>=1);S.cdVal=show?c:0;hubSet();
     /* ১০ থেকে ১ পর্যন্ত প্রতিটি সংখ্যায় টিক শব্দ; শেষ ৩ সেকেন্ডে চড়া সুর */
-    if(show){if(S.lastCd!==c){S.lastCd=c;softTick(c)}}else S.lastCd=null}$('bar').style.width=(left/tot*100)+'%';
+    if(show){if(S.lastCd!==c){S.lastCd=c;softTick(c)}}else S.lastCd=null}$('bar').style.width=Math.min(100,left/tot*100)+'%';
 }
 setInterval(tick,200);
 
