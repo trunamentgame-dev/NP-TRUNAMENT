@@ -54,7 +54,7 @@
     });
 
     // Immediate Service Worker registration using absolute URL relative to current path
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && /^https?:$/.test(window.location.protocol)) {
       try {
         const swUrl = new URL('service-worker.js', window.location.href).href;
         const swScope = new URL('./', window.location.href).href;
@@ -4016,9 +4016,46 @@
       }
     }
 
+    // ===== গেম প্যানেলের ভেতরেই ফ্রেমে খোলে; গেম "ব্যালেন্স এসেছে" জানালে তবেই প্যানেলের LOADING সরে =====
+    let npGameFrameEl = null, npGameIdleTimer = null;
+    function npOpenGameFrame(finalUrl, waitReady) {
+      npCloseGameFrame(true);
+      const wrap = document.createElement('div');
+      wrap.id = 'npGameFrameWrap';
+      wrap.style.cssText = 'position:fixed;inset:0;z-index:8000;background:#07090e';
+      const fr = document.createElement('iframe');
+      fr.style.cssText = 'width:100%;height:100%;border:0;display:block;background:#07090e';
+      fr.setAttribute('allow', 'fullscreen; autoplay');
+      fr.setAttribute('allowfullscreen', '');
+      // যে গেম "ready" সংকেত পাঠায় না (Ludo, Carrom ইত্যাদি) তার জন্য পেজ লোড হলেই লোডিং সরবে
+      if (!waitReady) fr.addEventListener('load', function () { if (window.npHideLoad) window.npHideLoad(); });
+      fr.src = finalUrl;
+      wrap.appendChild(fr);
+      document.body.appendChild(wrap);
+      npGameFrameEl = wrap;
+      try { history.pushState({ npGame: 1 }, ''); } catch (e) {}
+      // গেম খেলার সময় ১ ঘণ্টার অটো-লগআউট যেন না চলে
+      npGameIdleTimer = setInterval(function () { npTouchActive(true); }, 30000);
+    }
+    function npCloseGameFrame(silent) {
+      if (!npGameFrameEl) return;
+      npGameFrameEl.remove();
+      npGameFrameEl = null;
+      clearInterval(npGameIdleTimer);
+      if (window.npHideLoad) window.npHideLoad();
+      if (!silent) closeActiveGameSession();
+    }
+    window.addEventListener('popstate', function () { if (npGameFrameEl) { window.npSkipExit = true; npCloseGameFrame(); } });
+    window.addEventListener('message', function (e) {
+      if (!npGameFrameEl) return;
+      const fr = npGameFrameEl.querySelector('iframe');
+      if (!fr || e.source !== fr.contentWindow || !e.data) return;
+      if (e.data.type === 'NP_GAME_READY' && window.npHideLoad) window.npHideLoad();
+    });
+
     window.addEventListener('beforeunload', () => { closeActiveGameSession(); });
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) { closeActiveGameSession(); }
+      if (!document.hidden && !npGameFrameEl) { closeActiveGameSession(); }
     });
 
     async function playGameUrl(url, isLudo) {
@@ -4103,13 +4140,13 @@
         }
         await Promise.all(tasks);
       } catch (e) {}
-      if (window.npShowLoad) window.npShowLoad(true); // লোডিং টাইমার আবার ২০ সেকেন্ড
+      if (window.npShowLoad) window.npShowLoad(45000); // ব্যালেন্স আসা পর্যন্ত লোডিং (সর্বোচ্চ ৪৫ সেকেন্ড)
 
       let finalUrl = url;
       if (gameIdToken) {
         finalUrl = String(url).split('#')[0] + '#t=' + gameIdToken;
       }
-      if (sameWindow) { window.location.href = finalUrl; return; }
+      if (sameWindow) { npOpenGameFrame(finalUrl, /crazytime|creazy/i.test(String(url))); return; }
       try {
         const w = window.open('', '_blank');
         if (!w) { window.location.href = finalUrl; return; }
@@ -6544,6 +6581,11 @@
     history.pushState({ nrExitGuard: true }, "", location.href);
 
     window.addEventListener("popstate", function () {
+      if (window.npSkipExit) {
+        window.npSkipExit = false;
+        history.pushState({ nrExitGuard: true }, "", location.href);
+        return;
+      }
       if (isSupportModalOpen) {
         closeSupportModal();
         history.pushState({ nrExitGuard: true }, "", location.href);
@@ -6665,8 +6707,9 @@
       clearTimeout(t1); clearTimeout(t2);
       el.classList.remove('npld-fade');
       el.classList.add('npld-on');
-      t1 = setTimeout(hide, keep ? 20000 : 1800); // গেম নতুন ট্যাবে খোলে; প্যানেলে ফিরলে লোডিং আর থাকবে না
+      t1 = setTimeout(hide, typeof keep === 'number' ? keep : (keep ? 20000 : 1800)); // গেম নতুন ট্যাবে খোলে; প্যানেলে ফিরলে লোডিং আর থাকবে না
     };
+    window.npHideLoad = hide;
     window.addEventListener('pageshow', hide);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) hide(); });
   })();
