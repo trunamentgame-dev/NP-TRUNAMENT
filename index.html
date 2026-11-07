@@ -1745,6 +1745,25 @@
 .pp-srow strong{color:#fff}
 .pp-srow.total{border-top:1px solid #33425a;margin-top:5px;padding-top:11px;color:#f2d18a}
 .pp-srow.total strong{color:#ffd36a;font-size:15px}
+
+.pp-locked{opacity:.38;pointer-events:none;filter:grayscale(.35)}
+.pp-step{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.5px;color:#f5d48c;margin:0 0 10px}
+.pp-step i{font-style:normal;width:22px;height:22px;display:grid;place-items:center;border-radius:7px;background:linear-gradient(145deg,#ffdc82,#d99423);color:#211605;font-size:11px;font-weight:900}
+.pp-sec{margin-bottom:18px;transition:.2s}
+select.pp-input{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,#ffd36a 50%),linear-gradient(135deg,#ffd36a 50%,transparent 50%);background-position:calc(100% - 20px) 20px,calc(100% - 14px) 20px;background-size:6px 6px;background-repeat:no-repeat;padding-right:34px;color-scheme:dark}
+select.pp-input option{background:#111d33;color:#fff}
+.pp-timer{text-align:center;padding:14px;border-radius:12px;background:linear-gradient(145deg,#2a2314,#151b28);border:1.5px solid #ffcb49;box-shadow:0 0 16px #ffc64a22;margin-bottom:14px}
+.pp-timer-label{font-size:11px;color:#f2d18a;font-weight:800;letter-spacing:1px}
+.pp-timer-clock{font-family:var(--font-esports,inherit);font-size:38px;font-weight:900;color:#ffd36a;line-height:1.2;margin-top:2px}
+.pp-timer.low .pp-timer-clock{color:#ff6b6b}
+.pp-timer.low{border-color:#ff6b6b;box-shadow:0 0 16px #ff6b6b30}
+.pp-timer-bar{height:5px;border-radius:5px;background:#0b1427;overflow:hidden;margin-top:8px}
+.pp-timer-bar>div{height:100%;width:100%;background:linear-gradient(90deg,#ffd36a,#ff9825);transition:width 1s linear}
+.pp-timer-note{font-size:10px;color:#aebdd0;margin-top:7px;line-height:1.6}
+.pp-back{width:100%;margin-top:10px;height:40px;border-radius:9px;border:1px solid #344c70;background:#1b2d49;color:#dce8ff;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+.pp-sendbox{margin-top:10px;padding:10px;border-radius:9px;background:#0a1427;border:1px solid #304568;font-size:11px;color:#b9c8dd;line-height:1.9}
+.pp-sendbox b{color:#ffdc75}
+#promoChosenChip{display:none!important}
 /* hidden controls that keep the original logic working */
 .pp-hidden{display:none!important}
 #depositBonusCalcPreview{display:none!important}
@@ -3263,7 +3282,7 @@
       <div class="modal-handle"></div>
       <div class="modal-title pp-title">
         <div>
-          <h1>MOSTWIN88</h1>
+          <h1>DEPOSIT</h1>
           <p id="lblDepositHeader">PREMIUM DEPOSIT CENTER</p>
         </div>
         <button class="modal-close-btn" onclick="window.app.closeModal('modalDeposit')">✕</button>
@@ -3274,88 +3293,119 @@
         <div class="pp-balance-value">৳<span id="ppDepBalance">0</span></div>
       </div>
 
-      <div class="pp-sec-title">SELECT PAYMENT METHOD</div>
-      <div class="pp-grid">
-        <div class="pp-card active" data-kind="deposit" data-method="bKash" onclick="window.npPickMethod('deposit','bKash')">
-          <span class="pp-badge" data-pp-badge>10%</span>
-          <div class="pp-logo"><img data-pp-logo="bKash" src="https://i.postimg.cc/K4hz9m0W/Whats-App-Image-2026-10-23-at-4-14-08-PM.jpg" alt="bKash" onerror="this.style.display='none'"></div>
-          <div class="pp-name">bKASH</div>
-        </div>
-        <div class="pp-card" data-kind="deposit" data-method="Nagad" onclick="window.npPickMethod('deposit','Nagad')">
-          <span class="pp-badge" data-pp-badge>10%</span>
-          <div class="pp-logo"><img data-pp-logo="Nagad" src="https://i.postimg.cc/QtVHC4B2/Whats-App-Image-2026-10-23-at-4-14-08-PM-%281%29.jpg" alt="Nagad" onerror="this.style.display='none'"></div>
-          <div class="pp-name">NAGAD</div>
-        </div>
-        <div class="pp-card" data-kind="deposit" data-method="Rocket" onclick="window.npPickMethod('deposit','Rocket')">
-          <span class="pp-badge" data-pp-badge>10%</span>
-          <div class="pp-logo"><img data-pp-logo="Rocket" src="https://i.postimg.cc/BnGLpByx/Whats-App-Image-2026-10-23-at-4-14-08-PM-%282%29.jpg" alt="Rocket" onerror="this.style.display='none'"></div>
-          <div class="pp-name">ROCKET</div>
-        </div>
-      </div>
+      <form id="depositForm" onsubmit="window.app.handleDepositSubmit(event)">
 
-      <div class="pp-account">
-        <div class="pp-account-label">Payment Number</div>
-        <div class="pp-account-row">
-          <div class="pp-account-number" id="adminPaymentNumber">01712-345678</div>
-          <button type="button" class="pp-copy" onclick="window.app.copyText(document.getElementById('adminPaymentNumber').innerText)">COPY</button>
-        </div>
-        <div class="pp-account-type">Account Type: Personal &nbsp;•&nbsp; সর্বনিম্ন ডিপোজিট: ৳<span id="minDepositAmountLabel">50</span> টাকা</div>
-      </div>
-
-      <form id="depositForm" class="pp-form" onsubmit="window.app.handleDepositSubmit(event)">
-
-        <!-- original logic control (kept, hidden) -->
+        <!-- original logic controls (kept, hidden) -->
         <select class="pp-hidden" id="depositMethod" onchange="window.app.updateDepositMethodDetails()">
           <option value="bKash">bKash (বিকাশ Personal)</option>
           <option value="Nagad">Nagad (নগদ Personal)</option>
           <option value="Rocket">Rocket (রকেট Personal)</option>
         </select>
         <div class="pp-hidden" id="depositMethodLogoWrap"></div>
+        <div class="pp-hidden" id="depositBonusNoticeBox" style="display:none;">
+          <span id="depositBonusBadge"></span><div id="depositBonusNote"></div><div id="depositBonusCalcPreview"></div>
+        </div>
 
-        <!-- Deposit Bonus Offer Box -->
-        <div class="pp-promo" id="depositBonusNoticeBox" style="display:none;">
-          <div class="pp-promo-head">
-            <strong>🎁 DEPOSIT PROMOTION</strong>
-            <span class="pp-active">● ACTIVE OFFER</span>
+        <!-- ===== PAGE 1 ===== -->
+        <div id="ppStageA">
+
+          <div class="pp-sec">
+            <div class="pp-step"><i>1</i>SELECT DEPOSIT PROMOTION</div>
+            <select class="pp-input" id="ppPromoSelect" style="margin-bottom:12px" onchange="window.npPromoChange()">
+              <option value="">— প্রমোশন সিলেক্ট করুন —</option>
+            </select>
+            <div class="pp-promo" id="ppPromoInfo" style="display:none;margin-bottom:0">
+              <div class="pp-promo-head">
+                <strong id="ppPromoTitle">PROMOTION</strong>
+                <span class="pp-active">● ACTIVE OFFER</span>
+              </div>
+              <div class="pp-promo-desc" id="ppPromoDesc"></div>
+            </div>
           </div>
-          <div style="margin-bottom:8px"><span class="pp-pill" id="depositBonusBadge">10% বোনাস</span></div>
-          <div class="pp-promo-desc" id="depositBonusNote">ডিপোজিট করলেই সাথে সাথে ব্যালেন্সে বোনাস যুক্ত হবে।</div>
-          <div id="depositBonusCalcPreview" style="display:none;"></div>
+
+          <div class="pp-sec pp-locked" id="ppSecMethod">
+            <div class="pp-step"><i>2</i>SELECT PAYMENT METHOD</div>
+            <div class="pp-grid">
+              <div class="pp-card" data-kind="deposit" data-method="bKash" onclick="window.npPickMethod('deposit','bKash')">
+                <span class="pp-badge" data-pp-badge>10%</span>
+                <div class="pp-logo"><img data-pp-logo="bKash" src="https://i.postimg.cc/K4hz9m0W/Whats-App-Image-2026-10-23-at-4-14-08-PM.jpg" alt="bKash" onerror="this.style.display='none'"></div>
+                <div class="pp-name">bKASH</div>
+              </div>
+              <div class="pp-card" data-kind="deposit" data-method="Nagad" onclick="window.npPickMethod('deposit','Nagad')">
+                <span class="pp-badge" data-pp-badge>10%</span>
+                <div class="pp-logo"><img data-pp-logo="Nagad" src="https://i.postimg.cc/QtVHC4B2/Whats-App-Image-2026-10-23-at-4-14-08-PM-%281%29.jpg" alt="Nagad" onerror="this.style.display='none'"></div>
+                <div class="pp-name">NAGAD</div>
+              </div>
+              <div class="pp-card" data-kind="deposit" data-method="Rocket" onclick="window.npPickMethod('deposit','Rocket')">
+                <span class="pp-badge" data-pp-badge>10%</span>
+                <div class="pp-logo"><img data-pp-logo="Rocket" src="https://i.postimg.cc/BnGLpByx/Whats-App-Image-2026-10-23-at-4-14-08-PM-%282%29.jpg" alt="Rocket" onerror="this.style.display='none'"></div>
+                <div class="pp-name">ROCKET</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pp-sec pp-locked pp-form" id="ppSecAmount" style="margin-top:0">
+            <div class="pp-step"><i>3</i>DEPOSIT AMOUNT (৳)</div>
+            <input type="number" class="pp-input" id="depositAmount" required placeholder="Enter deposit amount" min="20"
+              oninput="window.app.updateDepositBonusPreview()" onkeydown="if(event.key==='Enter'){event.preventDefault();window.npDepNext();}">
+            <div class="pp-quick">
+              <button type="button" onclick="window.npSetDepAmount(50)">50</button>
+              <button type="button" onclick="window.npSetDepAmount(100)">100</button>
+              <button type="button" onclick="window.npSetDepAmount(300)">300</button>
+              <button type="button" onclick="window.npSetDepAmount(500)">500</button>
+              <button type="button" onclick="window.npSetDepAmount(1000)">1000</button>
+            </div>
+            <div class="pp-limit" style="margin-top:-8px;margin-bottom:12px">সর্বনিম্ন ডিপোজিট: ৳<span id="minDepositAmountLabel">50</span> টাকা</div>
+
+            <div class="pp-calc">
+              <div class="pp-row"><span>Deposit Amount</span><span class="pp-val" id="ppDepositValue">৳0.00</span></div>
+              <div class="pp-row"><span>Promotion Bonus</span><span class="pp-val pp-bonus" id="ppBonusValue">৳0.00</span></div>
+              <div class="pp-row"><span>Turnover Requirement</span><span class="pp-val" id="ppTurnoverValue">৳0.00</span></div>
+              <div class="pp-row pp-total"><span>Total Receive</span><span class="pp-val" id="ppTotalValue">৳0.00</span></div>
+              <div id="ppStatusMessage" class="pp-status"></div>
+            </div>
+
+            <button type="button" class="pp-submit" id="ppNextBtn" onclick="window.npDepNext()">SUBMIT — পেমেন্ট নাম্বার দেখুন</button>
+          </div>
         </div>
 
-        <label class="pp-label" for="depositAmount">DEPOSIT AMOUNT (৳)</label>
-        <input type="number" class="pp-input" id="depositAmount" required placeholder="Enter deposit amount" min="20" oninput="window.app.updateDepositBonusPreview()">
+        <!-- ===== PAGE 2 ===== -->
+        <div id="ppStageB" style="display:none">
 
-        <div class="pp-quick">
-          <button type="button" onclick="window.npSetDepAmount(50)">50</button>
-          <button type="button" onclick="window.npSetDepAmount(100)">100</button>
-          <button type="button" onclick="window.npSetDepAmount(300)">300</button>
-          <button type="button" onclick="window.npSetDepAmount(500)">500</button>
-          <button type="button" onclick="window.npSetDepAmount(1000)">1000</button>
+          <div class="pp-timer" id="ppTimerBox">
+            <div class="pp-timer-label">⏱ ডিপোজিট সম্পন্ন করার বাকি সময়</div>
+            <div class="pp-timer-clock" id="ppTimerClock">10:00</div>
+            <div class="pp-timer-bar"><div id="ppTimerBar"></div></div>
+            <div class="pp-timer-note">এই সময়ের মধ্যে টাকা পাঠিয়ে Transaction ID সাবমিট করতে হবে। সময় শেষ হলে আবার নতুন করে শুরু করতে হবে।</div>
+          </div>
+
+          <div class="pp-account" style="margin-top:0">
+            <div class="pp-account-label">Payment Number (<span id="ppSendMethod">bKash</span>)</div>
+            <div class="pp-account-row">
+              <div class="pp-account-number" id="adminPaymentNumber">01712-345678</div>
+              <button type="button" class="pp-copy" onclick="window.app.copyText(document.getElementById('adminPaymentNumber').innerText)">COPY</button>
+            </div>
+            <div class="pp-account-type">Account Type: Personal (Send Money)</div>
+            <div class="pp-sendbox" id="ppSendBox"></div>
+          </div>
+
+          <div class="pp-form">
+            <label class="pp-label" for="depositSenderNumber">SENDER NUMBER</label>
+            <input type="tel" class="pp-input" id="depositSenderNumber" required placeholder="017XXXXXXXX">
+
+            <label class="pp-label" for="depositTrxId">TRANSACTION ID</label>
+            <input type="text" class="pp-input" id="depositTrxId" required placeholder="BKA910283X" style="text-transform: uppercase;">
+
+            <button type="submit" class="pp-submit" id="btnSubmitDeposit" style="margin-top:0">
+              <span>ডিপোজিট রিকোয়েস্ট পাঠান</span>
+            </button>
+            <button type="button" class="pp-back" onclick="window.npDepBack()">← পরিবর্তন করুন</button>
+          </div>
         </div>
-
-        <label class="pp-label" for="depositSenderNumber">SENDER NUMBER</label>
-        <input type="tel" class="pp-input" id="depositSenderNumber" required placeholder="017XXXXXXXX">
-
-        <label class="pp-label" for="depositTrxId">TRANSACTION ID</label>
-        <input type="text" class="pp-input" id="depositTrxId" required placeholder="BKA910283X" style="text-transform: uppercase;">
-
-        <div class="pp-calc">
-          <div class="pp-row"><span>Deposit Amount</span><span class="pp-val" id="ppDepositValue">৳0.00</span></div>
-          <div class="pp-row"><span>Promotion Bonus</span><span class="pp-val pp-bonus" id="ppBonusValue">৳0.00</span></div>
-          <div class="pp-row"><span>Turnover Requirement</span><span class="pp-val" id="ppTurnoverValue">৳0.00</span></div>
-          <div class="pp-row pp-total"><span>Total Receive</span><span class="pp-val" id="ppTotalValue">৳0.00</span></div>
-          <div id="ppStatusMessage" class="pp-status"></div>
-        </div>
-
-        <button type="submit" class="pp-submit" id="btnSubmitDeposit">
-          <span>ডিপোজিট রিকোয়েস্ট পাঠান</span>
-        </button>
       </form>
 
       <div class="pp-notice">
-        নিচের অফিসিয়াল নাম্বারে Send Money করে TrxID ও প্রেরক নাম্বার লিখে সাবমিট করুন। অ্যাডমিন অনুমোদনের পর ব্যালেন্স অ্যাকাউন্টে যুক্ত হবে।
-        <br>Provided by MostWin88
+        নাম্বারে Send Money করে TrxID ও প্রেরক নাম্বার লিখে সাবমিট করুন। অ্যাডমিন অনুমোদনের পর ব্যালেন্স অ্যাকাউন্টে যুক্ত হবে।
       </div>
     </div>
   </div>
@@ -3458,8 +3508,7 @@
         </button>
       </form>
 
-      <div class="pp-notice" style="letter-spacing:1px">© 2026 MOSTWIN88</div>
-    </div>
+          </div>
   </div>
 
   <!-- 5. EDIT PROFILE MODAL -->
@@ -4715,9 +4764,11 @@
     }
 
     function npSyncCards(kind, method) {
+      const on = (kind === 'deposit') ? ppMethodChosen : true;
       document.querySelectorAll('.pp-card[data-kind="' + kind + '"]').forEach(c => {
-        c.classList.toggle('active', c.dataset.method === method);
+        c.classList.toggle('active', on && c.dataset.method === method);
       });
+      if (kind === 'deposit') { const sm = document.getElementById('ppSendMethod'); if (sm) sm.textContent = method; }
     }
 
     function npApplyMethodLogos() {
@@ -4733,7 +4784,7 @@
       const sel = document.getElementById(kind === 'deposit' ? 'depositMethod' : 'withdrawMethod');
       if (!sel) return;
       sel.value = method;
-      if (kind === 'deposit') updateDepositMethodDetails(); else updateWithdrawMethodDetails();
+      if (kind === 'deposit') { ppMethodChosen = true; updateDepositMethodDetails(); npDepRefresh(); } else updateWithdrawMethodDetails();
     }
 
     function npSetDepAmount(v) {
@@ -4753,56 +4804,191 @@
       set('ppWdAmount', amt); set('ppWdFee', 0); set('ppWdTotal', amt);
     }
 
+    // ---- Deposit 2-page flow state ----
+    let ppMethodChosen = false, ppTimer = null, ppEndTs = 0;
+    const PP_SECONDS = 600;
+    const $pp = (id) => document.getElementById(id);
+    const ppTk = (n) => '৳' + Math.round(Number(n) || 0);
+
+    function ppSelectedPromo() {
+      const el = $pp('ppPromoSelect'); const v = el ? el.value : '';
+      if (!v) return null;
+      if (v === '__std') return { kind: 'std' };
+      if (v === '__none') return { kind: 'none' };
+      const list = window.npPromoList ? window.npPromoList() : [];
+      const p = list.find(o => o.id === v);
+      return p ? { kind: 'promo', p } : null;
+    }
+
+    function npBuildPromoOptions() {
+      const el = $pp('ppPromoSelect'); if (!el) return;
+      const cur = el.value;
+      const list = window.npPromoList ? window.npPromoList() : [];
+      const c = npBonusConf();
+      let h = '<option value="">— প্রমোশন সিলেক্ট করুন —</option>';
+      list.forEach(o => {
+        const t = o.bonusType === 'fixed' ? ppTk(o.bonusValue) : (+o.bonusValue) + '%';
+        h += '<option value="' + escapeHtml(o.id) + '">🎁 ' + escapeHtml(o.name) + ' — ' + t + ' BONUS</option>';
+      });
+      if (c.on && (c.pct > 0 || c.tiers.length > 0)) h += '<option value="__std">🎁 STANDARD DEPOSIT BONUS</option>';
+      h += '<option value="__none">NO BONUS</option>';
+      el.innerHTML = h;
+      const ok = Array.prototype.some.call(el.options, o => o.value === cur);
+      el.value = ok ? cur : '';
+      npDepRefresh();
+    }
+
+    function npDepRefresh() {
+      const chosen = !!ppSelectedPromo();
+      const m = $pp('ppSecMethod'), a = $pp('ppSecAmount');
+      if (m) m.classList.toggle('pp-locked', !chosen);
+      if (a) a.classList.toggle('pp-locked', !(chosen && ppMethodChosen));
+      npDepCalc();
+    }
+
+    function npPromoChange() {
+      const sp = ppSelectedPromo();
+      if (window.npPromoSetSel) window.npPromoSetSel(sp && sp.kind === 'promo' ? sp.p.id : null);
+      npDepRefresh();
+    }
+
     function npDepCalc() {
       const c = npBonusConf();
-      const inp = document.getElementById('depositAmount');
+      const inp = $pp('depositAmount');
       const amt = Math.max(0, parseFloat(inp ? inp.value : 0) || 0);
       const minDep = state.settings.minDeposit || 50;
+      const sp = ppSelectedPromo();
 
-      let bonusPct = c.pct, mult = c.mult, matched = null;
-      if (c.tiers.length > 0) {
-        const sorted = [...c.tiers].sort((a, b) => (parseFloat(b.minDeposit) || 0) - (parseFloat(a.minDeposit) || 0));
-        matched = sorted.find(t => amt >= (parseFloat(t.minDeposit) || 0)) || null;
-        if (matched) { bonusPct = parseFloat(matched.bonusPercent) || 0; mult = parseFloat(matched.turnoverMultiplier) || 1; }
+      let bonus = 0, turnover = 0, eligible = false, warn = '', badge = '', pct = 0;
+      let infoTitle = '', infoDesc = '';
+
+      if (sp && sp.kind === 'promo') {
+        const p = sp.p, mn = +p.minDeposit || 0, mx = +p.maxDeposit || 0;
+        badge = p.bonusType === 'fixed' ? ppTk(p.bonusValue) : (+p.bonusValue) + '%';
+        infoTitle = String(p.name || 'PROMOTION');
+        infoDesc = (p.bonusType === 'fixed' ? 'Get <b>' + ppTk(p.bonusValue) + '</b> FIXED BONUS' : 'Get <b>' + (+p.bonusValue) + '%</b> BONUS') + ' on your eligible deposit.'
+          + '<br>Minimum Deposit: <b>' + ppTk(mn) + '</b><br>Maximum Deposit: <b>' + ppTk(mx) + '</b><br>Turnover: <b>' + (+p.turnoverMultiplier || 0) + 'x</b>'
+          + (p.endAt ? '<br>শেষ: <b>' + new Date(+p.endAt).toLocaleDateString() + '</b>' : '');
+        if (amt > 0) {
+          if (amt < mn || amt > mx) warn = 'এই অফারের জন্য Deposit Amount ' + ppTk(mn) + ' থেকে ' + ppTk(mx) + ' এর মধ্যে হতে হবে।';
+          else {
+            eligible = true; pct = +p.bonusValue || 0;
+            bonus = p.bonusType === 'fixed' ? (+p.bonusValue || 0) : Math.round(amt * (+p.bonusValue || 0) / 100);
+            turnover = Math.round((amt + bonus) * (+p.turnoverMultiplier || 0));
+          }
+        }
+      } else if (sp && sp.kind === 'std') {
+        let bonusPct = c.pct, mult = c.mult, matched = null;
+        if (c.tiers.length > 0) {
+          const sorted = [...c.tiers].sort((a, b) => (parseFloat(b.minDeposit) || 0) - (parseFloat(a.minDeposit) || 0));
+          matched = sorted.find(t => amt >= (parseFloat(t.minDeposit) || 0)) || null;
+          if (matched) { bonusPct = parseFloat(matched.bonusPercent) || 0; mult = parseFloat(matched.turnoverMultiplier) || 1; }
+        }
+        if (c.on && (matched || (bonusPct > 0 && amt >= c.minB))) {
+          eligible = true; pct = bonusPct;
+          bonus = Math.round((amt * bonusPct) / 100);
+          if (c.maxB > 0 && bonus > c.maxB) bonus = c.maxB;
+          turnover = Math.round((amt + bonus) * mult);
+        } else if (amt > 0 && c.tiers.length === 0 && bonusPct > 0 && amt < c.minB) {
+          warn = 'বোনাস পেতে সর্বনিম্ন ৳' + c.minB + ' ডিপোজিট করুন।';
+        }
+        if (matched) badge = (parseFloat(matched.bonusPercent) || 0) + '%';
+        else if (c.tiers.length > 0) badge = Math.max.apply(null, c.tiers.map(t => parseFloat(t.bonusPercent) || 0)) + '%';
+        else badge = c.pct + '%';
+        infoTitle = 'STANDARD DEPOSIT BONUS';
+        infoDesc = c.tiers.length > 0
+          ? c.tiers.map(t => '৳' + t.minDeposit + '+ ডিপোজিটে <b>' + t.bonusPercent + '%</b> বোনাস (' + t.turnoverMultiplier + 'x টার্নওভার)').join('<br>')
+          : 'Minimum Deposit: <b>৳' + c.minB + '</b><br>Bonus: <b>' + c.pct + '%</b>' + (c.maxB > 0 ? '<br>Max Bonus: <b>৳' + c.maxB + '</b>' : '') + '<br>Turnover: <b>' + c.mult + 'x</b>';
+      } else if (sp && sp.kind === 'none') {
+        infoTitle = 'NO BONUS'; infoDesc = 'No promotion bonus selected.';
       }
 
-      let bonus = 0, eligible = false;
-      if (c.on && (matched || (bonusPct > 0 && amt >= c.minB))) {
-        eligible = true;
-        bonus = Math.round((amt * bonusPct) / 100);
-        if (c.maxB > 0 && bonus > c.maxB) bonus = c.maxB;
+      // promotion info box
+      const box = $pp('ppPromoInfo');
+      if (box) {
+        box.style.display = sp ? 'block' : 'none';
+        if (sp) { $pp('ppPromoTitle').textContent = infoTitle; $pp('ppPromoDesc').innerHTML = infoDesc; }
       }
-      const turnover = eligible ? Math.round((amt + bonus) * mult) : 0;
 
-      // percentage badges on payment cards
-      let badgePct = 0;
-      if (c.on) {
-        if (matched) badgePct = parseFloat(matched.bonusPercent) || 0;
-        else if (c.tiers.length > 0) badgePct = Math.max.apply(null, c.tiers.map(t => parseFloat(t.bonusPercent) || 0));
-        else badgePct = c.pct;
-      }
+      // percentage badges on cards
       document.querySelectorAll('[data-pp-badge]').forEach(b => {
-        b.style.display = badgePct > 0 ? '' : 'none';
-        b.textContent = badgePct + '%';
+        b.style.display = badge ? '' : 'none';
+        b.textContent = badge;
       });
 
-      const setT = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = '৳' + v.toFixed(2); };
+      const setT = (id, v) => { const e = $pp(id); if (e) e.textContent = '৳' + v.toFixed(2); };
       setT('ppDepositValue', amt); setT('ppBonusValue', bonus); setT('ppTurnoverValue', turnover); setT('ppTotalValue', amt + bonus);
 
-      const bal = document.getElementById('ppDepBalance');
+      const bal = $pp('ppDepBalance');
       if (bal && state.userData) bal.textContent = state.userData.balance;
 
-      const st = document.getElementById('ppStatusMessage');
+      const st = $pp('ppStatusMessage');
       if (st) {
         st.className = 'pp-status'; st.textContent = '';
-        if (amt > 0 && amt < minDep) {
-          st.classList.add('warning'); st.textContent = 'সর্বনিম্ন ডিপোজিট ৳' + minDep + ' টাকা।';
-        } else if (amt > 0 && eligible) {
-          st.classList.add('success'); st.textContent = 'Promotion applied successfully! (' + bonusPct + '% বোনাস)';
-        } else if (amt > 0 && c.on && !matched && bonusPct > 0 && amt < c.minB) {
-          st.classList.add('warning'); st.textContent = 'বোনাস পেতে সর্বনিম্ন ৳' + c.minB + ' ডিপোজিট করুন।';
-        }
+        if (amt > 0 && amt < minDep) { st.classList.add('warning'); st.textContent = 'সর্বনিম্ন ডিপোজিট ৳' + minDep + ' টাকা।'; }
+        else if (warn) { st.classList.add('warning'); st.textContent = warn; }
+        else if (amt > 0 && eligible) { st.classList.add('success'); st.textContent = 'Promotion applied successfully!' + (pct ? ' (' + (sp.kind === 'promo' && sp.p.bonusType === 'fixed' ? ppTk(bonus) : pct + '%') + ' বোনাস)' : ''); }
       }
+    }
+
+    // ---- Page 1 -> Page 2 ----
+    function npDepNext() {
+      const sp = ppSelectedPromo();
+      if (!sp) { showToast('প্রথমে প্রমোশন সিলেক্ট করুন।', 'warning'); return; }
+      if (!ppMethodChosen) { showToast('bKash / Nagad / Rocket সিলেক্ট করুন।', 'warning'); return; }
+      const amt = parseFloat(($pp('depositAmount') || {}).value);
+      const minDep = state.settings.minDeposit || 50;
+      if (!amt || amt <= 0) { showToast('টাকার পরিমাণ লিখুন।', 'error'); return; }
+      if (amt < minDep) { showToast('সর্বনিম্ন ডিপোজিট ৳' + minDep + ' টাকা।', 'error'); return; }
+      if (window.npPromoCheck && !window.npPromoCheck(amt)) return;
+
+      updateDepositMethodDetails();
+      const method = $pp('depositMethod').value;
+      const sm = $pp('ppSendMethod'); if (sm) sm.textContent = method;
+      const bonusTxt = $pp('ppBonusValue') ? $pp('ppBonusValue').textContent : '';
+      const sb = $pp('ppSendBox');
+      if (sb) sb.innerHTML = 'পাঠাতে হবে: <b>' + ppTk(amt) + '</b>'
+        + (sp.kind !== 'none' && bonusTxt && bonusTxt !== '৳0.00' ? '<br>প্রমোশন বোনাস: <b>' + bonusTxt + '</b>' : '')
+        + '<br>পদ্ধতি: <b>Send Money (Personal)</b>';
+
+      $pp('ppStageA').style.display = 'none';
+      $pp('ppStageB').style.display = 'block';
+      npTimerStart();
+      const tb = $pp('depositTrxId'); if (tb) setTimeout(() => { try { tb.focus(); } catch (e) {} }, 150);
+    }
+
+    function npTimerStart() {
+      npTimerStop();
+      ppEndTs = Date.now() + PP_SECONDS * 1000;
+      npTimerTick();
+      ppTimer = setInterval(npTimerTick, 1000);
+    }
+    function npTimerStop() { if (ppTimer) { clearInterval(ppTimer); ppTimer = null; } }
+    function npTimerTick() {
+      const modal = $pp('modalDeposit');
+      if (!modal || !modal.classList.contains('active')) { npTimerStop(); return; }
+      const left = Math.max(0, Math.ceil((ppEndTs - Date.now()) / 1000));
+      const mm = String(Math.floor(left / 60)).padStart(2, '0'), ss = String(left % 60).padStart(2, '0');
+      const clk = $pp('ppTimerClock'); if (clk) clk.textContent = mm + ':' + ss;
+      const bar = $pp('ppTimerBar'); if (bar) bar.style.width = (left / PP_SECONDS * 100) + '%';
+      const box = $pp('ppTimerBox'); if (box) box.classList.toggle('low', left <= 120);
+      if (left <= 0) {
+        npDepReset(false);
+        showToast('⏰ ১০ মিনিট শেষ! সময় শেষ হওয়ায় আবার নতুন করে ডিপোজিট শুরু করুন।', 'warning');
+      }
+    }
+
+    function npDepBack() { npDepReset(false); }
+
+    function npDepReset(fresh) {
+      npTimerStop();
+      const A = $pp('ppStageA'), B = $pp('ppStageB');
+      if (A) A.style.display = 'block';
+      if (B) B.style.display = 'none';
+      const t = $pp('depositTrxId'); if (t) t.value = '';
+      const sn = $pp('depositSenderNumber'); if (sn) sn.value = '';
+      if (fresh) ppMethodChosen = false;
+      npDepRefresh();
     }
 
     document.addEventListener('reset', function (e) {
@@ -4810,11 +4996,32 @@
       if (id !== 'depositForm' && id !== 'withdrawForm') return;
       setTimeout(function () {
         try {
-          if (id === 'depositForm') { npSyncCards('deposit', document.getElementById('depositMethod').value); updateDepositMethodDetails(); npDepCalc(); }
-          else { npSyncCards('withdraw', document.getElementById('withdrawMethod').value); updateWithdrawMethodDetails(); npWdCalc(); }
+          if (id === 'depositForm') {
+            npSyncCards('deposit', $pp('depositMethod').value); updateDepositMethodDetails();
+            npDepReset(true); npBuildPromoOptions();
+          } else {
+            npSyncCards('withdraw', $pp('withdrawMethod').value); updateWithdrawMethodDetails(); npWdCalc();
+          }
         } catch (err) {}
       }, 0);
     });
+
+    // hooks used by the promotion module
+    window.npOnPromoUpdate = function () { try { npBuildPromoOptions(); } catch (e) {} };
+    window.npSyncPromoSelect = function () {
+      try {
+        const el = $pp('ppPromoSelect'); if (!el) return;
+        const sel = window.npPromoGetSel ? window.npPromoGetSel() : null;
+        if (sel) { npBuildPromoOptions(); el.value = sel.id; }
+        else if (el.value && el.value !== '__std' && el.value !== '__none') el.value = '';
+        npDepRefresh();
+      } catch (e) {}
+    };
+    window.npPromoChange = npPromoChange;
+    window.npDepNext = npDepNext;
+    window.npDepBack = npDepBack;
+    window.npDepReset = npDepReset;
+    window.npDepRefresh = npDepRefresh;
 
     window.npPickMethod = npPickMethod;
     window.npSetDepAmount = npSetDepAmount;
@@ -5962,6 +6169,7 @@
         return;
       }
       applySettings();
+      try { npDepReset(true); npBuildPromoOptions(); if (window.npSyncPromoSelect) window.npSyncPromoSelect(); } catch (e) {}
       openModal('modalDeposit');
     }
 
@@ -7058,6 +7266,7 @@
       return '<div class="pp-offer' + (on ? ' on' : '') + '" onclick="npPromoPick(\'' + k + '\')">' + '<span class="pp-badge" style="top:10px;right:10px">' + (p.bonusType === 'fixed' ? tk(p.bonusValue) : (+p.bonusValue) + '%') + '</span>' + '<div class="pp-offer-name">🎁 ' + esc(p.name) + '</div>' + '<div class="pp-offer-desc">' + bonusTxt(p) + '<br>Minimum Deposit: <b>' + tk(p.minDeposit) + '</b><br>Maximum Deposit: <b>' + tk(p.maxDeposit) + '</b><br>Turnover: <b>' + (+p.turnoverMultiplier) + 'x</b>' + (p.endAt ? '<br>শেষ: ' + new Date(+p.endAt).toLocaleDateString() : '') + '</div></div>';
     }).join('') : '<div style="text-align:center;color:#94a3b8;padding:14px;font-size:13px">এখন কোনো অ্যাক্টিভ অফার নেই</div>';
   }
+  var _ro = renderOffers; renderOffers = function () { _ro(); try { window.npOnPromoUpdate && window.npOnPromoUpdate(); } catch (e) {} };
   window.npPromoPick = function (k) { pick = k; renderOffers(); window.npPromoPreview(); };
   window.npPromoPreview = function () {
     var out = $('promoPreview'); if (!out) return;
@@ -7070,12 +7279,16 @@
   };
   function chip() {
     var c = $('promoChosenChip');
+    try { if (window.npSyncPromoSelect) window.npSyncPromoSelect(); } catch (e) {}
     if (!sel) { if (c) c.remove(); return; }
     var f = $('depositForm'); if (!f) return;
     if (!c) { c = document.createElement('div'); c.id = 'promoChosenChip'; c.style.cssText = 'margin:0 0 12px;padding:9px 12px;border-radius:10px;background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.5);font-size:12px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px'; f.parentNode.insertBefore(c, f); }
     c.innerHTML = '<span>🎁 নির্বাচিত অফার: <b>' + esc(sel.name) + '</b></span><button type="button" onclick="npPromoClear()" style="background:none;border:0;color:#f87171;font-weight:800;cursor:pointer">✕ বাতিল</button>';
   }
   window.npPromoClear = function () { sel = null; chip(); };
+  window.npPromoList = function () { return offers().map(function (k) { return Object.assign({ id: k }, P[k]); }); };
+  window.npPromoGetSel = function () { return sel; };
+  window.npPromoSetSel = function (id) { sel = (id && P[id]) ? { id: id, name: P[id].name } : null; chip(); };
   window.npOpenPromo = function () {
     if (typeof isLoggedIn === 'function' && !isLoggedIn()) { showToast('অফার দেখতে অনুগ্রহ করে লগইন করুন।', 'warning'); if (typeof showAuthModal === 'function') showAuthModal('login'); return; }
     pick = sel ? sel.id : ''; renderOffers(); window.npPromoPreview(); openModal('modalDepositPromo');
