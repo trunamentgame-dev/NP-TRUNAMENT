@@ -2914,6 +2914,15 @@
           <div id="turnoverNote" style="font-size:11px;color:#cbd5e1;margin-top:6px;font-weight:500;"></div>
         </div>
 
+        <div id="promoSummaryBox" style="display:none;margin:8px 0 4px;padding:12px 14px;border:1px solid rgba(251,191,36,0.35);border-radius:12px;background:rgba(0,0,0,0.35)">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:#cbd5e1;font-weight:700;">
+            <span>🎁 প্রোমো বোনাস ও টার্নওভার</span>
+            <button type="button" class="btn btn-primary" style="padding:6px 12px;font-size:12px;" onclick="window.npOpenPromo()">DEPOSIT PROMOTION</button>
+          </div>
+          <div id="promoSummaryGrid" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"></div>
+          <div id="promoSummaryList" style="margin-top:8px;font-size:11px;color:#cbd5e1;line-height:1.7"></div>
+        </div>
+
         <div class="wallet-action-row">
           <button class="btn btn-primary" onclick="window.app.openDepositModal()">
             <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -3248,6 +3257,21 @@
           <span>ডিপোজিট রিকোয়েস্ট পাঠান</span>
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- DEPOSIT PROMOTION POPUP (নতুন) -->
+  <div class="modal-overlay" id="modalDepositPromo">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">
+        <span>🎁 DEPOSIT PROMOTION</span>
+        <button class="modal-close-btn" onclick="window.app.closeModal('modalDepositPromo')">✕</button>
+      </div>
+      <div id="promoOfferList"></div>
+      <input type="number" class="form-input" id="promoAmount" min="1" placeholder="ডিপোজিট অ্যামাউন্ট (৳)" oninput="window.npPromoPreview()" style="margin-top:6px">
+      <div id="promoPreview" style="font-size:12px;font-weight:700;color:#fbbf24;margin:8px 2px 12px"></div>
+      <button type="button" class="btn btn-primary btn-block" onclick="window.npPromoContinue()"><span>অফার নিয়ে ডিপোজিট রিকোয়েস্ট করুন</span></button>
     </div>
   </div>
 
@@ -4221,6 +4245,7 @@
             gameName,
             gameUrl: url,
             startTime: Date.now(),
+            startServerAt: firebase.database.ServerValue.TIMESTAMP,
             startFormatted: new Date().toLocaleString(window.npLocale ? window.npLocale() : 'bn-BD'),
             endTime: null,
             duration: 'চলছে (Playing)',
@@ -5706,6 +5731,8 @@
         return;
       }
 
+      if (window.npPromoCheck && !window.npPromoCheck(amount)) return;
+
       btn.disabled = true;
       btn.innerText = 'সাবমিট হচ্ছে...';
 
@@ -5722,11 +5749,13 @@
             trxId,
             amount,
             status: 'Pending',
-            createdAt: firebase.database.ServerValue.TIMESTAMP
+            createdAt: firebase.database.ServerValue.TIMESTAMP,
+            ...(window.npPromoFields ? window.npPromoFields() : {})
           });
 
           closeModal('modalDeposit');
           document.getElementById('depositForm').reset();
+          if (window.npPromoClear) window.npPromoClear();
           playNotificationSound();
           showToast('✅ ডিপোজিট রিকোয়েস্ট সফলভাবে সাবমিট হয়েছে! অ্যাডমিন প্যানেলে যাচাই করে কিছুক্ষণের মধ্যে টাকা যুক্ত হবে।', 'success');
         } catch (err) {
@@ -6729,6 +6758,107 @@
       markAllNotificationsRead
     };
   </script>
+
+<script>
+/* ===== DEPOSIT PROMOTION (নতুন ফিচার) ===== */
+(function () {
+  var P = {}, CL = {}, ADMUID = '', sel = null, pick = '', curUid = '', refs = [];
+  var $ = function (i) { return document.getElementById(i); };
+  var tk = function (n) { return '৳' + Math.round(Number(n) || 0); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function calc(p, a) { var b = p.bonusType === 'fixed' ? (+p.bonusValue || 0) : Math.round(a * (+p.bonusValue || 0) / 100); return { b: b, t: Math.round((a + b) * (+p.turnoverMultiplier || 0)) }; }
+  function live(p) { var n = Date.now(); return !!p && p.active === true && (!p.startAt || n >= p.startAt) && (!p.endAt || n <= p.endAt) && !(ADMUID && p.adminOff && p.adminOff[ADMUID] === true); }
+  function offers() { return Object.keys(P).filter(function (k) { return live(P[k]); }).sort(function (a, b) { return (+P[a].minDeposit || 0) - (+P[b].minDeposit || 0); }); }
+  function bonusTxt(p) { return p.bonusType === 'fixed' ? tk(p.bonusValue) + ' বোনাস' : (+p.bonusValue) + '% বোনাস'; }
+  function renderSummary() {
+    var box = $('promoSummaryBox'); if (!box) return;
+    var logged = typeof state !== 'undefined' && state.currentUser;
+    box.style.display = logged ? 'block' : 'none'; if (!logged) return;
+    var s = { bonus: 0, pending: 0, active: 0, done: 0, remain: 0 }, rows = [];
+    Object.keys(CL).forEach(function (id) {
+      var c = CL[id], t = +c.turnover || 0, d = Math.min(+c.done || 0, t), st = c.status;
+      s.bonus += +c.bonus || 0;
+      if (st === 'active') { s.active += t; s.done += d; s.remain += t - d; }
+      else if (st === 'completed') { s.done += t; }
+      else { s.pending += t; s.remain += t; }
+      rows.push({ c: c, t: t, d: d, st: st });
+    });
+    $('promoSummaryGrid').innerHTML = [['বোনাস', s.bonus], ['পেন্ডিং', s.pending], ['অ্যাক্টিভ', s.active], ['সম্পন্ন', s.done], ['বাকি', s.remain]].map(function (x) {
+      return '<div style="flex:1;min-width:58px;text-align:center;background:rgba(255,255,255,.06);border-radius:8px;padding:6px 2px"><div style="font-size:10px;color:#94a3b8">' + x[0] + '</div><div style="font-size:13px;font-weight:800;color:#fbbf24">' + tk(x[1]) + '</div></div>';
+    }).join('');
+    var label = { pending: '⏳ পেন্ডিং', activating: '⏳ পেন্ডিং', active: '🔥 অ্যাক্টিভ', completed: '✅ সম্পন্ন' };
+    rows.sort(function (a, b) { return (+b.c.createdAt || 0) - (+a.c.createdAt || 0); });
+    $('promoSummaryList').innerHTML = rows.slice(0, 4).map(function (r) {
+      var extra = '';
+      if (r.st === 'pending') extra = r.c.activateAt ? ' — ' + Math.max(0, Math.ceil((r.c.activateAt - Date.now()) / 60000)) + ' মিনিট পর সক্রিয়' : ' — প্রথম গেম শুরুর ১০ মিনিট পর সক্রিয়';
+      else if (r.st === 'active' || r.st === 'completed') extra = ' — ' + tk(r.d) + ' / ' + tk(r.t);
+      return '<div>' + esc(r.c.promoName || 'প্রোমো') + ': ' + (label[r.st] || esc(r.st)) + extra + '</div>';
+    }).join('');
+  }
+  function renderOffers() {
+    var el = $('promoOfferList'); if (!el) return;
+    var ks = offers();
+    el.innerHTML = ks.length ? ks.map(function (k) {
+      var p = P[k], on = pick === k;
+      return '<div onclick="npPromoPick(\'' + k + '\')" style="cursor:pointer;margin:0 0 8px;padding:10px 12px;border-radius:12px;border:1.5px solid ' + (on ? '#10b981' : 'rgba(255,255,255,.2)') + ';background:' + (on ? 'rgba(16,185,129,.15)' : 'rgba(255,255,255,.05)') + '"><div style="font-weight:800;font-size:14px">🎁 ' + esc(p.name) + '</div><div style="font-size:12px;color:#cbd5e1;margin-top:3px">ডিপোজিট ' + tk(p.minDeposit) + ' – ' + tk(p.maxDeposit) + ' • ' + bonusTxt(p) + ' • টার্নওভার ' + (+p.turnoverMultiplier) + 'x' + (p.endAt ? ' • শেষ: ' + new Date(+p.endAt).toLocaleDateString() : '') + '</div></div>';
+    }).join('') : '<div style="text-align:center;color:#94a3b8;padding:14px;font-size:13px">এখন কোনো অ্যাক্টিভ অফার নেই</div>';
+  }
+  window.npPromoPick = function (k) { pick = k; renderOffers(); window.npPromoPreview(); };
+  window.npPromoPreview = function () {
+    var out = $('promoPreview'); if (!out) return;
+    var p = P[pick], a = parseFloat(($('promoAmount') || {}).value) || 0;
+    out.style.color = '#fbbf24';
+    if (!p) { out.textContent = 'একটি অফার বেছে নিন'; return; }
+    if (a < +p.minDeposit || a > +p.maxDeposit) { out.style.color = '#f87171'; out.textContent = 'এই অফারে ডিপোজিট ' + tk(p.minDeposit) + ' – ' + tk(p.maxDeposit) + ' এর মধ্যে হতে হবে'; return; }
+    var c = calc(p, a);
+    out.textContent = 'বোনাস ' + tk(c.b) + ' • টার্নওভার ' + tk(c.t) + ' (অ্যাডমিন অনুমোদনের পর, প্রথম গেম শুরুর ১০ মিনিটে অ্যাক্টিভ)';
+  };
+  function chip() {
+    var c = $('promoChosenChip');
+    if (!sel) { if (c) c.remove(); return; }
+    var f = $('depositForm'); if (!f) return;
+    if (!c) { c = document.createElement('div'); c.id = 'promoChosenChip'; c.style.cssText = 'margin:0 0 12px;padding:9px 12px;border-radius:10px;background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.5);font-size:12px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px'; f.parentNode.insertBefore(c, f); }
+    c.innerHTML = '<span>🎁 নির্বাচিত অফার: <b>' + esc(sel.name) + '</b></span><button type="button" onclick="npPromoClear()" style="background:none;border:0;color:#f87171;font-weight:800;cursor:pointer">✕ বাতিল</button>';
+  }
+  window.npPromoClear = function () { sel = null; chip(); };
+  window.npOpenPromo = function () {
+    if (typeof isLoggedIn === 'function' && !isLoggedIn()) { showToast('অফার দেখতে অনুগ্রহ করে লগইন করুন।', 'warning'); if (typeof showAuthModal === 'function') showAuthModal('login'); return; }
+    pick = sel ? sel.id : ''; renderOffers(); window.npPromoPreview(); openModal('modalDepositPromo');
+  };
+  window.npPromoContinue = function () {
+    var p = P[pick], a = parseFloat($('promoAmount').value) || 0;
+    if (!p || !live(p)) { showToast('একটি অ্যাক্টিভ অফার বেছে নিন।', 'warning'); return; }
+    if (a < +p.minDeposit || a > +p.maxDeposit) { showToast('ডিপোজিট ' + tk(p.minDeposit) + ' – ' + tk(p.maxDeposit) + ' এর মধ্যে দিন।', 'error'); return; }
+    sel = { id: pick, name: p.name };
+    closeModal('modalDepositPromo');
+    window.app.openDepositModal();
+    var inp = $('depositAmount'); if (inp) { inp.value = a; try { window.app.updateDepositBonusPreview(); } catch (e) {} }
+    chip();
+  };
+  window.npPromoCheck = function (amount) {
+    if (!sel) return true;
+    var p = P[sel.id];
+    if (!live(p)) { showToast('নির্বাচিত অফারটি এখন চালু নেই। অফার বাতিল করে আবার চেষ্টা করুন।', 'error'); return false; }
+    if (amount < +p.minDeposit || amount > +p.maxDeposit) { showToast('এই অফারে ডিপোজিট ' + tk(p.minDeposit) + ' – ' + tk(p.maxDeposit) + ' এর মধ্যে হতে হবে (অথবা অফার বাতিল করুন)।', 'error'); return false; }
+    return true;
+  };
+  window.npPromoFields = function () { return sel ? { promoId: sel.id, promoName: sel.name } : {}; };
+  function sync() {
+    var uid = (typeof state !== 'undefined' && state.currentUser) ? state.currentUser.uid : '';
+    if (uid === curUid) return;
+    if (uid && (typeof db === 'undefined' || !db)) return;
+    refs.forEach(function (r) { try { r.off(); } catch (e) {} }); refs = [];
+    P = {}; CL = {}; ADMUID = ''; sel = null; chip(); curUid = uid;
+    if (!uid) { renderSummary(); return; }
+    var nop = function () {};
+    var r1 = db.ref('depositPromotions'); r1.on('value', function (s) { P = s.val() || {}; renderSummary(); renderOffers(); }, nop); refs.push(r1);
+    var r2 = db.ref('promoTurnover/' + uid); r2.on('value', function (s) { CL = s.val() || {}; renderSummary(); }, nop); refs.push(r2);
+    db.ref('users/' + uid + '/adminUid').once('value').then(function (s) { ADMUID = s.val() || ''; renderOffers(); }).catch(nop);
+  }
+  setInterval(sync, 1500);
+  setInterval(renderSummary, 15000);
+})();
+</script>
 
   <!-- ==================== PHOTO 1 & PHOTO 2: EXIT SCRIPT ==================== -->
   <script>
