@@ -305,6 +305,14 @@ select.field{cursor:pointer}
   </p>
 
   <div class="contact-list">
+    <a class="contact-option" id="supportCallLink" href="#" style="display:none;border-color:#f5dfe8">
+      <span>
+        📞 সাপোর্ট হেল্পলাইনে কল করুন
+        <small id="supportCallNumber">-</small>
+      </span>
+      <span class="arrow" aria-hidden="true">›</span>
+    </a>
+
     <a class="contact-option whatsapp"
        id="whatsappLink"
        href="https://wa.me/966566774326"
@@ -380,6 +388,33 @@ const OFFICER_IMAGES = [
 ];
 
 const $ = id => document.getElementById(id);
+
+/* অ্যাডমিন প্যানেলে সেট করা সাপোর্ট হেল্পলাইন নাম্বার (Firebase settings/supportPhone) — ফাঁকা থাকলে কল বাটন লুকানো থাকে */
+let supportPhoneNumber = "";
+function applySupportPhone(){
+  const a = $("supportCallLink");
+  if(!a || !supportPhoneNumber) return;
+  a.href = "tel:" + supportPhoneNumber.replace(/[^\d+]/g, "");
+  const n = $("supportCallNumber");
+  if(n) n.textContent = supportPhoneNumber;
+  a.style.display = "flex";
+}
+(function loadSupportPhone(){
+  try{
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 8000);
+    fetch("https://np-trunament-bd-default-rtdb.firebaseio.com/settings/supportPhone.json",{signal:ctrl.signal,cache:"no-store"})
+      .then(r=>r.ok ? r.json() : null)
+      .then(v=>{
+        clearTimeout(timer);
+        if(typeof v === "string" && v.trim()){
+          supportPhoneNumber = v.trim();
+          applySupportPhone();
+        }
+      })
+      .catch(()=>{});
+  }catch(e){}
+})();
 
 /* নতুন চ্যাট সেশনে অফিসারের ছবি পরিবর্তন (রোটেশন) করার ফাংশন */
 function getNextOfficerImage() {
