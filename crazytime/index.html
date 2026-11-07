@@ -493,8 +493,8 @@ function ptrStep(now){
 function spinTo(seg,dur){
   const n=S.layout.length,st=2*Math.PI/n,TAU=2*Math.PI,base=-((seg+.5)*st)+(Math.random()-.5)*st*.24,from=S.rot;
   const d=(((base-from)%TAU)+TAU)%TAU,to=from+d+TAU*6,t0=performance.now();let lastTick=Math.floor(from/st),prevRot=from,prevT=t0,dirv=1;
-  /* শেষ দিকে চাকা ধীরে ধীরে এগিয়ে একটু পিছিয়ে আবার সামনে আসে (২-৩টা ঘর বদলায়), তারপর জেতা ঘরের ঠিক মাঝে থামে */
-  const settle=dur>2500,setDur=settle?1700:0,mainDur=dur-setDur,A=settle?1.1*st:0,OM=6.6,LAM=.142*OM,mainTo=to+A;
+  /* ওঠানামা বন্ধ: চাকা শুধু সামনে ঘুরে ধীরে ধীরে মসৃণভাবে জেতা ঘরের মাঝে থামে (settle=true করলে আবার শেষে ওঠানামা চালু হবে) */
+  const settle=false,setDur=settle?1700:0,mainDur=dur-setDur,A=settle?1.1*st:0,OM=6.6,LAM=.142*OM,mainTo=to+A;
   function finish(){PT.tg=0;ptrGo();const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}
   (function f(now){const el=Math.max(0,now-t0);let done=false;
     if(el<mainDur){const p=el/mainDur,e=1-Math.pow(1-p,4);S.rot=from+(mainTo-from)*e}
