@@ -883,6 +883,15 @@
       gap: 10px;
     }
 
+    /* History tabs (classic, inline - no popup) */
+    .np-hist-tabs { display:flex; gap:8px; overflow-x:auto; padding:2px 0 4px; scrollbar-width:none; }
+    .np-hist-tabs::-webkit-scrollbar { display:none; }
+    .np-hist-tab { flex:1 1 0; text-align:center; border:1px solid var(--border-subtle); background:var(--bg-card); color:var(--text-secondary); font-family:inherit; font-size:12.5px; font-weight:700; padding:9px 6px; border-radius:9999px; cursor:pointer; white-space:nowrap; transition:all .2s ease; }
+    .np-hist-tab.active { background:var(--color-primary, #f59e0b); color:#0f172a; border-color:transparent; }
+    .np-hist-tab .np-cnt { font-size:11px; opacity:.75; margin-left:4px; }
+    .np-hist-note { font-size:11px; color:var(--text-muted); margin:8px 2px 12px; }
+    .np-hist-chip { display:inline-block; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:9999px; margin-top:4px; }
+
     /* Transactions */
     .tx-item {
       background: var(--bg-card);
@@ -1941,6 +1950,30 @@
       animation-delay: 0ms !important;
     }
   }
+
+  /* PC/বড় স্ক্রিনেও ইন্ট্রো হোম পেজের মতোই মোবাইল-সাইজ কলামে (সর্বোচ্চ ৫৪০px) মাঝখানে দেখাবে */
+  @media (min-width: 541px) {
+    #np-intro {
+      inset: 0 auto 0 50%;
+      width: 540px;
+      transform: translateX(-50%);
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.25);
+    }
+
+    #np-intro .np-logo {
+      font-size: 124px;
+    }
+
+    #np-intro .np-brand-name {
+      font-size: 21px;
+      letter-spacing: 6px;
+    }
+
+    #np-intro .np-provider {
+      font-size: 15px;
+      letter-spacing: 1.5px;
+    }
+  }
 </style>
 
 <div id="np-intro" aria-label="NP Tournament BD intro">
@@ -2430,6 +2463,18 @@
           </div>
           <span style="font-size:12px; color:var(--color-primary); font-weight:700;" id="menuLangBadge">বাংলা ❯</span>
         </div>
+
+        <!-- Support Helpline (অ্যাডমিন প্যানেল থেকে সেট করা নাম্বার; খালি থাকলে লুকানো থাকে) -->
+        <a id="supportPhoneRow" href="#" class="tx-item" style="display: none; border: none; border-bottom: 1px solid var(--border-subtle); border-radius: 0; text-decoration: none; color: inherit; cursor: pointer;">
+          <div class="tx-left">
+            <div class="tx-icon-box tx-entry">📞</div>
+            <div>
+              <div class="tx-title">সাপোর্ট হেল্পলাইন (Support)</div>
+              <div class="tx-date" id="supportPhoneText">-</div>
+            </div>
+          </div>
+          <span style="font-size:12px; color:var(--color-primary); font-weight:700;">কল করুন ❯</span>
+        </a>
 
         <!-- Rules -->
         <div class="tx-item" style="border: none; border-radius: 0; cursor: pointer;" onclick="window.app.openRulesModal()">
@@ -3706,6 +3751,20 @@
 
       const minWith = document.getElementById('minWithdrawAmountLabel');
       if (minWith) minWith.innerText = state.settings.minWithdraw || 100;
+
+      // অ্যাডমিন প্যানেলে সেট করা সাপোর্ট হেল্পলাইন নাম্বার ইউজার প্যানেলে দেখানো
+      const supportNum = String(state.settings.supportPhone || '').trim();
+      const supportRow = document.getElementById('supportPhoneRow');
+      if (supportRow) {
+        if (supportNum) {
+          supportRow.style.display = 'flex';
+          supportRow.href = 'tel:' + supportNum.replace(/[^\d+]/g, '');
+          const supportTxt = document.getElementById('supportPhoneText');
+          if (supportTxt) supportTxt.innerText = supportNum;
+        } else {
+          supportRow.style.display = 'none';
+        }
+      }
     }
 
     function updateDepositMethodDetails() {
@@ -4995,9 +5054,10 @@
       }
     }
 
-    // --- লেনদেন হিস্ট্রি: শুধু গত ৭ দিন দেখানো হয় + ডিপোজিট/উইথড্র রিকোয়েস্টের স্ট্যাটাস ---
+    // --- লেনদেন হিস্ট্রি: ট্যাব (সব / ডিপোজিট / উইথড্র / অন্যান্য), শুধু গত ৭ দিন, রিকোয়েস্টের স্ট্যাটাসসহ ---
     let npDepReqs = [];
     let npWdReqs = [];
+    let npHistTab = 'deposit';
     const NP_HISTORY_MS = 7 * 24 * 60 * 60 * 1000;
 
     function npItemTs(o) {
@@ -5012,46 +5072,89 @@
 
     function npReqStatusInfo(status) {
       const v = String(status || '').trim().toLowerCase();
-      if (v === 'pending' || v === 'waiting') return { label: '🕒 পেন্ডিং — অ্যাডমিনের যাচাইয়ের অপেক্ষায়', color: '#f59e0b' };
-      if (['processing', 'in_progress', 'in progress', 'review', 'under review', 'under_review'].includes(v)) return { label: '⚙️ প্রসেসিং চলছে', color: '#3b82f6' };
-      if (['approved', 'completed', 'complete', 'success', 'successful', 'paid', 'done', 'accepted'].includes(v)) return { label: '✅ সম্পন্ন হয়েছে', color: '#10b981' };
-      if (['rejected', 'cancelled', 'canceled', 'failed', 'declined', 'refunded'].includes(v)) return { label: '❌ বাতিল হয়েছে', color: '#ef4444' };
-      return { label: escapeHtml(String(status || 'Pending')), color: '#94a3b8' };
+      if (v === 'pending' || v === 'waiting') return { key: 'pending', label: '🕒 পেন্ডিং', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)' };
+      if (['processing', 'in_progress', 'in progress', 'review', 'under review', 'under_review'].includes(v)) return { key: 'processing', label: '⚙️ প্রসেসিং চলছে', color: '#3b82f6', bg: 'rgba(59,130,246,0.15)' };
+      if (['approved', 'completed', 'complete', 'success', 'successful', 'paid', 'done', 'accepted'].includes(v)) return { key: 'success', label: '✅ সম্পন্ন', color: '#10b981', bg: 'rgba(16,185,129,0.15)' };
+      if (['rejected', 'cancelled', 'canceled', 'failed', 'declined', 'refunded'].includes(v)) return { key: 'rejected', label: '❌ বাতিল', color: '#ef4444', bg: 'rgba(239,68,68,0.15)' };
+      return { key: 'other', label: escapeHtml(String(status || 'Pending')), color: '#94a3b8', bg: 'rgba(148,163,184,0.15)' };
+    }
+
+    function setHistoryTab(tab) {
+      npHistTab = ['deposit', 'withdraw', 'other'].includes(tab) ? tab : 'deposit';
+      renderTxHistoryFeed();
+    }
+
+    function npBuildHistoryItems() {
+      const items = [];
+
+      // ডিপোজিট / উইথড্র রিকোয়েস্ট (স্ট্যাটাসসহ)
+      npDepReqs.filter(npWithin7Days).forEach(r => items.push({ src: 'req', kind: 'deposit', ts: npItemTs(r), raw: r }));
+      npWdReqs.filter(npWithin7Days).forEach(r => items.push({ src: 'req', kind: 'withdraw', ts: npItemTs(r), raw: r }));
+
+      // লেনদেন (ট্রানজেকশন) — একই কাজের ডুপ্লিকেট লাইন লুকানো হয়
+      const txs = (state.transactions || []).filter(npWithin7Days);
+      const hidden = new Set();
+
+      npWdReqs.forEach(r => {
+        txs.forEach(tx => {
+          if (tx.type === 'WITHDRAW_REQUEST' && !hidden.has(tx) && Number(tx.amount) === Number(r.amount) && Math.abs(npItemTs(r) - npItemTs(tx)) < 120000) hidden.add(tx);
+        });
+      });
+
+      npDepReqs.slice().sort((a, b) => npItemTs(a) - npItemTs(b)).forEach(r => {
+        if (npReqStatusInfo(r.status).key !== 'success') return;
+        const m = txs.find(tx => !hidden.has(tx) && String(tx.type || '').toUpperCase().includes('DEPOSIT') && Number(tx.amount) === Number(r.amount) && (!npItemTs(tx) || npItemTs(tx) >= npItemTs(r) - 60000));
+        if (m) hidden.add(m);
+      });
+
+      txs.forEach(tx => {
+        if (hidden.has(tx)) return;
+        const t = String(tx.type || '').toUpperCase();
+        const kind = t.includes('WITHDRAW') ? 'withdraw' : (t.includes('DEPOSIT') ? 'deposit' : 'other');
+        items.push({ src: 'tx', kind, ts: npItemTs(tx), raw: tx });
+      });
+
+      return items.sort((a, b) => b.ts - a.ts);
     }
 
     function renderTxHistoryFeed() {
       const feed = document.getElementById('txHistoryFeed');
       if (!feed) return;
 
-      // ৭ দিনের পুরনো লেনদেন আর দেখানো হয় না; একই উইথড্রের রিকোয়েস্ট কার্ড থাকলে ডুপ্লিকেট লাইন লুকানো হয়
-      const txList = (state.transactions || []).filter(npWithin7Days).filter(tx => {
-        if (tx.type !== 'WITHDRAW_REQUEST') return true;
-        return !npWdReqs.some(r => Number(r.amount) === Number(tx.amount) && Math.abs(npItemTs(r) - npItemTs(tx)) < 120000);
-      });
+      const all = npBuildHistoryItems();
+      const counts = {
+        all: all.length,
+        deposit: all.filter(i => i.kind === 'deposit').length,
+        withdraw: all.filter(i => i.kind === 'withdraw').length,
+        other: all.filter(i => i.kind === 'other').length
+      };
+      const shown = all.filter(i => i.kind === npHistTab);
 
-      const reqs = [
-        ...npDepReqs.map(r => ({ ...r, _kind: 'deposit' })),
-        ...npWdReqs.map(r => ({ ...r, _kind: 'withdraw' }))
-      ].filter(npWithin7Days).sort((a, b) => npItemTs(b) - npItemTs(a));
+      const tabDefs = [['deposit', 'ডিপোজিট হিস্ট্রি'], ['withdraw', 'উইথড্র হিস্ট্রি'], ['other', 'গেম হিস্ট্রি']];
+      const tabsHtml = `
+        <div class="np-hist-tabs">
+          ${tabDefs.map(([k, label]) => `
+            <button type="button" class="np-hist-tab ${npHistTab === k ? 'active' : ''}" onclick="window.app.setHistoryTab('${k}')">${label}<span class="np-cnt">${counts[k]}</span></button>
+          `).join('')}
+        </div>
+        <div class="np-hist-note">গত ৭ দিনের হিস্ট্রি দেখানো হচ্ছে</div>
+      `;
 
-      if (txList.length === 0 && reqs.length === 0) {
-        feed.innerHTML = `
+      if (shown.length === 0) {
+        feed.innerHTML = tabsHtml + `
           <div class="empty-state">
             <div class="empty-title">কোনো লেনদেন হিস্ট্রি নেই</div>
-            <div class="empty-desc">ডিপোজিট, উইথড্র ও টুর্নামেন্ট জয়েনিংয়ের বিবরণ এখানে প্রদর্শিত হবে (শুধু গত ৭ দিনের)।</div>
+            <div class="empty-desc">এই বিভাগে গত ৭ দিনে কোনো লেনদেন নেই।</div>
           </div>
         `;
         return;
       }
 
-      const headStyle = 'font-size:12px; font-weight:700; color:var(--text-secondary); margin:6px 2px 8px;';
-
-      const reqHtml = reqs.length === 0 ? '' : `
-        <div style="${headStyle}">ডিপোজিট / উইথড্র রিকোয়েস্ট স্ট্যাটাস (গত ৭ দিন)</div>
-        ${reqs.map(r => {
-          const isDep = r._kind === 'deposit';
+      feed.innerHTML = tabsHtml + shown.map(it => {
+        if (it.src === 'req') {
+          const r = it.raw;
+          const isDep = it.kind === 'deposit';
           const st = npReqStatusInfo(r.status);
-          const t = npItemTs(r);
           const noteText = r.adminNote || r.rejectReason || r.reason || '';
           return `
             <div class="tx-item">
@@ -5059,45 +5162,40 @@
                 <div class="tx-icon-box ${isDep ? 'tx-deposit' : 'tx-withdraw'}">${isDep ? '↓' : '↑'}</div>
                 <div>
                   <div class="tx-title">${isDep ? 'ডিপোজিট' : 'উইথড্র'} রিকোয়েস্ট${r.method ? ' (' + escapeHtml(String(r.method)) + ')' : ''}</div>
-                  <div class="tx-date">${t ? new Date(t).toLocaleString('bn-BD') : 'সম্প্রতি'}</div>
+                  <div class="tx-date">${it.ts ? new Date(it.ts).toLocaleString('bn-BD') : 'সম্প্রতি'}</div>
                   ${noteText ? `<div class="tx-date" style="margin-top:2px;">${escapeHtml(String(noteText))}</div>` : ''}
                 </div>
               </div>
               <div style="text-align:right;">
                 <div class="t-val" style="font-size:15px; color:${isDep ? '#10b981' : '#ef4444'};">${isDep ? '+' : '-'} ৳ ${escapeHtml(String(r.amount))}</div>
-                <div style="font-size:11px; font-weight:700; margin-top:3px; color:${st.color};">${st.label}</div>
+                <span class="np-hist-chip" style="background:${st.bg}; color:${st.color};">${st.label}</span>
               </div>
             </div>
           `;
-        }).join('')}
-      `;
-
-      const txHtml = txList.length === 0 ? '' : `
-        ${reqs.length ? `<div style="${headStyle} margin-top:14px;">লেনদেন (গত ৭ দিন)</div>` : ''}
-        ${txList.map(tx => {
-          const isDep = tx.type && (tx.type.includes('DEPOSIT') || tx.type.includes('CREDIT') || tx.type.includes('PRIZE'));
-          return `
-            <div class="tx-item">
-              <div class="tx-left">
-                <div class="tx-icon-box ${isDep ? 'tx-deposit' : 'tx-withdraw'}">
-                  ${isDep ? '↓' : '↑'}
-                </div>
-                <div>
-                  <div class="tx-title">${escapeHtml(tx.note || tx.type)}</div>
-                  <div class="tx-date">${tx.date || 'সম্প্রতি'}</div>
-                </div>
+        }
+        const tx = it.raw;
+        const isDep = tx.type && (tx.type.includes('DEPOSIT') || tx.type.includes('CREDIT') || tx.type.includes('PRIZE'));
+        const doneChip = (it.kind === 'deposit') ? `<span class="np-hist-chip" style="background:rgba(16,185,129,0.15); color:#10b981;">✅ সম্পন্ন</span>` : '';
+        return `
+          <div class="tx-item">
+            <div class="tx-left">
+              <div class="tx-icon-box ${isDep ? 'tx-deposit' : 'tx-withdraw'}">
+                ${isDep ? '↓' : '↑'}
               </div>
-              <div style="text-align:right;">
-                <div class="t-val" style="font-size:15px; color:${isDep ? '#10b981' : '#ef4444'};">
-                  ${isDep ? '+' : '-'} ৳ ${tx.amount}
-                </div>
+              <div>
+                <div class="tx-title">${escapeHtml(tx.note || tx.type)}</div>
+                <div class="tx-date">${tx.date || 'সম্প্রতি'}</div>
               </div>
             </div>
-          `;
-        }).join('')}
-      `;
-
-      feed.innerHTML = reqHtml + txHtml;
+            <div style="text-align:right;">
+              <div class="t-val" style="font-size:15px; color:${isDep ? '#10b981' : '#ef4444'};">
+                ${isDep ? '+' : '-'} ৳ ${tx.amount}
+              </div>
+              ${doneChip}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // --- Helpers & Modals ---
@@ -5812,6 +5910,7 @@
       updateWithdrawMethodDetails,
       dismissRulesModal,
       refreshWallet,
+      setHistoryTab,
       openTournamentDetail,
       openSupportModal,
       closeSupportModal,
