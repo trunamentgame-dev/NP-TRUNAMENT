@@ -2897,7 +2897,22 @@
           </button>
         </div>
 
-        <div id="turnoverBox" style="display:none;margin:10px 0 2px;padding:10px 12px;border:1px solid rgba(255,255,255,0.2);border-radius:12px;background:rgba(0,0,0,0.25)"><div style="display:flex;justify-content:space-between;font-size:12px;color:#cbd5e1"><span>🎯 টার্নওভার</span><span id="turnoverTxt"></span></div><div style="height:8px;border-radius:99px;background:rgba(255,255,255,0.15);margin-top:6px;overflow:hidden"><div id="turnoverBar" style="height:100%;width:0;background:#10b981;transition:width .3s"></div></div><div id="turnoverNote" style="font-size:11px;color:#cbd5e1;margin-top:6px"></div></div>
+        <!-- Bonus Offer Banner in Wallet -->
+        <div id="walletBonusOfferBanner" style="display:none; margin:10px 0 6px; padding:8px 12px; background:linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(109, 40, 217, 0.15)); border:1px solid rgba(139, 92, 246, 0.45); border-radius:10px; font-size:12px; color:#ddd6fe; align-items:center; gap:8px;">
+          <span style="font-size:18px;">🎁</span>
+          <span>ডিপোজিট করলেই পাচ্ছেন <strong><span id="walletBonusPercentLabel">10%</span> ক্যাশ বোনাস</strong>!</span>
+        </div>
+
+        <div id="turnoverBox" style="margin:10px 0 4px;padding:12px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:12px;background:rgba(0,0,0,0.35)">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#cbd5e1;font-weight:700;">
+            <span>🎯 উইথড্র টার্নওভার প্রগ্রেস</span>
+            <span id="turnoverTxt" style="color:#fbbf24;"></span>
+          </div>
+          <div style="height:9px;border-radius:99px;background:rgba(255,255,255,0.15);margin-top:7px;overflow:hidden">
+            <div id="turnoverBar" style="height:100%;width:0;background:#10b981;transition:width .3s"></div>
+          </div>
+          <div id="turnoverNote" style="font-size:11px;color:#cbd5e1;margin-top:6px;font-weight:500;"></div>
+        </div>
 
         <div class="wallet-action-row">
           <button class="btn btn-primary" onclick="window.app.openDepositModal()">
@@ -3171,6 +3186,22 @@
         </div>
       </div>
 
+      <!-- Deposit Bonus Offer Box -->
+      <div id="depositBonusNoticeBox" style="display:none; background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(5, 150, 105, 0.1)); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 20px;">🎁</span>
+            <b style="color: #34d399; font-size: 13px;">ডিপোজিট বোনাস অফার চালু আছে!</b>
+          </div>
+          <span class="badge" style="background:#10b981; color:#fff; font-weight:700; font-size:12px; padding:3px 8px; border-radius:6px;" id="depositBonusBadge">10% বোনাস</span>
+        </div>
+        <div style="font-size: 11px; color: #cbd5e1; margin-top: 5px;" id="depositBonusNote">
+          ডিপোজিট করলেই সাথে সাথে ব্যালেন্সে বোনাস যুক্ত হবে।
+        </div>
+        <div id="depositBonusCalcPreview" style="display:none; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.15); font-size: 12px; color: #fbbf24; font-weight: 600;">
+        </div>
+      </div>
+
       <form id="depositForm" onsubmit="window.app.handleDepositSubmit(event)">
         <div class="form-group">
           <label class="form-label">পেমেন্ট মেথড নির্বাচন করুন</label>
@@ -3200,7 +3231,7 @@
 
         <div class="form-group">
           <label class="form-label">টাকার পরিমাণ (BDT ৳)</label>
-          <input type="number" class="form-input" id="depositAmount" required placeholder="50" min="20">
+          <input type="number" class="form-input" id="depositAmount" required placeholder="50" min="20" oninput="window.app.updateDepositBonusPreview()">
         </div>
 
         <div class="form-group">
@@ -3238,6 +3269,9 @@
           </div>
         </div>
       </div>
+
+      <!-- Turnover Alert Box in Withdraw Modal -->
+      <div id="withdrawTurnoverAlertBox" style="margin-bottom: 14px; padding: 10px 14px; border-radius: 12px; font-size: 12px; border: 1px solid rgba(255,255,255,0.15);"></div>
 
       <form id="withdrawForm" onsubmit="window.app.handleWithdrawSubmit(event)">
         <div class="form-group">
@@ -3466,7 +3500,7 @@
   <script>
   function npTurnoverLeft(){
     try {
-      var u = state.userData || {};
+      var u = (typeof state !== 'undefined' && state.userData) ? state.userData : {};
       var req = parseFloat(u.turnoverRequired) || 0;
       var done = parseFloat(u.turnoverDone !== undefined ? u.turnoverDone : u.turnoverCompleted) || 0;
       return Math.max(0, Math.round((req - done) * 100) / 100);
@@ -3474,16 +3508,79 @@
   }
   function npRenderTurnover(){
     var b = document.getElementById('turnoverBox');
-    if (!b) return;
-    var u = state.userData || {};
+    var u = (typeof state !== 'undefined' && state.userData) ? state.userData : {};
     var req = parseFloat(u.turnoverRequired) || 0;
     var done = parseFloat(u.turnoverDone !== undefined ? u.turnoverDone : u.turnoverCompleted) || 0;
-    if (req <= 0) { b.style.display = 'none'; return; }
-    var left = npTurnoverLeft(), p = Math.min(100, Math.round(done / req * 100));
-    b.style.display = 'block';
-    document.getElementById('turnoverTxt').textContent = '৳' + Math.min(done, req) + ' / ৳' + req;
-    document.getElementById('turnoverBar').style.width = p + '%';
-    document.getElementById('turnoverNote').textContent = left > 0 ? 'উইথড্র করতে আরও ৳' + left + ' টার্নওভার বাকি (' + p + '% সম্পন্ন)' : '✅ টার্নওভার সম্পন্ন, এখন উইথড্র করতে পারবেন';
+    var left = npTurnoverLeft();
+    var p = req > 0 ? Math.min(100, Math.round(done / req * 100)) : 100;
+
+    if (b) {
+      b.style.display = 'block';
+      var txtEl = document.getElementById('turnoverTxt');
+      var barEl = document.getElementById('turnoverBar');
+      var noteEl = document.getElementById('turnoverNote');
+      if (req > 0) {
+        if (txtEl) txtEl.textContent = '৳' + Math.min(done, req) + ' / ৳' + req;
+        if (barEl) {
+          barEl.style.width = p + '%';
+          barEl.style.background = left > 0 ? '#f59e0b' : '#10b981';
+        }
+        if (noteEl) noteEl.textContent = left > 0 ? 'উইথড্র করতে আরও ৳' + left + ' টার্নওভার বাকি (' + p + '% সম্পন্ন)' : '✅ টার্নওভার সম্পন্ন, এখন উইথড্র করতে পারবেন';
+      } else {
+        if (txtEl) txtEl.textContent = 'শর্ত নেই (০%)';
+        if (barEl) {
+          barEl.style.width = '100%';
+          barEl.style.background = '#10b981';
+        }
+        if (noteEl) noteEl.textContent = '✅ কোনো টার্নওভার বাকি নেই, আপনি উইথড্র করতে পারবেন';
+      }
+    }
+
+    var wAlert = document.getElementById('withdrawTurnoverAlertBox');
+    var wBtn = document.getElementById('btnSubmitWithdraw');
+    if (wAlert) {
+      if (left > 0) {
+        wAlert.style.display = 'block';
+        wAlert.style.background = 'rgba(239, 68, 68, 0.12)';
+        wAlert.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+        wAlert.innerHTML = `
+          <div style="display:flex; align-items:flex-start; gap:8px;">
+            <span style="font-size:20px; line-height:1;">⚠️</span>
+            <div>
+              <div style="font-weight:700; color:#ef4444; font-size:13px;">উইথড্র লক: টার্নওভার অপূর্ণ!</div>
+              <div style="font-size:11px; color:#cbd5e1; margin-top:2px;">
+                প্রয়োজনীয় টার্নওভার: <strong>৳${req}</strong> | সম্পন্ন: <strong>৳${done}</strong>
+              </div>
+              <div style="font-size:12px; color:#f87171; font-weight:700; margin-top:3px;">
+                উইথড্র করতে আরও ৳${left} টাকার ম্যাচ/টুর্নামেন্ট খেলতে হবে।
+              </div>
+            </div>
+          </div>`;
+        if (wBtn) {
+          wBtn.disabled = true;
+          wBtn.style.opacity = '0.55';
+          wBtn.style.cursor = 'not-allowed';
+          wBtn.innerHTML = `<span>⚠️ আরও ৳${left} টার্নওভার বাকি</span>`;
+        }
+      } else {
+        wAlert.style.display = 'block';
+        wAlert.style.background = 'rgba(16, 185, 129, 0.12)';
+        wAlert.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+        wAlert.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">✅</span>
+            <div style="font-size:12px; color:#34d399; font-weight:700;">
+              টার্নওভার সম্পূর্ণ সম্পন্ন হয়েছে! আপনি যেকোনো পরিমাণ উইথড্র করতে পারবেন।
+            </div>
+          </div>`;
+        if (wBtn) {
+          wBtn.disabled = false;
+          wBtn.style.opacity = '1';
+          wBtn.style.cursor = 'pointer';
+          wBtn.innerHTML = `<span>উইথড্র কনফার্ম করুন</span>`;
+        }
+      }
+    }
   }
   </script>
   <script>
@@ -4375,6 +4472,52 @@
           supportRow.style.display = 'none';
         }
       }
+
+      // Deposit Bonus Settings application
+      const isBonusOn = state.settings.depositBonusEnabled === true || String(state.settings.depositBonusEnabled) === 'true';
+      const bonusPct = (typeof state.settings.depositBonusPercent !== 'undefined') ? parseFloat(state.settings.depositBonusPercent) : 10;
+      const minDepForBonus = (typeof state.settings.minDepositForBonus !== 'undefined') ? parseFloat(state.settings.minDepositForBonus) : 100;
+      const maxBonus = (typeof state.settings.maxBonusAmount !== 'undefined') ? parseFloat(state.settings.maxBonusAmount) : 500;
+
+      const depBonusBox = document.getElementById('depositBonusNoticeBox');
+      const depBonusBadge = document.getElementById('depositBonusBadge');
+      const depBonusNote = document.getElementById('depositBonusNote');
+      const walletBonusBanner = document.getElementById('walletBonusOfferBanner');
+      const walletBonusPctLabel = document.getElementById('walletBonusPercentLabel');
+
+      if (isBonusOn && bonusPct > 0) {
+        if (depBonusBox) depBonusBox.style.display = 'block';
+        if (depBonusBadge) depBonusBadge.innerText = `${bonusPct}% বোনাস`;
+        if (depBonusNote) depBonusNote.innerText = `সর্বনিম্ন ৳${minDepForBonus} ডিপোজিট করলেই পাচ্ছেন আকর্ষণীয় ${bonusPct}% ক্যাশ বোনাস${maxBonus > 0 ? ` (সর্বোচ্চ ৳${maxBonus})` : ''}! অনুমোদনের পর সাথে সাথে যুক্ত হবে।`;
+        if (walletBonusBanner) walletBonusBanner.style.display = 'flex';
+        if (walletBonusPctLabel) walletBonusPctLabel.innerText = `${bonusPct}%`;
+      } else {
+        if (depBonusBox) depBonusBox.style.display = 'none';
+        if (walletBonusBanner) walletBonusBanner.style.display = 'none';
+      }
+      try { updateDepositBonusPreview(); } catch (e) {}
+      try { npRenderTurnover(); } catch (e) {}
+    }
+
+    function updateDepositBonusPreview() {
+      const isBonusOn = state.settings.depositBonusEnabled === true || String(state.settings.depositBonusEnabled) === 'true';
+      const bonusPct = (typeof state.settings.depositBonusPercent !== 'undefined') ? parseFloat(state.settings.depositBonusPercent) : 10;
+      const minDepForBonus = (typeof state.settings.minDepositForBonus !== 'undefined') ? parseFloat(state.settings.minDepositForBonus) : 100;
+      const maxBonus = (typeof state.settings.maxBonusAmount !== 'undefined') ? parseFloat(state.settings.maxBonusAmount) : 500;
+      const previewEl = document.getElementById('depositBonusCalcPreview');
+      if (!previewEl) return;
+
+      const depInput = document.getElementById('depositAmount');
+      const amt = depInput ? (parseFloat(depInput.value) || 0) : 0;
+      if (!isBonusOn || bonusPct <= 0 || amt < minDepForBonus) {
+        previewEl.style.display = 'none';
+        return;
+      }
+
+      let calcBonus = Math.round((amt * bonusPct) / 100);
+      if (maxBonus > 0 && calcBonus > maxBonus) calcBonus = maxBonus;
+      previewEl.style.display = 'block';
+      previewEl.innerHTML = `🎁 আপনি বোনাস পাবেন: <span style="color:#10b981; font-weight:700;">+৳${calcBonus}</span> (মোট ব্যালেন্সে জমা হবে: <span style="color:#fff; font-weight:700;">৳${amt + calcBonus}</span>)`;
     }
 
     function updateDepositMethodDetails() {
@@ -5579,6 +5722,7 @@
         return;
       }
       applySettings();
+      try { npRenderTurnover(); } catch (e) {}
       document.getElementById('helperWalletBal').innerText = state.userData.balance;
       openModal('modalWithdraw');
     }
@@ -6534,6 +6678,8 @@
       handleDepositSubmit,
       openWithdrawModal,
       handleWithdrawSubmit,
+      updateDepositBonusPreview,
+      npRenderTurnover,
       updateDepositMethodDetails,
       updateWithdrawMethodDetails,
       dismissRulesModal,
