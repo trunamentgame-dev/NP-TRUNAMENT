@@ -1679,103 +1679,165 @@
     @media (prefers-reduced-motion:reduce){.npld .npld-ch{animation:none;opacity:1;transform:none;filter:none}.npld{transition-duration:.01s}}
   </style>
 <style id="npPayUI">
-/* ===== Deposit / Withdraw premium UI (design only) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+/* ===== Premium Deposit / Withdraw UI (design only) ===== */
+#modalDeposit,#modalWithdraw,#modalDepositPromo{--pp-gold:#ffd36a;--pp-gold2:#e6a32c;--pp-line:rgba(255,255,255,.075)}
 #modalDeposit .modal-sheet,#modalWithdraw .modal-sheet,#modalDepositPromo .modal-sheet{
-  background:radial-gradient(ellipse at 50% -15%,#263553 0%,transparent 55%),linear-gradient(180deg,#080e1c,#060913 75%);
-  border:1px solid #293851;color:#fff;max-width:480px;padding-left:14px;padding-right:14px}
-#modalDeposit .modal-handle,#modalWithdraw .modal-handle,#modalDepositPromo .modal-handle{background:#34435b}
+  background:radial-gradient(ellipse 80% 38% at 50% -6%,rgba(255,196,80,.13) 0%,transparent 70%),radial-gradient(ellipse at 50% -15%,#263553 0%,transparent 58%),linear-gradient(180deg,#09101f,#060913 78%);
+  border:1px solid #2a3a56;border-bottom:0;border-top:1px solid rgba(255,211,106,.35);color:#fff;max-width:480px;
+  padding:16px 14px calc(26px + var(--safe-bottom,0px));font-family:Inter,system-ui,sans-serif;
+  box-shadow:0 -18px 50px rgba(0,0,0,.55)}
+#modalDeposit .modal-handle,#modalWithdraw .modal-handle,#modalDepositPromo .modal-handle{background:#3a4b66;width:44px}
+#modalDeposit .modal-close-btn,#modalWithdraw .modal-close-btn,#modalDepositPromo .modal-close-btn{background:rgba(255,255,255,.06);border:1px solid var(--pp-line);color:#cfd9ea;width:32px;height:32px;transition:.2s}
+#modalDeposit .modal-close-btn:active,#modalWithdraw .modal-close-btn:active{transform:scale(.92)}
 #modalDeposit .modal-title,#modalWithdraw .modal-title,#modalDepositPromo .modal-title{color:#fff}
-#modalDeposit .modal-close-btn,#modalWithdraw .modal-close-btn,#modalDepositPromo .modal-close-btn{background:#1b2d49;border:1px solid #344c70;color:#dce8ff}
-.pp-title{position:relative;justify-content:center!important;text-align:center;margin-bottom:18px!important}
+.pp-title{position:relative;justify-content:center!important;text-align:center;margin-bottom:16px!important}
 .pp-title .modal-close-btn{position:absolute;right:0;top:0}
-.pp-title h1{font-size:23px;font-weight:900;letter-spacing:2px;color:#fff;line-height:1.1}
-.pp-title p{margin-top:5px;font-size:10px;letter-spacing:2px;color:#94a6c5;font-weight:400}
-.pp-balance{padding:16px;border-radius:14px;background:linear-gradient(120deg,#172e55,#101d36);border:1px solid #2c456d;margin-bottom:20px;box-shadow:0 8px 22px #0003}
-.pp-balance-label{color:#aabbd6;font-size:11px;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
-.pp-balance-value{font-size:27px;font-weight:900;color:#39e6a0;font-family:var(--font-esports,inherit)}
-.pp-sec-title{font-size:13px;font-weight:800;letter-spacing:.6px;color:#e8efff;margin-bottom:13px}
+.pp-title h1{font-family:Rajdhani,sans-serif;font-size:27px;font-weight:800;letter-spacing:4px;line-height:1.05;background:linear-gradient(180deg,#fff1c4,#ffd36a 55%,#d99423);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pp-title p{margin-top:6px;font-size:9.5px;letter-spacing:3px;color:#8fa3c4;font-weight:600;text-transform:uppercase}
+.pp-title p:before,.pp-title p:after{content:"";display:inline-block;width:18px;height:1px;background:linear-gradient(90deg,transparent,#8fa3c4);vertical-align:middle;margin:0 8px}
+.pp-title p:after{transform:scaleX(-1)}
+
+/* balance */
+.pp-balance{position:relative;overflow:hidden;padding:16px 18px;border-radius:16px;margin-bottom:16px;background:linear-gradient(125deg,#1a3158,#0f1c35 62%);border:1px solid #2e4a78;box-shadow:0 10px 26px rgba(0,0,0,.35),inset 0 1px rgba(255,255,255,.08)}
+.pp-balance:before{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-40px;top:-70px;background:radial-gradient(circle,rgba(255,206,92,.28),transparent 70%)}
+.pp-balance-label{position:relative;color:#9db2d3;font-size:10px;letter-spacing:2px;font-weight:700}
+.pp-balance-value{position:relative;font-family:Rajdhani,sans-serif;font-size:34px;font-weight:800;color:#3ee8a4;margin-top:2px;text-shadow:0 0 22px rgba(62,232,164,.28);line-height:1.15}
+
+/* stepper */
+.pp-stepper{display:flex;align-items:center;justify-content:space-between;margin:0 2px 16px}
+.pp-stepper .s{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:46px}
+.pp-stepper .s b{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#7d8fae;background:#101a2c;border:1.5px solid #2b3a55;transition:.25s}
+.pp-stepper .s span{font-size:9px;font-weight:700;letter-spacing:.8px;color:#6c7e9d;text-transform:uppercase;transition:.25s}
+.pp-stepper .s.active b{color:#241700;background:linear-gradient(145deg,#ffe29a,#e29c25);border-color:#ffe29a;box-shadow:0 0 0 4px rgba(255,200,80,.14),0 0 16px rgba(255,200,80,.35)}
+.pp-stepper .s.active span{color:#ffd36a}
+.pp-stepper .s.done b{color:#ffd36a;background:rgba(255,211,106,.1);border-color:rgba(255,211,106,.55);font-size:0}
+.pp-stepper .s.done b:after{content:"✓";font-size:12px}
+.pp-stepper .s.done span{color:#b9a46a}
+.pp-stepper em{flex:1;height:2px;margin:0 2px 15px;border-radius:2px;background:#1d2a42;position:relative;overflow:hidden}
+.pp-stepper em.on:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#ffd36a,#e6a32c)}
+
+/* panels */
+.pp-sec{margin-bottom:14px;transition:opacity .25s,filter .25s}
+.pp-panel{padding:15px;border-radius:16px;background:linear-gradient(160deg,rgba(27,40,66,.78),rgba(13,21,36,.92));border:1px solid var(--pp-line);box-shadow:0 10px 26px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.05)}
+.pp-locked{opacity:.36;pointer-events:none;filter:grayscale(.4) blur(.2px)}
+.pp-step{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:800;letter-spacing:1.1px;color:#f3d28a;margin:0 0 12px;text-transform:uppercase}
+.pp-step i{font-style:normal;width:22px;height:22px;display:grid;place-items:center;border-radius:7px;background:linear-gradient(145deg,#ffe29a,#d99423);color:#211605;font-size:11px;font-weight:900;box-shadow:0 3px 10px rgba(217,148,35,.35)}
+
+/* inputs */
+.pp-label{display:block;font-size:10.5px;font-weight:700;letter-spacing:1px;color:#9fb1cc;margin-bottom:8px;text-transform:uppercase}
+.pp-input{display:block;width:100%;height:50px;padding:0 14px;margin-bottom:14px;border:1px solid #2f4262;border-radius:12px;outline:none;background:#080f1f;color:#fff;font-size:14px;font-weight:500;font-family:inherit;transition:border-color .2s,box-shadow .2s}
+.pp-input::placeholder{color:#566988}
+.pp-input:focus{border-color:#ffc94b;box-shadow:0 0 0 4px rgba(255,201,75,.1)}
+select.pp-input{appearance:none;-webkit-appearance:none;font-weight:700;background-image:linear-gradient(45deg,transparent 50%,#ffd36a 50%),linear-gradient(135deg,#ffd36a 50%,transparent 50%);background-position:calc(100% - 21px) 22px,calc(100% - 15px) 22px;background-size:6px 6px;background-repeat:no-repeat;padding-right:38px;color-scheme:dark}
+select.pp-input option{background:#111d33;color:#fff}
+.pp-amt{position:relative}
+.pp-amt b{position:absolute;left:15px;top:13px;font-family:Rajdhani,sans-serif;font-size:22px;font-weight:800;color:#ffd36a;pointer-events:none}
+.pp-amt .pp-input{padding-left:38px;font-family:Rajdhani,sans-serif;font-size:24px;font-weight:700;letter-spacing:.5px;height:52px}
+.pp-limit{margin:-4px 0 12px;font-size:10.5px;color:#7f92b1;line-height:1.6}
+
+/* method cards */
 .pp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
-.pp-card{position:relative;min-width:0;padding:10px 7px;border:1.5px solid #293b5a;border-radius:12px;background:#111d33;text-align:center;cursor:pointer;transition:.2s}
-.pp-card.active{border-color:#ffcb49;background:#192b48;box-shadow:0 0 12px #ffcb4930}
-.pp-card:active{transform:scale(.97)}
-.pp-logo{width:100%;height:43px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.pp-logo img{display:block;width:auto;height:auto;max-width:88%;max-height:38px;object-fit:contain}
-.pp-name{font-size:11px;font-weight:900;letter-spacing:.6px;margin-top:7px;color:#fff}
-.pp-hint{font-size:9px;color:#8291a7;margin-top:3px}
-.pp-badge{position:absolute;top:-9px;right:-7px;min-width:43px;max-width:65px;padding:5px 6px;border-radius:20px;background:linear-gradient(135deg,#ffe36a,#ff9825);color:#321900;font-size:10px;font-weight:900;text-align:center;box-shadow:0 2px 8px #0007;z-index:5}
-.pp-account{margin-top:16px;padding:15px;border-radius:12px;background:#111d33;border:1px solid #293e60}
-.pp-account-label{font-size:11px;color:#a9bad4;margin-bottom:9px}
-.pp-account-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.pp-account-number{font-size:19px;font-weight:900;letter-spacing:1px;color:#fff}
-.pp-copy{border:0;border-radius:7px;background:#29466e;color:#fff;padding:9px 13px;font-size:11px;font-weight:800;cursor:pointer}
-.pp-account-type{margin-top:8px;font-size:10px;color:#8295b5}
-.pp-form{margin-top:16px;padding:16px;border-radius:13px;background:#111d33;border:1px solid #293e60}
-.pp-label{display:block;font-size:11px;font-weight:800;letter-spacing:.4px;color:#c4d0e4;margin-bottom:8px}
-.pp-input{display:block;width:100%;height:46px;padding:0 12px;margin-bottom:16px;border:1px solid #304666;border-radius:8px;outline:none;background:#0b1427;color:#fff;font-size:14px;font-family:inherit}
-.pp-input:focus{border-color:#ffc94b}
-.pp-promo{padding:14px;margin-bottom:16px;border-radius:10px;background:linear-gradient(135deg,#172b4a,#14213b);border:1px solid #3a5277}
-.pp-promo-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:10px}
-.pp-promo-head strong{font-size:13px;color:#fff}
-.pp-active{color:#69efa0;font-size:9px;font-weight:900;white-space:nowrap}
-.pp-pill{background:linear-gradient(135deg,#ffe36a,#ff9825);color:#321900;font-weight:900;font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap}
-.pp-promo-desc{color:#b9c8df;font-size:11px;line-height:1.9}
-.pp-promo-desc b{color:#ffdc75}
-.pp-quick{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:-7px;margin-bottom:16px}
-.pp-quick.four{grid-template-columns:repeat(4,1fr);margin-top:10px}
-.pp-quick button{padding:9px 2px;border:1px solid #344c70;border-radius:7px;background:#1b2d49;color:#dce8ff;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit}
-.pp-quick button:active{background:#ffca49;color:#241700}
-.pp-calc{padding:14px;border-radius:10px;background:#0a1427;border:1px solid #304568}
-.pp-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;font-size:12px;color:#b9c8dd}
-.pp-val{color:#fff;font-weight:800;text-align:right}
-.pp-bonus{color:#62efa0}
-.pp-total{border-top:1px solid #304568;padding-top:12px;margin-top:3px;margin-bottom:0;font-size:14px;font-weight:900}
-.pp-total .pp-val{color:#ffda69;font-size:19px}
-.pp-status{display:none;margin-top:12px;padding:10px;border-radius:7px;font-size:11px;line-height:1.6}
-.pp-status.success{display:block;background:#103525;color:#7af0a8}
-.pp-status.warning{display:block;background:#392b13;color:#ffda85}
-.pp-submit{width:100%;min-height:49px;margin-top:17px;border:1px solid #ffe4a0;border-radius:10px;background:linear-gradient(110deg,#b97916,#ffd86f 48%,#e6a32c);color:#261800;font-size:15px;font-weight:900;letter-spacing:.7px;cursor:pointer;box-shadow:0 6px 20px #e9aa3430,inset 0 1px #fff8;font-family:inherit}
+.pp-card{position:relative;min-width:0;padding:12px 6px 10px;border:1.5px solid #29395a;border-radius:14px;background:linear-gradient(160deg,#142039,#0d1628);text-align:center;cursor:pointer;transition:.22s;overflow:visible}
+.pp-card:active{transform:scale(.96)}
+.pp-card.active{border-color:#ffcb49;background:linear-gradient(160deg,#2a2618,#141b2b);box-shadow:0 0 0 3px rgba(255,203,73,.1),0 8px 22px rgba(255,190,60,.16)}
+.pp-card.active:after{content:"✓";position:absolute;left:7px;top:6px;width:16px;height:16px;border-radius:50%;background:#ffcb49;color:#241700;font-size:10px;font-weight:900;display:grid;place-items:center}
+.pp-logo{width:100%;height:42px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pp-logo img{display:block;width:auto;height:auto;max-width:86%;max-height:36px;object-fit:contain;border-radius:6px}
+.pp-name{font-size:11px;font-weight:800;letter-spacing:.8px;margin-top:8px;color:#fff}
+.pp-hint{font-size:9px;color:#7f92b1;margin-top:3px}
+.pp-badge{position:absolute;top:-10px;right:-6px;min-width:44px;max-width:68px;padding:4px 7px;border-radius:20px;background:linear-gradient(135deg,#ffe36a,#ff9825);color:#321900;font-size:10px;font-weight:900;text-align:center;box-shadow:0 4px 12px rgba(255,150,30,.35);z-index:5;letter-spacing:.3px}
+
+/* promo info */
+.pp-promo{position:relative;padding:14px;margin-bottom:0;border-radius:13px;background:linear-gradient(135deg,rgba(255,203,73,.09),rgba(23,43,74,.9) 55%);border:1px solid rgba(255,203,73,.28)}
+.pp-promo-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:9px}
+.pp-promo-head strong{font-size:13px;color:#fff;font-weight:800}
+.pp-active{color:#5df0a0;font-size:9px;font-weight:800;white-space:nowrap;letter-spacing:.6px}
+.pp-promo-desc{color:#b4c4de;font-size:11px;line-height:1.95}
+.pp-promo-desc b{color:#ffdc75;font-weight:800}
+.pp-pill{background:linear-gradient(135deg,#ffe36a,#ff9825);color:#321900;font-weight:900;font-size:11px;padding:3px 9px;border-radius:20px}
+
+/* quick amounts */
+.pp-quick{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:-4px 0 12px}
+.pp-quick.four{grid-template-columns:repeat(4,1fr)}
+.pp-quick button{padding:10px 2px;border:1px solid #31456a;border-radius:10px;background:linear-gradient(160deg,#1a2a47,#101b30);color:#dbe6fb;font-size:11.5px;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s}
+.pp-quick button:active{background:linear-gradient(135deg,#ffe29a,#e29c25);color:#241700;border-color:#ffe29a;transform:scale(.95)}
+
+/* calc / summary */
+.pp-calc,.pp-summary{padding:14px 15px;border-radius:13px;background:linear-gradient(160deg,#091326,#0d1a2f);border:1px solid #28405f}
+.pp-summary{margin-top:14px}
+.pp-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;font-size:12px;color:#aebedb;border-bottom:1px dashed rgba(255,255,255,.07)}
+.pp-row:first-child{padding-top:0}
+.pp-val{color:#fff;font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
+.pp-bonus{color:#5df0a0}
+.pp-total{border-bottom:0;border-top:1px solid #35507a;margin-top:4px;padding:13px 0 0;font-size:13px;font-weight:800;color:#f3d28a;text-transform:uppercase;letter-spacing:.5px}
+.pp-total .pp-val{color:#ffd36a;font-family:Rajdhani,sans-serif;font-size:24px;letter-spacing:0}
+.pp-summary-title{color:#9fb1cc;font-size:10px;font-weight:800;letter-spacing:1.5px;margin-bottom:8px}
+.pp-srow{display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-size:12px;color:#aebedb;border-bottom:1px dashed rgba(255,255,255,.07)}
+.pp-srow strong{color:#fff;font-variant-numeric:tabular-nums}
+.pp-srow.total{border-bottom:0;border-top:1px solid #35507a;margin-top:4px;padding-top:13px;color:#f3d28a;font-weight:800}
+.pp-srow.total strong{color:#ffd36a;font-family:Rajdhani,sans-serif;font-size:22px}
+.pp-status{display:none;margin-top:12px;padding:10px 12px;border-radius:9px;font-size:11px;line-height:1.6;font-weight:600}
+.pp-status.success{display:block;background:rgba(21,90,56,.4);color:#7af0a8;border:1px solid rgba(93,240,160,.25)}
+.pp-status.warning{display:block;background:rgba(104,76,20,.4);color:#ffda85;border:1px solid rgba(255,218,133,.25)}
+
+/* buttons */
+.pp-submit{position:relative;overflow:hidden;width:100%;min-height:52px;margin-top:16px;border:1px solid #ffe4a0;border-radius:13px;background:linear-gradient(110deg,#b97916,#ffd86f 48%,#e6a32c);color:#241700;font-family:Rajdhani,sans-serif;font-size:17px;font-weight:800;letter-spacing:1.2px;cursor:pointer;box-shadow:0 8px 24px rgba(233,170,52,.28),inset 0 1px rgba(255,255,255,.55);transition:transform .15s}
+.pp-submit:before{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:ppShine 3.2s infinite}
+@keyframes ppShine{0%,55%{left:-60%}100%{left:130%}}
 .pp-submit:active{transform:scale(.98)}
 .pp-submit:disabled{cursor:not-allowed}
-.pp-notice{margin-top:15px;text-align:center;font-size:10px;color:#8292ad;line-height:1.8}
-.pp-notice-box{display:flex;gap:9px;padding:11px;border-radius:9px;background:#17243a;border:1px solid #30425e;color:#aebdd0;font-size:10px;line-height:1.7;margin-top:13px}
-.pp-limit{margin-top:-6px;margin-bottom:6px;font-size:10px;color:#8493a9;line-height:1.6}
-.pp-summary{background:linear-gradient(145deg,#0a1424,#101d30);border:1px solid #293b53;border-radius:11px;padding:13px;margin-top:14px}
-.pp-summary-title{color:#b7c5d8;font-size:10px;font-weight:800;letter-spacing:1px;margin-bottom:10px}
-.pp-srow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;font-size:11px;color:#9aa9bd}
-.pp-srow strong{color:#fff}
-.pp-srow.total{border-top:1px solid #33425a;margin-top:5px;padding-top:11px;color:#f2d18a}
-.pp-srow.total strong{color:#ffd36a;font-size:15px}
+.pp-submit:disabled:before{display:none}
+.pp-back{width:100%;margin-top:10px;height:44px;border-radius:12px;border:1px solid #31456a;background:rgba(255,255,255,.04);color:#c9d6ee;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.pp-notice{margin-top:16px;text-align:center;font-size:10px;color:#7587a6;line-height:1.8}
+.pp-notice-box{display:flex;gap:10px;padding:12px;border-radius:11px;background:rgba(23,36,58,.8);border:1px solid #2c4160;color:#a9bad2;font-size:10.5px;line-height:1.7;margin-top:14px}
+.pp-notice-box .ic{flex:none;width:20px;height:20px;border-radius:50%;background:rgba(255,211,106,.15);color:#ffd36a;display:grid;place-items:center;font-size:12px;font-weight:800}
 
-.pp-locked{opacity:.38;pointer-events:none;filter:grayscale(.35)}
-.pp-step{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.5px;color:#f5d48c;margin:0 0 10px}
-.pp-step i{font-style:normal;width:22px;height:22px;display:grid;place-items:center;border-radius:7px;background:linear-gradient(145deg,#ffdc82,#d99423);color:#211605;font-size:11px;font-weight:900}
-.pp-sec{margin-bottom:18px;transition:.2s}
-select.pp-input{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,#ffd36a 50%),linear-gradient(135deg,#ffd36a 50%,transparent 50%);background-position:calc(100% - 20px) 20px,calc(100% - 14px) 20px;background-size:6px 6px;background-repeat:no-repeat;padding-right:34px;color-scheme:dark}
-select.pp-input option{background:#111d33;color:#fff}
-.pp-timer{text-align:center;padding:14px;border-radius:12px;background:linear-gradient(145deg,#2a2314,#151b28);border:1.5px solid #ffcb49;box-shadow:0 0 16px #ffc64a22;margin-bottom:14px}
-.pp-timer-label{font-size:11px;color:#f2d18a;font-weight:800;letter-spacing:1px}
-.pp-timer-clock{font-family:var(--font-esports,inherit);font-size:38px;font-weight:900;color:#ffd36a;line-height:1.2;margin-top:2px}
-.pp-timer.low .pp-timer-clock{color:#ff6b6b}
-.pp-timer.low{border-color:#ff6b6b;box-shadow:0 0 16px #ff6b6b30}
-.pp-timer-bar{height:5px;border-radius:5px;background:#0b1427;overflow:hidden;margin-top:8px}
-.pp-timer-bar>div{height:100%;width:100%;background:linear-gradient(90deg,#ffd36a,#ff9825);transition:width 1s linear}
-.pp-timer-note{font-size:10px;color:#aebdd0;margin-top:7px;line-height:1.6}
-.pp-back{width:100%;margin-top:10px;height:40px;border-radius:9px;border:1px solid #344c70;background:#1b2d49;color:#dce8ff;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
-.pp-sendbox{margin-top:10px;padding:10px;border-radius:9px;background:#0a1427;border:1px solid #304568;font-size:11px;color:#b9c8dd;line-height:1.9}
-.pp-sendbox b{color:#ffdc75}
-#promoChosenChip{display:none!important}
-/* hidden controls that keep the original logic working */
+/* page 2: timer ring + payment */
+.pp-timer{display:flex;align-items:center;gap:16px;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(255,203,73,.1),rgba(14,22,38,.95) 60%);border:1px solid rgba(255,203,73,.4);box-shadow:0 0 24px rgba(255,190,60,.1);margin-bottom:14px}
+.pp-ring{position:relative;flex:none;width:96px;height:96px}
+.pp-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pp-ring circle{fill:none;stroke-width:7;stroke-linecap:round}
+.pp-ring .bg{stroke:#1b2a44}
+.pp-ring .fg{stroke:url(#ppGrad);stroke-dasharray:289;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s}
+.pp-timer-clock{position:absolute;inset:0;display:grid;place-items:center;font-family:Rajdhani,sans-serif;font-size:27px;font-weight:800;color:#ffd36a;letter-spacing:.5px}
+.pp-timer-txt{min-width:0}
+.pp-timer-label{font-size:11px;color:#f3d28a;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.pp-timer-note{font-size:10.5px;color:#a9bad2;margin-top:6px;line-height:1.65}
+.pp-timer.low{border-color:rgba(255,107,107,.6);box-shadow:0 0 24px rgba(255,90,90,.16)}
+.pp-timer.low .pp-timer-clock{color:#ff7b7b}
+.pp-timer.low .pp-ring .fg{stroke:#ff6b6b}
+.pp-timer.low .pp-timer-label{color:#ff9d9d}
+.pp-account{padding:16px;border-radius:16px;background:linear-gradient(160deg,rgba(27,40,66,.78),rgba(13,21,36,.92));border:1px solid var(--pp-line);box-shadow:0 10px 26px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.05)}
+.pp-account-label{font-size:10.5px;letter-spacing:1px;color:#9fb1cc;margin-bottom:10px;font-weight:700;text-transform:uppercase}
+.pp-account-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 13px;border-radius:12px;background:#080f1f;border:1px dashed rgba(255,211,106,.45)}
+.pp-account-number{font-family:Rajdhani,sans-serif;font-size:25px;font-weight:800;letter-spacing:1.5px;color:#fff}
+.pp-copy{border:0;border-radius:9px;background:linear-gradient(135deg,#34527f,#27406a);color:#fff;padding:10px 15px;font-size:11px;font-weight:800;letter-spacing:.8px;cursor:pointer;font-family:inherit;transition:.2s;white-space:nowrap}
+.pp-copy.ok{background:linear-gradient(135deg,#1f9d63,#16774a)}
+.pp-account-type{margin-top:10px;font-size:10px;color:#8295b5}
+.pp-send-amt{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:11px 13px;border-radius:11px;background:rgba(255,211,106,.07);border:1px solid rgba(255,211,106,.22)}
+.pp-send-amt span{font-size:11px;color:#c8b27a;font-weight:700}
+.pp-send-amt b{font-family:Rajdhani,sans-serif;font-size:24px;color:#ffd36a;font-weight:800}
+.pp-send-sub{margin-top:8px;font-size:11px;color:#9fb1cc}
+.pp-send-sub b{color:#5df0a0}
+.pp-howto{margin:14px 2px 0;display:grid;gap:9px}
+.pp-howto div{display:flex;gap:10px;align-items:flex-start;font-size:11px;color:#a9bad2;line-height:1.55}
+.pp-howto i{flex:none;font-style:normal;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;background:rgba(255,211,106,.14);color:#ffd36a;font-size:10px;font-weight:900;margin-top:1px}
+
 .pp-hidden{display:none!important}
 #depositBonusCalcPreview{display:none!important}
-#withdrawTurnoverAlertBox{border-radius:10px!important}
+#promoChosenChip{display:none!important}
+#withdrawTurnoverAlertBox{border-radius:13px!important}
+#withdrawTurnoverAlertBox:empty{display:none!important}
+
 /* promotion popup list */
-.pp-offer{cursor:pointer;margin:0 0 10px;padding:13px;border-radius:12px;border:1.5px solid #3a5277;background:linear-gradient(135deg,#172b4a,#14213b);position:relative}
-.pp-offer.on{border-color:#ffcb49;box-shadow:0 0 12px #ffcb4930}
-.pp-offer-name{font-weight:800;font-size:13px;color:#fff;padding-right:62px}
-.pp-offer-desc{font-size:11px;color:#b9c8df;line-height:1.9;margin-top:6px}
+.pp-offer{cursor:pointer;margin:0 0 11px;padding:14px;border-radius:14px;border:1.5px solid #2f4262;background:linear-gradient(135deg,rgba(255,203,73,.06),rgba(18,32,56,.95) 60%);position:relative;transition:.2s}
+.pp-offer.on{border-color:#ffcb49;box-shadow:0 0 0 3px rgba(255,203,73,.1),0 8px 22px rgba(255,190,60,.14)}
+.pp-offer-name{font-weight:800;font-size:13px;color:#fff;padding-right:64px}
+.pp-offer-desc{font-size:11px;color:#b4c4de;line-height:1.95;margin-top:6px}
 .pp-offer-desc b{color:#ffdc75}
-#modalDepositPromo .form-input{background:#0b1427;border:1px solid #304666;color:#fff;height:46px}
-@media(max-width:350px){.pp-grid{gap:7px}.pp-card{padding:9px 4px}.pp-account-number{font-size:16px}}
+#modalDepositPromo .form-input{background:#080f1f;border:1px solid #2f4262;color:#fff;height:50px;border-radius:12px}
+@media(max-width:350px){.pp-grid{gap:7px}.pp-card{padding:10px 3px 9px}.pp-account-number{font-size:20px}.pp-ring{width:80px;height:80px}.pp-timer-clock{font-size:23px}}
 </style>
 
 <style>
@@ -2980,9 +3042,6 @@ select.pp-input option{background:#111d33;color:#fff}
     <main class="app-view" id="viewWallet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <div style="font-weight: 700; font-size: 15px; color: #fff;">আমার ওয়ালেট (Wallet)</div>
-        <button class="btn btn-outline btn-sm" onclick="window.app.switchView('viewHome')" style="border-color: var(--border-gold); color: var(--color-primary); gap: 4px;">
-          <span>🏠 হোম পেজ</span>
-        </button>
       </div>
 
       <div class="wallet-card">
@@ -3293,6 +3352,13 @@ select.pp-input option{background:#111d33;color:#fff}
         <div class="pp-balance-value">৳<span id="ppDepBalance">0</span></div>
       </div>
 
+      <div class="pp-stepper" id="ppStepper">
+        <div class="s active" data-s="1"><b>1</b><span>Promo</span></div><em></em>
+        <div class="s" data-s="2"><b>2</b><span>Method</span></div><em></em>
+        <div class="s" data-s="3"><b>3</b><span>Amount</span></div><em></em>
+        <div class="s" data-s="4"><b>4</b><span>Pay</span></div>
+      </div>
+
       <form id="depositForm" onsubmit="window.app.handleDepositSubmit(event)">
 
         <!-- original logic controls (kept, hidden) -->
@@ -3309,12 +3375,12 @@ select.pp-input option{background:#111d33;color:#fff}
         <!-- ===== PAGE 1 ===== -->
         <div id="ppStageA">
 
-          <div class="pp-sec">
-            <div class="pp-step"><i>1</i>SELECT DEPOSIT PROMOTION</div>
-            <select class="pp-input" id="ppPromoSelect" style="margin-bottom:12px" onchange="window.npPromoChange()">
+          <div class="pp-sec pp-panel">
+            <div class="pp-step"><i>1</i>Deposit Promotion</div>
+            <select class="pp-input" id="ppPromoSelect" style="margin-bottom:0" onchange="window.npPromoChange()">
               <option value="">— প্রমোশন সিলেক্ট করুন —</option>
             </select>
-            <div class="pp-promo" id="ppPromoInfo" style="display:none;margin-bottom:0">
+            <div class="pp-promo" id="ppPromoInfo" style="display:none;margin-top:12px">
               <div class="pp-promo-head">
                 <strong id="ppPromoTitle">PROMOTION</strong>
                 <span class="pp-active">● ACTIVE OFFER</span>
@@ -3323,8 +3389,8 @@ select.pp-input option{background:#111d33;color:#fff}
             </div>
           </div>
 
-          <div class="pp-sec pp-locked" id="ppSecMethod">
-            <div class="pp-step"><i>2</i>SELECT PAYMENT METHOD</div>
+          <div class="pp-sec pp-panel pp-locked" id="ppSecMethod">
+            <div class="pp-step"><i>2</i>Payment Method</div>
             <div class="pp-grid">
               <div class="pp-card" data-kind="deposit" data-method="bKash" onclick="window.npPickMethod('deposit','bKash')">
                 <span class="pp-badge" data-pp-badge>10%</span>
@@ -3344,10 +3410,13 @@ select.pp-input option{background:#111d33;color:#fff}
             </div>
           </div>
 
-          <div class="pp-sec pp-locked pp-form" id="ppSecAmount" style="margin-top:0">
-            <div class="pp-step"><i>3</i>DEPOSIT AMOUNT (৳)</div>
-            <input type="number" class="pp-input" id="depositAmount" required placeholder="Enter deposit amount" min="20"
-              oninput="window.app.updateDepositBonusPreview()" onkeydown="if(event.key==='Enter'){event.preventDefault();window.npDepNext();}">
+          <div class="pp-sec pp-panel pp-locked" id="ppSecAmount">
+            <div class="pp-step"><i>3</i>Deposit Amount</div>
+            <div class="pp-amt">
+              <b>৳</b>
+              <input type="number" class="pp-input" id="depositAmount" required placeholder="0" min="20" inputmode="numeric"
+                oninput="window.app.updateDepositBonusPreview()" onkeydown="if(event.key==='Enter'){event.preventDefault();window.npDepNext();}">
+            </div>
             <div class="pp-quick">
               <button type="button" onclick="window.npSetDepAmount(50)">50</button>
               <button type="button" onclick="window.npSetDepAmount(100)">100</button>
@@ -3355,7 +3424,7 @@ select.pp-input option{background:#111d33;color:#fff}
               <button type="button" onclick="window.npSetDepAmount(500)">500</button>
               <button type="button" onclick="window.npSetDepAmount(1000)">1000</button>
             </div>
-            <div class="pp-limit" style="margin-top:-8px;margin-bottom:12px">সর্বনিম্ন ডিপোজিট: ৳<span id="minDepositAmountLabel">50</span> টাকা</div>
+            <div class="pp-limit">সর্বনিম্ন ডিপোজিট: ৳<span id="minDepositAmountLabel">50</span> টাকা</div>
 
             <div class="pp-calc">
               <div class="pp-row"><span>Deposit Amount</span><span class="pp-val" id="ppDepositValue">৳0.00</span></div>
@@ -3365,7 +3434,7 @@ select.pp-input option{background:#111d33;color:#fff}
               <div id="ppStatusMessage" class="pp-status"></div>
             </div>
 
-            <button type="button" class="pp-submit" id="ppNextBtn" onclick="window.npDepNext()">SUBMIT — পেমেন্ট নাম্বার দেখুন</button>
+            <button type="button" class="pp-submit" id="ppNextBtn" onclick="window.npDepNext()"><span>CONTINUE TO PAYMENT  →</span></button>
           </div>
         </div>
 
@@ -3373,30 +3442,41 @@ select.pp-input option{background:#111d33;color:#fff}
         <div id="ppStageB" style="display:none">
 
           <div class="pp-timer" id="ppTimerBox">
-            <div class="pp-timer-label">⏱ ডিপোজিট সম্পন্ন করার বাকি সময়</div>
-            <div class="pp-timer-clock" id="ppTimerClock">10:00</div>
-            <div class="pp-timer-bar"><div id="ppTimerBar"></div></div>
-            <div class="pp-timer-note">এই সময়ের মধ্যে টাকা পাঠিয়ে Transaction ID সাবমিট করতে হবে। সময় শেষ হলে আবার নতুন করে শুরু করতে হবে।</div>
+            <div class="pp-ring">
+              <svg viewBox="0 0 100 100">
+                <defs><linearGradient id="ppGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe29a"/><stop offset="1" stop-color="#ff9825"/></linearGradient></defs>
+                <circle class="bg" cx="50" cy="50" r="46"/>
+                <circle class="fg" id="ppTimerRing" cx="50" cy="50" r="46"/>
+              </svg>
+              <div class="pp-timer-clock" id="ppTimerClock">10:00</div>
+            </div>
+            <div class="pp-timer-txt">
+              <div class="pp-timer-label">⏱ Time Remaining</div>
+              <div class="pp-timer-note">এই সময়ের মধ্যে টাকা পাঠিয়ে Transaction ID সাবমিট করুন। সময় শেষ হলে আবার নতুন করে শুরু করতে হবে।</div>
+            </div>
           </div>
 
-          <div class="pp-account" style="margin-top:0">
-            <div class="pp-account-label">Payment Number (<span id="ppSendMethod">bKash</span>)</div>
+          <div class="pp-account">
+            <div class="pp-account-label">Send Money to · <span id="ppSendMethod">bKash</span> Personal</div>
             <div class="pp-account-row">
               <div class="pp-account-number" id="adminPaymentNumber">01712-345678</div>
-              <button type="button" class="pp-copy" onclick="window.app.copyText(document.getElementById('adminPaymentNumber').innerText)">COPY</button>
+              <button type="button" class="pp-copy" onclick="window.npCopyNum(this)">COPY</button>
             </div>
             <div class="pp-account-type">Account Type: Personal (Send Money)</div>
-            <div class="pp-sendbox" id="ppSendBox"></div>
+            <div id="ppSendBox"></div>
           </div>
 
-          <div class="pp-form">
-            <label class="pp-label" for="depositSenderNumber">SENDER NUMBER</label>
-            <input type="tel" class="pp-input" id="depositSenderNumber" required placeholder="017XXXXXXXX">
+          <div class="pp-howto">
+            <div><i>1</i><span>উপরের নাম্বারটি <b style="color:#ffd36a">COPY</b> করুন</span></div>
+            <div><i>2</i><span>আপনার অ্যাপ থেকে নির্ধারিত পরিমাণ টাকা <b style="color:#ffd36a">Send Money</b> করুন</span></div>
+            <div><i>3</i><span>নিচে Transaction ID বসিয়ে সাবমিট করুন</span></div>
+          </div>
 
-            <label class="pp-label" for="depositTrxId">TRANSACTION ID</label>
-            <input type="text" class="pp-input" id="depositTrxId" required placeholder="BKA910283X" style="text-transform: uppercase;">
+          <div class="pp-panel" style="margin-top:14px">
+            <label class="pp-label" for="depositTrxId">Transaction ID</label>
+            <input type="text" class="pp-input" id="depositTrxId" required placeholder="e.g. BKA910283X" autocomplete="off" style="text-transform: uppercase;margin-bottom:0;letter-spacing:1px;font-weight:700">
 
-            <button type="submit" class="pp-submit" id="btnSubmitDeposit" style="margin-top:0">
+            <button type="submit" class="pp-submit" id="btnSubmitDeposit" style="margin-top:14px">
               <span>ডিপোজিট রিকোয়েস্ট পাঠান</span>
             </button>
             <button type="button" class="pp-back" onclick="window.npDepBack()">← পরিবর্তন করুন</button>
@@ -3405,7 +3485,7 @@ select.pp-input option{background:#111d33;color:#fff}
       </form>
 
       <div class="pp-notice">
-        নাম্বারে Send Money করে TrxID ও প্রেরক নাম্বার লিখে সাবমিট করুন। অ্যাডমিন অনুমোদনের পর ব্যালেন্স অ্যাকাউন্টে যুক্ত হবে।
+        অ্যাডমিন অনুমোদনের পর ব্যালেন্স অ্যাকাউন্টে যুক্ত হবে।
       </div>
     </div>
   </div>
@@ -3431,8 +3511,8 @@ select.pp-input option{background:#111d33;color:#fff}
       <div class="modal-handle"></div>
       <div class="modal-title pp-title">
         <div>
-          <h1>PREMIUM WITHDRAW</h1>
-          <p id="lblWithdrawHeader">উইথড্র রিকোয়েস্ট (Withdraw)</p>
+          <h1>WITHDRAW</h1>
+          <p id="lblWithdrawHeader">PREMIUM WITHDRAW</p>
         </div>
         <button class="modal-close-btn" onclick="window.app.closeModal('modalWithdraw')">✕</button>
       </div>
@@ -3440,17 +3520,15 @@ select.pp-input option{background:#111d33;color:#fff}
       <div class="pp-balance">
         <div class="pp-balance-label">AVAILABLE WALLET BALANCE</div>
         <div class="pp-balance-value">৳ <span id="helperWalletBal">0</span></div>
-        <div style="color:#75869f;font-size:10px;margin-top:3px">Your available withdrawal balance</div>
+        <div style="position:relative;color:#7f92b1;font-size:10px;margin-top:3px">Your available withdrawal balance</div>
       </div>
 
       <!-- Turnover Alert Box in Withdraw Modal -->
       <div id="withdrawTurnoverAlertBox" style="margin-bottom: 14px; padding: 10px 14px; border-radius: 12px; font-size: 12px; border: 1px solid rgba(255,255,255,0.15);"></div>
 
-      <form id="withdrawForm" class="pp-form" style="margin-top:0" onsubmit="window.app.handleWithdrawSubmit(event)">
+      <form id="withdrawForm" onsubmit="window.app.handleWithdrawSubmit(event)">
 
-        <div class="pp-sec-title">SELECT PAYMENT METHOD</div>
-
-        <!-- original logic control (kept, hidden) -->
+        <!-- original logic controls (kept, hidden) -->
         <select class="pp-hidden" id="withdrawMethod" onchange="window.app.updateWithdrawMethodDetails()">
           <option value="bKash">bKash (বিকাশ)</option>
           <option value="Nagad">Nagad (নগদ)</option>
@@ -3458,57 +3536,65 @@ select.pp-input option{background:#111d33;color:#fff}
         </select>
         <div class="pp-hidden" id="withdrawMethodLogoWrap"></div>
 
-        <div class="pp-grid" style="margin-bottom:16px">
-          <div class="pp-card active" data-kind="withdraw" data-method="bKash" onclick="window.npPickMethod('withdraw','bKash')">
-            <div class="pp-logo"><img data-pp-logo="bKash" src="https://i.postimg.cc/K4hz9m0W/Whats-App-Image-2026-10-23-at-4-14-08-PM.jpg" alt="bKash" onerror="this.style.display='none'"></div>
-            <div class="pp-name">bKash</div>
-            <div class="pp-hint">Mobile Banking</div>
-          </div>
-          <div class="pp-card" data-kind="withdraw" data-method="Nagad" onclick="window.npPickMethod('withdraw','Nagad')">
-            <div class="pp-logo"><img data-pp-logo="Nagad" src="https://i.postimg.cc/QtVHC4B2/Whats-App-Image-2026-10-23-at-4-14-08-PM-%281%29.jpg" alt="Nagad" onerror="this.style.display='none'"></div>
-            <div class="pp-name">Nagad</div>
-            <div class="pp-hint">Mobile Banking</div>
-          </div>
-          <div class="pp-card" data-kind="withdraw" data-method="Rocket" onclick="window.npPickMethod('withdraw','Rocket')">
-            <div class="pp-logo"><img data-pp-logo="Rocket" src="https://i.postimg.cc/BnGLpByx/Whats-App-Image-2026-10-23-at-4-14-08-PM-%282%29.jpg" alt="Rocket" onerror="this.style.display='none'"></div>
-            <div class="pp-name">Rocket</div>
-            <div class="pp-hint">Mobile Banking</div>
+        <div class="pp-sec pp-panel">
+          <div class="pp-step"><i>1</i>Payment Method</div>
+          <div class="pp-grid">
+            <div class="pp-card active" data-kind="withdraw" data-method="bKash" onclick="window.npPickMethod('withdraw','bKash')">
+              <div class="pp-logo"><img data-pp-logo="bKash" src="https://i.postimg.cc/K4hz9m0W/Whats-App-Image-2026-10-23-at-4-14-08-PM.jpg" alt="bKash" onerror="this.style.display='none'"></div>
+              <div class="pp-name">bKash</div>
+              <div class="pp-hint">Mobile Banking</div>
+            </div>
+            <div class="pp-card" data-kind="withdraw" data-method="Nagad" onclick="window.npPickMethod('withdraw','Nagad')">
+              <div class="pp-logo"><img data-pp-logo="Nagad" src="https://i.postimg.cc/QtVHC4B2/Whats-App-Image-2026-10-23-at-4-14-08-PM-%281%29.jpg" alt="Nagad" onerror="this.style.display='none'"></div>
+              <div class="pp-name">Nagad</div>
+              <div class="pp-hint">Mobile Banking</div>
+            </div>
+            <div class="pp-card" data-kind="withdraw" data-method="Rocket" onclick="window.npPickMethod('withdraw','Rocket')">
+              <div class="pp-logo"><img data-pp-logo="Rocket" src="https://i.postimg.cc/BnGLpByx/Whats-App-Image-2026-10-23-at-4-14-08-PM-%282%29.jpg" alt="Rocket" onerror="this.style.display='none'"></div>
+              <div class="pp-name">Rocket</div>
+              <div class="pp-hint">Mobile Banking</div>
+            </div>
           </div>
         </div>
 
-        <label class="pp-label" for="withdrawNumber">YOUR RECEIVING ACCOUNT NUMBER</label>
-        <input type="tel" class="pp-input" id="withdrawNumber" required placeholder="Enter your personal number">
-
-        <label class="pp-label" for="withdrawAmount">WITHDRAW AMOUNT</label>
-        <input type="number" class="pp-input" id="withdrawAmount" required placeholder="Enter amount" min="50" oninput="window.npWdCalc()">
-
-        <div class="pp-quick four" style="margin-top:-6px">
-          <button type="button" onclick="window.npSetWdAmount(500)">৳500</button>
-          <button type="button" onclick="window.npSetWdAmount(1000)">৳1,000</button>
-          <button type="button" onclick="window.npSetWdAmount(2000)">৳2,000</button>
-          <button type="button" onclick="window.npSetWdAmount(5000)">৳5,000</button>
+        <div class="pp-sec pp-panel">
+          <div class="pp-step"><i>2</i>Receiving Account</div>
+          <label class="pp-label" for="withdrawNumber" style="margin-top:-2px">Your personal number</label>
+          <input type="tel" class="pp-input" id="withdrawNumber" required placeholder="017XXXXXXXX" inputmode="numeric" style="margin-bottom:0;letter-spacing:1px;font-weight:600">
         </div>
 
-        <div class="pp-limit">Minimum: ৳<span id="minWithdrawAmountLabel">100</span></div>
+        <div class="pp-sec pp-panel">
+          <div class="pp-step"><i>3</i>Withdraw Amount</div>
+          <div class="pp-amt">
+            <b>৳</b>
+            <input type="number" class="pp-input" id="withdrawAmount" required placeholder="0" min="50" inputmode="numeric" oninput="window.npWdCalc()">
+          </div>
+          <div class="pp-quick four">
+            <button type="button" onclick="window.npSetWdAmount(500)">৳500</button>
+            <button type="button" onclick="window.npSetWdAmount(1000)">৳1,000</button>
+            <button type="button" onclick="window.npSetWdAmount(2000)">৳2,000</button>
+            <button type="button" onclick="window.npSetWdAmount(5000)">৳5,000</button>
+          </div>
+          <div class="pp-limit" style="margin-bottom:0">Minimum: ৳<span id="minWithdrawAmountLabel">100</span></div>
 
-        <div class="pp-summary">
-          <div class="pp-summary-title">WITHDRAWAL SUMMARY</div>
-          <div class="pp-srow"><span>Withdraw Amount</span><strong id="ppWdAmount">৳0.00</strong></div>
-          <div class="pp-srow"><span>Withdraw Fee</span><strong id="ppWdFee">৳0.00</strong></div>
-          <div class="pp-srow total"><span>Total Deduction</span><strong id="ppWdTotal">৳0.00</strong></div>
+          <div class="pp-summary">
+            <div class="pp-summary-title">WITHDRAWAL SUMMARY</div>
+            <div class="pp-srow"><span>Withdraw Amount</span><strong id="ppWdAmount">৳0.00</strong></div>
+            <div class="pp-srow"><span>Withdraw Fee</span><strong id="ppWdFee">৳0.00</strong></div>
+            <div class="pp-srow total"><span>TOTAL DEDUCTION</span><strong id="ppWdTotal">৳0.00</strong></div>
+          </div>
         </div>
 
         <div class="pp-notice-box">
-          <span style="font-size:16px">ⓘ</span>
-          <span>সর্বনিম্ন উইথড্র শর্ত মানলে অ্যাডমিন ভেরিফাই করে ১ ঘণ্টার মধ্যে পেমেন্ট পাঠিয়ে দিবেন। জমা দেওয়ার আগে আপনার পার্সোনাল রিসিভিং নাম্বারটি যাচাই করে নিন।</span>
+          <span class="ic">i</span>
+          <span>জমা দেওয়ার আগে আপনার পার্সোনাল রিসিভিং নাম্বারটি যাচাই করে নিন। অ্যাডমিন ভেরিফাই করে ১ ঘণ্টার মধ্যে পেমেন্ট পাঠিয়ে দিবেন।</span>
         </div>
 
         <button type="submit" class="pp-submit" id="btnSubmitWithdraw">
           <span>উইথড্র কনফার্ম করুন</span>
         </button>
       </form>
-
-          </div>
+    </div>
   </div>
 
   <!-- 5. EDIT PROFILE MODAL -->
@@ -4838,12 +4924,31 @@ select.pp-input option{background:#111d33;color:#fff}
       npDepRefresh();
     }
 
+    function ppStepUpdate() {
+      const B = $pp('ppStageB');
+      const onB = !!(B && B.style.display === 'block');
+      const cur = onB ? 4 : (!ppSelectedPromo() ? 1 : (!ppMethodChosen ? 2 : 3));
+      document.querySelectorAll('#ppStepper .s').forEach(el => {
+        const n = +el.dataset.s;
+        el.classList.toggle('done', n < cur);
+        el.classList.toggle('active', n === cur);
+      });
+      document.querySelectorAll('#ppStepper em').forEach((em, i) => em.classList.toggle('on', i + 1 < cur));
+    }
+    function npCopyNum(btn) {
+      const num = ($pp('adminPaymentNumber') || {}).innerText || '';
+      try { window.app.copyText(num); } catch (e) {}
+      if (btn) { const t = btn.textContent; btn.textContent = 'COPIED ✓'; btn.classList.add('ok'); setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('ok'); }, 1600); }
+    }
+    window.npCopyNum = npCopyNum;
+
     function npDepRefresh() {
       const chosen = !!ppSelectedPromo();
       const m = $pp('ppSecMethod'), a = $pp('ppSecAmount');
       if (m) m.classList.toggle('pp-locked', !chosen);
       if (a) a.classList.toggle('pp-locked', !(chosen && ppMethodChosen));
       npDepCalc();
+      ppStepUpdate();
     }
 
     function npPromoChange() {
@@ -4947,12 +5052,12 @@ select.pp-input option{background:#111d33;color:#fff}
       const sm = $pp('ppSendMethod'); if (sm) sm.textContent = method;
       const bonusTxt = $pp('ppBonusValue') ? $pp('ppBonusValue').textContent : '';
       const sb = $pp('ppSendBox');
-      if (sb) sb.innerHTML = 'পাঠাতে হবে: <b>' + ppTk(amt) + '</b>'
-        + (sp.kind !== 'none' && bonusTxt && bonusTxt !== '৳0.00' ? '<br>প্রমোশন বোনাস: <b>' + bonusTxt + '</b>' : '')
-        + '<br>পদ্ধতি: <b>Send Money (Personal)</b>';
+      if (sb) sb.innerHTML = '<div class="pp-send-amt"><span>পাঠাতে হবে (Send Amount)</span><b>' + ppTk(amt) + '</b></div>'
+        + (sp.kind !== 'none' && bonusTxt && bonusTxt !== '৳0.00' ? '<div class="pp-send-sub">🎁 প্রমোশন বোনাস: <b>+' + bonusTxt + '</b></div>' : '');
 
       $pp('ppStageA').style.display = 'none';
       $pp('ppStageB').style.display = 'block';
+      ppStepUpdate();
       npTimerStart();
       const tb = $pp('depositTrxId'); if (tb) setTimeout(() => { try { tb.focus(); } catch (e) {} }, 150);
     }
@@ -4970,7 +5075,7 @@ select.pp-input option{background:#111d33;color:#fff}
       const left = Math.max(0, Math.ceil((ppEndTs - Date.now()) / 1000));
       const mm = String(Math.floor(left / 60)).padStart(2, '0'), ss = String(left % 60).padStart(2, '0');
       const clk = $pp('ppTimerClock'); if (clk) clk.textContent = mm + ':' + ss;
-      const bar = $pp('ppTimerBar'); if (bar) bar.style.width = (left / PP_SECONDS * 100) + '%';
+      const ring = $pp('ppTimerRing'); if (ring) ring.style.strokeDashoffset = String(289 * (1 - left / PP_SECONDS));
       const box = $pp('ppTimerBox'); if (box) box.classList.toggle('low', left <= 120);
       if (left <= 0) {
         npDepReset(false);
@@ -6179,7 +6284,8 @@ select.pp-input option{background:#111d33;color:#fff}
 
       const amount = parseFloat(document.getElementById('depositAmount').value);
       const method = document.getElementById('depositMethod').value;
-      const senderNumber = document.getElementById('depositSenderNumber').value.trim();
+      const _snEl = document.getElementById('depositSenderNumber');
+      const senderNumber = _snEl ? _snEl.value.trim() : '';
       const trxId = document.getElementById('depositTrxId').value.trim().toUpperCase();
       const btn = document.getElementById('btnSubmitDeposit');
 
@@ -6189,8 +6295,8 @@ select.pp-input option{background:#111d33;color:#fff}
         return;
       }
 
-      if (!senderNumber || !trxId) {
-        showToast('প্রেরক নাম্বার ও TrxID সঠিক ভাবে লিখুন।', 'error');
+      if (!trxId) {
+        showToast('Transaction ID (TrxID) সঠিক ভাবে লিখুন।', 'error');
         return;
       }
 
