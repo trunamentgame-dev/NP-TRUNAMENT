@@ -201,18 +201,16 @@ header{background:linear-gradient(180deg,#4a1238,#220a24);border-bottom:2px soli
 .hrow .history-bar{flex:1;min-width:0;background:none;border-bottom:0}
 .hrow .my-bets{position:static;flex-shrink:0;padding:4px 12px;font-size:11px}
 
-/* ===== v8/v9: player counter with stacked profile pictures ===== */
+/* ===== v8/v9: player counter bottom-right, plain no-box ===== */
 .bar{display:none}
-.player-counter{position:absolute;right:12px;bottom:46px;display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 5px;background:rgba(10,15,26,.72);border:1.2px solid rgba(245,158,11,.4);border-radius:9999px;box-shadow:0 3px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.15);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:4}
+.player-counter{position:absolute;top:auto;left:auto;right:14px;bottom:46px;display:flex;align-items:center;gap:5px;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;font-size:14px;color:#fff;text-shadow:0 1px 3px #000,0 0 8px rgba(0,0,0,.8);z-index:4}
 .avatar-stack{display:inline-flex;align-items:center}
-.avatar-stack .av{display:inline-flex;width:22px;height:22px;border-radius:50%;margin-left:-9px;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.6);border:1.5px solid #0e131f;overflow:hidden}
+.avatar-stack .av{display:inline-flex;width:17px;height:17px;border-radius:50%;margin-left:-7px;position:relative;border:1.2px solid #07090e;box-shadow:0 1px 3px rgba(0,0,0,.8);overflow:hidden}
 .avatar-stack .av:first-child{margin-left:0;z-index:1}
 .avatar-stack .av:nth-child(2){z-index:2}
 .avatar-stack .av:nth-child(3){z-index:3}
 .avatar-stack svg{width:100%;height:100%;display:block}
-.pcount-num{font-weight:900;font-variant-numeric:tabular-nums;color:#fff;font-size:13.5px;letter-spacing:.3px;text-shadow:0 1px 3px #000,0 0 8px rgba(0,0,0,.85)}
-.demo-tag{display:inline-block;font-size:8.5px;font-weight:900;letter-spacing:.4px;padding:1px 4px;border-radius:4px;background:rgba(239,68,68,.3);border:1px solid rgba(239,68,68,.7);color:#fca5a5;margin-right:4px;vertical-align:middle;text-transform:uppercase}
-.wf-demo .wn{color:#fde047}
+.pcount-num{font-weight:900;font-variant-numeric:tabular-nums;color:#fff;font-size:14px;letter-spacing:.3px;text-shadow:0 1px 3px #000,0 0 8px rgba(0,0,0,.8)}
 .promo{position:absolute;left:10px;right:10px;bottom:9px;height:40px;z-index:3;border-radius:10px;overflow:hidden;border:1.5px solid #d97706;background:linear-gradient(90deg,#141b2d,#1c263f 50%,#141b2d);box-shadow:0 3px 10px rgba(0,0,0,.5),inset 0 0 12px rgba(0,0,0,.4);transition:opacity .25s}
 .result-badge.show~.promo{opacity:0}
 .promo .sl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;padding:0 10px 4px;font-size:12.5px;font-weight:800;color:#fff;opacity:0;transform:translateX(28px);transition:opacity .5s,transform .5s;white-space:nowrap}
@@ -329,10 +327,10 @@ body.zmx .bet-card .spots{opacity:.8}
 /* ===== v19: কাঁটা (পয়েন্টার) ছোট + চাকার পেগের ধাক্কায় হালকা দোলে ===== */
 .ptr{width:clamp(17px,calc(var(--ws)*.065),26px)!important;top:calc(var(--ws)*-.028)!important;transform:translateX(-50%) rotate(var(--pa,0deg));transform-origin:50% 30%}
 
-/* ===== v18: রেজাল্ট শুধু চাকার মাঝের গোল হাবে (কোনো বক্স/পপআপ নেই) ===== */
+/* ===== v18: রেজাল্ট শুধু চাকার মাঝের গোল হাবে (ঠিক মিডিলে অ্যাডজাস্ট করা) ===== */
 .result-badge{display:none!important}
-.hub.res b{white-space:pre;text-align:center;line-height:1.02;font-weight:900;color:#fff;transform:translateY(calc(var(--ws)*-.045));animation:resIn .45s cubic-bezier(.2,1.5,.4,1) both}
-@keyframes resIn{from{opacity:0;scale:.4}to{opacity:1;scale:1}}
+.hub.res b{white-space:pre;text-align:center;line-height:1.05;font-weight:900;color:#fff;transform:none!important;margin:auto;display:flex;align-items:center;justify-content:center;animation:resIn .45s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes resIn{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
 </style>
 </head>
 <body>
@@ -522,7 +520,7 @@ function ptrStep(now){
   el.style.setProperty('--pa',PT.a.toFixed(2)+'deg');requestAnimationFrame(ptrStep);
 }
 /* ===== Bot Box: Player Count System & Auto Player Win History ===== */
-let botCount=20,botCountFrozen=false,lastBotRound=null,lastDemoFeedRound=null;
+let botCount=20,botCountFrozen=false,lastBotRound=null,lastAutoFeedRound=null;
 function updateBotCountDisplay(){const el=$('playerCountVal');if(el)el.textContent=botCount}
 function resetBotCount(){botCount=20;botCountFrozen=false;updateBotCountDisplay()}
 function freezeBotCount(){botCountFrozen=true}
@@ -535,43 +533,57 @@ setInterval(()=>{
     }
   }
 },250);
-function generateDemoWinners(){
+function generateAutoWinners(){
   const pool=['Sakib','Tanvir','Hasan','Rahim','Karim','Sohan','Nayeem','Fahim','Mahmud','Arif','Bijoy','Imran','Sumon','Rubel','Kabir','Rony','Shakil','Tareq','Alamin','Farhan','Shohel'];
   const count=Math.floor(Math.random()*6)+10;
   const shuffled=[...pool].sort(()=>Math.random()-.5);
   const list=[];
   for(let i=0;i<count;i++){
     const rawName=shuffled[i%shuffled.length];
-    const r=Math.random();
     let amt;
-    if(r<0.35)amt=Math.floor(Math.random()*1500+500);
-    else if(r<0.70)amt=Math.floor(Math.random()*8000+2000);
-    else if(r<0.90)amt=Math.floor(Math.random()*10000+10000);
-    else amt=Math.floor(Math.random()*30000+20000);
-    amt=Math.round(amt/100)*100;
-    list.push({name:rawName,win:amt,isDemo:true});
+    if(i===0){
+      amt=500;
+    }else{
+      const r=Math.random();
+      if(r<0.30)amt=Math.floor(Math.random()*1500+500);
+      else if(r<0.65)amt=Math.floor(Math.random()*8000+2000);
+      else if(r<0.88)amt=Math.floor(Math.random()*10000+10000);
+      else amt=Math.floor(Math.random()*30000+20000);
+      amt=Math.round(amt/100)*100;
+      if(amt<500)amt=500;
+    }
+    list.push({name:rawName,win:amt});
   }
   return list;
 }
-function triggerDemoFeed(roundId){
-  if(lastDemoFeedRound===roundId)return;
-  lastDemoFeedRound=roundId;
-  showFeed(generateDemoWinners());
+function triggerAutoFeed(roundId){
+  if(lastAutoFeedRound===roundId)return;
+  lastAutoFeedRound=roundId;
+  showFeed(generateAutoWinners());
 }
 
 function spinTo(seg,dur){
   freezeBotCount();
-  const curRound=S.st?S.st.roundId:S.spun;
-  setTimeout(()=>triggerDemoFeed(curRound),Math.max(600,dur-2800));
+  dur = Math.max(12000, dur || 12000); // বোর্ড আরও সময় নিয়ে ১২+ সেকেন্ড ঘুরবে
   const n=S.layout.length,st=2*Math.PI/n,TAU=2*Math.PI,base=-((seg+.5)*st)+(Math.random()-.5)*st*.24,from=S.rot;
   const d=(((base-from)%TAU)+TAU)%TAU,t0=performance.now();let lastTick=Math.floor(from/st),prevRot=from,prevT=t0,dirv=1;
   /* শুধু এক দিকে ঘোরে, কখনো উল্টো নয়। শুরুতে ০.৬ সেকেন্ডে মসৃণভাবে গতি ওঠে, তারপর ধীরে ধীরে কমে জেতা ঘরের মাঝে থামে।
      সর্বোচ্চ গতি VCAP-এ আটকানো, তাই খুব দ্রুত ঘুরে উল্টো ঘুরছে বলে ভুল দেখায় না (wagon-wheel ইফেক্ট) */
-  const VCAP=6.5,tu=Math.min(.6,dur/4000),T=dur/1000,K=tu/2+(T-tu)/3;
+  const VCAP=6.5,tu=Math.min(.8,dur/4000),T=dur/1000,K=tu/2+(T-tu)/3;
   const N=Math.max(0,Math.floor((VCAP*K-d)/TAU)),D=d+TAU*N,Vm=D/K,to=from+D;
   S.spinning=true;
   if(dur>6500){S.goUntil=Date.now()+1000;goChime()}   /* ১০…১ এর পর "GO" */
-  function finish(){S.spinning=false;PT.tg=0;ptrGo();const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;if(!S.st||Z.skip!==S.st.roundId){zoomIn();S.resShow=S.st.roundId}hubSet()}}
+  function finish(){
+    S.spinning=false;PT.tg=0;ptrGo();const r=S.st&&S.st.result;
+    if(r){
+      S.winSeg=r.seg;
+      if(!S.st||Z.skip!==S.st.roundId){zoomIn();S.resShow=S.st.roundId}
+      hubSet();
+      // রেজাল্ট দেওয়ার পরে ৫০০ থেকে শুরু হয়ে উইনার্স ফিড উঠবে:
+      const rId=S.st?S.st.roundId:S.spun;
+      setTimeout(()=>triggerAutoFeed(rId),450);
+    }
+  }
   (function f(now){const t=Math.max(0,now-t0)/1000;let done=false;
     if(t<tu)S.rot=from+Vm*(t/2-tu/(2*Math.PI)*Math.sin(Math.PI*t/tu));
     else if(t<T){const q=(t-tu)/(T-tu);S.rot=from+Vm*tu/2+Vm*(T-tu)/3*(1-Math.pow(1-q,3))}
@@ -633,8 +645,7 @@ function maskName(n){n=String(n||'');if(n.includes('*'))return n;return n.length
 function showFeed(L){const f=$('wfeed');if(!f)return;f.innerHTML='';const rows=[];
   if(S.res&&S.st&&S.res.round==S.st.roundId&&S.res.win>0)rows.push('<div class="wf me">🎉 আপনি জিতেছেন <b>'+money(S.res.win)+'</b></div>');
   (L||[]).forEach(x=>{
-    const demoTag=x.isDemo?'<span class="demo-tag">[Demo]</span> ':'';
-    rows.push('<div class="wf'+(x.isDemo?' wf-demo':'')+'">🏆 '+demoTag+'<span class="wn">'+esc(maskName(x.name))+'</span> <b>'+Number(x.win).toLocaleString('en-US')+' tk</b></div>');
+    rows.push('<div class="wf">🏆 <span class="wn">'+esc(maskName(x.name))+'</span> <b>'+Number(x.win).toLocaleString('en-US')+' tk</b></div>');
   });
   rows.forEach((h,i)=>{const t=document.createElement('div');t.innerHTML=h;const e=t.firstChild;e.style.animationDelay=(i*240)+'ms';f.appendChild(e)});
   clearTimeout(S.wt);S.wt=setTimeout(()=>{f.innerHTML=''},rows.length*240+3600)}
@@ -652,7 +663,7 @@ function renderTable(){
 }
 function tick(){
   const s=S.st;if(!s||!s.endsAt)return;
-  const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:10000,spin:8000,result:5000}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on){zoomOut()}
+  const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:10000,spin:8000,result:5000}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on&&!S.spinning){zoomOut()}
   {const c=Math.ceil(left/1000),show=(s.phase==='betting'&&c>=1);S.cdVal=show?c:0;hubSet();
     /* ১০ থেকে ১ পর্যন্ত প্রতিটি সংখ্যায় টিক শব্দ; শেষ ৩ সেকেন্ডে চড়া সুর */
     if(show){if(S.lastCd!==c){S.lastCd=c;softTick(c)}}else S.lastCd=null}$('bar').style.width=Math.min(100,left/tot*100)+'%';
@@ -669,12 +680,12 @@ function onState(m){
     }
   }else if(m.phase==='spin'||m.phase==='result'){
     freezeBotCount();
-    if(m.phase==='result')triggerDemoFeed(m.roundId);
+    if(m.phase==='result'&&!S.spinning)triggerAutoFeed(m.roundId);
   }
   {const fl=$('fairLine');if(fl)fl.textContent=m.hash?('Round #'+m.roundId+' hash: '+m.hash+(m.reveal?'  |  Round #'+m.reveal.id+' seed: '+m.reveal.seed:'')):''}
   $('limits').textContent=m.cfg?`${money(m.cfg.minBet)} – ${money(m.cfg.maxBet)}`:'';
-  if(m.phase==='spin'&&m.result&&S.spun!==m.roundId){S.spun=m.roundId;spinTo(m.result.seg,Math.max(1200,m.endsAt-(Date.now()+S.off)-300))}
-  if(m.phase==='result'&&m.result){if(S.spun!==m.roundId){S.spun=m.roundId;setRot(m.result.seg)}renderSpots(m.result.spot)}else renderSpots();
+  if(m.phase==='spin'&&m.result&&S.spun!==m.roundId){S.spun=m.roundId;spinTo(m.result.seg,Math.max(12000,m.endsAt-(Date.now()+S.off)+3000))}
+  if(m.phase==='result'&&m.result){if(!S.spinning&&S.spun!==m.roundId){S.spun=m.roundId;setRot(m.result.seg)}renderSpots(m.result.spot)}else renderSpots();
   renderHist();renderTable();renderMsg();tick();
 }
 /* ইউজার প্যানেল গেমটা ফ্রেমে খোলে; ব্যালেন্স + গেমের ডাটা আসার পর প্যানেলকে জানায়, তখন প্যানেলের LOADING সরে */
