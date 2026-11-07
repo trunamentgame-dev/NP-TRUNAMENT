@@ -98,19 +98,6 @@ html{background:#02060f}
 
 #homeBtn{position:fixed;left:0;right:0;margin:0 auto;width:max-content;bottom:max(18px,env(safe-area-inset-bottom));z-index:30;padding:11px 32px;font-size:1rem}
 
-/* Home -> loading screen (CRAMBOD tilted background + LOADING..... letter animation) */
-/* shared by #mwLoad (game open) and #mwGo (home) */
-.mwg{display:none;position:fixed;inset:0;z-index:100000;align-items:center;justify-content:center;overflow:hidden;background:#0a1530;--cy:9.6s;font-family:Georgia,"Times New Roman",serif;touch-action:none}
-#mwGo.on,.mwg.on{display:flex}
-#mwLoad{transition:opacity .4s ease}
-#mwGo::after,.mwg::after{display:none}
-.mwg-bg{position:absolute;left:50%;top:50%;width:190vmax;height:190vmax;transform:translate(-50%,-50%) rotate(-30deg);display:flex;flex-direction:column;justify-content:center;gap:.9em;font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-style:italic;font-size:clamp(16px,4.6vw,26px);font-weight:900;letter-spacing:.15em;white-space:nowrap;color:rgba(251,191,36,.09);filter:blur(1.5px);pointer-events:none;-webkit-user-select:none;user-select:none}
-.mwg-word{position:relative;z-index:2;display:flex;flex-wrap:nowrap;align-items:baseline;justify-content:center;max-width:100%;padding:0 8px;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:min(4.6vw,22px,4vh);font-weight:700;line-height:1;letter-spacing:.32em}
-.mwg::before{content:"";position:absolute;left:50%;top:calc(50% + 26px);width:96px;height:2px;margin-left:-48px;border-radius:2px;background:linear-gradient(90deg,transparent,#e6b84a,transparent);opacity:.8}
-.mwg-l{display:inline-block;color:#e6b84a;transform-origin:50% 60%;text-shadow:0 0 10px rgba(230,184,74,.35);animation:mwg-z 1.6s ease-in-out infinite;animation-delay:calc(var(--i) * .11s)}
-@keyframes mwg-z{0%,60%,100%{opacity:.4}25%{opacity:1}}
-@media (prefers-reduced-motion:reduce){.mwg .mwg-l{animation:none!important;opacity:1;transform:none;filter:none}}
-
 /* ===== সব পেজের ব্যাকগ্রাউন্ড: ছোট ছোট বোর্ড, ৩০° বাঁকা, ফাঁকা ছাড়া ===== */
 body::before{display:none}
 #bgTile{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none;background:#5e3419}
@@ -144,13 +131,9 @@ body::before{display:none}
 @media (prefers-reduced-motion:reduce){#vs *,#vs::before{animation:none!important}#vs .vbar i{width:100%}}
 </style></head><body>
 <div id="bgTile" aria-hidden="true"></div>
-<div id="mwLoad" class="mwg on" aria-label="Loading"></div>
 <script>
-function mwHide(){var e=document.getElementById("mwLoad");if(!e||e._h)return;e._h=1;e.style.opacity="0";e.style.pointerEvents="none";setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e)},450)}
-function mwBuild(o,t){if(!o||o.firstChild)return;var w=document.createElement("div");w.className="mwg-word";for(var i=0;i<t.length;i++){var s=document.createElement("span");s.className="mwg-l";s.setAttribute("data-l",t.charAt(i));s.style.setProperty("--i",i);s.textContent=t.charAt(i);w.appendChild(s)}o.appendChild(w)}
-mwBuild(document.getElementById("mwLoad"),"LOADING.....");
+function mwHide(){}
 try{fetch("https://carrom-server-8jiz.onrender.com/health",{mode:"no-cors",cache:"no-store"}).catch(function(){})}catch(e){}
-setTimeout(mwHide,3000);
 </script>
 
 <div class="screen" id="home">
@@ -209,7 +192,6 @@ setTimeout(mwHide,3000);
 
 <div class="scrim" id="cpS"><div class="sheet"><div class="grab"></div><h2>দুঃখিত!</h2><div class="sum">কোনো Real Player পাওয়া যায়নি। আপনি কি 🤖 Computer Player-এর সঙ্গে খেলতে চান?<br>(জিতলে সরাসরি আপনার মূল ওয়ালেটে টাকা যোগ হবে)</div><button class="big" id="cpY">হ্যাঁ</button><button class="ghost" id="cpN">না, আবার খুঁজুন</button></div></div>
 <button id="bkBtn" type="button" aria-label="হোমে ফিরুন" title="হোমে ফিরুন"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-6h4v6"/></svg></button>
-<div id="mwGo" class="mwg" aria-label="Loading"></div>
 <div class="scrim" id="homeS"><div class="sheet"><div class="grab"></div><h2>হোমে ফিরে যাবেন?</h2><div class="sum">আপনি ইউজার প্যানেলে ফিরে যাবেন।</div><button class="big" id="homeY">হ্যাঁ, হোমে যান</button><button class="ghost" id="homeN">না, এখানেই থাকুন</button></div></div>
 <div class="vs" id="vs"><h2>ম্যাচ পাওয়া গেছে!</h2>
  <div class="vrow"><div class="l" id="vsL"></div><div class="vsmark">VS</div><div class="r" id="vsR"></div></div>
@@ -598,7 +580,7 @@ $('homeBtn').onclick=$('bkBtn').onclick=openHome;
 function placeBk(){const b=$('bkBtn');if(inGame()){const r=$('d0').getBoundingClientRect(),c=document.body.getBoundingClientRect();b.style.top=Math.round(r.bottom+6)+'px'}else b.style.top=''}
 window.addEventListener('resize',placeBk);
 $('homeN').onclick=()=>sheet('homeS',false);
-function mwGoShow(){const o=$('mwGo');if(!o)return;mwBuild(o,'LOADING.....');o.className='mwg on'}
+function mwGoShow(){}
 $('homeY').onclick=()=>{sheet('homeS',false);try{tx({t:'cancel'})}catch(e){}mwGoShow();
  const u='https://trunamentgame-dev.github.io/NP-TRUNAMENT/';
  setTimeout(()=>{try{window.top.location.replace(u)}catch(e){location.replace(u)}},900)};
