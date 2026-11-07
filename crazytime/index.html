@@ -370,7 +370,7 @@ const resLabel=(spot,mega)=>spot==='mega'?'MEGA '+mega+'x':labelOf(spot);
 const MIN_WIN_POP=500;
 function paintRB(rb,spot){const c=colorOf(spot);rb.style.background=c;rb.style.borderColor='#fff';rb.style.boxShadow='0 0 26px '+c;rb.style.color=(spot==='mega'||spot==='x50')?'#1a1200':'#fff'}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2300)}
-function beep(f,d,v){if(!S.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v||.05;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function beep(f,d,v){if(!S.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v||.05;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
 function confetti(){const cf=$('cf'),cols=['#fbbf24','#ef4444','#3b82f6','#a855f7','#10b981','#fff'];let h='';for(let i=0;i<46;i++)h+=`<i style="left:${Math.random()*100}%;background:${cols[i%6]};animation-duration:${1.8+Math.random()*1.8}s;animation-delay:${Math.random()*.5}s"></i>`;cf.innerHTML=h;setTimeout(()=>cf.innerHTML='',4200)}
 function winPop(w){confetti();$('popAmt').textContent=money(w);$('pop').classList.add('on');[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.18,.07),i*120));clearTimeout(popT);popT=setTimeout(()=>$('pop').classList.remove('on'),3500)}
 if($('btnBets'))$('btnBets').onclick=()=>{renderTable();$('betPop').classList.add('on')};
@@ -477,7 +477,9 @@ function renderTable(){
 function tick(){
   const s=S.st;if(!s||!s.endsAt)return;
   const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:15000,spin:8000,result:5000}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on){zoomOut()}
-  {const c=Math.ceil(left/1000);$('tm').textContent=(s.phase==='betting'&&c>=1&&c<=15)?c:''}$('bar').style.width=(left/tot*100)+'%';
+  {const c=Math.ceil(left/1000),show=(s.phase==='betting'&&c>=1&&c<=10);$('tm').textContent=show?c:'';
+    /* ১০ থেকে ১ পর্যন্ত প্রতিটি সংখ্যায় টিক শব্দ; শেষ ৩ সেকেন্ডে চড়া সুর */
+    if(show){if(S.lastCd!==c){S.lastCd=c;if(c<=3)beep(1200,.16,.09);else beep(800,.08,.06)}}else S.lastCd=null}$('bar').style.width=(left/tot*100)+'%';
 }
 setInterval(tick,200);
 
@@ -492,17 +494,20 @@ function onState(m){
   if(m.phase==='result'&&m.result){if(S.spun!==m.roundId){S.spun=m.roundId;setRot(m.result.seg)}renderSpots(m.result.spot)}else renderSpots();
   renderHist();renderTable();renderMsg();
 }
+/* ইউজার প্যানেল গেমটা ফ্রেমে খোলে; ব্যালেন্স + গেমের ডাটা আসার পর প্যানেলকে জানায়, তখন প্যানেলের LOADING সরে */
+function npReady(){if(npReady.d)return;npReady.d=1;try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'NP_GAME_READY'},'*')}catch(e){}}
+function npCheckReady(){if(S.bal!=null&&S.layout&&S.layout.length)npReady()}
 function handle(m){
-  if(m.t==='hello'){S.layout=m.layout;S.spots=m.spots;S.bets=m.bets||{};draw();renderSpots();renderTable()}
+  if(m.t==='hello'){S.layout=m.layout;S.spots=m.spots;S.bets=m.bets||{};draw();renderSpots();renderTable();npCheckReady()}
   else if(m.t==='state')onState(m);
-  else if(m.t==='bal'){S.bal=m.balance;$('headerBalance').textContent=money2(m.balance)}
+  else if(m.t==='bal'){S.bal=m.balance;$('headerBalance').textContent=money2(m.balance);npCheckReady()}
   else if(m.t==='bets'){const old=S.bets||{};S.bets=m.bets;renderSpots();renderTable();renderMsg();let i=0;for(const id in m.bets){const d=(m.bets[id]||0)-(old[id]||0);if(d>0)floatAt(id,d,i++)}}
   else if(m.t==='err'){toast(m.msg);beep(200,.15,.05)}
   else if(m.t==='settle'){
     if(m.stake>0){S.res={round:m.roundId,stake:m.stake,win:m.win};renderMsg();S.log.unshift({id:m.roundId,stake:m.stake,win:m.win,spot:m.spot,mega:m.mega});S.log=S.log.slice(0,30);renderTable();
       if(m.win>=MIN_WIN_POP)winPop(m.win);else if(m.win>0){}else toast(`এই রাউন্ডে হেরেছেন ${money(m.stake)}`)}}
   else if(m.t==='winners'){S.winners=(m.list||[]).slice(0,20);showFeed(S.winners)}
-  else if(m.t==='fatal'){const f=$('fatal');f.textContent=m.msg;f.style.display='flex'}
+  else if(m.t==='fatal'){const f=$('fatal');f.textContent=m.msg;f.style.display='flex';npReady()}
 }
 /* ⚠️ নিচের লাইনে আপনার Render সার্ভারের ঠিকানা বসান (https নয়, wss:// দিয়ে শুরু হবে)।
    উদাহরণ: 'wss://crazytime-backend-abcd.onrender.com'  (অথবা পেজ লোডের আগে window.CRAZY_SERVER_URL সেট করুন) */
