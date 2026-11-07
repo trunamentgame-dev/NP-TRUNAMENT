@@ -2897,6 +2897,8 @@
           </button>
         </div>
 
+        <div id="turnoverBox" style="display:none;margin:10px 0 2px;padding:10px 12px;border:1px solid rgba(255,255,255,0.2);border-radius:12px;background:rgba(0,0,0,0.25)"><div style="display:flex;justify-content:space-between;font-size:12px;color:#cbd5e1"><span>🎯 টার্নওভার</span><span id="turnoverTxt"></span></div><div style="height:8px;border-radius:99px;background:rgba(255,255,255,0.15);margin-top:6px;overflow:hidden"><div id="turnoverBar" style="height:100%;width:0;background:#10b981;transition:width .3s"></div></div><div id="turnoverNote" style="font-size:11px;color:#cbd5e1;margin-top:6px"></div></div>
+
         <div class="wallet-action-row">
           <button class="btn btn-primary" onclick="window.app.openDepositModal()">
             <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -3461,6 +3463,15 @@
 
   <!-- ==================== JAVASCRIPT APPLICATION CODE ==================== -->
   <script src="./firebase-config.js"></script>
+  <script>
+  function npTurnoverLeft(){try{var u=state.userData||{};return Math.max(0,Math.round(((+u.turnoverRequired||0)-(+u.turnoverDone||0))*100)/100)}catch(e){return 0}}
+  function npRenderTurnover(){var b=document.getElementById('turnoverBox');if(!b)return;var u=state.userData||{},req=+u.turnoverRequired||0,done=+u.turnoverDone||0;
+    if(req<=0){b.style.display='none';return}
+    var left=npTurnoverLeft(),p=Math.min(100,Math.round(done/req*100));b.style.display='block';
+    document.getElementById('turnoverTxt').textContent='৳'+Math.min(done,req)+' / ৳'+req;
+    document.getElementById('turnoverBar').style.width=p+'%';
+    document.getElementById('turnoverNote').textContent=left>0?'উইথড্র করতে আরও ৳'+left+' টার্নওভার বাকি ('+p+'% সম্পন্ন)':'✅ টার্নওভার সম্পন্ন, এখন উইথড্র করতে পারবেন';}
+  </script>
   <script>
     /**
      * NP TOURNAMENT BD - USER PANEL ENGINE
@@ -4192,6 +4203,8 @@
             ffIgn: data.ffIgn || 'Not Set',
             ffUid: data.ffUid || data.gameUid || '000000000',
             balance: typeof data.balance === 'number' ? data.balance : 0,
+            turnoverRequired: typeof data.turnoverRequired === 'number' ? data.turnoverRequired : 0,
+            turnoverDone: typeof data.turnoverDone === 'number' ? data.turnoverDone : 0,
             status: data.status || 'ACTIVE',
             dpUrl: data.dpUrl || '',
             dpWidth: data.dpWidth || '75px',
@@ -4834,6 +4847,7 @@
         if (pFfUid) pFfUid.innerText = state.userData.ffUid || 'দেওয়া হয়নি';
         if (walletBal) walletBal.innerText = state.userData.balance;
         if (helperWalletBal) helperWalletBal.innerText = state.userData.balance;
+        try { npRenderTurnover(); } catch (e) {}
 
         if (pAvatarBox) {
           const w = state.userData.dpWidth || '75px';
@@ -5562,6 +5576,12 @@
       const minWithdraw = state.settings.minWithdraw || 100;
       if (amount < minWithdraw) {
         showToast(`সর্বনিম্ন উইথড্র ৳${minWithdraw} টাকা।`, 'error');
+        return;
+      }
+
+      const npLeft = (typeof npTurnoverLeft === 'function') ? npTurnoverLeft() : 0;
+      if (npLeft > 0) {
+        showToast(`উইথড্র করতে আরও ৳${npLeft} টার্নওভার বাকি আছে।`, 'error');
         return;
       }
 
