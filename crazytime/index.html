@@ -322,6 +322,11 @@ body.zmx .bet-card .spots{opacity:.8}
 
 /* ===== v19: কাঁটা (পয়েন্টার) ছোট + চাকার পেগের ধাক্কায় হালকা দোলে ===== */
 .ptr{width:clamp(17px,calc(var(--ws)*.065),26px)!important;top:calc(var(--ws)*-.028)!important;transform:translateX(-50%) rotate(var(--pa,0deg));transform-origin:50% 30%}
+
+/* ===== v18: রেজাল্ট শুধু চাকার মাঝের গোল হাবে (কোনো বক্স/পপআপ নেই) ===== */
+.result-badge{display:none!important}
+.hub.res b{white-space:pre;text-align:center;line-height:1.02;font-weight:900;color:#fff;transform:translateY(calc(var(--ws)*-.045));animation:resIn .45s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes resIn{from{opacity:0;scale:.4}to{opacity:1;scale:1}}
 </style>
 </head>
 <body>
@@ -421,7 +426,7 @@ function softTick(c){
   try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
     const t=AC.currentTime,last=c<=3;
     const f=last?({3:784,2:880,1:1047})[c]:523.25;               /* সুর: ১০–৪ একই নিচু সুর; ৩,২,১ ধাপে ওপরে */
-    const v=last?(.05+(3-c)*.012):(.016+(10-c)*.0035);            /* জোর: আস্তে আস্তে বাড়ে */
+    const v=last?(.05+(3-c)*.012):(.016+(10-Math.min(c,10))*.0035);            /* জোর: আস্তে আস্তে বাড়ে */
     const d=last?(c===1?.7:.45):.2;                               /* দৈর্ঘ্য */
     const out=AC.createGain(),lp=AC.createBiquadFilter();
     lp.type='lowpass';lp.frequency.value=3200;lp.Q.value=.5;
@@ -437,8 +442,20 @@ function softTick(c){
   }catch(e){}
 }
 function goChime(){beep(784,.5,.05);setTimeout(()=>beep(1175,.9,.06),110)}
+function hubSet(){
+  /* হাবের লেখা: রেজাল্ট থাকলে রেজাল্ট (বক্স ছাড়া), নইলে কাউন্টডাউন, তারপর GO */
+  const b=$('tm');if(!b)return;const h=b.parentNode,st=S.st,r=st&&st.result;
+  const res=!!(r&&S.resShow===st.roundId&&st.phase!=='betting');
+  let txt;
+  if(res){txt=r.spot==='mega'?'MEGA\n'+r.mega+'x':labelOf(r.spot);const col=colorOf(r.spot);
+    b.style.fontSize='calc(var(--ws)*'+(r.spot==='mega'?'.062':(txt.length>3?'.1':'.125'))+')';
+    b.style.textShadow='0 0 16px '+col+',0 0 6px '+col+',0 2px 4px rgba(0,0,0,.85)'}
+  else{txt=S.cdVal?String(S.cdVal):((S.goUntil||0)>Date.now()?'GO':'');b.style.fontSize='';b.style.textShadow=''}
+  if(b.textContent!==txt)b.textContent=txt;
+  h.classList.toggle('res',res);
+}
 function confetti(){const cf=$('cf'),cols=['#fbbf24','#ef4444','#3b82f6','#a855f7','#10b981','#fff'];let h='';for(let i=0;i<46;i++)h+=`<i style="left:${Math.random()*100}%;background:${cols[i%6]};animation-duration:${1.8+Math.random()*1.8}s;animation-delay:${Math.random()*.5}s"></i>`;cf.innerHTML=h;setTimeout(()=>cf.innerHTML='',4200)}
-function winPop(w){confetti();$('popAmt').textContent=money(w);$('pop').classList.add('on');[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,i===3?1.1:.55,.06),i*130));clearTimeout(popT);popT=setTimeout(()=>$('pop').classList.remove('on'),3500)}
+function winPop(w){confetti();[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,i===3?1.1:.55,.06),i*130))}
 if($('btnBets'))$('btnBets').onclick=()=>{renderTable();$('betPop').classList.add('on')};
 $('betClose').onclick=()=>$('betPop').classList.remove('on');
 $('betPop').onclick=e=>{if(e.target.id==='betPop')$('betPop').classList.remove('on')};
@@ -500,7 +517,7 @@ function spinTo(seg,dur){
   const N=Math.max(0,Math.floor((VCAP*K-d)/TAU)),D=d+TAU*N,Vm=D/K,to=from+D;
   S.spinning=true;
   if(dur>6500){S.goUntil=Date.now()+1000;goChime()}   /* ১০…১ এর পর "GO" */
-  function finish(){S.spinning=false;PT.tg=0;ptrGo();const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}
+  function finish(){S.spinning=false;PT.tg=0;ptrGo();const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;if(!S.st||Z.skip!==S.st.roundId){zoomIn();S.resShow=S.st.roundId}hubSet()}}
   (function f(now){const t=Math.max(0,now-t0)/1000;let done=false;
     if(t<tu)S.rot=from+Vm*(t/2-tu/(2*Math.PI)*Math.sin(Math.PI*t/tu));
     else if(t<T){const q=(t-tu)/(T-tu);S.rot=from+Vm*tu/2+Vm*(T-tu)/3*(1-Math.pow(1-q,3))}
@@ -579,14 +596,14 @@ function renderTable(){
 function tick(){
   const s=S.st;if(!s||!s.endsAt)return;
   const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:15000,spin:8000,result:5000}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on){zoomOut()}
-  {const c=Math.ceil(left/1000),show=(s.phase==='betting'&&c>=1&&c<=10);$('tm').textContent=show?c:((S.goUntil||0)>Date.now()?'GO':'');
+  {const c=Math.ceil(left/1000),show=(s.phase==='betting'&&c>=1);S.cdVal=show?c:0;hubSet();
     /* ১০ থেকে ১ পর্যন্ত প্রতিটি সংখ্যায় টিক শব্দ; শেষ ৩ সেকেন্ডে চড়া সুর */
     if(show){if(S.lastCd!==c){S.lastCd=c;softTick(c)}}else S.lastCd=null}$('bar').style.width=(left/tot*100)+'%';
 }
 setInterval(tick,200);
 
 function onState(m){
-  S.off=m.now-Date.now();S.st=m;S.winSeg=(m.phase==='result'&&m.result)?m.result.seg:null;const rb=$('rb');if(m.phase==='result'&&m.result){rb.textContent=resLabel(m.result.spot,m.result.mega);paintRB(rb,m.result.spot);if(Z.skip!==m.roundId){zoomIn();rb.classList.add('show')}}else{rb.classList.remove('show');if(m.phase==='spin'){if(Z.skip!==m.roundId)zoomIn()}else zoomOut()}
+  S.off=m.now-Date.now();S.st=m;S.winSeg=(m.phase==='result'&&m.result)?m.result.seg:null;const rb=$('rb');if(m.phase==='result'&&m.result){if(Z.skip!==m.roundId){zoomIn();if(!S.spinning)S.resShow=m.roundId}}else{rb.classList.remove('show');if(m.phase==='spin'){if(Z.skip!==m.roundId)zoomIn()}else zoomOut()}
   $('ph').textContent={betting:'বেট ধরুন',spin:'ঘুরছে',result:'ফলাফল',paused:'বিরতি'}[m.phase]||'';
   if(m.phase==='betting'||S.onl==null){S.onl=m.online||0;$('online').textContent='👥 '+S.onl}
   {const fl=$('fairLine');if(fl)fl.textContent=m.hash?('Round #'+m.roundId+' hash: '+m.hash+(m.reveal?'  |  Round #'+m.reveal.id+' seed: '+m.reveal.seed:'')):''}
@@ -594,7 +611,7 @@ function onState(m){
   if(m.phase==='betting'&&m.roundId!==S.lastRound){S.bets={};S.lastRound=m.roundId}
   if(m.phase==='spin'&&m.result&&S.spun!==m.roundId){S.spun=m.roundId;spinTo(m.result.seg,Math.max(1200,m.endsAt-(Date.now()+S.off)-300))}
   if(m.phase==='result'&&m.result){if(S.spun!==m.roundId){S.spun=m.roundId;setRot(m.result.seg)}renderSpots(m.result.spot)}else renderSpots();
-  renderHist();renderTable();renderMsg();
+  renderHist();renderTable();renderMsg();tick();
 }
 /* ইউজার প্যানেল গেমটা ফ্রেমে খোলে; ব্যালেন্স + গেমের ডাটা আসার পর প্যানেলকে জানায়, তখন প্যানেলের LOADING সরে */
 function npReady(){if(npReady.d)return;npReady.d=1;try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'NP_GAME_READY'},'*')}catch(e){}}
@@ -659,8 +676,8 @@ function zoomIn(){
 function zoomOut(){
   const a=document.querySelector('.arena-box'),rig=document.querySelector('.rig');
   if(!Z.on||!rig)return;
-  Z.on=false;rig.style.transform='';a.classList.remove('zm');document.body.classList.remove('zmx');$('rb').classList.remove('show');
-  if(S.st)Z.skip=S.st.roundId;
+  Z.on=false;rig.style.transform='';a.classList.remove('zm');document.body.classList.remove('zmx');$('rb').classList.remove('show');S.resShow=null;
+  if(S.st)Z.skip=S.st.roundId;hubSet();
 }
 fitWheel();addEventListener('load',fitWheel);
 try{new ResizeObserver(()=>{fitWheel();if(Z.on){Z.on=false;zoomIn()}}).observe(document.querySelector('.arena-box'));new ResizeObserver(fitWheel).observe(document.querySelector('.panels-container'))}catch(e){addEventListener('resize',fitWheel)}
