@@ -306,6 +306,21 @@ header{flex:none;padding:calc(6px + env(safe-area-inset-top)) 12px 6px}
 .mw-yes,.mw-no{display:block;width:100%;height:42px;margin-top:8px;border-radius:12px;font-weight:900;font-size:14px;font-family:inherit;cursor:pointer}
 .mw-yes{border:0;color:#fff;background:linear-gradient(180deg,#f59e0b,#ea580c)}
 .mw-no{border:1px solid #d97706;background:#1c263f;color:#fbbf24}
+
+/* ===== v18: চাকা ও বেট বক্স একই সাজানো ক্যাসিনো ঘর; জুমে বেট বক্স কাচের মতো স্বচ্ছ ===== */
+.arena-box{overflow:visible!important;clip-path:inset(0 0 -100vh 0);background:none!important;border:0!important;box-shadow:none!important}
+.room{bottom:calc(-1px*var(--ext,0));border-top:2px solid #d97706;border-bottom:2px solid #d97706;
+  background:radial-gradient(circle at 30px 30px,rgba(245,158,11,.12) 2px,transparent 3px) 0 0/60px 60px,radial-gradient(circle at 0 0,rgba(245,158,11,.08) 2px,transparent 3px) 0 0/60px 60px,repeating-linear-gradient(90deg,transparent 0 118px,rgba(245,158,11,.14) 118px 120px),radial-gradient(ellipse at 50% 32%,#7a1636 0%,#4a0d25 52%,#1f0511 100%)}
+.panels-container{background:transparent}
+.bet-card{background:rgba(20,4,12,.30)!important;border:2px solid rgba(217,119,6,.85)!important;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);box-shadow:0 4px 14px rgba(0,0,0,.35)!important;transition:background .6s,backdrop-filter .6s,-webkit-backdrop-filter .6s}
+.bet-card .stepper-box{background:rgba(0,0,0,.22)!important;transition:background .6s}
+.bet-card .spots{transition:opacity .6s}
+body.zmx .bet-card{background:rgba(255,255,255,.04)!important;-webkit-backdrop-filter:blur(1px);backdrop-filter:blur(1px);border-color:rgba(251,191,36,.9)!important}
+body.zmx .bet-card .stepper-box{background:rgba(0,0,0,.08)!important;border-color:rgba(245,158,11,.25)}
+body.zmx .bet-card .spots{opacity:.8}
+
+/* ===== v19: কাঁটা (পয়েন্টার) ছোট + চাকার পেগের ধাক্কায় হালকা দোলে ===== */
+.ptr{width:clamp(17px,calc(var(--ws)*.065),26px)!important;top:calc(var(--ws)*-.028)!important;transform:translateX(-50%) rotate(var(--pa,0deg));transform-origin:50% 30%}
 </style>
 </head>
 <body>
@@ -371,6 +386,19 @@ const MIN_WIN_POP=500;
 function paintRB(rb,spot){const c=colorOf(spot);rb.style.background=c;rb.style.borderColor='#fff';rb.style.boxShadow='0 0 26px '+c;rb.style.color=(spot==='mega'||spot==='x50')?'#1a1200':'#fff'}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2300)}
 function beep(f,d,v){if(!S.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v||.05;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function softTick(c){
+  /* নরম কাউন্টডাউন: sine সুর + ধীরে ওঠা/ধীরে নামা (fade); ১০ থেকে ১ যত কাছে আসে, শব্দ আস্তে আস্তে একটু বাড়ে */
+  if(!S.sound)return;
+  try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+    const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();
+    const f=520+(10-c)*18, v=.012+(10-c)*.0035, d=c<=3?.32:.22;
+    o.type='sine';o.frequency.value=f;
+    g.gain.setValueAtTime(.0001,t);
+    g.gain.exponentialRampToValueAtTime(v,t+.05);
+    g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02);
+  }catch(e){}
+}
 function confetti(){const cf=$('cf'),cols=['#fbbf24','#ef4444','#3b82f6','#a855f7','#10b981','#fff'];let h='';for(let i=0;i<46;i++)h+=`<i style="left:${Math.random()*100}%;background:${cols[i%6]};animation-duration:${1.8+Math.random()*1.8}s;animation-delay:${Math.random()*.5}s"></i>`;cf.innerHTML=h;setTimeout(()=>cf.innerHTML='',4200)}
 function winPop(w){confetti();$('popAmt').textContent=money(w);$('pop').classList.add('on');[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.18,.07),i*120));clearTimeout(popT);popT=setTimeout(()=>$('pop').classList.remove('on'),3500)}
 if($('btnBets'))$('btnBets').onclick=()=>{renderTable();$('betPop').classList.add('on')};
@@ -409,11 +437,23 @@ function draw(t){
   x.beginPath();x.ellipse(R,R*.66,wr*.8,wr*.52,0,0,7);x.fillStyle=gl;x.fill();
 }
 let lastDraw=0;(function loop(t){if(t-lastDraw>33){lastDraw=t;draw(t)}requestAnimationFrame(loop)})(0);
+
+/* কাঁটার দোলা: স্প্রিং-ফিজিক্স। চাকার প্রতিটি ঘরের পেগ কাঁটায় ধাক্কা দিলে কাঁটা হালকা সরে আবার ফিরে আসে */
+const PT={a:0,v:0,run:false,t:0};
+function ptrKick(){PT.v-=230;if(!PT.run){PT.run=true;PT.t=performance.now();requestAnimationFrame(ptrStep)}}
+function ptrStep(now){
+  const el=document.querySelector('.ptr');if(!el){PT.run=false;return}
+  const dt=Math.min(.033,(now-PT.t)/1000||.016);PT.t=now;
+  PT.v+=(-1100*PT.a-26*PT.v)*dt;PT.a+=PT.v*dt;
+  if(PT.a<-24){PT.a=-24;if(PT.v<0)PT.v=0}if(PT.a>24){PT.a=24;if(PT.v>0)PT.v=0}
+  if(Math.abs(PT.a)<.05&&Math.abs(PT.v)<1){PT.a=0;PT.v=0;PT.run=false;el.style.setProperty('--pa','0deg');return}
+  el.style.setProperty('--pa',PT.a.toFixed(2)+'deg');requestAnimationFrame(ptrStep);
+}
 function spinTo(seg,dur){
   const n=S.layout.length,st=2*Math.PI/n,TAU=2*Math.PI,base=-((seg+.5)*st)+(Math.random()-.5)*st*.6,from=S.rot;
   const d=(((base-from)%TAU)+TAU)%TAU,to=from+d+TAU*6,t0=performance.now();let lastTick=0;
   (function f(now){const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,4);S.rot=from+(to-from)*e;
-    const k=Math.floor(S.rot/st);if(k!==lastTick&&p<.95){lastTick=k;beep(900,.02,.015)}if(p<1)requestAnimationFrame(f);else{const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}})(t0);
+    const k=Math.floor(S.rot/st);if(k!==lastTick){lastTick=k;if(p<.95)beep(900,.02,.015);ptrKick()}if(p<1)requestAnimationFrame(f);else{const r=S.st&&S.st.result;if(r){S.winSeg=r.seg;const rb=$('rb');rb.textContent=resLabel(r.spot,r.mega);paintRB(rb,r.spot);if(!S.st||Z.skip!==S.st.roundId){zoomIn();rb.classList.add('show')}}}})(t0);
 }
 function setRot(seg){S.rot=-((seg+.5)*(2*Math.PI/S.layout.length));draw()}
 
@@ -479,7 +519,7 @@ function tick(){
   const left=Math.max(0,s.endsAt-(Date.now()+S.off)),tot={betting:15000,spin:8000,result:5000}[s.phase]||1;if(s.phase==='result'&&left<800&&Z.on){zoomOut()}
   {const c=Math.ceil(left/1000),show=(s.phase==='betting'&&c>=1&&c<=10);$('tm').textContent=show?c:'';
     /* ১০ থেকে ১ পর্যন্ত প্রতিটি সংখ্যায় টিক শব্দ; শেষ ৩ সেকেন্ডে চড়া সুর */
-    if(show){if(S.lastCd!==c){S.lastCd=c;if(c<=3)beep(1200,.16,.09);else beep(800,.08,.06)}}else S.lastCd=null}$('bar').style.width=(left/tot*100)+'%';
+    if(show){if(S.lastCd!==c){S.lastCd=c;softTick(c)}}else S.lastCd=null}$('bar').style.width=(left/tot*100)+'%';
 }
 setInterval(tick,200);
 
@@ -532,6 +572,7 @@ function fitWheel(){
   const cs=getComputedStyle(a),pt=parseFloat(cs.paddingTop)||0,pb=parseFloat(cs.paddingBottom)||0;
   const ah=a.clientHeight-pt-pb-22,aw=a.clientWidth;
   a.style.setProperty('--ws',Math.max(120,Math.min(aw*.74,ah*.84))+'px');
+  const pn=document.querySelector('.panels-container');if(pn)a.style.setProperty('--ext',Math.max(0,pn.offsetTop+pn.offsetHeight-a.offsetTop-a.offsetHeight));
 }
 function zoomIn(){
   const a=document.querySelector('.arena-box'),rig=document.querySelector('.rig'),st=document.querySelector('.stage'),pn=document.querySelector('.panels-container');
@@ -546,16 +587,16 @@ function zoomIn(){
   const tgtY=cardTop;
   rig.style.transform='translate(0,'+(tgtY-curY).toFixed(1)+'px) scale('+sc.toFixed(3)+')';
   a.style.setProperty('--rby',(cardTop-a.offsetTop-34).toFixed(1)+'px');
-  a.classList.add('zm');Z.on=true;
+  a.classList.add('zm');document.body.classList.add('zmx');Z.on=true;
 }
 function zoomOut(){
   const a=document.querySelector('.arena-box'),rig=document.querySelector('.rig');
   if(!Z.on||!rig)return;
-  Z.on=false;rig.style.transform='';a.classList.remove('zm');$('rb').classList.remove('show');
+  Z.on=false;rig.style.transform='';a.classList.remove('zm');document.body.classList.remove('zmx');$('rb').classList.remove('show');
   if(S.st)Z.skip=S.st.roundId;
 }
-fitWheel();
-try{new ResizeObserver(()=>{fitWheel();if(Z.on){Z.on=false;zoomIn()}}).observe(document.querySelector('.arena-box'))}catch(e){addEventListener('resize',fitWheel)}
+fitWheel();addEventListener('load',fitWheel);
+try{new ResizeObserver(()=>{fitWheel();if(Z.on){Z.on=false;zoomIn()}}).observe(document.querySelector('.arena-box'));new ResizeObserver(fitWheel).observe(document.querySelector('.panels-container'))}catch(e){addEventListener('resize',fitWheel)}
 renderChips();renderHist();renderTable();
 const NOLOGIN='লগইন টোকেন নেই। ইউজার প্যানেল থেকে Play Now চাপুন।';
 if(CT_SERVER.indexOf('YOUR-')>=0)showFatal('সার্ভারের ঠিকানা বসানো হয়নি।');
