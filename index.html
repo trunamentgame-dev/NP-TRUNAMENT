@@ -4473,11 +4473,12 @@
         }
       }
 
-      // Deposit Bonus Settings application
+      // Deposit Bonus Settings application (supports Multiple Tiers)
       const isBonusOn = state.settings.depositBonusEnabled === true || String(state.settings.depositBonusEnabled) === 'true';
       const bonusPct = (typeof state.settings.depositBonusPercent !== 'undefined') ? parseFloat(state.settings.depositBonusPercent) : 10;
       const minDepForBonus = (typeof state.settings.minDepositForBonus !== 'undefined') ? parseFloat(state.settings.minDepositForBonus) : 100;
       const maxBonus = (typeof state.settings.maxBonusAmount !== 'undefined') ? parseFloat(state.settings.maxBonusAmount) : 500;
+      const tiers = Array.isArray(state.settings.depositBonusTiers) ? state.settings.depositBonusTiers : [];
 
       const depBonusBox = document.getElementById('depositBonusNoticeBox');
       const depBonusBadge = document.getElementById('depositBonusBadge');
@@ -4485,12 +4486,18 @@
       const walletBonusBanner = document.getElementById('walletBonusOfferBanner');
       const walletBonusPctLabel = document.getElementById('walletBonusPercentLabel');
 
-      if (isBonusOn && bonusPct > 0) {
+      if (isBonusOn && (bonusPct > 0 || tiers.length > 0)) {
         if (depBonusBox) depBonusBox.style.display = 'block';
-        if (depBonusBadge) depBonusBadge.innerText = `${bonusPct}% বোনাস`;
-        if (depBonusNote) depBonusNote.innerText = `সর্বনিম্ন ৳${minDepForBonus} ডিপোজিট করলেই পাচ্ছেন আকর্ষণীয় ${bonusPct}% ক্যাশ বোনাস${maxBonus > 0 ? ` (সর্বোচ্চ ৳${maxBonus})` : ''}! অনুমোদনের পর সাথে সাথে যুক্ত হবে।`;
+        if (tiers.length > 0) {
+          const tierSummary = tiers.map(t => `<span style="background:rgba(255,255,255,0.08); padding:3px 8px; border-radius:6px; display:inline-block; margin:2px 4px 2px 0;">৳${t.minDeposit}+ ডিপোজিটে <b>${t.bonusPercent}%</b> বোনাস (${t.turnoverMultiplier}x টার্নওভার)</span>`).join(' ');
+          if (depBonusBadge) depBonusBadge.innerText = `প্রমোশন অফার`;
+          if (depBonusNote) depBonusNote.innerHTML = `<div style="font-size:12px; font-weight:600; color:#34d399; margin-bottom:4px;">🎁 ডিপোজিট প্রমোশন অফারসমূহ:</div><div style="line-height:1.6;">${tierSummary}</div>`;
+        } else {
+          if (depBonusBadge) depBonusBadge.innerText = `${bonusPct}% বোনাস`;
+          if (depBonusNote) depBonusNote.innerText = `সর্বনিম্ন ৳${minDepForBonus} ডিপোজিট করলেই পাচ্ছেন আকর্ষণীয় ${bonusPct}% ক্যাশ বোনাস${maxBonus > 0 ? ` (সর্বোচ্চ ৳${maxBonus})` : ''}! অনুমোদনের পর সাথে সাথে যুক্ত হবে।`;
+        }
         if (walletBonusBanner) walletBonusBanner.style.display = 'flex';
-        if (walletBonusPctLabel) walletBonusPctLabel.innerText = `${bonusPct}%`;
+        if (walletBonusPctLabel) walletBonusPctLabel.innerText = tiers.length > 0 ? `${tiers[0].bonusPercent}%+` : `${bonusPct}%`;
       } else {
         if (depBonusBox) depBonusBox.style.display = 'none';
         if (walletBonusBanner) walletBonusBanner.style.display = 'none';
@@ -4501,23 +4508,39 @@
 
     function updateDepositBonusPreview() {
       const isBonusOn = state.settings.depositBonusEnabled === true || String(state.settings.depositBonusEnabled) === 'true';
-      const bonusPct = (typeof state.settings.depositBonusPercent !== 'undefined') ? parseFloat(state.settings.depositBonusPercent) : 10;
+      let bonusPct = (typeof state.settings.depositBonusPercent !== 'undefined') ? parseFloat(state.settings.depositBonusPercent) : 10;
+      let turnoverMult = parseFloat(state.settings.turnoverMultiplier) || 1;
       const minDepForBonus = (typeof state.settings.minDepositForBonus !== 'undefined') ? parseFloat(state.settings.minDepositForBonus) : 100;
       const maxBonus = (typeof state.settings.maxBonusAmount !== 'undefined') ? parseFloat(state.settings.maxBonusAmount) : 500;
+      const tiers = Array.isArray(state.settings.depositBonusTiers) ? state.settings.depositBonusTiers : [];
+
       const previewEl = document.getElementById('depositBonusCalcPreview');
       if (!previewEl) return;
 
       const depInput = document.getElementById('depositAmount');
       const amt = depInput ? (parseFloat(depInput.value) || 0) : 0;
-      if (!isBonusOn || bonusPct <= 0 || amt < minDepForBonus) {
+
+      let matchedTier = null;
+      if (tiers.length > 0) {
+        const sorted = [...tiers].sort((a,b) => (parseFloat(b.minDeposit)||0) - (parseFloat(a.minDeposit)||0));
+        matchedTier = sorted.find(t => amt >= (parseFloat(t.minDeposit)||0));
+        if (matchedTier) {
+          bonusPct = parseFloat(matchedTier.bonusPercent) || 0;
+          turnoverMult = parseFloat(matchedTier.turnoverMultiplier) || 1;
+        }
+      }
+
+      if (!isBonusOn || (!matchedTier && (bonusPct <= 0 || amt < minDepForBonus))) {
         previewEl.style.display = 'none';
         return;
       }
 
       let calcBonus = Math.round((amt * bonusPct) / 100);
       if (maxBonus > 0 && calcBonus > maxBonus) calcBonus = maxBonus;
+      const calcTurnover = Math.round((amt + calcBonus) * turnoverMult);
+
       previewEl.style.display = 'block';
-      previewEl.innerHTML = `🎁 আপনি বোনাস পাবেন: <span style="color:#10b981; font-weight:700;">+৳${calcBonus}</span> (মোট ব্যালেন্সে জমা হবে: <span style="color:#fff; font-weight:700;">৳${amt + calcBonus}</span>)`;
+      previewEl.innerHTML = `🎁 প্রমোশন: <b>+৳${calcBonus}</b> (${bonusPct}% বোনাস) | মোট ব্যালেন্স: <b>৳${amt + calcBonus}</b><br><span style="color:#94a3b8; font-size:11px;">🎯 টার্নওভার প্রয়োজন হবে: <b>৳${calcTurnover}</b> (${turnoverMult}x)</span>`;
     }
 
     function updateDepositMethodDetails() {
