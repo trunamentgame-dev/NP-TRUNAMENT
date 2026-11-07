@@ -1844,11 +1844,19 @@ select.pp-input option{background:#111d33;color:#fff}
 /* wallet: admin promotions strip (inside dark wallet card) */
 #walletPromoStrip{display:none;margin:10px 0 4px}
 .np-ws-title{font-size:12px;font-weight:800;color:#fcd34d;margin-bottom:6px}
-.np-ws-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:12px;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(255,255,255,.04));border:1px solid rgba(245,158,11,.4);cursor:pointer}
-.np-ws-item>div{min-width:0}
-.np-ws-item b{display:block;font-size:13px;color:#fff}
-.np-ws-item span{display:block;font-size:10.5px;color:#cbd5e1;margin-top:2px;line-height:1.5}
-.np-ws-item em{font-style:normal;flex:none;font-weight:900;font-size:12px;padding:4px 10px;border-radius:99px;background:linear-gradient(135deg,#ffe36a,#ff9825);color:#321900}
+.np-sl{overflow:hidden;border-radius:14px}
+.np-sl-track{display:flex;transition:transform .55s cubic-bezier(.22,.8,.3,1)}
+.np-sl-slide{flex:0 0 100%;min-width:0;display:flex;align-items:center;gap:14px;padding:14px;cursor:pointer;border-radius:14px;border:1px solid rgba(255,203,73,.45);background:radial-gradient(circle at 100% 0,rgba(255,203,73,.22),transparent 55%),linear-gradient(135deg,#2a2210,#141b2d 70%);box-shadow:inset 0 1px rgba(255,255,255,.08)}
+.np-sl-badge{flex:none;width:72px;height:72px;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(145deg,#ffe36a,#ff9825);color:#321900;box-shadow:0 6px 18px rgba(255,150,30,.35)}
+.np-sl-badge b{font-family:Rajdhani,sans-serif;font-size:25px;font-weight:800;line-height:1}
+.np-sl-badge span{font-size:9px;font-weight:900;letter-spacing:1.5px;margin-top:2px}
+.np-sl-info{min-width:0}
+.np-sl-info strong{display:block;font-size:15px;color:#fff;font-weight:800}
+.np-sl-info small{display:block;margin-top:3px;font-size:10.5px;line-height:1.5;color:#cbd5e1}
+.np-sl-info u{display:inline-block;margin-top:7px;text-decoration:none;font-size:11px;font-weight:800;color:#ffd36a}
+.np-sl-dots{display:flex;justify-content:center;gap:6px;margin-top:8px}
+.np-sl-dots i{width:6px;height:6px;border-radius:99px;background:rgba(255,255,255,.28);cursor:pointer;transition:.3s}
+.np-sl-dots i.on{width:20px;background:#ffcb49}
 
 /* Deposit / Withdraw / Promotion popups follow the LIGHT theme */
 body[data-theme="light"] #modalDeposit,body[data-theme="light"] #modalWithdraw,body[data-theme="light"] #modalDepositPromo{--pp-line:#e2e8f0}
@@ -3128,12 +3136,6 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             <svg class="icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
             <span id="btnRefresh">রিফ্রেশ</span>
           </button>
-        </div>
-
-        <!-- Bonus Offer Banner in Wallet -->
-        <div id="walletBonusOfferBanner" style="display:none; margin:10px 0 6px; padding:8px 12px; background:linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(109, 40, 217, 0.15)); border:1px solid rgba(139, 92, 246, 0.45); border-radius:10px; font-size:12px; color:#ddd6fe; align-items:center; gap:8px;">
-          <span style="font-size:18px;">🎁</span>
-          <span>ডিপোজিট করলেই পাচ্ছেন <strong><span id="walletBonusPercentLabel">10%</span> ক্যাশ বোনাস</strong>!</span>
         </div>
 
         <div id="walletPromoStrip"></div>
@@ -7438,18 +7440,54 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       return '<div class="pp-offer' + (on ? ' on' : '') + '" onclick="npPromoPick(\'' + k + '\')">' + '<span class="pp-badge" style="top:10px;right:10px">' + (p.bonusType === 'fixed' ? tk(p.bonusValue) : (+p.bonusValue) + '%') + '</span>' + '<div class="pp-offer-name">🎁 ' + esc(p.name) + '</div>' + '<div class="pp-offer-desc">' + bonusTxt(p) + '<br>Minimum Deposit: <b>' + tk(p.minDeposit) + '</b><br>Maximum Deposit: <b>' + tk(p.maxDeposit) + '</b><br>Turnover: <b>' + (+p.turnoverMultiplier) + 'x</b>' + (p.endAt ? '<br>শেষ: ' + new Date(+p.endAt).toLocaleDateString() : '') + '</div></div>';
     }).join('') : '<div style="text-align:center;color:#94a3b8;padding:14px;font-size:13px">এখন কোনো অ্যাক্টিভ অফার নেই</div>';
   }
+  var DEFAULT_OFFERS = [
+    { name: 'Welcome Bonus', pct: 3, min: 100 },
+    { name: 'Silver Bonus', pct: 5, min: 500 },
+    { name: 'Gold Bonus', pct: 8, min: 1000 },
+    { name: 'Platinum Bonus', pct: 10, min: 2000 },
+    { name: 'VIP Bonus', pct: 15, min: 5000 }
+  ];
+  var slIdx = 0, slTimer = null, slN = 0;
+  function slGo(i) {
+    var tr = document.getElementById('npSlTrack'); if (!tr || !slN) return;
+    slIdx = ((i % slN) + slN) % slN;
+    tr.style.transform = 'translateX(' + (-100 * slIdx) + '%)';
+    document.querySelectorAll('#npSlDots i').forEach(function (d, n) { d.classList.toggle('on', n === slIdx); });
+  }
+  function slStart() {
+    if (slTimer) clearInterval(slTimer);
+    slTimer = setInterval(function () { if (slN > 1) slGo(slIdx + 1); }, 3000);
+  }
   function renderWalletStrip() {
     var el = $('walletPromoStrip'); if (!el) return;
-    var ks = (typeof state !== 'undefined' && state.currentUser) ? offers() : [];
-    if (!ks.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
+    var ks = offers(), slides = [];
+    if (ks.length) {
+      ks.forEach(function (k) {
+        var p = P[k];
+        slides.push({ pct: p.bonusType === 'fixed' ? tk(p.bonusValue) : (+p.bonusValue) + '%', name: p.name,
+          sub: 'Min ' + tk(p.minDeposit) + ' • Max ' + tk(p.maxDeposit) + ' • ' + (+p.turnoverMultiplier || 0) + 'x টার্নওভার' + (p.endAt ? ' • শেষ ' + new Date(+p.endAt).toLocaleDateString() : ''),
+          go: "npWalletPromoGo('" + k + "')" });
+      });
+    } else {
+      DEFAULT_OFFERS.forEach(function (o) {
+        slides.push({ pct: o.pct + '%', name: o.name, sub: 'সর্বনিম্ন ডিপোজিট ' + tk(o.min) + ' • ক্যাশ বোনাস', go: "npWalletPromoGo('')" });
+      });
+    }
+    slN = slides.length; if (slIdx >= slN) slIdx = 0;
     el.style.display = 'block';
-    el.innerHTML = '<div class="np-ws-title">🎁 চলমান ডিপোজিট অফার</div>' + ks.map(function (k) {
-      var p = P[k];
-      return '<div class="np-ws-item" onclick="npWalletPromoGo(\'' + k + '\')"><div><b>' + esc(p.name) + '</b><span>Min ' + tk(p.minDeposit) + ' • Max ' + tk(p.maxDeposit) + ' • ' + (+p.turnoverMultiplier || 0) + 'x টার্নওভার' + (p.endAt ? ' • শেষ ' + new Date(+p.endAt).toLocaleDateString() : '') + '</span></div><em>' + (p.bonusType === 'fixed' ? tk(p.bonusValue) : (+p.bonusValue) + '%') + '</em></div>';
-    }).join('');
+    el.innerHTML = '<div class="np-ws-title">🎁 চলমান ডিপোজিট অফার</div><div class="np-sl"><div class="np-sl-track" id="npSlTrack">' +
+      slides.map(function (x) {
+        return '<div class="np-sl-slide" onclick="' + x.go + '"><div class="np-sl-badge"><b>' + esc(x.pct) + '</b><span>BONUS</span></div><div class="np-sl-info"><strong>' + esc(x.name) + '</strong><small>' + esc(x.sub) + '</small><u>ডিপোজিট করুন ›</u></div></div>';
+      }).join('') + '</div></div><div class="np-sl-dots" id="npSlDots">' + slides.map(function (_, n) { return '<i data-i="' + n + '"></i>'; }).join('') + '</div>';
+    document.querySelectorAll('#npSlDots i').forEach(function (d) { d.onclick = function () { slGo(+d.dataset.i); slStart(); }; });
+    var sl = el.querySelector('.np-sl'), x0 = null;
+    sl.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    sl.addEventListener('touchend', function (e) { if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) { slGo(slIdx + (dx < 0 ? 1 : -1)); slStart(); } x0 = null; }, { passive: true });
+    slGo(slIdx); slStart();
   }
+  setTimeout(function () { try { renderWalletStrip(); } catch (e) {} }, 800);
   window.npWalletPromoGo = function (id) {
-    try { if (window.npPromoSetSel) window.npPromoSetSel(id); window.app.openDepositModal(); } catch (e) {}
+    try { if (id && window.npPromoSetSel) window.npPromoSetSel(id); window.app.openDepositModal(); } catch (e) {}
   };
   var _ro = renderOffers; renderOffers = function () { try { renderWalletStrip(); } catch (e) {} _ro(); try { window.npOnPromoUpdate && window.npOnPromoUpdate(); } catch (e) {} };
   window.npPromoPick = function (k) { pick = k; renderOffers(); window.npPromoPreview(); };
