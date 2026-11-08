@@ -737,7 +737,7 @@ function showMaint(){
     mo.innerHTML=`<div class="bl" style="font-size:34px">🛠️</div><h3>রক্ষণাবেক্ষণ চলছে</h3><p>${esc(maint.message||'গেমটি সাময়িকভাবে বন্ধ আছে।')}</p>${r?`<p>ফিরে আসার সম্ভাব্য সময়: ${esc(r)}</p>`:''}`;
     mo.classList.remove('off')}else mo.classList.add('off');
 }
-setTimeout(()=>{if(!uid)$('bmsg').textContent='ব্যবহারকারীকে চেনা যায়নি। অনুগ্রহ করে ইউজার প্যানেল থেকে লগইন করে গেমটি খুলুন।'},8000);
+setTimeout(()=>{if(!uid)$('bmsg').textContent='ব্যবহারকারীকে চেনা যায়নি। অনুগ্রহ করে ইউজার প্যানেল থেকে লগইন করে গেমটি খুলুন। [DEBUG framed='+(window.parent!==window)+' hashLen='+(location.hash||'').length+' search='+(location.search||'').length+' page='+location.host+location.pathname+']'},8000);
 setTimeout(()=>{if(uid&&!cur)$('bmsg').textContent='সার্ভারের সাথে সংযোগ হচ্ছে, একটু অপেক্ষা করুন…'},8000);
 function liveInit(){detect();startFeed()}
 
