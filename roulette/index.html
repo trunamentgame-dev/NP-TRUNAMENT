@@ -426,7 +426,7 @@ function zoomIn(){
 }
 function zoomOut(){$('wheel').className='wheel';$('veil').classList.remove('on')}
 function setBtns(v){['undo','clear','rebet','reset'].forEach(i=>$(i).disabled=v)}
-function toast(t,ms){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>e.classList.remove('show'),ms||1800)}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
 
 /* ---------- Sound engine (Web Audio – fully synthesized, no audio files) ---------- */
 let ac,master,revIn,noiseBuf,spin=null;
@@ -586,7 +586,7 @@ function spinStop(){
   setTimeout(()=>{[N.w,N.h,N.b,N.lfo].forEach(n=>{try{n.stop()}catch(e){}})},2500);
 }
 /* ---------- LIVE: real wallet + shared server rounds (same login/session logic as the crash game) ---------- */
-const API_BASE='https://roulette-server-cixf.onrender.com'; /* <-- Render URL এখানে বসান */
+const API_BASE='https://YOUR-ROULETTE-BACKEND.onrender.com'; /* <-- Render URL এখানে বসান */
 const FB_CONFIG={apiKey:"AIzaSyBFaoU_cDws6YVAXFMWBnogGAQHhjfC23Q",authDomain:"np-trunament-bd.firebaseapp.com",databaseURL:"https://np-trunament-bd-default-rtdb.firebaseio.com",projectId:"np-trunament-bd",storageBucket:"np-trunament-bd.firebasestorage.app",messagingSenderId:"324972484501",appId:"1:324972484501:web:38598aa922e983990b889c"};
 let fdb=null,fauth=null;
 try{if(!firebase.apps.length)firebase.initializeApp(FB_CONFIG);fauth=firebase.auth();fdb=firebase.database()}catch(e){}
@@ -649,7 +649,7 @@ function setBal(b,force){
   if(!force&&(inflight||dirty))return;
   balance=b;balLoaded=true;render();sessionSync();bootCheck();
 }
-async function fetchBal(force){if(!uid)return;try{const r=await api('/api/user/balance?uid='+encodeURIComponent(uid));if(r&&typeof r.balance==='number')setBal(r.balance,force);else if(r&&ERR[r.error]&&!balLoaded)toast(ERR[r.error],6000)}catch(e){}}
+async function fetchBal(force){if(!uid)return;try{const r=await api('/api/user/balance?uid='+encodeURIComponent(uid));if(r&&typeof r.balance==='number')setBal(r.balance,force);else if(r&&ERR[r.error]&&!balLoaded)$('bmsg').textContent=ERR[r.error]}catch(e){}}
 setInterval(()=>{if(!uid)detect();else if(!document.hidden&&!holdBal&&!inflight)fetchBal()},12000);
 
 /* admin game-session tracking (same game_sessions node the crash game updates) */
@@ -727,7 +727,7 @@ setInterval(()=>{
 },100);
 
 /* loading + maintenance overlays */
-const bo=document.createElement('div');bo.id='boot';bo.className='ov off';bo.style.display='none';
+const bo=document.createElement('div');bo.id='boot';bo.className='ov';
 bo.innerHTML='<div class="bl">'+'MOSTWIN88'.split('').map((ch,i)=>`<i style="animation-delay:${i*.12}s">${ch}</i>`).join('')+'</div><p id="bmsg">লোড হচ্ছে…</p>';
 const mo=document.createElement('div');mo.id='mnt';mo.className='ov off';
 document.body.append(bo,mo);
@@ -737,8 +737,8 @@ function showMaint(){
     mo.innerHTML=`<div class="bl" style="font-size:34px">🛠️</div><h3>রক্ষণাবেক্ষণ চলছে</h3><p>${esc(maint.message||'গেমটি সাময়িকভাবে বন্ধ আছে।')}</p>${r?`<p>ফিরে আসার সম্ভাব্য সময়: ${esc(r)}</p>`:''}`;
     mo.classList.remove('off')}else mo.classList.add('off');
 }
-setTimeout(()=>{if(!uid)toast('ব্যবহারকারীকে চেনা যায়নি। অনুগ্রহ করে ইউজার প্যানেল থেকে লগইন করে গেমটি খুলুন। [DEBUG framed='+(window.parent!==window)+' hashLen='+(location.hash||'').length+' search='+(location.search||'').length+' page='+location.host+location.pathname+']',15000)},8000);
-setTimeout(()=>{if(uid&&!cur)toast('সার্ভারের সাথে সংযোগ হচ্ছে, একটু অপেক্ষা করুন…',6000)},8000);
+setTimeout(()=>{if(!uid)$('bmsg').textContent='ব্যবহারকারীকে চেনা যায়নি। অনুগ্রহ করে ইউজার প্যানেল থেকে লগইন করে গেমটি খুলুন।'},8000);
+setTimeout(()=>{if(uid&&!cur)$('bmsg').textContent=/YOUR-ROULETTE/.test(API_BASE)?'গেমের সার্ভার ঠিকানা (API_BASE) বসানো হয়নি — index.html এ Render URL বসান':'সার্ভারের সাথে সংযোগ হচ্ছে, একটু অপেক্ষা করুন…'},8000);
 function liveInit(){detect();startFeed()}
 
 /* ---------- Fit everything to one screen ---------- */
