@@ -586,7 +586,7 @@ function spinStop(){
   setTimeout(()=>{[N.w,N.h,N.b,N.lfo].forEach(n=>{try{n.stop()}catch(e){}})},2500);
 }
 /* ---------- LIVE: real wallet + shared server rounds (same login/session logic as the crash game) ---------- */
-const API_BASE='https://YOUR-ROULETTE-BACKEND.onrender.com'; /* <-- Render URL এখানে বসান */
+const API_BASE='https://roulette-server-om2j.onrender.com'; /* <-- Render URL এখানে বসান */
 const FB_CONFIG={apiKey:"AIzaSyBFaoU_cDws6YVAXFMWBnogGAQHhjfC23Q",authDomain:"np-trunament-bd.firebaseapp.com",databaseURL:"https://np-trunament-bd-default-rtdb.firebaseio.com",projectId:"np-trunament-bd",storageBucket:"np-trunament-bd.firebasestorage.app",messagingSenderId:"324972484501",appId:"1:324972484501:web:38598aa922e983990b889c"};
 let fdb=null,fauth=null;
 try{if(!firebase.apps.length)firebase.initializeApp(FB_CONFIG);fauth=firebase.auth();fdb=firebase.database()}catch(e){}
