@@ -4791,7 +4791,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
     // --- ১ ঘণ্টা নিষ্ক্রিয় থাকলে অটো লগআউট (সক্রিয় থাকলে লগইন থাকে; অ্যাপ বন্ধ থাকলেও সময় গোনা হয়) ---
     let userInactivityTimer = null;
-    const NP_IDLE_MS = 60 * 60 * 1000;   // ১ ঘণ্টা কোনো কাজ না করলে অটো লগআউট
+    const NP_IDLE_MS = 30 * 24 * 60 * 60 * 1000; // সেশন স্থায়ী: কোনো কাজ না করলেও সাইনআউট হবে না
     let npLastActWrite = 0;
     let npIdleListenersOn = false;
 
