@@ -346,6 +346,61 @@ html,body{height:100%;overflow:hidden}
 @media(max-height:630px){.app{zoom:.7}}
 @media(max-height:590px){.app{zoom:.65}}
 @media(max-height:550px){.app{zoom:.6}}
+.bar i.g{background:linear-gradient(135deg,#34d399,#059669)}.bar i.b{background:linear-gradient(135deg,#38bdf8,#4f46e5)}.bar i.r{background:linear-gradient(135deg,#fb7185,#e11d48)}
+.stage{height:294px}
+.tb1{top:60px}.tb2{top:66px}
+.cd{position:absolute;left:50%;top:0;width:62px;height:62px;margin-left:-31px;z-index:5;opacity:0;transform:scale(.7);transition:opacity .3s,transform .3s;pointer-events:none;filter:drop-shadow(0 4px 10px #000a)}
+.cd.show{opacity:1;transform:none}
+.cd svg{width:100%;height:100%;transform:rotate(-90deg)}
+.cd circle{fill:#06101ce6;stroke-width:3.5}
+.cd .cdfg{fill:none;stroke:#34d399;stroke-linecap:round;stroke-dasharray:119.4;stroke-dashoffset:0;transition:stroke .3s}
+.cd .cdbg{stroke:#ffffff22}
+.cd b{position:absolute;inset:0;display:grid;place-items:center;font:800 28px 'Outfit',sans-serif;color:#fff}
+.cd.warn .cdfg{stroke:#fbbf24}.cd.hot .cdfg{stroke:#fb7185}.cd.hot b{color:#fda4af}
+.cd.hot{animation:cdp .5s ease-in-out infinite alternate}
+@keyframes cdp{to{transform:scale(1.12)}}
+@media(max-height:874px){.app{zoom:.96}}
+@media(max-height:836px){.app{zoom:.9}}
+@media(max-height:790px){.app{zoom:.86}}
+@media(max-height:745px){.app{zoom:.8}}
+@media(max-height:705px){.app{zoom:.75}}
+@media(max-height:665px){.app{zoom:.7}}
+@media(max-height:625px){.app{zoom:.65}}
+@media(max-height:585px){.app{zoom:.6}}
+@media(max-height:545px){.app{zoom:.55}}
+.nav{display:flex;justify-content:center}
+.home{display:flex;align-items:center;gap:8px;padding:7px 28px;border-radius:30px;border:1px solid #fbbf2466;background:linear-gradient(180deg,#ffffff1c,#ffffff08);color:#fff;font:700 14px 'Outfit',sans-serif;letter-spacing:1.5px;cursor:pointer;box-shadow:inset 0 1px 0 #fff3,0 6px 16px #0008}
+.home svg{width:20px;height:20px;stroke:#fbbf24;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.home:active{transform:translateY(2px)}
+@media(max-height:919px){.app{zoom:.96}}
+@media(max-height:882px){.app{zoom:.9}}
+@media(max-height:826px){.app{zoom:.86}}
+@media(max-height:790px){.app{zoom:.8}}
+@media(max-height:736px){.app{zoom:.75}}
+@media(max-height:690px){.app{zoom:.7}}
+@media(max-height:644px){.app{zoom:.65}}
+@media(max-height:598px){.app{zoom:.6}}
+@media(max-height:552px){.app{zoom:.55}}
+.bi .home{order:2;padding:6px 14px;font-size:12px;gap:6px}.bi .home svg{width:17px;height:17px}
+.bi>div:first-of-type{order:1}.bi>div:last-of-type{order:3}
+.bi{align-items:center}
+.res{position:absolute;left:50%;top:0;transform:translate(-50%,-10px) scale(.6);display:flex;align-items:center;gap:10px;padding:6px 22px 6px 8px;border-radius:40px;opacity:0;pointer-events:none;transition:.35s cubic-bezier(.3,1.4,.5,1);z-index:6;box-shadow:0 0 0 2px #ffffff55,0 10px 26px #000a,0 0 30px var(--rc,#fff)}
+.res.show{opacity:1;transform:translate(-50%,0) scale(1)}
+.res b{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#111;font:800 34px 'Outfit',sans-serif}
+.res span{font:800 22px 'Outfit',sans-serif;color:#fff;letter-spacing:1px;text-shadow:0 2px 4px #0006;white-space:nowrap}
+.res.down{background:linear-gradient(135deg,#34d399,#047857);--rc:#34d399}
+.res.lucky{background:linear-gradient(135deg,#38bdf8,#4338ca);--rc:#38bdf8}
+.res.up{background:linear-gradient(135deg,#fb7185,#be123c);--rc:#fb7185}
+@media(max-height:874px){.app{zoom:.96}}
+@media(max-height:836px){.app{zoom:.9}}
+@media(max-height:790px){.app{zoom:.86}}
+@media(max-height:745px){.app{zoom:.8}}
+@media(max-height:705px){.app{zoom:.75}}
+@media(max-height:665px){.app{zoom:.7}}
+@media(max-height:625px){.app{zoom:.65}}
+@media(max-height:585px){.app{zoom:.6}}
+@media(max-height:545px){.app{zoom:.55}}
+@media(min-height:875px){.app{zoom:1}}
 @media(max-width:400px){.mf{width:15px;height:15px;padding:1.5px}.mf i{width:3px;height:3px}.he span{width:17px}}
 @media(prefers-reduced-motion:reduce){.die{transition-duration:.01s}.wrap.toss,.grp.shake{animation:none}}
 </style></head><body>
@@ -360,14 +415,14 @@ html,body{height:100%;overflow:hidden}
   <div class="tb1"></div><div class="tb2"></div><div class="felt"></div>
   <div class="grp" id="grp"><div class="rimb"></div><div class="dice" id="board"></div><div class="dome"></div></div>
   <div class="banner" id="extra">Extra Pay</div>
-  <div class="status" id="status"></div>
+  <div class="res" id="res"></div><div class="status" id="status"></div><div class="cd" id="cd"><svg viewBox="0 0 44 44"><circle class="cdbg" cx="22" cy="22" r="19"/><circle class="cdfg" id="cdr" cx="22" cy="22" r="19"/></svg><b id="cdn"></b></div>
   <div class="tm"><div id="bar"></div></div>
  </div>
  <div class="info"><span style="margin:0">#<b id="rno">1</b></span><button id="road">Roadmap</button><button id="mm" class="on">Multiple mode</button><span>Min <u>10</u> Max <s>1000</s></span></div>
  <div class="zones" id="zones"></div>
  <div class="sums" id="sums"></div>
  <div class="bot">
-  <div class="bi"><div>ব্যালেন্স ৳<b id="bal">0</b></div><div>আপনার বেট ৳<b id="tot">0</b></div></div>
+  <div class="bi"><button class="home" id="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>HOME</span></button><div>ব্যালেন্স ৳<b id="bal">0</b></div><div>আপনার বেট ৳<b id="tot">0</b></div></div>
   <div class="tray" id="tray"></div>
   <div class="ctl"><button class="cb" id="auto">⟳<small>Auto</small></button><button class="bigchip" id="chipbtn" data-v="10">10</button><button class="cb" id="dbl">×2<small>Double</small></button><button class="cb" id="undo">↶<small>Undo</small></button><button class="cb" id="clear">✕<small>Clear</small></button></div>
  </div>
@@ -432,7 +487,7 @@ function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');cle
 // render
 function render(){const to=Wallet.get(),from=shown,t0=performance.now();cancelAnimationFrame(tw);
  const st=t=>{const p=Math.min(1,(t-t0)/500);shown=Math.round(from+(to-from)*(1-Math.pow(1-p,3)));$('bal').textContent=$('bal2').textContent=shown.toLocaleString();if(p<1)tw=requestAnimationFrame(st)};tw=requestAnimationFrame(st);
- Q('[data-k]').forEach(e=>{const v=bets[e.dataset.k]||'';e.querySelector('.amt').textContent=v;e.dataset.a=v});$('tot').textContent=sum(bets).toLocaleString();$('rno').textContent=round}
+ Q('[data-k]').forEach(e=>{const v=bets[e.dataset.k]||'';e.querySelector('.amt').textContent=v;e.dataset.a=v});$('tot').textContent=sum(bets).toLocaleString();$('rno').textContent=round;drawSide();drawPct()}
 function drawHist(){const mf=n=>`<div class="mf">${[0,1,2,3,4,5,6,7,8].map(k=>`<i style="opacity:${pips[n].includes(k)?1:0}"></i>`).join('')}</div>`;
  const h=H.slice(-12);$('hist').innerHTML=h.map(([a,b,x],i)=>`<div class="he${i==h.length-1?' cur':''}"><em>${x?'★':''}</em>${mf(a)}${mf(b)}<span class="${kind(a+b)}">${a+b}</span></div>`).join('');
  const c={down:0,lucky:0,up:0};H.forEach(([a,b])=>c[kind(a+b)]++);const p=k=>Math.round(c[k]/H.length*100)+'%';$('pd').textContent=p('down');$('pu').textContent=p('up');$('pl7').textContent=p('lucky')}
@@ -457,19 +512,19 @@ const lock=on=>Q('.z,.sm,.cb,.bigchip').forEach(b=>b.disabled=on);
 function botBets(){BOTS.forEach((b,i)=>{const r=Math.random();b.k=r<.4?'down':r<.8?'up':r<.88?'lucky':'n'+SUMS[Math.random()*10|0];b.amt=[100,200,500,1000,2000][Math.random()*5|0];const e=$('pb'+i);e.textContent=b.amt.toLocaleString();e.style.color='';e.previousElementSibling.classList.remove('happy','sad')})}
 function botSettle(s){BOTS.forEach((b,i)=>{const n=+b.k.slice(1),o=b.k===kind(s)?ODD[b.k]:b.k==='n'+s?PAY[n]*(extra[n]||1):0,e=$('pb'+i);e.textContent=o?'+'+(b.amt*o).toLocaleString():'-'+b.amt.toLocaleString();e.style.color=o?'#ffd24a':'#f99';const a=e.previousElementSibling;a.classList.remove('happy','sad');void a.offsetWidth;a.classList.add(o?'happy':'sad')})}
 // round loop
-function startBetting(){phase='bet';$('rnd').textContent=round;Q('.win').forEach(e=>e.classList.remove('win'));$('grp').classList.remove('lift');lock(false);
+function startBetting(){phase='bet';$('res').className='res';$('rnd').textContent=round;Q('.win').forEach(e=>e.classList.remove('win'));$('grp').classList.remove('lift');lock(false);
  if(Wallet.get()<=0){Wallet.set(5000);toast('নতুন ৳5000')}
  extra={};if(Math.random()<EXTRA.chance){const n=1+(Math.random()*2|0);while(Object.keys(extra).length<n)extra[SUMS[Math.random()*10|0]]=EXTRA.mult}
  SUMS.forEach(s=>{const x=$('x'+s);x.textContent=extra[s]?PAY[s]*extra[s]+'X':'';x.parentNode.classList.toggle('ex',!!extra[s])});
  if(Object.keys(extra).length){const e=$('extra');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
  botBets();if(auto&&last)for(const k in last)place(k,last[k],true);render();
  const end=Date.now()+BETTING*1000;clearInterval(tick);
- tick=setInterval(()=>{const l=Math.max(0,end-Date.now());$('bar').style.transform=`scaleX(${l/(BETTING*1000)})`;$('status').textContent='বেট ধরুন · '+Math.ceil(l/1000)+'s';if(l<=0){clearInterval(tick);roll()}},100)}
-function roll(){phase='roll';lock(true);$('tray').classList.remove('show');if(sum(bets))last={...bets};
+ tick=setInterval(()=>{const l=Math.max(0,end-Date.now());$('bar').style.transform=`scaleX(${l/(BETTING*1000)})`;$('status').textContent='বেট ধরুন · '.split(' ·')[0];const sec=Math.ceil(l/1000);$('cdn').textContent=sec;$('cdr').style.strokeDashoffset=119.4*(1-l/(BETTING*1000));$('cd').className='cd show'+(sec<=3?' hot':sec<=5?' warn':'');if(l<=0){clearInterval(tick);roll()}},100)}
+function roll(){phase='roll';lock(true);$('cd').className='cd';$('tray').classList.remove('show');if(sum(bets))last={...bets};
  const a=rnd6(),b=rnd6(),g=$('grp');$('status').textContent='ডাইস গড়াচ্ছে…';rattle();setTimeout(()=>beep(110,.18,'sine',.2),ROLL_MS-500);
  g.classList.add('shake');dice.forEach(d=>{d.w.classList.remove('toss');void d.w.offsetWidth;d.w.classList.add('toss')});setDie(0,a,1);setDie(1,b,1);
  setTimeout(()=>{g.classList.remove('shake');g.classList.add('lift');setTimeout(()=>settle(a,b),600)},ROLL_MS)}
-function settle(a,b){const s=a+b,kd=kind(s);phase='result';let ret=0;
+function settle(a,b){const s=a+b,kd=kind(s);phase='result';let ret=0;const R=$('res');R.innerHTML=`<b>${s}</b><span>${kd==='down'?'7 DOWN':kd==='up'?'7 UP':'LUCKY 7'}</span>`;R.className='res show '+kd;
  for(const k in bets){const o=k===kd?ODD[k]:k==='n'+s?PAY[s]*(extra[s]||1):0;if(o)ret+=bets[k]*(o+1)}
  const stake=sum(bets);if(ret)Wallet.set(Wallet.get()+ret);
  $('status').textContent=`${s} · ${kd==='down'?'7 DOWN':kd==='up'?'7 UP':'LUCKY 7'}`;
@@ -489,5 +544,12 @@ setInterval(()=>{if(phase!==demo.ph){demo.ph=phase;
  if(phase==='result'){const[a,b]=H[H.length-1],o=kind(a+b)==='lucky'?5:2;demo.win=Array.from({length:3},()=>[nm(),[500,1000,2000,5000][Math.random()*4|0]*o])}}
  if(phase==='bet'){demo.on+=Math.random()*3|0;const r=Math.random(),k=r<.42?'d':r<.8?'u':'s',n=1+Math.random()*4|0;demo[k]+=n;demo.pool+=n*[50,100,200,500][Math.random()*4|0]}
  drawSide();drawPct()},500);
+function cnt(){const c={d:demo.d,s:demo.s,u:demo.u},m=new Set();for(const k in bets)if(bets[k])m.add(k==='down'?'d':k==='up'?'u':k==='lucky'?'s':(+k.slice(1)<7?'d':'u'));m.forEach(x=>c[x]++);return c}
+function drawPct(){const c=cnt(),T=c.d+c.s+c.u,p=k=>T?Math.round(c[k]/T*100):0,w=k=>T?c[k]/T*100:33.3;$('pd').textContent=p('d')+'%';$('pl7').textContent=p('s')+'%';$('pu').textContent=p('u')+'%';$('bd').style.width=w('d')+'%';$('bs').style.width=w('s')+'%';$('bu').style.width=w('u')+'%'}
+function drawSide(){if(!demo.win.length)demo.win=Array.from({length:3},()=>[nm(),[1000,2000,5000,10000][Math.random()*4|0]]);const c=cnt(),t=c.d+c.s+c.u,pc=k=>t?Math.round(c[k]/t*100):0;
+ $('sl').innerHTML=`<h4>ONLINE</h4><div class="big"><span class="dot"></span>${demo.on}</div><h4 style="margin-top:6px">BETTING · ${t}</h4>`+[['d','DOWN','g'],['s','7','b'],['u','UP','r']].map(([k,n,cl])=>`<div class="row"><span>${n}</span><span class="bar"><i class="${cl}" style="width:${pc(k)}%"></i></span><span>${c[k]}</span></div>`).join('');
+ $('sr').innerHTML=`<h4>TOTAL BET</h4><div class="big">৳${fmt(demo.pool+sum(bets))}</div><h4 style="margin-top:6px">LAST WIN</h4>`+demo.win.map(w=>`<div class="row"><span>${w[0]}</span><span style="margin-left:auto;color:#ffd24a">+${fmt(w[1])}</span></div>`).join('')}
+const HOME_URL=''; // নিজের user panel-এর লিংক এখানে দিন, যেমন 'https://.../index.html'
+$('home').onclick=()=>{try{if(window.AndroidBridge&&AndroidBridge.goHome){AndroidBridge.goHome();return}}catch(e){}if(HOME_URL)location.href=HOME_URL;else if(history.length>1)history.back();else location.href='/'};
 drawHist();startBetting();
 </script></body></html>
