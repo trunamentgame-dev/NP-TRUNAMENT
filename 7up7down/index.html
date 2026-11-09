@@ -37,14 +37,14 @@ h1{flex:1;margin:0;font:400 26px/1 'Lilita One',Impact,sans-serif;background:lin
 .base{position:absolute;left:50%;bottom:18px;width:250px;height:60px;transform:translateX(-50%);border-radius:50%;background:linear-gradient(#222,#000);border:3px solid #3a3a3a;box-shadow:0 12px 20px #000a}
 .base::after{content:"";position:absolute;inset:8px 16px;border-radius:50%;background:radial-gradient(#2fa162,#14693c);box-shadow:inset 0 0 14px #000a}
 .grp{position:absolute;left:50%;bottom:44px;width:190px;height:170px;margin-left:-95px}
-.grp.shake{animation:shk .12s linear infinite}
-@keyframes shk{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(7px,-4px) rotate(2deg)}50%{transform:translate(-6px,3px) rotate(-2deg)}75%{transform:translate(5px,-3px) rotate(1deg)}100%{transform:translate(0,0) rotate(0)}}
+.grp.shake{animation:shk .2s ease-in-out infinite;will-change:transform}
+@keyframes shk{0%,100%{transform:translate3d(0,0,0) rotate(0)}25%{transform:translate3d(4px,-2px,0) rotate(1deg)}50%{transform:translate3d(-4px,1px,0) rotate(-1deg)}75%{transform:translate3d(3px,-2px,0) rotate(.6deg)}}
 .dice{position:absolute;left:0;right:0;bottom:6px;display:flex;justify-content:center;gap:26px;perspective:500px}
 .dome{position:absolute;inset:0;border-radius:95px 95px 14px 14px/120px 120px 14px 14px;background:radial-gradient(ellipse at 30% 20%,#fff6,#fff1 40%,#fff0 70%),linear-gradient(90deg,#fff2,#fff0 30%,#fff0 70%,#fff3);border:2px solid #fff5;box-shadow:inset 0 0 30px #fff3,0 0 18px #0006;transition:transform .7s cubic-bezier(.3,.8,.3,1),opacity .7s;pointer-events:none}
 .grp.lift .dome{transform:translateY(-130px);opacity:.15}
-.die{--s:52px;--h:26px;width:var(--s);height:var(--s);position:relative;transform-style:preserve-3d;transition:transform 1.8s cubic-bezier(.15,.7,.2,1)}
-.wrap{transform-style:preserve-3d}.wrap.toss{animation:toss 1.8s ease-out}
-@keyframes toss{0%{transform:translateY(0)}25%{transform:translateY(-55px)}50%{transform:translateY(0)}65%{transform:translateY(-22px)}80%{transform:translateY(0)}90%{transform:translateY(-5px)}100%{transform:translateY(0)}}
+.die{--s:52px;--h:26px;width:var(--s);height:var(--s);position:relative;transform-style:preserve-3d;transition:transform var(--rd,1.8s) cubic-bezier(.3,.55,.2,1);will-change:transform}
+.wrap{transform-style:preserve-3d;will-change:transform}.wrap.toss{animation:toss var(--rd,1.8s) linear both}
+@keyframes toss{0%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}22%{transform:translate3d(0,-60px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}46%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}60%{transform:translate3d(0,-26px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}74%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}85%{transform:translate3d(0,-9px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}93%,100%{transform:translate3d(0,0,0)}}
 .f{position:absolute;inset:0;border-radius:10px;background:linear-gradient(145deg,#fff,#dcdcdc 70%,#bdbdbd);box-shadow:inset 0 0 8px #0004;display:grid;grid:repeat(3,1fr)/repeat(3,1fr);padding:8px;backface-visibility:hidden}
 .f::after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(135deg,#fffc,#fff0 40%,#0001);pointer-events:none}
 .f i{width:78%;height:78%;margin:auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#555,#000 70%);opacity:0}.f i.on{opacity:1}
@@ -91,7 +91,7 @@ h1{font-size:30px;filter:drop-shadow(0 1px 0 #7a3a00) drop-shadow(0 2px 0 #7a3a0
 .base::after{background:var(--noise),radial-gradient(#2fa162,#14693c)}
 .slot{position:relative}
 .sh{position:absolute;left:50%;bottom:-16px;width:62px;height:16px;margin-left:-31px;border-radius:50%;background:radial-gradient(#000d,#0000 70%)}
-.wrap.toss+.sh{animation:shd 1.8s ease-out}
+.wrap.toss+.sh{animation:shd var(--rd,1.8s) ease-in-out both}
 @keyframes shd{0%{transform:scale(1);opacity:1}25%{transform:scale(.5);opacity:.35}50%{transform:scale(1);opacity:1}65%{transform:scale(.75);opacity:.7}80%{transform:scale(1)}100%{transform:scale(1)}}
 .f{border-radius:13px;background:linear-gradient(145deg,#fffdf4,#ece6d4 60%,#cfc6ad);box-shadow:inset 0 0 0 1.5px #fffa,inset 2px 2px 6px #fff,inset -3px -3px 8px #0004,0 0 1px #0006}
 .f::after{border-radius:13px}
@@ -413,9 +413,10 @@ html,body{height:100%;overflow:hidden}
 @keyframes spn{to{transform:rotate(360deg)}}
 #ld p{margin:0;font-weight:700;font-size:15px;line-height:1.5;max-width:320px}
 #ld small{opacity:.7;font-size:12px;max-width:320px}
+@media(max-width:420px){.wal small{display:block!important;font-size:7px;line-height:1}.wal{gap:4px}.top{gap:4px}}
 </style></head><body>
 <div class="app">
- <div class="top"><button class="ib" onclick="if(history.length>1)history.back()" aria-label="ফিরে যান">‹</button><div class="logo" role="heading" aria-level="1"><i class="mk"></i><div><div class="lt"><span class="n">7</span><span class="u">UP</span><span class="n">7</span><span class="d">DOWN</span></div><small>DICE CASINO</small></div></div><div class="sp"></div><div class="wal"><span class="wi">৳</span><div><small>BALANCE</small><b id="bal2">0</b></div></div><button class="ib" id="snd" aria-label="সাউন্ড">🔊</button></div>
+ <div class="top"><button class="ib" onclick="if(history.length>1)history.back()" aria-label="ফিরে যান">‹</button><div class="logo" role="heading" aria-level="1"><i class="mk"></i><div><div class="lt"><span class="n">7</span><span class="u">UP</span><span class="n">7</span><span class="d">DOWN</span></div><small>DICE CASINO</small></div></div><div class="sp"></div><div class="wal"><span class="wi">৳</span><div><small>BALANCE</small><b id="bal2">0</b></div></div><div class="wal mybet"><span class="wi">🎲</span><div><small>MY BET</small><b id="tot">0</b></div></div><button class="ib" id="snd" aria-label="সাউন্ড">🔊</button></div>
  <div class="stats"><span class="sg g">2-6 <b id="pd"></b></span><span class="sg b">7 <b id="pl7"></b></span><span class="sg r">8-12 <b id="pu"></b></span><div class="sbar"><i id="bd" class="g"></i><i id="bs" class="b"></i><i id="bu" class="r"></i></div><small>কোন ঘরে কত % বেট ধরেছে (লাইভ)</small></div>
  <div class="hist" id="hist"></div>
  <div class="stage">
@@ -431,7 +432,6 @@ html,body{height:100%;overflow:hidden}
  <div class="zones" id="zones"></div>
  <div class="sums" id="sums"></div>
  <div class="bot">
-  <div class="bi"><button class="home" id="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>HOME</span></button><div>ব্যালেন্স ৳<b id="bal">0</b></div><div>আপনার বেট ৳<b id="tot">0</b></div></div>
   <div class="tray" id="tray"></div>
   <div class="ctl"><button class="cb" id="auto">⟳<small>Auto</small></button><button class="bigchip" id="chipbtn" data-v="10">10</button><button class="cb" id="dbl">×2<small>Double</small></button><button class="cb" id="undo">↶<small>Undo</small></button><button class="cb" id="clear">✕<small>Clear</small></button></div>
  </div>
@@ -451,7 +451,7 @@ const SUMS=[2,3,4,5,6,8,9,10,11,12],PAY={2:20,3:12,4:8,5:6,6:5,8:5,9:6,10:8,11:1
 let MIN=10,MAX=1000,betMs=12000;
 const $=id=>document.getElementById(id),Q=s=>document.querySelectorAll(s);
 const kind=s=>s<7?'down':s>7?'up':'lucky',sum=o=>Object.values(o).reduce((a,b)=>a+b,0);
-const fmtB=v=>(+v).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+const fmtB=v=>Math.floor((+v||0)+1e-9).toLocaleString('en-US');
 const Wallet={v:0,get(){return this.v},set(v){this.v=v}};
 let bets={},stack=[],last=null,extra={},auto=false,chip=10,phase='init',round=0,rot=[[0,0],[0,0]],tick,tw,shown=0,H=[],histV=-1;
 let srvOff=0,endsAt=0,pollT=null,pending=0,qq=Promise.resolve(),needSync=false,seq=0;
@@ -489,7 +489,7 @@ function setDie(i,v,spin){const[x,y]=face[v],n=spin?360*(2+Math.floor(Math.rando
 setDie(0,3,0);setDie(1,4,0);
 let snd=true,ac;const A=()=>ac||(ac=new(window.AudioContext||window.webkitAudioContext)());
 function beep(f,d,t='sine',v=.08,w=0){if(!snd)return;try{const c=A(),o=c.createOscillator(),g=c.createGain(),s=c.currentTime+w;o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+d)}catch(e){}}
-function rattle(){if(!snd)return;try{const c=A();for(let i=0;i<10;i++){const n=c.sampleRate*.04,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let k=0;k<n;k++)d[k]=(Math.random()*2-1)*(1-k/n);const s=c.createBufferSource(),g=c.createGain(),f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=1200+Math.random()*1500;g.gain.value=.25;s.buffer=b;s.connect(f);f.connect(g);g.connect(c.destination);s.start(c.currentTime+i*.17+Math.random()*.05)}}catch(e){}}
+function rattle(n){if(!snd)return;n=n||10;try{const c=A();for(let i=0;i<n;i++){const n=c.sampleRate*.04,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let k=0;k<n;k++)d[k]=(Math.random()*2-1)*(1-k/n);const s=c.createBufferSource(),g=c.createGain(),f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=1200+Math.random()*1500;g.gain.value=.25;s.buffer=b;s.connect(f);f.connect(g);g.connect(c.destination);s.start(c.currentTime+i*.17+Math.random()*.05)}}catch(e){}}
 const winSnd=()=>[660,880,1175].forEach((f,i)=>beep(f,.35,'triangle',.1,i*.12));
 $('snd').onclick=()=>{snd=!snd;$('snd').textContent=snd?'🔊':'🔇'};
 function burst(){const f=document.createElement('div');f.style.cssText='position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:25';document.body.appendChild(f);
@@ -574,7 +574,7 @@ setInterval(()=>{if(uid)fetchBalance()},15000);
 
 // ===================== রেন্ডার =====================
 function render(){const to=Wallet.get(),from=shown,t0=performance.now();cancelAnimationFrame(tw);
- const st=t=>{const p=Math.min(1,(t-t0)/500);shown=p>=1?to:from+(to-from)*(1-Math.pow(1-p,3));$('bal').textContent=$('bal2').textContent=fmtB(shown);if(p<1)tw=requestAnimationFrame(st)};tw=requestAnimationFrame(st);
+ const st=t=>{const p=Math.min(1,(t-t0)/500);shown=p>=1?to:from+(to-from)*(1-Math.pow(1-p,3));$('bal2').textContent=fmtB(shown);if(p<1)tw=requestAnimationFrame(st)};tw=requestAnimationFrame(st);
  Q('[data-k]').forEach(e=>{const v=bets[e.dataset.k]||'';e.querySelector('.amt').textContent=v;e.dataset.a=v});$('tot').textContent=fmtB(sum(bets));$('rno').textContent=round;drawSide();drawPct()}
 function drawHist(){const mf=n=>`<div class="mf">${[0,1,2,3,4,5,6,7,8].map(k=>`<i style="opacity:${pips[n].includes(k)?1:0}"></i>`).join('')}</div>`;
  const h=H.slice(-12);$('hist').innerHTML=h.map(([a,b,x],i)=>`<div class="he${i==h.length-1?' cur':''}"><em>${x?'★':''}</em>${mf(a)}${mf(b)}<span class="${kind(a+b)}">${a+b}</span></div>`).join('')}
@@ -622,12 +622,13 @@ function startBetting(s){phase='bet';round=s.round;bets={};stack=[];extra=s.extr
  if(auto&&last&&!sum(bets))setTimeout(()=>{if(phase==='bet')placeMany(last,true)},200)}
 function doRoll(s){phase='roll';round=s.round;clearInterval(tick);lock(true);$('cd').className='cd';$('tray').classList.remove('show');if(sum(bets))last={...bets};
  const[a,b]=s.dice,g=$('grp'),lateMs=s.endsAt-now();$('status').textContent='ডাইস গড়াচ্ছে…';
- if(lateMs<1800){setDie(0,a,0);setDie(1,b,0);g.classList.add('lift');return}
- rattle();g.classList.add('shake');dice.forEach(d=>{d.w.classList.remove('toss');void d.w.offsetWidth;d.w.classList.add('toss')});setDie(0,a,1);setDie(1,b,1);
- setTimeout(()=>{g.classList.remove('shake');g.classList.add('lift')},2000)}
+ if(lateMs<1800){document.documentElement.style.removeProperty('--rd');setDie(0,a,0);setDie(1,b,0);g.classList.add('lift');return}
+  const dur=Math.max(1800,Math.min(3400,lateMs-450));document.documentElement.style.setProperty('--rd',dur+'ms');
+ rattle(Math.round(dur*.8/170));g.classList.add('shake');dice.forEach(d=>{d.w.classList.remove('toss');void d.w.offsetWidth;d.w.classList.add('toss')});setDie(0,a,1);setDie(1,b,1);
+ setTimeout(()=>g.classList.remove('shake'),dur*.7);setTimeout(()=>g.classList.add('lift'),dur+120)}
 function doResult(s,wasRoll){phase='result';round=s.round;clearInterval(tick);lock(true);$('cd').className='cd';
  const[a,b]=s.dice,sm=a+b,kd=kind(sm),g=$('grp');
- if(!wasRoll){setDie(0,a,0);setDie(1,b,0)}g.classList.remove('shake');g.classList.add('lift');
+ if(!wasRoll){document.documentElement.style.removeProperty('--rd');setDie(0,a,0);setDie(1,b,0)}g.classList.remove('shake');g.classList.add('lift');
  const R=$('res');R.innerHTML=`<b>${sm}</b><span>${kd==='down'?'7 DOWN':kd==='up'?'7 UP':'LUCKY 7'}</span>`;R.className='res show '+kd;
  $('status').textContent=`${sm} · ${kd==='down'?'7 DOWN':kd==='up'?'7 UP':'LUCKY 7'}`;
  Q(`[data-k="${kd}"],[data-k="n${sm}"]`).forEach(e=>e.classList.add('win'));
@@ -665,7 +666,6 @@ function drawSide(){const t=live.d+live.s+live.u,pc=k=>t?Math.round(live[k]/t*10
  $('sl').innerHTML=`<h4>ONLINE</h4><div class="big"><span class="dot"></span>${live.on}</div><h4 style="margin-top:6px">PLAYERS · ${t}</h4>`+[['d','DOWN','g'],['s','7','b'],['u','UP','r']].map(([k,n,cl])=>`<div class="row"><span>${n}</span><span class="bar"><i class="${cl}" style="width:${pc(k)}%"></i></span><span>${live[k]}</span></div>`).join('');
  $('sr').innerHTML=`<h4>TOTAL BET</h4><div class="big">৳${fmtB(live.pool)}</div><h4 style="margin-top:6px">LAST WIN</h4>`+(live.win.length?live.win.map(w=>`<div class="row"><span>${w.n}</span><span style="margin-left:auto;color:#ffd24a">+${fmtB(w.w)}</span></div>`).join(''):'<div class="row">—</div>');
  [0,1,2].forEach(i=>{const e=$('pb'+i),w=live.win[i];if(!e)return;e.textContent=w?'+'+fmtB(w.w):'';e.style.color=w?'#ffd24a':''})}
-$('home').onclick=()=>{try{if(window.AndroidBridge&&AndroidBridge.goHome){AndroidBridge.goHome();return}}catch(e){}try{if(window.parent&&window.parent!==window){window.parent.postMessage({type:'GO_HOME'},'*')}}catch(e){}if(HOME_URL)location.href=HOME_URL;else if(history.length>1)history.back()};
 lock(true);drawHist();render();poll();
 
 </script></body></html>
