@@ -731,7 +731,7 @@ const bo=document.createElement('div');bo.id='boot';bo.className='ov';
 bo.innerHTML='<div class="bl">'+'MOSTWIN88'.split('').map((ch,i)=>`<i style="animation-delay:${i*.12}s">${ch}</i>`).join('')+'</div><p id="bmsg">লোড হচ্ছে…</p>';
 const mo=document.createElement('div');mo.id='mnt';mo.className='ov off';
 document.body.append(bo,mo);
-function bootCheck(){if(balLoaded&&cur)bo.classList.add('off')}
+function bootCheck(){if(balLoaded&&cur){bo.classList.add('off');try{if(window.parent&&window.parent!==window&&!window.__npRdy){window.__npRdy=1;window.parent.postMessage({type:'NP_GAME_READY'},'*')}}catch(e){}}}
 function showMaint(){
   if(maint&&maint.enabled){let r=maint.estimatedReturn;if(typeof r==='number')r=new Date(r).toLocaleString('bn-BD');
     mo.innerHTML=`<div class="bl" style="font-size:34px">🛠️</div><h3>রক্ষণাবেক্ষণ চলছে</h3><p>${esc(maint.message||'গেমটি সাময়িকভাবে বন্ধ আছে।')}</p>${r?`<p>ফিরে আসার সম্ভাব্য সময়: ${esc(r)}</p>`:''}`;
