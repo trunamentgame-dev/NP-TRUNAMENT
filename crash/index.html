@@ -883,6 +883,7 @@ function mwHide(){window.__mwDone=1}
           isBalanceLoaded = true;
           currentBalance = typeof bal === 'number' ? bal : Number(bal || 0);
           if (window.mwHide) mwHide(); // ব্যালেন্স এসে গেছে, লোডিং পেজ সরাও
+          try{if(window.parent&&window.parent!==window&&!window.__npRdy){window.__npRdy=1;window.parent.postMessage({type:'NP_GAME_READY'},'*')}}catch(e){} // প্যানেলকে জানাও: গেম প্রস্তুত
           const el = document.getElementById('headerBalance');
           if (el) {
             el.innerText = '৳' + currentBalance.toLocaleString('en-US', {
