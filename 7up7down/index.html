@@ -42,10 +42,10 @@ h1{flex:1;margin:0;font:400 26px/1 'Lilita One',Impact,sans-serif;background:lin
 .dice{position:absolute;left:0;right:0;bottom:6px;display:flex;justify-content:center;gap:26px;perspective:500px}
 .dome{position:absolute;inset:0;border-radius:95px 95px 14px 14px/120px 120px 14px 14px;background:radial-gradient(ellipse at 30% 20%,#fff6,#fff1 40%,#fff0 70%),linear-gradient(90deg,#fff2,#fff0 30%,#fff0 70%,#fff3);border:2px solid #fff5;box-shadow:inset 0 0 30px #fff3,0 0 18px #0006;transition:transform .7s cubic-bezier(.3,.8,.3,1),opacity .7s;pointer-events:none}
 .grp.lift .dome{transform:translateY(-130px);opacity:.15}
-.die{--s:52px;--h:26px;width:var(--s);height:var(--s);position:relative;transform-style:preserve-3d;transition:transform var(--rd,1.8s) cubic-bezier(.3,.55,.2,1);will-change:transform}
+.die{--s:52px;--h:26px;width:var(--s);height:var(--s);position:relative;transform-style:preserve-3d;transition:transform var(--rd,1.8s) cubic-bezier(.3,.55,.2,1);}
 .wrap{transform-style:preserve-3d;will-change:transform}.wrap.toss{animation:toss var(--rd,1.8s) linear both}
-@keyframes toss{0%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}22%{transform:translate3d(0,-60px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}46%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}60%{transform:translate3d(0,-26px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}74%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}85%{transform:translate3d(0,-9px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}93%,100%{transform:translate3d(0,0,0)}}
-.f{position:absolute;inset:0;border-radius:10px;background:linear-gradient(145deg,#fff,#dcdcdc 70%,#bdbdbd);box-shadow:inset 0 0 8px #0004;display:grid;grid:repeat(3,1fr)/repeat(3,1fr);padding:8px;backface-visibility:hidden}
+@keyframes toss{0%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}22%{transform:translate3d(0,-30px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}46%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}60%{transform:translate3d(0,-13px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}74%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}85%{transform:translate3d(0,-4px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}93%,100%{transform:translate3d(0,0,0)}}
+.f{position:absolute;inset:-.5px;border-radius:10px;background:linear-gradient(145deg,#fff,#dcdcdc 70%,#bdbdbd);box-shadow:inset 0 0 8px #0004;display:grid;grid:repeat(3,1fr)/repeat(3,1fr);padding:8px;backface-visibility:hidden}
 .f::after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(135deg,#fffc,#fff0 40%,#0001);pointer-events:none}
 .f i{width:78%;height:78%;margin:auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#555,#000 70%);opacity:0}.f i.on{opacity:1}
 .f1 i.on{background:radial-gradient(circle at 35% 30%,#ff6a6a,#b00000 70%)}
@@ -414,9 +414,14 @@ html,body{height:100%;overflow:hidden}
 #ld p{margin:0;font-weight:700;font-size:15px;line-height:1.5;max-width:320px}
 #ld small{opacity:.7;font-size:12px;max-width:320px}
 @media(max-width:420px){.wal small{display:block!important;font-size:7px;line-height:1}.wal{gap:4px}.top{gap:4px}}
+@media(max-width:420px){}
+.bot{margin-top:auto}
+.f{inset:-1px;border-radius:8px}.f::after{border-radius:8px}
+.mbt{position:absolute;right:10px;bottom:7px;z-index:3;display:flex;align-items:baseline;gap:5px;font:700 10px/1 'Outfit','Hind Siliguri',sans-serif;letter-spacing:1.4px;color:#ffffffcc;text-shadow:0 2px 4px #000,0 0 8px #000;pointer-events:none}
+.mbt b{font:800 15px/1 'Outfit',sans-serif;letter-spacing:0;color:var(--gold)}
 </style></head><body>
 <div class="app">
- <div class="top"><button class="ib" onclick="if(history.length>1)history.back()" aria-label="ফিরে যান">‹</button><div class="logo" role="heading" aria-level="1"><i class="mk"></i><div><div class="lt"><span class="n">7</span><span class="u">UP</span><span class="n">7</span><span class="d">DOWN</span></div><small>DICE CASINO</small></div></div><div class="sp"></div><div class="wal"><span class="wi">৳</span><div><small>BALANCE</small><b id="bal2">0</b></div></div><div class="wal mybet"><span class="wi">🎲</span><div><small>MY BET</small><b id="tot">0</b></div></div><button class="ib" id="snd" aria-label="সাউন্ড">🔊</button></div>
+ <div class="top"><button class="ib" onclick="if(history.length>1)history.back()" aria-label="ফিরে যান">‹</button><div class="logo" role="heading" aria-level="1"><i class="mk"></i><div><div class="lt"><span class="n">7</span><span class="u">UP</span><span class="n">7</span><span class="d">DOWN</span></div><small>DICE CASINO</small></div></div><div class="sp"></div><div class="wal"><span class="wi">৳</span><div><small>BALANCE</small><b id="bal2">0</b></div></div><button class="ib" id="snd" aria-label="সাউন্ড">🔊</button></div>
  <div class="stats"><span class="sg g">2-6 <b id="pd"></b></span><span class="sg b">7 <b id="pl7"></b></span><span class="sg r">8-12 <b id="pu"></b></span><div class="sbar"><i id="bd" class="g"></i><i id="bs" class="b"></i><i id="bu" class="r"></i></div><small>কোন ঘরে কত % বেট ধরেছে (লাইভ)</small></div>
  <div class="hist" id="hist"></div>
  <div class="stage">
@@ -425,7 +430,7 @@ html,body{height:100%;overflow:hidden}
   <div class="tb1"></div><div class="tb2"></div><div class="felt"></div>
   <div class="grp" id="grp"><div class="rimb"></div><div class="dice" id="board"></div><div class="dome"></div></div>
   <div class="banner" id="extra">Extra Pay</div>
-  <div class="res" id="res"></div><div class="status" id="status"></div><div class="cd" id="cd"><svg viewBox="0 0 44 44"><circle class="cdbg" cx="22" cy="22" r="19"/><circle class="cdfg" id="cdr" cx="22" cy="22" r="19"/></svg><b id="cdn"></b></div>
+  <div class="res" id="res"></div><div class="status" id="status"></div><div class="mbt">MY BET <b id="tot">0</b></div><div class="cd" id="cd"><svg viewBox="0 0 44 44"><circle class="cdbg" cx="22" cy="22" r="19"/><circle class="cdfg" id="cdr" cx="22" cy="22" r="19"/></svg><b id="cdn"></b></div>
   <div class="tm"><div id="bar"></div></div>
  </div>
  <div class="info"><span style="margin:0">#<b id="rno">1</b></span><button id="road">Roadmap</button><button id="mm" class="on">Multiple mode</button><span>Min <u>10</u> Max <s>1000</s></span></div>
@@ -668,4 +673,15 @@ function drawSide(){const t=live.d+live.s+live.u,pc=k=>t?Math.round(live[k]/t*10
  [0,1,2].forEach(i=>{const e=$('pb'+i),w=live.win[i];if(!e)return;e.textContent=w?'+'+fmtB(w.w):'';e.style.color=w?'#ffd24a':''})}
 lock(true);drawHist();render();poll();
 
-</script></body></html>
+</script><script>
+/* স্ক্রিন সাইজ অনুযায়ী পুরো গেম নিজে থেকে ফিট হবে (নিচে ফাঁকা থাকবে না) */
+(function(){const a=document.querySelector('.app');let raf=0;
+function fit(){try{const cs=getComputedStyle(document.body),vh=window.innerHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);
+a.style.zoom='1';a.style.height='auto';const nat=a.getBoundingClientRect().height;
+let z=nat>0?Math.min(1,vh/nat):1;z=Math.max(.5,z);a.style.zoom=String(z);a.style.height=(vh/z)+'px'}catch(e){}}
+function sched(){cancelAnimationFrame(raf);raf=requestAnimationFrame(fit)}
+addEventListener('resize',sched);addEventListener('orientationchange',sched);addEventListener('load',sched);
+if(window.visualViewport)visualViewport.addEventListener('resize',sched);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(sched);fit()})();
+</script>
+</body></html>
