@@ -2448,6 +2448,19 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
+<script>
+  /* Admin referral link: index.html?ref=<adminUid>. Remembered for 30 days so the user can register later. */
+  (function () {
+    try {
+      var p = new URLSearchParams(location.search).get('ref');
+      if (p && /^[A-Za-z0-9_-]{6,128}$/.test(p)) localStorage.setItem('np_ref', JSON.stringify({ ref: p, t: Date.now() }));
+    } catch (e) {}
+    window.npGetRef = function () {
+      try { var o = JSON.parse(localStorage.getItem('np_ref') || 'null'); if (o && o.ref && Date.now() - o.t < 30 * 864e5) return o.ref; } catch (e) {}
+      return null;
+    };
+  })();
+  </script>
 </head>
 <body data-theme="dark">
 
@@ -4572,6 +4585,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       if (window.npHideLoad) window.npHideLoad();
       if (!silent) closeActiveGameSession();
     }
+    window.npCloseGame = function () { npCloseGameFrame(false); };
     window.addEventListener('popstate', function () { if (npGameFrameEl) { window.npSkipExit = true; npCloseGameFrame(); } });
     window.addEventListener('message', function (e) {
       if (!npGameFrameEl) return;
@@ -4585,7 +4599,26 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       if (!document.hidden && !npGameFrameEl) { closeActiveGameSession(); }
     });
 
-    async function playGameUrl(url, isLudo) {
+    // ---- গেম রেজিস্ট্রি: কোন গেমে টোকেন যাবে / প্রস্তুত সংকেতের অপেক্ষা হবে / কোন সার্ভার জাগানো হবে, তা এখন গেমের রেকর্ড (Firebase games/{id}) থেকে আসে ----
+    // রেকর্ডের ফিল্ড:  integrated (true = নিজস্ব গেম, false = বাইরের লিংক)  ও  healthUrl (গেম সার্ভারের /health লিংক, ঐচ্ছিক)
+    // integrated ফিল্ড না থাকা পুরোনো গেম আগের মতোই চলে।
+    const NP_LEGACY_GAME = /crazytime|creazy|aviator|avitor|crash|roulette|ludo|carrom|crambod/i;
+    function npGameRecord(url) {
+      const clean = String(url || '').split('#')[0];
+      const list = [].concat(typeof gamesForBoxes !== 'undefined' && Array.isArray(gamesForBoxes) ? gamesForBoxes : [], state.games || []);
+      return list.find(g => g && [g.url, g.gameUrl, g.link].some(u => u && String(u).split('#')[0] === clean)) || null;
+    }
+    function npGameInfo(url) {
+      const rec = npGameRecord(url) || {};
+      const external = /spribe[.]co/i.test(String(url));
+      const sendToken = rec.integrated === true ? true : (rec.integrated === false ? false : !external);
+      const waitReady = rec.integrated === true ? true : (rec.integrated === false ? false : (NP_LEGACY_GAME.test(String(url)) && !external));
+      const health = rec.healthUrl || (/crazytime/i.test(String(url)) ? 'https://crazytime-backend.onrender.com/health' : '');
+      return { name: rec.name || rec.title || '', sendToken, waitReady, health };
+    }
+
+    async function playGameUrlInner(url, isLudo) {
+      const npInfo = npGameInfo(url);
       // 1. Firebase Authentication State check before launching game
       if (!isLoggedIn()) {
         pendingGameUrl = url;
@@ -4595,6 +4628,14 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
       if (!url || url === '#' || url === 'javascript:void(0)') {
         showToast('এই গেমের প্লে লিংক পাওয়া যায়নি।', 'warning');
+        return;
+      }
+
+      // ক্লিক করার সাথে সাথেই লোডিং দেখাও (সেশন/টোকেন/ব্যালেন্সের জন্য অপেক্ষা করার আগে)
+      const npRetry = function () { npCloseGameFrame(false); setTimeout(function () { playGameUrl(url, isLudo); }, 80); };
+      if (window.npGameLoadStart) window.npGameLoadStart(60000, npRetry);
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        if (window.npGameLoadFail) window.npGameLoadFail('ইন্টারনেট সংযোগ নেই। সংযোগ ঠিক করে আবার চেষ্টা করুন।');
         return;
       }
 
@@ -4610,6 +4651,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           const matchGame = (state.games || []).find(g => (g.url && g.url === url) || (g.link && g.link === url));
           if (matchGame && matchGame.name) gameName = matchGame.name;
         }
+        if (npInfo.name) gameName = npInfo.name;   // রেজিস্ট্রির নামই সেশনে যায় (নতুন গেম নিজে থেকেই ঠিক নামে রেকর্ড হয়)
 
         const deviceId = localStorage.getItem('np_device_fingerprint') || 'dev_web';
         const userIp = localStorage.getItem('np_last_ip') || '';
@@ -4638,8 +4680,9 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             device: deviceDesc,
             status: 'ACTIVE'
           };
-          await sessionRef.set(sessionData);
           try { sessionStorage.setItem('np_active_game_session', sessionId); } catch (e) {}
+          // সেশন লেখা লোডিং আটকে রাখে না: সর্বোচ্চ ৩ সেকেন্ড অপেক্ষা, লেখা পিছনে চলতে থাকে
+          await Promise.race([sessionRef.set(sessionData).catch(function () {}), new Promise(function (r) { setTimeout(r, 3000); })]);
         }
       } catch (err) {
         console.warn('Game session start error:', err);
@@ -4647,7 +4690,6 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
       // সব গেম (এখনকার ও ভবিষ্যতে যোগ করা): নতুন উইন্ডো না খুলে একই উইন্ডোতে সরাসরি লোডিং → গেম
       const sameWindow = true;
-      if (window.npShowLoad) window.npShowLoad(sameWindow);
 
       // লোডিং চলা অবস্থাতেই: (১) তাজা টোকেন (২) ইউজারের লেটেস্ট ব্যালেন্স (৩) গেম সার্ভার জাগানো
       // — এগুলো তৈরি হওয়ার পরেই গেমে যাবে (প্রতিটির সর্বোচ্চ অপেক্ষা সীমা আছে, তাই আটকে থাকবে না)
@@ -4663,18 +4705,17 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             }).catch(() => {}), 5000));
           }
         }
-        if (/crazytime/i.test(String(url))) {
-          tasks.push(npWait(fetch('https://crazytime-backend.onrender.com/health', { mode: 'no-cors', cache: 'no-store' }).catch(() => {}), 12000));
+        if (npInfo.health) {
+          tasks.push(npWait(fetch(npInfo.health, { mode: 'no-cors', cache: 'no-store' }).catch(() => {}), 12000));
         }
         await Promise.all(tasks);
       } catch (e) {}
-      if (window.npShowLoad) window.npShowLoad(45000); // ব্যালেন্স আসা পর্যন্ত লোডিং (সর্বোচ্চ ৪৫ সেকেন্ড)
 
       let finalUrl = url;
-      if (gameIdToken) {
+      if (gameIdToken && npInfo.sendToken) {   // বাইরের গেমে ইউজারের লগইন-টোকেন পাঠানো হয় না
         finalUrl = String(url).split('#')[0] + '#t=' + gameIdToken;
       }
-      if (sameWindow) { npOpenGameFrame(finalUrl, /crazytime|creazy/i.test(String(url))); return; }
+      if (sameWindow) { npOpenGameFrame(finalUrl, npInfo.waitReady); return; }
       try {
         const w = window.open('', '_blank');
         if (!w) { window.location.href = finalUrl; return; }
@@ -4688,6 +4729,14 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       } catch (e) {
         window.location.href = finalUrl;
       }
+    }
+
+    // একই সময়ে একাধিকবার Play চাপলে (ডাবল ক্লিক / ধীর নেট) শুধু একটি গেম ও একটি সেশন তৈরি হবে
+    let npPlayBusy = false;
+    async function playGameUrl(url, isLudo) {
+      if (npPlayBusy || npGameFrameEl) return;
+      npPlayBusy = true;
+      try { await playGameUrlInner(url, isLudo); } finally { npPlayBusy = false; }
     }
 
     function openGameLoginPrompt() {
@@ -5647,7 +5696,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             createdAt: firebase.database.ServerValue.TIMESTAMP
           });
 
-          await db.ref(`users/${uid}`).set({
+          await npCreateUserRecord(uid, {
             uid,
             username: cleanUsername,
             name,
@@ -5673,6 +5722,20 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             btn.innerHTML = '<span>🚀 নতুন প্লেয়ার অ্যাকাউন্ট খুলুন</span>';
           }
         }
+      }
+    }
+
+    // নতুন ইউজার রেকর্ড: অ্যাডমিনের রেফারেল লিংক থেকে এলে ইউজার সেই অ্যাডমিনের অধীনে যায়।
+    // লিংক পুরোনো/ভুল হলে রেজিস্ট্রেশন আটকাবে না, অ্যাডমিন ছাড়াই অ্যাকাউন্ট তৈরি হবে।
+    async function npCreateUserRecord(uid, data) {
+      const ref = window.npGetRef ? window.npGetRef() : null;
+      if (ref) data.adminUid = ref;
+      try {
+        await db.ref(`users/${uid}`).set(data);
+      } catch (e) {
+        if (!ref) throw e;
+        delete data.adminUid;
+        await db.ref(`users/${uid}`).set(data);
       }
     }
 
@@ -5875,7 +5938,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
             const cred = await auth.createUserWithEmailAndPassword(email, password);
             if (db) {
-              await db.ref(`users/${cred.user.uid}`).set({
+              await npCreateUserRecord(cred.user.uid, {
                 uid: cred.user.uid,
                 username: cleanUser,
                 name,
@@ -6253,7 +6316,6 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         }
 
         const newBal = freshBal - entryFee;
-        const newCount = currentJoined + 1;
         const trxKey = db.ref('transactions').push().key;
 
         const updates = {};
@@ -6264,13 +6326,19 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           gameUid: state.userData.ffUid || freshUser.ffUid || '00000',
           joinedAt: firebase.database.ServerValue.TIMESTAMP
         };
-        updates[`tournaments/${tournamentId}/joinedCount`] = newCount;
-        updates[`users/${uid}/balance`] = newBal;
+        // balance & turnover change with server-side increments, so a game payout / server turnover that
+        // lands at the same moment is never overwritten by a stale local value
+        const SV = firebase.database.ServerValue;
+        updates[`users/${uid}/balance`] = SV.increment(-entryFee);
         updates[`users/${uid}/joinedMatches/${tournamentId}`] = true;
-        const curTurnoverDone = parseFloat(freshUser.turnoverDone !== undefined ? freshUser.turnoverDone : freshUser.turnoverCompleted) || 0;
-        const newTurnoverDone = curTurnoverDone + entryFee;
-        updates[`users/${uid}/turnoverDone`] = newTurnoverDone;
-        updates[`users/${uid}/turnoverCompleted`] = newTurnoverDone;
+        if (freshUser.turnoverDone !== undefined) {
+          updates[`users/${uid}/turnoverDone`] = SV.increment(entryFee);
+          updates[`users/${uid}/turnoverCompleted`] = SV.increment(entryFee);
+        } else {
+          const curTurnoverDone = parseFloat(freshUser.turnoverCompleted) || 0;   // legacy users: keep their old progress
+          updates[`users/${uid}/turnoverDone`] = curTurnoverDone + entryFee;
+          updates[`users/${uid}/turnoverCompleted`] = curTurnoverDone + entryFee;
+        }
         updates[`transactions/${trxKey}`] = {
           trxId: trxKey,
           uid,
@@ -6285,7 +6353,19 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           note: `Joined ${t.title}`
         };
 
-        await db.ref().update(updates);
+        // reserve the slot atomically (two people can no longer take the last slot together)
+        const slotRef = db.ref(`tournaments/${tournamentId}/joinedCount`);
+        const slotTx = await slotRef.transaction(c => ((c || 0) < maxSlots ? (c || 0) + 1 : undefined));
+        if (!slotTx.committed) {
+          showToast('দুঃখিত! এই টুর্নামেন্টের সবকটি স্লট পূর্ণ হয়ে গেছে।', 'error');
+          return;
+        }
+        try {
+          await db.ref().update(updates);
+        } catch (updErr) {
+          await slotRef.transaction(c => Math.max(0, (c || 0) - 1)).catch(() => {});   // give the slot back
+          throw updErr;
+        }
 
         playNotificationSound();
         showToast('🎉 টুর্নামেন্টে অংশগ্রহণ সফল হয়েছে! আপনার স্লট নিশ্চিত হয়েছে।', 'success');
@@ -6424,6 +6504,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           await db.ref(`depositRequests/${reqId}`).set({
             id: reqId,
             uid: state.currentUser.uid,
+            adminUid: state.userData.adminUid || null,
             userName: state.userData.name || 'Player',
             userEmail: state.userData.email || '',
             method,
@@ -6470,6 +6551,10 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       const receiverNumber = document.getElementById('withdrawNumber').value.trim();
       const btn = document.getElementById('btnSubmitWithdraw');
 
+      if (!isFinite(amount) || amount <= 0) {
+        showToast('সঠিক উইথড্র পরিমাণ লিখুন।', 'error');
+        return;
+      }
       const minWithdraw = state.settings.minWithdraw || 100;
       if (amount < minWithdraw) {
         showToast(`সর্বনিম্ন উইথড্র ৳${minWithdraw} টাকা।`, 'error');
@@ -6500,6 +6585,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           updates[`withdrawalRequests/${reqId}`] = {
             id: reqId,
             uid,
+            adminUid: state.userData.adminUid || null,
             userName: state.userData.name || 'Player',
             userEmail: state.userData.email || '',
             method,
@@ -6509,7 +6595,8 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             status: 'Pending',
             createdAt: firebase.database.ServerValue.TIMESTAMP
           };
-          updates[`users/${uid}/balance`] = newBal;
+          // atomic: subtract on the server (never overwrite with a possibly stale local balance)
+          updates[`users/${uid}/balance`] = firebase.database.ServerValue.increment(-amount);
 
           const trxKey = db.ref('transactions').push().key;
           updates[`transactions/${trxKey}`] = {
@@ -7778,26 +7865,59 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     @keyframes npldg-pulse{0%,60%,100%{transform:scale(.8);opacity:.55;filter:brightness(.8)}25%{transform:scale(1.35);opacity:1;filter:brightness(1.25)}}
     @media (prefers-reduced-motion:reduce){.npld .npld-ch{animation:none;opacity:1;transform:none;filter:none}.npld{transition-duration:.01s}}
   </style>
-  <div class="npld" id="npLoad" role="status" aria-label="Loading"><div class="npld-txt" aria-hidden="true"><span class="npld-ch" style="--i:0">L</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">A</span><span class="npld-ch" style="--i:3">D</span><span class="npld-ch" style="--i:4">I</span><span class="npld-ch" style="--i:5">N</span><span class="npld-ch" style="--i:6">G</span><span class="npld-ch" style="--i:7">.</span><span class="npld-ch" style="--i:8">.</span><span class="npld-ch" style="--i:9">.</span><span class="npld-ch" style="--i:10">.</span><span class="npld-ch" style="--i:11">.</span></div></div>
+  <style>
+    .npld-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;max-width:100%;padding:0 12px}
+    .npld-brand{font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-weight:900;letter-spacing:.32em;padding-left:.32em;font-size:clamp(12px,3.6vw,17px);color:#fde68a;opacity:.92;text-shadow:0 0 14px rgba(245,158,11,.5)}
+    .npld-bar{width:min(220px,56vw);height:3px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+    .npld-bar i{display:block;height:100%;width:40%;border-radius:3px;background:linear-gradient(90deg,#f59e0b,#fde68a);animation:npldbar 1.3s ease-in-out infinite}
+    @keyframes npldbar{0%{transform:translateX(-110%)}100%{transform:translateX(280%)}}
+    .npld-err{display:none;flex-direction:column;align-items:center;gap:12px;text-align:center;color:#e2e8f0;font-family:var(--font-bengali,sans-serif);font-size:14px;line-height:1.5;max-width:320px}
+    .npld.npld-err-on .npld-err{display:flex}
+    .npld.npld-err-on .npld-bar,.npld.npld-err-on .npld-txt{display:none}
+    .npld-err-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+    .npld-err-btns button{border:0;cursor:pointer;padding:10px 18px;border-radius:10px;font-weight:700;font-size:13.5px;font-family:inherit;background:#f59e0b;color:#0f172a}
+    .npld-err-btns button#npLoadClose{background:rgba(255,255,255,.12);color:#e2e8f0}
+    @media (prefers-reduced-motion:reduce){.npld-bar i{animation:none;width:100%}}
+  </style>
+  <div class="npld" id="npLoad" role="status" aria-label="Loading"><div class="npld-wrap"><div class="npld-brand" aria-hidden="true">MOSTWIN88</div><div class="npld-txt" aria-hidden="true"><span class="npld-ch" style="--i:0">L</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">A</span><span class="npld-ch" style="--i:3">D</span><span class="npld-ch" style="--i:4">I</span><span class="npld-ch" style="--i:5">N</span><span class="npld-ch" style="--i:6">G</span><span class="npld-ch" style="--i:7">.</span><span class="npld-ch" style="--i:8">.</span><span class="npld-ch" style="--i:9">.</span><span class="npld-ch" style="--i:10">.</span><span class="npld-ch" style="--i:11">.</span></div><div class="npld-bar" aria-hidden="true"><i></i></div><div class="npld-err" id="npLoadErr" role="alert"><div id="npLoadErrMsg"></div><div class="npld-err-btns"><button type="button" id="npLoadRetry">আবার চেষ্টা করুন</button><button type="button" id="npLoadClose">বন্ধ করুন</button></div></div></div></div>
   <script>
   (function () {
-    var el = document.getElementById('npLoad'), t1 = null, t2 = null;
+    var el = document.getElementById('npLoad'), t1 = null, t2 = null, tLimit = null, waiting = false, retryFn = null;
+    var errMsg = document.getElementById('npLoadErrMsg');
+    function clearTimers() { clearTimeout(t1); clearTimeout(t2); clearTimeout(tLimit); }
     function hide() {
       if (!el) return;
-      clearTimeout(t1); clearTimeout(t2);
+      clearTimers(); waiting = false; retryFn = null;
       el.classList.add('npld-fade');
-      t2 = setTimeout(function () { el.classList.remove('npld-on'); el.classList.remove('npld-fade'); }, 260);
+      t2 = setTimeout(function () { el.classList.remove('npld-on'); el.classList.remove('npld-fade'); el.classList.remove('npld-err-on'); }, 260);
     }
+    // ছোট পেজ-ট্রানজিশনের জন্য (আগের মতো): নির্দিষ্ট সময় পর নিজে সরে যায়
     window.npShowLoad = function (keep) {
       if (!el) return;
-      clearTimeout(t1); clearTimeout(t2);
-      el.classList.remove('npld-fade');
-      el.classList.add('npld-on');
-      t1 = setTimeout(hide, typeof keep === 'number' ? keep : (keep ? 20000 : 1800)); // গেম নতুন ট্যাবে খোলে; প্যানেলে ফিরলে লোডিং আর থাকবে না
+      clearTimers(); waiting = false;
+      el.classList.remove('npld-fade'); el.classList.remove('npld-err-on'); el.classList.add('npld-on');
+      t1 = setTimeout(hide, typeof keep === 'number' ? keep : (keep ? 20000 : 1800));
+    };
+    // গেম লোডিং: টাইমারে নিজে বন্ধ হয় না; গেম "প্রস্তুত" জানালে তবেই সরে। limitMs পার হলে এরর + আবার চেষ্টা দেখায়।
+    window.npGameLoadStart = function (limitMs, onRetry) {
+      if (!el) return;
+      clearTimers(); waiting = true; retryFn = onRetry || null;
+      el.classList.remove('npld-fade'); el.classList.remove('npld-err-on'); el.classList.add('npld-on');
+      tLimit = setTimeout(function () { window.npGameLoadFail('গেম লোড হতে স্বাভাবিকের চেয়ে বেশি সময় লাগছে। আবার চেষ্টা করুন।'); }, limitMs || 60000);
+    };
+    window.npGameLoadFail = function (msg) {
+      if (!el) return;
+      clearTimeout(tLimit); clearTimeout(t1); clearTimeout(t2); waiting = true;
+      if (errMsg) errMsg.textContent = msg || 'গেম চালু করা যায়নি। আবার চেষ্টা করুন।';
+      el.classList.remove('npld-fade'); el.classList.add('npld-on'); el.classList.add('npld-err-on');
     };
     window.npHideLoad = hide;
-    window.addEventListener('pageshow', hide);
-    document.addEventListener('visibilitychange', function () { if (!document.hidden) hide(); });
+    var rb = document.getElementById('npLoadRetry'), cb = document.getElementById('npLoadClose');
+    if (rb) rb.addEventListener('click', function () { var f = retryFn; if (f) f(); else hide(); });
+    if (cb) cb.addEventListener('click', function () { try { if (window.npCloseGame) window.npCloseGame(); } catch (e) {} hide(); });
+    // ট্যাব বদলে ফিরলে গেম লোডিং অকালে সরবে না
+    window.addEventListener('pageshow', function () { if (!waiting) hide(); });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && !waiting) hide(); });
   })();
   </script>
   <script>
