@@ -10,7 +10,7 @@
 html,body{margin:0;min-height:100%}
 body{font-family:'Hind Siliguri',system-ui,sans-serif;color:#fff;background:#050806;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
 button{font-family:inherit;color:inherit;cursor:pointer}button:disabled{opacity:.5;pointer-events:none}
-.app{max-width:575px;min-height:100vh;margin:0 auto;padding:8px 10px 14px;display:flex;flex-direction:column;gap:8px;background:radial-gradient(ellipse at 50% 22%,#17623b,#0b3b25 55%,#06190f);border-inline:1px solid #1d2a22;box-shadow:0 0 60px #000;position:relative;overflow:hidden}
+.app{width:100%;max-width:500px;min-height:100vh;margin:0 auto;padding:8px 8px 14px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
 .top{display:flex;align-items:center;gap:8px}
 .ib{width:36px;height:36px;border-radius:10px;border:1px solid #fff3;background:var(--card);font-size:20px}
 h1{flex:1;margin:0;font:400 26px/1 'Lilita One',Impact,sans-serif;background:linear-gradient(#fff3a0,#ffc400 45%,#e07800);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #7a3a00)}
@@ -42,13 +42,13 @@ h1{flex:1;margin:0;font:400 26px/1 'Lilita One',Impact,sans-serif;background:lin
 .dice{position:absolute;left:0;right:0;bottom:6px;display:flex;justify-content:center;gap:26px;perspective:500px}
 .dome{position:absolute;inset:0;border-radius:95px 95px 14px 14px/120px 120px 14px 14px;background:radial-gradient(ellipse at 30% 20%,#fff6,#fff1 40%,#fff0 70%),linear-gradient(90deg,#fff2,#fff0 30%,#fff0 70%,#fff3);border:2px solid #fff5;box-shadow:inset 0 0 30px #fff3,0 0 18px #0006;transition:transform .7s cubic-bezier(.3,.8,.3,1),opacity .7s;pointer-events:none}
 .grp.lift .dome{transform:translateY(-130px);opacity:.15}
-.die{--s:52px;--h:26px;width:var(--s);height:var(--s);position:relative;transform-style:preserve-3d;transition:transform var(--rd,1.8s) cubic-bezier(.3,.55,.2,1);}
+.die{--s:52px;--h:26px;width:var(--s);height:var(--s);position:relative;transform-style:preserve-3d;background:#ebe3cf;border-radius:3.5px;transition:transform var(--rd,1.8s) cubic-bezier(.3,.55,.2,1);}
 .wrap{transform-style:preserve-3d;will-change:transform}.wrap.toss{animation:toss var(--rd,1.8s) linear both}
 @keyframes toss{0%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}22%{transform:translate3d(0,-30px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}46%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}60%{transform:translate3d(0,-13px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}74%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.2,.7,.3,1)}85%{transform:translate3d(0,-4px,0);animation-timing-function:cubic-bezier(.7,0,.8,.3)}93%,100%{transform:translate3d(0,0,0)}}
-.f{position:absolute;inset:-.5px;border-radius:10px;background:linear-gradient(145deg,#fff,#dcdcdc 70%,#bdbdbd);box-shadow:inset 0 0 8px #0004;display:grid;grid:repeat(3,1fr)/repeat(3,1fr);padding:8px;backface-visibility:hidden}
-.f::after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(135deg,#fffc,#fff0 40%,#0001);pointer-events:none}
-.f i{width:78%;height:78%;margin:auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#555,#000 70%);opacity:0}.f i.on{opacity:1}
-.f1 i.on{background:radial-gradient(circle at 35% 30%,#ff6a6a,#b00000 70%)}
+.f{position:absolute;inset:0;border-radius:3.5px;background:linear-gradient(145deg,#ffffff 0%,#f6f1e3 52%,#e4daba 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.7),inset 0 1px 2px #fff,inset -1px -1px 2px rgba(0,0,0,0.12);display:grid;grid:repeat(3,1fr)/repeat(3,1fr);padding:7px;backface-visibility:hidden}
+.f::after{content:"";position:absolute;inset:0;border-radius:3.5px;background:linear-gradient(135deg,rgba(255,255,255,0.5),rgba(255,255,255,0) 40%,rgba(0,0,0,0.03));pointer-events:none}
+.f i{width:78%;height:78%;margin:auto;border-radius:50%;background:radial-gradient(circle at 38% 32%,#383838,#0a0a0a 72%);box-shadow:inset 0 1.5px 2px #000,0 1px 0.5px rgba(255,255,255,0.7);opacity:0}.f i.on{opacity:1}
+.f1 i.on{background:radial-gradient(circle at 38% 32%,#ff3b3b,#a80000 75%);box-shadow:inset 0 1.5px 2px #500,0 1px 0.5px rgba(255,255,255,0.7)}
 .f1{transform:translateZ(var(--h))}.f6{transform:rotateY(180deg) translateZ(var(--h))}.f3{transform:rotateY(90deg) translateZ(var(--h))}.f4{transform:rotateY(-90deg) translateZ(var(--h))}.f2{transform:rotateX(90deg) translateZ(var(--h))}.f5{transform:rotateX(-90deg) translateZ(var(--h))}
 .banner{position:absolute;left:0;right:0;top:46%;text-align:center;font:400 40px 'Lilita One',sans-serif;color:#ffe27a;background:linear-gradient(90deg,#0000,#7a1a00cc 25%,#7a1a00cc 75%,#0000);padding:4px 0;text-shadow:0 3px 0 #7a3a00;opacity:0;transform:scaleY(.2);transition:.3s;pointer-events:none;z-index:4}
 .banner.show{opacity:1;transform:none}
@@ -93,11 +93,11 @@ h1{font-size:30px;filter:drop-shadow(0 1px 0 #7a3a00) drop-shadow(0 2px 0 #7a3a0
 .sh{position:absolute;left:50%;bottom:-16px;width:62px;height:16px;margin-left:-31px;border-radius:50%;background:radial-gradient(#000d,#0000 70%)}
 .wrap.toss+.sh{animation:shd var(--rd,1.8s) ease-in-out both}
 @keyframes shd{0%{transform:scale(1);opacity:1}25%{transform:scale(.5);opacity:.35}50%{transform:scale(1);opacity:1}65%{transform:scale(.75);opacity:.7}80%{transform:scale(1)}100%{transform:scale(1)}}
-.f{border-radius:13px;background:linear-gradient(145deg,#fffdf4,#ece6d4 60%,#cfc6ad);box-shadow:inset 0 0 0 1.5px #fffa,inset 2px 2px 6px #fff,inset -3px -3px 8px #0004,0 0 1px #0006}
-.f::after{border-radius:13px}
-.f i{background:radial-gradient(circle at 40% 35%,#444,#000 65%);box-shadow:inset 0 2px 3px #000,0 1px 0 #fffc}
-.f1 i.on{background:radial-gradient(circle at 40% 35%,#ff5a5a,#9a0000 70%)}
-.f2{filter:brightness(1.07)}.f3{filter:brightness(.86)}.f4{filter:brightness(.94)}.f5{filter:brightness(.7)}.f6{filter:brightness(.8)}
+.f{border-radius:3.5px;inset:0;background:linear-gradient(145deg,#ffffff 0%,#f6f1e3 52%,#e4daba 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.7),inset 0 1px 2px #fff,inset -1px -1px 2px rgba(0,0,0,0.12)}
+.f::after{border-radius:3.5px}
+.f i{background:radial-gradient(circle at 38% 32%,#383838,#0a0a0a 72%);box-shadow:inset 0 1.5px 2px #000,0 1px 0.5px rgba(255,255,255,0.7)}
+.f1 i.on{background:radial-gradient(circle at 38% 32%,#ff3b3b,#a80000 75%);box-shadow:inset 0 1.5px 2px #500,0 1px 0.5px rgba(255,255,255,0.7)}
+.f2{filter:brightness(1.04)}.f3{filter:brightness(.95)}.f4{filter:brightness(.97)}.f5{filter:brightness(.92)}.f6{filter:brightness(.94)}
 .dome{background:radial-gradient(ellipse at 28% 18%,#fffd 0,#fff4 12%,#fff0 38%),radial-gradient(ellipse at 50% 100%,#9fe8ff33,#0000 60%),linear-gradient(90deg,#fff3,#fff0 22%,#fff0 78%,#fff4);border:1.5px solid #fff6;box-shadow:inset 0 0 40px #fff3,inset 0 -12px 30px #8fe0ff22,0 0 22px #0007}
 .dome::before{content:"";position:absolute;left:14%;top:8%;width:16%;height:44%;border-radius:50%;background:linear-gradient(#fffc,#fff0);transform:rotate(18deg);filter:blur(2px)}
 .dome::after{content:"";position:absolute;left:-6px;right:-6px;bottom:-8px;height:18px;border-radius:50%;background:linear-gradient(#f0c050,#7a5008);box-shadow:0 4px 8px #000a}
@@ -158,10 +158,8 @@ h1{font-size:30px;filter:drop-shadow(0 1px 0 #7a3a00) drop-shadow(0 2px 0 #7a3a0
 .dome::after{left:-5px;right:-5px;bottom:-12px;height:24px;border:5px solid #161616;border-radius:50%;background:transparent;box-shadow:inset 0 0 0 1px #6a6a6a,0 0 0 1px #4a4a4a}
 .stage{margin-inline:auto;width:100%;max-width:380px}
 .stage{background:none;border:0;box-shadow:none;border-radius:0;overflow:visible}
-.stage::before,.stage::after{display:none}
-.app{width:calc(100% - 2*clamp(0px,6vw,38px));max-width:499px;margin-inline:auto}
-body{background:radial-gradient(ellipse at 50% 0,#0d2a1a,#030805 70%)}
-.app{border-inline:1px solid #c9972b44;box-shadow:0 0 0 1px #000,0 0 80px #000,0 0 40px #0b6b3a33;background:var(--noise),radial-gradient(ellipse at 50% 30%,#1a6b42 0,#0d4028 45%,#051a0f 100%)}
+.app{width:100%;max-width:500px;margin-inline:auto;border-inline:none;box-shadow:none}
+body{background:#060912}
 .ib{border:1px solid #c9972b88;background:linear-gradient(#2a2a2a,#0a0a0a);color:#ffe9a8;box-shadow:inset 0 1px 0 #fff3,0 3px 6px #0009}
 h1{letter-spacing:2px}
 .stats{background:linear-gradient(#0a1f14cc,#04100ae6);border:1px solid #c9972b55;box-shadow:inset 0 1px 0 #fff1,0 3px 10px #0008}.stats b{color:#ffd86b}
@@ -277,9 +275,9 @@ h1{filter:drop-shadow(0 1px 0 #8a4a00) drop-shadow(0 2px 0 #7a3a00) drop-shadow(
 .sl .row{grid-template-columns:40px 1fr 24px;font-size:11px}.sl .row span:first-child{font-size:11px}.sl .row span:last-child{font-size:12px}
 .sr .row{font-size:11px}
 @media(max-width:480px){.side{width:70px}.side h4{font-size:8px}.side .big{font-size:14px}.sr .big{font-size:12px}.sl .row{grid-template-columns:24px 1fr 16px;font-size:8px}.sl .row span:first-child{font-size:8px}.sl .row span:last-child{font-size:10px}.sr .row{font-size:8px}}
-.f1 i.on{background:radial-gradient(circle at 40% 35%,#444,#000 65%)}
-body{background:#05070d;font-family:'Outfit','Hind Siliguri',system-ui,sans-serif}
-.app{background:radial-gradient(60% 40% at 50% 0%,#0f766e66,transparent 70%),radial-gradient(50% 35% at 0% 60%,#6d28d955,transparent 70%),radial-gradient(50% 35% at 100% 80%,#be185d44,transparent 70%),linear-gradient(180deg,#0a1224,#060912);border-inline:1px solid #ffffff14;box-shadow:0 0 0 1px #000,0 0 90px #000,0 0 60px #14b8a622}
+.f1 i.on{background:radial-gradient(circle at 38% 32%,#ff3b3b,#a80000 75%)}
+body{background:#060912;font-family:'Outfit','Hind Siliguri',system-ui,sans-serif}
+.app{background:radial-gradient(60% 40% at 50% 0%,#0f766e66,transparent 70%),radial-gradient(50% 35% at 0% 60%,#6d28d955,transparent 70%),radial-gradient(50% 35% at 100% 80%,#be185d44,transparent 70%),linear-gradient(180deg,#0a1224,#060912);border-inline:none;box-shadow:none}
 .app::after{background:radial-gradient(ellipse at 50% 40%,transparent 60%,#0008 100%)}
 h1{font-family:'Outfit',sans-serif;font-weight:800;letter-spacing:1px;background:linear-gradient(90deg,#fde68a,#fbbf24 40%,#fb7185);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px #fbbf2466) drop-shadow(0 2px 2px #000a)}
 .stats,.hist,.info,.bot{background:linear-gradient(180deg,#ffffff14,#ffffff08);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid #ffffff22;border-radius:16px;box-shadow:inset 0 1px 0 #ffffff33,0 10px 30px #0008}
@@ -416,7 +414,7 @@ html,body{height:100%;overflow:hidden}
 @media(max-width:420px){.wal small{display:block!important;font-size:7px;line-height:1}.wal{gap:4px}.top{gap:4px}}
 @media(max-width:420px){}
 .bot{margin-top:auto}
-.f{inset:-1px;border-radius:8px}.f::after{border-radius:8px}
+.f{inset:0;border-radius:3.5px}.f::after{border-radius:3.5px}
 .mbt{position:absolute;right:10px;bottom:7px;z-index:3;display:flex;align-items:baseline;gap:5px;font:700 10px/1 'Outfit','Hind Siliguri',sans-serif;letter-spacing:1.4px;color:#ffffffcc;text-shadow:0 2px 4px #000,0 0 8px #000;pointer-events:none}
 .mbt b{font:800 15px/1 'Outfit',sans-serif;letter-spacing:0;color:var(--gold)}
 </style></head><body>
@@ -480,13 +478,31 @@ let simCurD=0,simCurS=0,simCurU=0,simCurPool=0;
 
 function resetSimRound(){
  simTargetPlayers=Math.floor(Math.random()*151)+50; // 50 to 200 players
- const dW=0.40+Math.random()*0.08,uW=0.40+Math.random()*0.08,sW=Math.max(0.08,1-dW-uW),sumW=dW+uW+sW;
+ const mode=Math.random();
+ let dW, uW, sW;
+ if(mode<0.44){
+  // Green / Down (2-6) crowd favorite
+  dW=0.46+Math.random()*0.12;
+  sW=0.07+Math.random()*0.05;
+  uW=1-dW-sW;
+ }else if(mode<0.88){
+  // Red / Up (8-12) crowd favorite
+  uW=0.46+Math.random()*0.12;
+  sW=0.07+Math.random()*0.05;
+  dW=1-uW-sW;
+ }else{
+  // Balanced race
+  dW=0.43+Math.random()*0.06;
+  uW=0.43+Math.random()*0.06;
+  sW=Math.max(0.06,1-dW-uW);
+ }
+ const sumW=dW+uW+sW;
  simSplit={d:dW/sumW,s:sW/sumW,u:uW/sumW};
  simPoolPerPlayer=Math.floor(Math.random()*150)+180;
- const initialP=Math.max(12,Math.floor(simTargetPlayers*(0.16+Math.random()*0.10)));
- simCurD=Math.floor(initialP*simSplit.d);
- simCurS=Math.floor(initialP*simSplit.s);
- simCurU=initialP-simCurD-simCurS;
+ const initialP=Math.max(15,Math.floor(simTargetPlayers*(0.18+Math.random()*0.10)));
+ simCurD=Math.max(1,Math.round(initialP*simSplit.d));
+ simCurS=Math.max(1,Math.round(initialP*simSplit.s));
+ simCurU=Math.max(1,initialP-simCurD-simCurS);
  simCurPool=initialP*simPoolPerPlayer;
 }
 resetSimRound();
@@ -668,16 +684,13 @@ function runTick(){clearInterval(tick);tick=setInterval(()=>{if(phase!=='bet'){c
  const sec=Math.ceil(l/1000);$('cdn').textContent=sec;$('cdr').style.strokeDashoffset=119.4*(1-Math.min(1,l/betMs));$('cd').className='cd show'+(sec<=3?' hot':sec<=5?' warn':'');
  // প্রতিবেটে 50/200 জন বেট ধরছে এমন ডায়নামিক অগ্রগতি (লাইভ ইউজারদের মতো আচরণ)
  const progress=Math.min(1,Math.max(0,1-(l/betMs)));
- const targetSoFar=Math.floor(simTargetPlayers*Math.pow(progress,0.82));
- const curT=simCurD+simCurS+simCurU;
- if(targetSoFar>curT){
-  const diff=targetSoFar-curT;
-  const aD=Math.round(diff*simSplit.d), aS=Math.round(diff*simSplit.s), aU=diff-aD-aS;
-  simCurD+=aD; simCurS+=aS; simCurU+=Math.max(0,aU);
-  simCurPool+=diff*(simPoolPerPlayer+Math.floor((Math.random()-.5)*50));
-  live.d=simCurD; live.s=simCurS; live.u=simCurU; live.pool=simCurPool;
-  drawSide(); drawPct();
- }
+ const targetSoFar=Math.max(simCurD+simCurS+simCurU,Math.floor(simTargetPlayers*Math.pow(progress,0.82)));
+ simCurD=Math.max(1,Math.round(targetSoFar*simSplit.d));
+ simCurS=Math.max(1,Math.round(targetSoFar*simSplit.s));
+ simCurU=Math.max(1,targetSoFar-simCurD-simCurS);
+ simCurPool=Math.max(simCurPool,targetSoFar*simPoolPerPlayer+Math.floor((Math.random()-.5)*60));
+ live.d=simCurD; live.s=simCurS; live.u=simCurU; live.pool=simCurPool;
+ drawSide(); drawPct();
  if(l<=0){$('cd').className='cd';$('status').textContent='বেট বন্ধ…';lock(true)}},100)}
 function startBetting(s){phase='bet';round=s.round;bets={};stack=[];extra=s.extra||{};
  resetSimRound();
@@ -744,8 +757,10 @@ async function poll(){clearTimeout(pollT);
  pollT=setTimeout(poll,wait)}
 
 // ===================== সাইড প্যানেল (রিয়েল ডেটা) =====================
-function drawPct(){const T=live.d+live.s+live.u,p=k=>T?Math.round(live[k]/T*100):0,w=k=>T?live[k]/T*100:33.3;
- $('pd').textContent=p('d')+'%';$('pl7').textContent=p('s')+'%';$('pu').textContent=p('u')+'%';$('bd').style.width=w('d')+'%';$('bs').style.width=w('s')+'%';$('bu').style.width=w('u')+'%'}
+function drawPct(){const T=live.d+live.s+live.u;if(!T){$('pd').textContent='0%';$('pl7').textContent='0%';$('pu').textContent='0%';$('bd').style.width='33.3%';$('bs').style.width='33.3%';$('bu').style.width='33.4%';return}
+ const pD=Math.round(live.d/T*100),pS=Math.round(live.s/T*100),pU=100-pD-pS;
+ $('pd').textContent=pD+'%';$('pl7').textContent=pS+'%';$('pu').textContent=pU+'%';
+ $('bd').style.width=(live.d/T*100)+'%';$('bs').style.width=(live.s/T*100)+'%';$('bu').style.width=(live.u/T*100)+'%'}
 function drawSide(){const t=live.d+live.s+live.u,pc=k=>t?Math.round(live[k]/t*100):0;
  $('sl').innerHTML=`<h4>ONLINE</h4><div class="big"><span class="dot"></span>${live.on}</div><h4 style="margin-top:6px">PLAYERS · ${t}</h4>`+[['d','DOWN','g'],['s','7','b'],['u','UP','r']].map(([k,n,cl])=>`<div class="row"><span>${n}</span><span class="bar"><i class="${cl}" style="width:${pc(k)}%"></i></span><span>${live[k]}</span></div>`).join('');
  $('sr').innerHTML=`<h4>TOTAL BET</h4><div class="big">৳${fmtB(live.pool)}</div><h4 style="margin-top:6px">LAST WIN</h4>`+(live.win.length?live.win.map(w=>`<div class="row"><span>${w.n}</span><span style="margin-left:auto;color:#ffd24a">+${fmtB(w.w)}</span></div>`).join(''):'<div class="row">—</div>');
