@@ -339,8 +339,8 @@ html,body{height:100%;overflow:hidden}
 .bigchip{width:60px;height:60px}.cb{width:50px;height:50px}
 .stage::after{display:none}
 .tb1,.tb2{position:absolute;z-index:-1;pointer-events:none}
-.tb1{left:-3%;right:-3%;top:6px;bottom:-14px;clip-path:polygon(33% 0,67% 0,100% 100%,0 100%);background:linear-gradient(#e9c46a,#a8741a 25%,#4a2a0c 60%,#2a1507)}
-.tb2{left:-1.8%;right:-1.8%;top:12px;bottom:-8px;clip-path:polygon(33.3% 0,66.7% 0,100% 100%,0 100%);background:linear-gradient(#0009,#0000 45%),linear-gradient(#0000 75%,#0006),var(--noise),radial-gradient(ellipse at 50% 60%,#22c58a,#0e7a4f 55%,#064e35)}
+.tb1{left:-2%;right:-2%;top:102px;bottom:-10px;clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(224,180,80,0.35) 0%,rgba(140,88,20,0.25) 25%,rgba(42,21,7,0.5) 60%,rgba(18,9,3,0.8) 100%);box-shadow:0 6px 18px #000c;opacity:.82}
+.tb2{left:-1.2%;right:-1.2%;top:107px;bottom:-6px;clip-path:polygon(35.3% 0,64.7% 0,100% 100%,0 100%);background:linear-gradient(#0007,#0000 45%),linear-gradient(#0000 75%,#0006),var(--noise),radial-gradient(ellipse at 50% 65%,#1eb57a,#0e7a4f 55%,#064e35)}
 @media(max-height:829px){.app{zoom:.96}}
 @media(max-height:790px){.app{zoom:.9}}
 @media(max-height:750px){.app{zoom:.86}}
@@ -351,7 +351,7 @@ html,body{height:100%;overflow:hidden}
 @media(max-height:550px){.app{zoom:.6}}
 .bar i.g{background:linear-gradient(135deg,#34d399,#059669)}.bar i.b{background:linear-gradient(135deg,#38bdf8,#4f46e5)}.bar i.r{background:linear-gradient(135deg,#fb7185,#e11d48)}
 .stage{height:294px}
-.tb1{top:60px}.tb2{top:66px}
+.tb1{top:102px}.tb2{top:107px}
 .cd{position:absolute;left:50%;top:0;width:62px;height:62px;margin-left:-31px;z-index:5;opacity:0;transform:scale(.7);transition:opacity .3s,transform .3s;pointer-events:none;filter:drop-shadow(0 4px 10px #000a)}
 .cd.show{opacity:1;transform:none}
 .cd svg{width:100%;height:100%;transform:rotate(-90deg)}
@@ -460,8 +460,54 @@ const fmtB=v=>Math.floor((+v||0)+1e-9).toLocaleString('en-US');
 const Wallet={v:0,get(){return this.v},set(v){this.v=v}};
 let bets={},stack=[],last=null,extra={},auto=false,chip=10,phase='init',round=0,rot=[[0,0],[0,0]],tick,tw,shown=0,H=[],histV=-1;
 let srvOff=0,endsAt=0,pollT=null,pending=0,qq=Promise.resolve(),needSync=false,seq=0;
-let uid=null,token=null,balLoaded=false,gotState=false,readySent=false;
-const live={on:0,d:0,s:0,u:0,pool:0,win:[]};
+// ===================== র্যান্ডম অ্যাক্টিভ ক্রাউড ও উইন সিমুলেশন (50-250+ Online, 50-200 Players, 2k/5k/10k Wins) =====================
+const WIN_USERS=['Mijan***','017***54','019***28','User_83','Sakib***','018***91','016***33','Riyad***','013***19','Hasan***','015***72','Joy***','017***09','019***77','Tanvir*','016***62'];
+function genWinAmount(){
+ const r=Math.random();
+ if(r<0.42) return Math.floor(Math.random()*17+20)*100; // 2k tier: 2,000 - 3,600
+ else if(r<0.78) return Math.floor(Math.random()*21+48)*100; // 5k tier: 4,800 - 6,800
+ else return Math.floor(Math.random()*46+95)*100; // 10k tier: 9,500 - 14,000
+}
+function genWinItem(){
+ return {n:WIN_USERS[Math.floor(Math.random()*WIN_USERS.length)],w:genWinAmount()};
+}
+let simOnline=Math.floor(Math.random()*85)+115; // 115-200
+let simTargetPlayers=Math.floor(Math.random()*151)+50; // 50 - 200 players
+let simSplit={d:0.44,s:0.12,u:0.44};
+let simPoolPerPlayer=Math.floor(Math.random()*140)+180;
+let simCurD=0,simCurS=0,simCurU=0,simCurPool=0;
+
+function resetSimRound(){
+ simTargetPlayers=Math.floor(Math.random()*151)+50; // 50 to 200 players
+ const dW=0.40+Math.random()*0.08,uW=0.40+Math.random()*0.08,sW=Math.max(0.08,1-dW-uW),sumW=dW+uW+sW;
+ simSplit={d:dW/sumW,s:sW/sumW,u:uW/sumW};
+ simPoolPerPlayer=Math.floor(Math.random()*150)+180;
+ const initialP=Math.max(12,Math.floor(simTargetPlayers*(0.16+Math.random()*0.10)));
+ simCurD=Math.floor(initialP*simSplit.d);
+ simCurS=Math.floor(initialP*simSplit.s);
+ simCurU=initialP-simCurD-simCurS;
+ simCurPool=initialP*simPoolPerPlayer;
+}
+resetSimRound();
+
+const live={on:simOnline,d:simCurD,s:simCurS,u:simCurU,pool:simCurPool,win:[genWinItem(),genWinItem(),genWinItem(),genWinItem()]};
+
+// 50-250+ এর মধ্যে অনলাইন ইউজার স্বাভাবিক ওঠা-নামা করবে
+setInterval(()=>{
+ const delta=Math.floor(Math.random()*7)-3;
+ simOnline=Math.max(52,Math.min(256,simOnline+delta));
+ live.on=simOnline;
+ drawSide();
+},3200);
+
+// সাময়িক নতুন উইন আপডেট
+setInterval(()=>{
+ if(Math.random()<0.35){
+  live.win.unshift(genWinItem());
+  if(live.win.length>5)live.win.length=5;
+  drawSide();
+ }
+},9000);
 const now=()=>Date.now()+srvOff;
 const pips={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 // UI build
@@ -619,11 +665,25 @@ function setExtraUI(){SUMS.forEach(s=>{const x=$('x'+s);x.textContent=extra[s]?P
 function runTick(){clearInterval(tick);tick=setInterval(()=>{if(phase!=='bet'){clearInterval(tick);return}
  const l=Math.max(0,endsAt-now());$('bar').style.transform=`scaleX(${Math.min(1,l/betMs)})`;$('status').textContent='বেট ধরুন';
  const sec=Math.ceil(l/1000);$('cdn').textContent=sec;$('cdr').style.strokeDashoffset=119.4*(1-Math.min(1,l/betMs));$('cd').className='cd show'+(sec<=3?' hot':sec<=5?' warn':'');
+ // প্রতিবেটে 50/200 জন বেট ধরছে এমন ডায়নামিক অগ্রগতি (লাইভ ইউজারদের মতো আচরণ)
+ const progress=Math.min(1,Math.max(0,1-(l/betMs)));
+ const targetSoFar=Math.floor(simTargetPlayers*Math.pow(progress,0.82));
+ const curT=simCurD+simCurS+simCurU;
+ if(targetSoFar>curT){
+  const diff=targetSoFar-curT;
+  const aD=Math.round(diff*simSplit.d), aS=Math.round(diff*simSplit.s), aU=diff-aD-aS;
+  simCurD+=aD; simCurS+=aS; simCurU+=Math.max(0,aU);
+  simCurPool+=diff*(simPoolPerPlayer+Math.floor((Math.random()-.5)*50));
+  live.d=simCurD; live.s=simCurS; live.u=simCurU; live.pool=simCurPool;
+  drawSide(); drawPct();
+ }
  if(l<=0){$('cd').className='cd';$('status').textContent='বেট বন্ধ…';lock(true)}},100)}
 function startBetting(s){phase='bet';round=s.round;bets={};stack=[];extra=s.extra||{};
+ resetSimRound();
+ live.d=simCurD; live.s=simCurS; live.u=simCurU; live.pool=simCurPool;
  $('res').className='res';$('rnd').textContent=round;Q('.win').forEach(e=>e.classList.remove('win'));$('grp').classList.remove('lift');lock(false);setExtraUI();
  if(s.me&&s.me.bets&&Object.keys(s.me.bets).length){bets={...s.me.bets};stack=Object.entries(bets)}
- render();runTick();
+ render();runTick();drawSide();drawPct();
  if(auto&&last&&!sum(bets))setTimeout(()=>{if(phase==='bet')placeMany(last,true)},200)}
 function doRoll(s){phase='roll';round=s.round;clearInterval(tick);lock(true);$('cd').className='cd';$('tray').classList.remove('show');if(sum(bets))last={...bets};
  const[a,b]=s.dice,g=$('grp'),lateMs=s.endsAt-now();$('status').textContent='ডাইস গড়াচ্ছে…';
@@ -637,6 +697,11 @@ function doResult(s,wasRoll){phase='result';round=s.round;clearInterval(tick);lo
  const R=$('res');R.innerHTML=`<b>${sm}</b><span>${kd==='down'?'7 DOWN':kd==='up'?'7 UP':'LUCKY 7'}</span>`;R.className='res show '+kd;
  $('status').textContent=`${sm} · ${kd==='down'?'7 DOWN':kd==='up'?'7 UP':'LUCKY 7'}`;
  Q(`[data-k="${kd}"],[data-k="n${sm}"]`).forEach(e=>e.classList.add('win'));
+ // রাউন্ড শেষে নতুন র‍্যান্ডম 2k, 5k, 10k লাস্ট উইন অ্যাড হবে
+ live.win.unshift(genWinItem());
+ if(Math.random()>0.45) live.win.unshift(genWinItem());
+ if(live.win.length>5) live.win.length=5;
+ drawSide();
  const m=s.me&&s.me.last;
  if(m&&m.round===s.round){const net=Math.round((m.ret-m.stake)*100)/100;
   if(net>0){toast('+৳'+fmtB(net)+' জিতেছেন');winSnd();burst()}else if(m.stake){toast('এবার হেরেছেন');beep(180,.35,'sawtooth',.05)}}
@@ -648,7 +713,20 @@ function applyState(s,force){
  MIN=s.min||MIN;MAX=s.max||MAX;betMs=s.betMs||betMs;
  const iu=document.querySelector('.info u'),is=document.querySelector('.info s');if(iu)iu.textContent=MIN;if(is)is.textContent=MAX;
  if(s.hist){H=s.hist;histV=s.hv;drawHist()}
- live.on=s.online||0;live.d=s.stats.d;live.s=s.stats.s;live.u=s.stats.u;live.pool=s.stats.pool;live.win=s.winners||[];
+ // অনলাইন প্লেয়ার ৫০-২৫০+ র্যান্ডম ও অ্যাক্টিভ সিমুলেশন + সার্ভার ডেটা সমন্বয়
+ live.on=Math.max(simOnline,s.online||0);
+ if(s.stats&&s.stats.pool>0){
+  live.d=Math.max(s.stats.d,simCurD);
+  live.s=Math.max(s.stats.s,simCurS);
+  live.u=Math.max(s.stats.u,simCurU);
+  live.pool=Math.max(s.stats.pool,simCurPool);
+ }else{
+  live.d=simCurD;
+  live.s=simCurS;
+  live.u=simCurU;
+  live.pool=simCurPool;
+ }
+ if(s.winners&&s.winners.length>0){live.win=s.winners}
  endsAt=s.endsAt;gotState=true;ready();
  if(s.authErr==='BAD_TOKEN')refreshToken();
  const changed=s.round!==round||s.phase!==phase;
