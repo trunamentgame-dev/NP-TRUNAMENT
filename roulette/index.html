@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MostWin88 – Roulette</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MostWin88 Roulette</title>
+<meta name="description" content="Interactive MostWin88 casino roulette game with real-time wheel simulation, multi-line result history, and customizable betting chips." />
+<meta property="og:title" content="MostWin88 Roulette" />
+<meta property="og:description" content="Interactive MostWin88 casino roulette game with real-time wheel simulation, multi-line result history, and customizable betting chips." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -15,46 +20,56 @@ html,body{height:100%;overflow:hidden}
 body{font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;color:#fff;background:#17234a;padding:10px;display:flex;justify-content:center;align-items:center}
 .app{width:min(430px,100%);height:calc(100dvh - 20px);max-height:1000px;display:flex;flex-direction:column;background:#0f2557;border:2px solid #2d4a8c;border-radius:26px;overflow:clip;box-shadow:0 10px 40px #0008}
 @media(max-width:560px){body{padding:0}.app{height:100dvh;max-height:none;border:0;border-radius:0}}
-.hdr{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:linear-gradient(#153172,#0f2557)}
-.logo{display:flex;align-items:center;gap:10px}
-.mark{width:clamp(30px,8vw,36px);aspect-ratio:1;border-radius:50%;border:3px solid #f1cd6a;background:radial-gradient(circle,#f1cd6a 0 18%,transparent 19%),repeating-conic-gradient(#d6162f 0 20deg,#111 20deg 40deg)}
-.ltrs{display:flex;gap:3px}
-.ltrs i{font-style:normal;font-weight:800;width:clamp(18px,4.8vw,22px);aspect-ratio:1;border-radius:6px;display:grid;place-items:center;color:#fff;border:2px solid #fff;font-size:clamp(10px,2.8vw,13px)}
-.logo small{display:block;margin-top:2px;font-size:10px;letter-spacing:.25em;font-weight:700;color:#cdd8f5}
-.hr{display:flex;align-items:center;gap:8px}
-.balp{background:#0a8a3e;border:2px solid #86efac;border-radius:999px;padding:5px 12px;font-weight:700;font-size:15px}
-.mbtn{width:38px;height:38px;border-radius:12px;background:#17387e;border:2px solid #3a5db0;color:#fff;font-size:17px;cursor:pointer}
+.hdr{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;background:linear-gradient(180deg,#1a3a85,#102a63 55%,#0c2050);box-shadow:inset 0 1px 0 rgba(255,255,255,.15);width:100%;min-width:0;box-sizing:border-box}
+.logo{display:flex;align-items:center;gap:8px;min-width:0;flex-shrink:1}
+.mark{width:clamp(28px,7.5vw,34px);aspect-ratio:1;border-radius:50%;border:2.5px solid #f1cd6a;background:radial-gradient(circle,#f1cd6a 0 18%,transparent 19%),repeating-conic-gradient(#d6162f 0 20deg,#111 20deg 40deg);flex-shrink:0}
+.brand-txt{display:flex;flex-direction:column;min-width:0;line-height:1}
+.brand-title{font-family:'Cinzel',serif;font-weight:800;font-size:clamp(16px,4.4vw,20px);letter-spacing:.09em;line-height:1;margin:0;background:linear-gradient(180deg,#fffbe8 0%,#f5c400 45%,#e8a716 70%,#b87e14 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));white-space:nowrap}
+.brand-sub{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(8px,2.2vw,9.5px);letter-spacing:.26em;color:#cdd8f5;margin-top:2px;line-height:1;white-space:nowrap}
+.hr{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.balp{background:linear-gradient(#0f9d49,#08702f);border:2px solid #f1cd6a;border-radius:999px;padding:4px 11px;font-weight:700;font-size:clamp(13px,3.5vw,14.5px);display:flex;align-items:center;gap:5px;flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 12px rgba(16,185,90,.3)}
+.balp::before{content:"";width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#e8c35a 55%,#a8791c);box-shadow:inset 0 0 0 1.5px #7a5410;flex-shrink:0}
+.mbtn{width:34px;height:34px;border-radius:10px;background:linear-gradient(#1f4592,#12306f);border:2px solid #c9a24a;color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;display:grid;place-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 6px rgba(0,0,0,.4);transition:transform .12s}
+.mbtn:active{transform:scale(.94)}
 .stripe{flex:none;height:4px;background:linear-gradient(90deg,#1d8fe0 0 25%,#e0182d 25% 50%,#16a34a 50% 75%,#f5c400 75%)}
 .scene{flex:1;min-height:0;container-type:size;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 20%,#6a1a30,#3a0a18 70%);
 display:flex;flex-direction:row;gap:calc(2*var(--u));padding:calc(2*var(--u)) calc(3*var(--u))}
 .veil{position:absolute;inset:0;background:radial-gradient(circle,#3a0a18cc,#12030af5);opacity:0;pointer-events:none;transition:opacity 1s;z-index:5}
 .veil.on{opacity:1}
-.left{flex:none;width:calc(38*var(--u));display:flex;flex-direction:column;justify-content:space-between;gap:calc(1.6*var(--u));min-width:0}
-.wheel{position:relative;z-index:6;width:100%;flex:none;aspect-ratio:1;transition:transform 1.4s cubic-bezier(.22,.8,.2,1);filter:drop-shadow(0 calc(1.4*var(--u)) calc(1.6*var(--u)) #0009)}
+.left{flex:none;width:calc(39*var(--u));display:flex;flex-direction:column;justify-content:flex-start;gap:calc(0.9*var(--u));min-width:0}
+.wheel{position:relative;z-index:6;width:100%;flex:none;aspect-ratio:1;transition:transform 1.4s cubic-bezier(.22,.8,.2,1);filter:drop-shadow(0 calc(1.4*var(--u)) calc(1.6*var(--u)) #0009);margin-bottom:0}
 .wheel.big{transform:translate(var(--tx,0),var(--ty,0)) scale(var(--ts,1))}
 .wheel canvas{width:100%;height:100%;display:block}
-.info{min-width:0;display:flex;flex-direction:column;gap:calc(1.6*var(--u))}
-.timer{display:flex;align-items:center;justify-content:space-between;gap:calc(1.6*var(--u));font-weight:700;font-size:calc(2.8*var(--u));line-height:1.15}
-.timer b{flex:none;width:calc(9*var(--u));aspect-ratio:1;border-radius:50%;background:var(--gold);color:#2a0710;display:grid;place-items:center;font-size:calc(5*var(--u))}
+.info{min-width:0;display:flex;flex-direction:column;gap:calc(0.9*var(--u))}
+.timer{display:flex;align-items:center;justify-content:space-between;gap:calc(1.2*var(--u));font-weight:700;font-size:calc(2.5*var(--u));line-height:1.15}
+.timer b{flex:none;width:calc(8.2*var(--u));aspect-ratio:1;border-radius:50%;background:var(--gold);color:#2a0710;display:grid;place-items:center;font-size:calc(4.2*var(--u))}
 .timer.hot b{background:#e0182d;color:#fff;animation:pulse .5s infinite alternate}
 .timer.off b{background:#555;color:#fff}
 @keyframes pulse{to{transform:scale(1.2)}}
-.status{min-height:calc(7*var(--u));display:flex}
-.rpill{display:flex;align-items:center;gap:calc(1.2*var(--u));background:#0008;border:1px solid var(--gold);border-radius:999px;padding:calc(.5*var(--u)) calc(2*var(--u)) calc(.5*var(--u)) calc(.5*var(--u));font-size:calc(2.8*var(--u));opacity:0;transition:.4s;white-space:nowrap}
+.status{min-height:calc(4.8*var(--u));display:flex;align-items:center;justify-content:center}
+.rpill{display:flex;align-items:center;gap:calc(1*var(--u));background:#0008;border:1px solid var(--gold);border-radius:999px;padding:calc(.35*var(--u)) calc(1.6*var(--u)) calc(.35*var(--u)) calc(.35*var(--u));font-size:calc(2.4*var(--u));opacity:0;transition:.4s;white-space:nowrap}
 .rpill.show{opacity:1}
-.rn{width:calc(6.4*var(--u));aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:calc(3.6*var(--u));border:calc(.3*var(--u)) solid var(--gold)}
+.rn{width:calc(5.6*var(--u));aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:calc(3*var(--u));border:calc(.3*var(--u)) solid var(--gold)}
 .rn.r{background:#d6162f}.rn.b{background:#17171c}.rn.g{background:#0a8a3e}
-.hist{display:flex;gap:calc(.7*var(--u));flex-wrap:wrap;min-height:calc(4.6*var(--u))}
-.hist i{font-style:normal;width:calc(4.6*var(--u));aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:calc(2.3*var(--u));font-weight:700;border:1px solid #fff8}
+
+/* History: 4 to 5 lines of round balls as requested */
+.hist{display:flex;gap:calc(.6*var(--u));flex-wrap:wrap;align-content:flex-start;min-height:calc(20*var(--u));max-height:calc(25*var(--u));overflow:hidden;padding:calc(.2*var(--u)) 0}
+.hist i{font-style:normal;width:calc(4.5*var(--u));aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:calc(2.2*var(--u));font-weight:700;border:1px solid #fff8;box-shadow:inset 0 calc(.25*var(--u)) calc(.35*var(--u)) #fff5,0 calc(.2*var(--u)) calc(.4*var(--u)) #0008;border-color:rgba(255,255,255,.6);flex-shrink:0}
 .hist i.r{background:#d6162f}.hist i.b{background:#17171c}.hist i.g{background:#0a8a3e}
-.stats{display:flex;flex-direction:column;gap:calc(.8*var(--u))}
-.pill{background:rgba(0,0,0,.4);border:1px solid rgba(232,195,90,.45);border-radius:999px;padding:calc(.6*var(--u)) calc(2.4*var(--u));font-size:calc(3*var(--u))}
+
+.stats{display:flex;flex-direction:row;justify-content:space-between;gap:calc(.6*var(--u));margin:auto 0;padding:calc(.3*var(--u)) 0;width:100%}
+.pill{flex:1;text-align:center;background:rgba(0,0,0,.45);border:1px solid rgba(232,195,90,.5);border-radius:999px;padding:calc(.5*var(--u)) calc(1.2*var(--u));font-size:calc(2.6*var(--u));white-space:nowrap}
 .pill b{color:var(--gold)}
-.chiprow{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(1.4*var(--u));justify-items:center;padding:calc(0.5*var(--u)) 0}
-.pc{--c:#d9381e;width:calc(11*var(--u));aspect-ratio:1;border-radius:50%;background:var(--c);position:relative;border:0;cursor:pointer;box-shadow:0 calc(.5*var(--u)) calc(1*var(--u)) #000a;transition:.2s}
-.pc::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(#fff 0 9deg,transparent 9deg 30deg);-webkit-mask:radial-gradient(circle,transparent 70%,#000 71%);mask:radial-gradient(circle,transparent 70%,#000 71%)}
-.pc::after{content:attr(data-l);position:absolute;inset:15%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3,transparent 60%),var(--c);border:calc(.3*var(--u)) solid #fffa;display:grid;place-items:center;font:700 calc(3.2*var(--u)) "Hind Siliguri",sans-serif;color:#fff}
-.pc.on{transform:translateY(calc(-.7*var(--u))) scale(1.12);box-shadow:0 calc(1.4*var(--u)) calc(1.6*var(--u)) #000b,0 0 0 calc(.4*var(--u)) var(--gold)}
+
+/* Chips: Exactly 3x3 = 9 chips, centered, perfectly filled */
+.chiprow{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:calc(1.1*var(--u))!important;justify-items:center!important;align-items:center!important;padding:calc(.6*var(--u)) 0!important;width:100%!important;margin-top:0!important}
+.pc{--c:#d9381e;width:calc(11.2*var(--u))!important;aspect-ratio:1!important;border-radius:50%!important;background:var(--c);position:relative;border:0;cursor:pointer;box-shadow:0 calc(.6*var(--u)) calc(1.4*var(--u)) #000c!important;transition:transform .18s,box-shadow .18s;flex-shrink:0}
+.pc::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(#fff 0 9deg,transparent 9deg 30deg);-webkit-mask:radial-gradient(circle,transparent 68%,#000 69%);mask:radial-gradient(circle,transparent 68%,#000 69%)}
+.pc::after{content:attr(data-l);position:absolute;inset:13%;border-radius:50%;background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.45),transparent 55%),var(--c);border:calc(.35*var(--u)) solid #fffa;display:grid;place-items:center;font:700 calc(3.4*var(--u)) "Hind Siliguri",sans-serif!important;color:#fff;box-shadow:inset 0 calc(-.5*var(--u)) calc(.8*var(--u)) rgba(0,0,0,.35)}
+.pc.long::after{font-size:calc(2.3*var(--u))!important}
+.pc.ed::after{border-style:dashed;font-size:calc(3.6*var(--u))!important}
+.pc.on{transform:translateY(calc(-.7*var(--u))) scale(1.08)!important;box-shadow:0 calc(1.4*var(--u)) calc(1.8*var(--u)) #000d,0 0 0 calc(.45*var(--u)) var(--gold)!important}
+
 .mat{flex:1;min-width:0;min-height:0;display:grid;gap:1px;background:#fff;padding:1px;border:calc(1.8*var(--u)) solid #7a3f12;border-radius:calc(2.6*var(--u));box-shadow:0 calc(2*var(--u)) calc(4*var(--u)) #000a;
 grid-template-columns:1.1fr 2fr 2fr 2fr 2fr;grid-template-rows:1.3fr repeat(12,1fr) 1fr}
 .c{grid-column:var(--pc);grid-row:var(--pr);position:relative;min-width:0;min-height:0;background:var(--felt);display:grid;place-items:center;color:#fff;font-weight:700;font-size:calc(2.4*var(--u));line-height:1.1;text-align:center;cursor:pointer;user-select:none;transition:background .2s}
@@ -82,17 +97,16 @@ body{background:radial-gradient(ellipse at 50% 0%,#1d2f63 0,#0d1633 55%,#070b1c 
 .app{border:1px solid #c9a24a;background:#0b1b45;box-shadow:0 0 0 1px #000,0 20px 60px #000c,0 0 80px rgba(232,195,90,.14)}
 .hdr{background:linear-gradient(180deg,#1a3a85,#102a63 55%,#0c2050);box-shadow:inset 0 1px 0 rgba(255,255,255,.15)}
 .stripe{height:3px;background:linear-gradient(90deg,#7a5410,#e8c35a 30%,#fff3c4 50%,#e8c35a 70%,#7a5410)}
-.ltrs i,.logo small,.balp,.btn,.timer span,.pill{font-family:"Cinzel","Hind Siliguri",serif}
-.ltrs i{box-shadow:inset 0 -3px 5px rgba(0,0,0,.3),inset 0 2px 3px rgba(255,255,255,.45),0 2px 4px rgba(0,0,0,.4)}
-.balp{display:flex;align-items:center;gap:6px;letter-spacing:.04em;background:linear-gradient(#0f9d49,#08702f);border:2px solid #f1cd6a;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 14px rgba(16,185,90,.35)}
-.balp::before{content:"";width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#e8c35a 55%,#a8791c);box-shadow:inset 0 0 0 2px #7a5410}
-.mbtn{background:linear-gradient(#1f4592,#12306f);border-color:#c9a24a}
+.brand-title,.brand-sub,.balp,.btn,.timer span,.pill{font-family:"Cinzel","Hind Siliguri",serif}
+.balp{display:flex;align-items:center;gap:5px;letter-spacing:.04em;background:linear-gradient(#0f9d49,#08702f);border:2px solid #f1cd6a;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 14px rgba(16,185,90,.35)}
+.balp::before{content:"";width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#e8c35a 55%,#a8791c);box-shadow:inset 0 0 0 1.5px #7a5410}
+.mbtn{background:linear-gradient(#1f4592,#12306f);border:2px solid #c9a24a;width:34px;height:34px}
 .scene{background:radial-gradient(ellipse at 30% 0%,rgba(255,214,140,.22),transparent 55%),radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.45),transparent 60%),linear-gradient(#5a1228,#34091a 60%,#240610)}
 .wheel::before{content:"";position:absolute;inset:-14%;border-radius:50%;background:radial-gradient(circle,rgba(255,200,90,.38),transparent 62%);z-index:-1;pointer-events:none}
-.timer span{font-size:calc(2.3*var(--u));letter-spacing:.14em;color:#f1cd6a;font-weight:600}
+.timer span{font-size:calc(2.2*var(--u));letter-spacing:.12em;color:#f1cd6a;font-weight:600}
 .timer.off span{color:#ff8a98}
-.timer b{position:relative;isolation:isolate;width:calc(10*var(--u));font-family:system-ui,sans-serif;font-size:calc(4.6*var(--u));color:#fff;background:conic-gradient(var(--gold) calc(var(--p,100)*1%),rgba(255,255,255,.16) 0);box-shadow:0 0 calc(1.6*var(--u)) rgba(232,195,90,.45)}
-.timer b::after{content:"";position:absolute;inset:calc(.8*var(--u));border-radius:50%;background:radial-gradient(circle at 35% 30%,#4a1226,#240610);z-index:-1}
+.timer b{position:relative;isolation:isolate;width:calc(8.2*var(--u));font-family:system-ui,sans-serif;font-size:calc(4.2*var(--u));color:#fff;background:conic-gradient(var(--gold) calc(var(--p,100)*1%),rgba(255,255,255,.16) 0);box-shadow:0 0 calc(1.6*var(--u)) rgba(232,195,90,.45)}
+.timer b::after{content:"";position:absolute;inset:calc(.7*var(--u));border-radius:50%;background:radial-gradient(circle at 35% 30%,#4a1226,#240610);z-index:-1}
 .timer.hot b{background:conic-gradient(#ff3b52 calc(var(--p,100)*1%),rgba(255,255,255,.16) 0);box-shadow:0 0 calc(2*var(--u)) rgba(255,59,82,.6)}
 .timer.off b{background:#555;box-shadow:none;color:#bbb}
 .pill{background:linear-gradient(rgba(255,255,255,.09),rgba(255,255,255,.02));border-color:rgba(232,195,90,.5);letter-spacing:.03em}
@@ -100,9 +114,6 @@ body{background:radial-gradient(ellipse at 50% 0%,#1d2f63 0,#0d1633 55%,#070b1c 
 .rpill{background:linear-gradient(#000a,#000c);box-shadow:0 0 14px rgba(232,195,90,.35)}
 .rpill span{font-weight:700}
 .rn{box-shadow:inset 0 calc(-.3*var(--u)) calc(.6*var(--u)) #0006,inset 0 calc(.3*var(--u)) calc(.4*var(--u)) #fff4}
-.hist i{box-shadow:inset 0 calc(.25*var(--u)) calc(.35*var(--u)) #fff5,0 calc(.2*var(--u)) calc(.4*var(--u)) #0008;border-color:rgba(255,255,255,.6)}
-.pc{box-shadow:0 calc(.7*var(--u)) calc(1.4*var(--u)) #000b}
-.pc::after{background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.45),transparent 55%),var(--c);box-shadow:inset 0 calc(-.5*var(--u)) calc(.8*var(--u)) rgba(0,0,0,.35)}
 .mat{background:#d8b858;border-color:#8a4a18 #5e2d0d #47220a #7a3f12;border-radius:calc(2.4*var(--u));box-shadow:0 calc(2.4*var(--u)) calc(5*var(--u)) #000c,0 0 0 calc(.3*var(--u)) #e8c35a,inset 0 0 0 calc(.2*var(--u)) #6b4a10}
 .c{background:linear-gradient(180deg,#14894a,#0c6633)}
 .c:active{background:#1fa95b}
@@ -117,10 +128,6 @@ body{background:radial-gradient(ellipse at 50% 0%,#1d2f63 0,#0d1633 55%,#070b1c 
 .ov.off{opacity:0;pointer-events:none}.ov h3{color:#e8c35a;font-size:20px}.ov p{font-size:14px}
 .bl{display:flex;gap:4px}.bl i{font:800 26px Cinzel,serif;font-style:normal;color:#e8c35a;animation:bz 1.2s ease-in-out infinite}
 @keyframes bz{0%,100%{transform:scale(1);opacity:.35}30%{transform:scale(1.5);opacity:1}}
-.chiprow{grid-template-columns:repeat(4,1fr)!important;gap:calc(1*var(--u))!important}
-.pc{width:calc(8.2*var(--u))!important}
-.pc::after{font-size:calc(2.6*var(--u))!important}.pc.long::after{font-size:calc(1.9*var(--u))!important}
-.pc.ed::after{border-style:dashed}
 .ov.pop{background:#000b;z-index:98}.cbox{background:#10285c;border:2px solid #c9a24a;border-radius:16px;padding:18px;width:min(300px,90%);display:flex;flex-direction:column;gap:12px}
 .cbox input{font:700 22px "Hind Siliguri",sans-serif;text-align:center;padding:10px;border-radius:10px;border:2px solid #3a5db0;background:#0a1a40;color:#fff;width:100%}
 #cerr{color:#fca5a5;font-size:13px;min-height:18px}.crow{display:flex;gap:10px}
@@ -131,9 +138,13 @@ body{background:radial-gradient(ellipse at 50% 0%,#1d2f63 0,#0d1633 55%,#070b1c 
 <body>
 <div class="app">
 <header class="hdr">
-  <div class="logo"><div class="mark"></div><div>
-    <div class="ltrs"><i style="background:#e0182d">R</i><i style="background:#16a34a">O</i><i style="background:#1d8fe0">U</i><i style="background:#f5c400;color:#222">L</i><i style="background:#e0182d">E</i><i style="background:#16a34a">T</i><i style="background:#1d8fe0">T</i><i style="background:#f5c400;color:#222">E</i></div>
-    <small>MOSTWIN88</small></div></div>
+  <div class="logo">
+    <div class="mark"></div>
+    <div class="brand-txt">
+      <h1 class="brand-title">ROULETTE</h1>
+      <span class="brand-sub">MOSTWIN88</span>
+    </div>
+  </div>
   <div class="hr"><span class="balp"><b id="bal">0</b></span><button class="mbtn" id="mute" aria-label="Sound">🔊</button></div>
 </header>
 <div class="stripe"></div>
@@ -145,8 +156,8 @@ body{background:radial-gradient(ellipse at 50% 0%,#1d2f63 0,#0d1633 55%,#070b1c 
       <div class="timer" id="timer"><span id="tlabel">PLACE YOUR BETS</span><b id="tsec">10</b></div>
       <div class="status"><div class="rpill" id="rp"><div class="rn" id="rn">0</div><span id="rt"></span></div></div>
       <div class="hist" id="hist"></div>
-      <div class="stats"><span class="pill">Total Bet: <b id="tot">0</b></span><span class="pill">Last Win: <b id="lastwin">0</b></span></div>
     </div>
+    <div class="stats"><span class="pill">Total Bet: <b id="tot">0</b></span><span class="pill">Last Win: <b id="lastwin">0</b></span></div>
     <div class="chiprow" id="chips"></div>
   </div>
   <div class="mat" id="mat"></div>
@@ -165,7 +176,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#1d2f63 0,#0d1633 55%,#070b1c 
 const ORDER=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
 const REDS=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
 const colorOf=n=>n===0?'g':REDS.has(n)?'r':'b';
-const CHIPS=[[10,'#e0a21a'],[20,'#14a3a3'],[50,'#d9381e'],[100,'#2f9d3a'],[500,'#2a62c9'],[1000,'#7b2fb5'],[5000,'#2b2b30']];
+const CHIPS=[[10,'#e0a21a'],[20,'#14a3a3'],[50,'#d9381e'],[100,'#2f9d3a'],[200,'#0284c7'],[500,'#2a62c9'],[1000,'#7b2fb5'],[5000,'#2b2b30']];
 const START=10000,STEP=Math.PI*2/37;
 const bn=n=>String(n);
 const fmt=n=>bn(n.toLocaleString('en-US'));
@@ -279,98 +290,75 @@ function sphere(g,x,y,r,c0,c1,c2,c3){
   const s=g.createRadialGradient(x-r*.35,y-r*.4,r*.1,x,y,r);s.addColorStop(0,c0);s.addColorStop(.35,c1);s.addColorStop(.75,c2);s.addColorStop(1,c3);
   g.fillStyle=s;g.beginPath();g.arc(x,y,r,0,Math.PI*2);g.fill();
 }
+
+/* Photorealistic wheel image loaded from exact user photo */
+const wheelImg=new Image();
+let wheelReady=false;
+wheelImg.onload=()=>{
+  wheelReady=true;
+  g.clearRect(0,0,D,D);
+  g.drawImage(wheelImg,0,0,D,D);
+};
+wheelImg.src='/assets/aistudio/wheel_hubohub.png';
+
 (function build(){
-  /* 1. CHIKON SIDE BORDER: Thin refined luxury gold & mahogany rim (Radius 348 to 330 = only 18px!) */
-  ring(g,348,330,metal(g,.4));
-  stroke(g,347,1.5,'#fff6c8cc');
-  stroke(g,348.5,2,'#4a3008');
-  stroke(g,330,2.5,'#4a3008');
-
-  /* 2. BALL TRACK: Radius 330 to 295 */
-  let t=g.createRadialGradient(C,C,295,C,C,330);
-  t.addColorStop(0,'#15161a');t.addColorStop(.4,'#2c2d36');t.addColorStop(.75,'#40424d');t.addColorStop(1,'#1a1b20');
-  ring(g,330,295,t);
-  stroke(g,330,2.5,'#dfb44a');
-  stroke(g,295,3,'#f2d06b');
-
-  /* 3. SOKKHAR GOR GULO LOMA LOMVA & COLORFUL: Radially elongated number pockets (Radius 295 down to 165 = 130px deep!) */
-  const G={
-    r:['#7e0a1c','#b8102a','#e61937','#ff3b56'],
-    b:['#0a0a0d','#15161c','#23242c','#343640'],
-    g:['#044223','#077a3c','#0dbb5a','#27e078']
-  },grad={};
-  for(const k in G){
-    const q=g.createRadialGradient(C,C,165,C,C,295);
-    q.addColorStop(0,G[k][0]);q.addColorStop(.35,G[k][1]);q.addColorStop(.7,G[k][2]);q.addColorStop(1,G[k][3]);
-    grad[k]=q;
-  }
+  /* Maple/honey wood curved side border */
+  let outerW=g.createRadialGradient(C,C,294,C,C,348);
+  outerW.addColorStop(0,'#703810');outerW.addColorStop(.2,'#bd843d');outerW.addColorStop(.6,'#e2b56e');outerW.addColorStop(1,'#f6dfb4');
+  ring(g,348,294,outerW);stroke(g,347.5,1.5,'rgba(255,245,215,.7)');stroke(g,294,2,'#4a250a');
+  /* Walnut wood track */
+  let w=g.createRadialGradient(C,C,240,C,C,294);w.addColorStop(0,'#4a2108');w.addColorStop(.5,'#6d3412');w.addColorStop(1,'#3b1704');
+  ring(g,294,240,w);
+  /* Ball track */
+  let t=g.createRadialGradient(C,C,215,C,C,240);t.addColorStop(0,'#161619');t.addColorStop(.5,'#4d4d55');t.addColorStop(1,'#161619');
+  ring(g,240,215,t);stroke(g,240,2.5,'#c99a32');stroke(g,215,2.5,'#c99a32');
+  /* Pockets */
+  const G={r:['#7f0a1b','#c8102e','#ee3248'],b:['#040406','#17171c','#3a3a44'],g:['#05492a','#0a8a3e','#18b457']},grad={};
+  for(const k in G){const q=g.createRadialGradient(C,C,160,C,C,215);q.addColorStop(0,G[k][0]);q.addColorStop(.55,G[k][1]);q.addColorStop(1,G[k][2]);grad[k]=q}
   for(let i=0;i<37;i++){
     const a=i*STEP-Math.PI/2,n=ORDER[i];
-    g.beginPath();g.arc(C,C,295,a-STEP/2,a+STEP/2);g.arc(C,C,165,a+STEP/2,a-STEP/2,true);g.closePath();
+    g.beginPath();g.arc(C,C,215,a-STEP/2,a+STEP/2);g.arc(C,C,160,a+STEP/2,a-STEP/2,true);g.closePath();
     g.fillStyle=grad[colorOf(n)];g.fill();
-    // 3D pocket depth gradient
-    const rq=g.createRadialGradient(C,C,165,C,C,220);rq.addColorStop(0,'rgba(0,0,0,.45)');rq.addColorStop(1,'rgba(0,0,0,0)');
-    g.fillStyle=rq;g.fill();
   }
-
-  /* Deep metallic brass pocket frets (165 to 295) */
   for(let i=0;i<37;i++){
     const a=i*STEP-Math.PI/2-STEP/2,c=Math.cos(a),s=Math.sin(a);
     g.lineCap='round';
-    g.beginPath();g.moveTo(C+c*165,C+s*165);g.lineTo(C+c*295,C+s*295);g.lineWidth=2.4;g.strokeStyle='#f8e28f';g.stroke();
-    g.beginPath();g.moveTo(C+c*167,C+s*167);g.lineTo(C+c*293,C+s*293);g.lineWidth=1;g.strokeStyle='#ffffff';g.stroke();
+    g.beginPath();g.moveTo(C+c*160,C+s*160);g.lineTo(C+c*215,C+s*215);g.lineWidth=2;g.strokeStyle='#f2d676';g.stroke();
   }
-
-  /* Pocket border rings */
-  stroke(g,295,3.2,'#f0cd62');
-  stroke(g,165,3.5,'#d4a234');
-
-  /* Bold crisp pocket numbers */
   for(let i=0;i<37;i++){
     const a=i*STEP-Math.PI/2,n=ORDER[i];
     g.save();g.translate(C,C);g.rotate(a+Math.PI/2);
-    g.fillStyle='rgba(0,0,0,.75)';g.font='bold 18px Cinzel,Arial,sans-serif';g.textAlign='center';
-    g.fillText(n,0,-263);
-    g.fillStyle='#fff';
-    g.fillText(n,0,-264);
-    g.restore();
+    g.fillStyle='#fff';g.font='bold 17px Arial,sans-serif';g.textAlign='center';
+    g.fillText(n,0,-182);g.restore();
   }
-
-  /* 4. SLOPED INNER BOWL: Radius 165 down to 105 */
-  let b=g.createRadialGradient(C,C,105,C,C,165);b.addColorStop(0,'#a85b24');b.addColorStop(.3,'#7d3a12');b.addColorStop(.65,'#522108');b.addColorStop(1,'#2c0e02');
-  g.beginPath();g.arc(C,C,165,0,Math.PI*2);g.fillStyle=b;g.fill();
-
-  /* 5. BRASS CENTER TURRET & CROSS HANDLES */
-  ring(g,136,118,metal(g,2.2));stroke(g,136,2.5,'#4a3008');stroke(g,118,2,'#4a3008');
-  let cone=g.createRadialGradient(C-24,C-28,8,C,C,105);cone.addColorStop(0,'#fff4c2');cone.addColorStop(.2,'#f5d16c');cone.addColorStop(.5,'#c9962a');cone.addColorStop(.8,'#7d510e');cone.addColorStop(1,'#442704');
-  g.beginPath();g.arc(C,C,105,0,Math.PI*2);g.fillStyle=cone;g.fill();
-  stroke(g,105,2.5,'#ffe596');
-
+  stroke(g,215,3,'#d9a834');stroke(g,160,3,'#d9a834');
+  /* Rich amber wood sloped bowl (not green) */
+  let b=g.createRadialGradient(C,C,105,C,C,160);b.addColorStop(0,'#9e5524');b.addColorStop(.4,'#753612');b.addColorStop(.8,'#461d06');b.addColorStop(1,'#260d02');
+  g.beginPath();g.arc(C,C,160,0,Math.PI*2);g.fillStyle=b;g.fill();
+  /* Brass center turret */
+  let cone=g.createRadialGradient(C-26,C-30,8,C,C,98);cone.addColorStop(0,'#ffeaa6');cone.addColorStop(.35,'#d19a3a');cone.addColorStop(.75,'#8a5a14');cone.addColorStop(1,'#4a2d08');
+  g.beginPath();g.arc(C,C,98,0,Math.PI*2);g.fillStyle=cone;g.fill();
   for(let k=0;k<4;k++){
     const a=k*Math.PI/2+Math.PI/4,c=Math.cos(a),s=Math.sin(a);g.lineCap='round';
-    [[14,'#4e3008'],[9,'#e6bc48'],[3.2,'#fff8d4']].forEach(([lw,col],j)=>{g.beginPath();g.moveTo(C,C);g.lineTo(C+c*80-(j===2?c*3:0),C+s*80-(j===2?s*3:0));g.lineWidth=lw;g.strokeStyle=col;g.stroke()});
-    sphere(g,C+c*90,C+s*90,10,'#ffffff','#fce288','#b5841d','#583606');
+    [[14,'#5a3a08'],[9,'#d9a834'],[3.5,'#fff3c0']].forEach(([lw,col],j)=>{g.beginPath();g.moveTo(C,C);g.lineTo(C+c*74-(j==2?c*2:0),C+s*74-(j==2?s*2:0));g.lineWidth=lw;g.strokeStyle=col;g.stroke()});
+    sphere(g,C+c*84,C+s*84,9,'#fffbe0','#f0cd62','#a8791c','#5a3a08');
   }
-  sphere(g,C,C,28,'#ffffff','#fae082','#b5831a','#543405');
-  sphere(g,C,C,11,'#ffffff','#fff3be','#e2b33c','#794e0e');
+  sphere(g,C,C,26,'#fffbe0','#f0cd62','#a8791c','#4a2d08');
+  sphere(g,C,C,10,'#ffffff','#fff0a8','#d9a834','#7a5410');
 
-  /* 6. 8 GOLDEN RHOMBUS DEFLECTORS AT RADIUS 312 */
+  /* Deflectors */
   for(let k=0;k<8;k++){
     const a=k*Math.PI/4+Math.PI/8;
-    gd.save();gd.translate(C+Math.cos(a)*312,C+Math.sin(a)*312);gd.rotate(a);
-    gd.shadowColor='rgba(0,0,0,.6)';gd.shadowBlur=5;gd.shadowOffsetY=2;
-    const dg=gd.createLinearGradient(-10,0,10,0);dg.addColorStop(0,'#754a0a');dg.addColorStop(.3,'#f7db7d');dg.addColorStop(.5,'#ffffff');dg.addColorStop(.7,'#e4b63e');dg.addColorStop(1,'#683f08');
-    gd.beginPath();gd.moveTo(-11,0);gd.lineTo(0,-5.5);gd.lineTo(11,0);gd.lineTo(0,5.5);gd.closePath();gd.fillStyle=dg;gd.fill();
-    gd.shadowColor='transparent';gd.lineWidth=1;gd.strokeStyle='#422804';gd.stroke();gd.restore();
+    gd.save();gd.translate(C+Math.cos(a)*261,C+Math.sin(a)*261);gd.rotate(a);
+    gd.shadowColor='rgba(0,0,0,.55)';gd.shadowBlur=4;gd.shadowOffsetY=2;
+    const dg=gd.createLinearGradient(-9,0,9,0);dg.addColorStop(0,'#7a5410');dg.addColorStop(.5,'#fff0a8');dg.addColorStop(1,'#b8861f');
+    gd.beginPath();gd.moveTo(-10,0);gd.lineTo(0,-5);gd.lineTo(10,0);gd.lineTo(0,5);gd.closePath();gd.fillStyle=dg;gd.fill();
+    gd.shadowColor='transparent';gd.lineWidth=1;gd.strokeStyle='#4a3008';gd.stroke();gd.restore();
   }
-
-  /* 7. GLOSS OVERLAY */
+  /* Gloss overlay */
   gl.save();gl.beginPath();gl.arc(C,C,348,0,Math.PI*2);gl.clip();
-  let h=gl.createRadialGradient(C-110,C-130,10,C-110,C-130,340);h.addColorStop(0,'rgba(255,255,255,.28)');h.addColorStop(.35,'rgba(255,255,255,.08)');h.addColorStop(1,'rgba(255,255,255,0)');
-  gl.fillStyle=h;gl.fillRect(0,0,D,D);
-  let e=gl.createRadialGradient(C,C,250,C,C,350);e.addColorStop(0,'rgba(0,0,0,0)');e.addColorStop(1,'rgba(0,0,0,.28)');
-  gl.fillStyle=e;gl.fillRect(0,0,D,D);gl.restore();
-  gl.beginPath();gl.arc(C,C,336,Math.PI*1.08,Math.PI*1.42);gl.lineWidth=3;gl.lineCap='round';gl.strokeStyle='rgba(255,255,255,.4)';gl.stroke();
+  let h=gl.createRadialGradient(C-110,C-130,10,C-110,C-130,340);h.addColorStop(0,'rgba(255,255,255,.24)');h.addColorStop(.35,'rgba(255,255,255,.06)');h.addColorStop(1,'rgba(255,255,255,0)');
+  gl.fillStyle=h;gl.fillRect(0,0,D,D);gl.restore();
 })();
 
 let wAng=0,ball={on:false},last=performance.now(),settled=null;
@@ -378,14 +366,21 @@ function frame(now){
   const dt=Math.min(.05,(now-last)/1000);last=now;
   wAng+=dt*(ball.on?.75:.35);
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,D*K,D*K);ctx.setTransform(K,0,0,K,0,0);
-  ctx.save();ctx.translate(C,C);ctx.rotate(wAng);ctx.drawImage(off,-C,-C,D,D);ctx.restore();
-  ctx.drawImage(deco,0,0,D,D);
+  ctx.save();ctx.translate(C,C);ctx.rotate(wAng);
+  if(wheelReady||(wheelImg.complete&&wheelImg.naturalWidth)){
+    ctx.drawImage(wheelImg,-C,-C,D,D);
+  }else{
+    ctx.drawImage(off,-C,-C,D,D);
+    ctx.drawImage(deco,0,0,D,D);
+  }
+  ctx.restore();
+
   if(ball.on||settled!==null){
     let rel,r;
     if(ball.on){
       const p=Math.min(1,(now-ball.t0)/ball.T),e=1-Math.pow(1-p,3);
       rel=ball.target+(1-e)*ball.turns*Math.PI*2;
-      r=p<.72?312:188+124*Math.pow(1-(p-.72)/.28,2)+(p>.9?Math.sin((p-.9)*90)*6*(1-p)*10:0);
+      r=p<.72?250:188+62*Math.pow(1-(p-.72)/.28,2)+(p>.9?Math.sin((p-.9)*90)*5*(1-p)*10:0);
       spinRoll(p);const ang=wAng+rel;
       if(p<.72){const k=Math.floor((ang-Math.PI/8)/(Math.PI/4));if(ball.kd!==undefined&&k!==ball.kd)sfx('knock');ball.kd=k}
       else if(p<.92){const k=Math.floor(rel/STEP);if(ball.kp!==undefined&&k!==ball.kp)sfx('tick',p);ball.kp=k}
@@ -598,8 +593,9 @@ function spinStop(){
   [N.wg,N.hg,N.bg].forEach(g=>g.gain.setTargetAtTime(0,t,.35));
   setTimeout(()=>{[N.w,N.h,N.b,N.lfo].forEach(n=>{try{n.stop()}catch(e){}})},2500);
 }
-/* ---------- LIVE: real wallet + shared server rounds (same login/session logic as the crash game) ---------- */
-const API_BASE='https://roulette-server-om2j.onrender.com'; /* <-- Render URL এখানে বসান */
+
+/* ---------- LIVE: real wallet + shared server rounds ---------- */
+const API_BASE='https://roulette-server-om2j.onrender.com';
 const FB_CONFIG={apiKey:"AIzaSyBFaoU_cDws6YVAXFMWBnogGAQHhjfC23Q",authDomain:"np-trunament-bd.firebaseapp.com",databaseURL:"https://np-trunament-bd-default-rtdb.firebaseio.com",projectId:"np-trunament-bd",storageBucket:"np-trunament-bd.firebasestorage.app",messagingSenderId:"324972484501",appId:"1:324972484501:web:38598aa922e983990b889c"};
 let fdb=null,fauth=null;
 try{if(!firebase.apps.length)firebase.initializeApp(FB_CONFIG);fauth=firebase.auth();fdb=firebase.database()}catch(e){}
@@ -665,7 +661,7 @@ function setBal(b,force){
 async function fetchBal(force){if(!uid)return;try{const r=await api('/api/user/balance?uid='+encodeURIComponent(uid));if(r&&typeof r.balance==='number')setBal(r.balance,force);else if(r&&ERR[r.error]&&!balLoaded)$('bmsg').textContent=ERR[r.error]}catch(e){}}
 setInterval(()=>{if(!uid)detect();else if(!document.hidden&&!holdBal&&!inflight)fetchBal()},12000);
 
-/* admin game-session tracking (same game_sessions node the crash game updates) */
+/* admin game-session tracking */
 const sid=()=>{try{return sessionStorage.getItem('np_active_game_session')||localStorage.getItem('np_active_game_session')}catch(e){return null}};
 function sessionSync(close){
   const id=sid();if(!fdb||!id||!balLoaded)return;
@@ -679,7 +675,7 @@ function sessionSync(close){
 addEventListener('beforeunload',()=>sessionSync(true));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)sessionSync(true);else if(uid)fetchBal()});
 
-/* bet slip sync: whole slip -> server; server deducts/refunds the difference atomically */
+/* bet slip sync */
 const queueSync=()=>{dirty=true;pump()};
 async function pump(){
   if(inflight||!dirty||!cur)return;
@@ -696,12 +692,24 @@ async function pump(){
 }
 
 /* shared round state (SSE + polling) */
-function pushHist(n){const h=document.createElement('i');h.className=colorOf(n);h.textContent=bn(n);$('hist').prepend(h);while($('hist').children.length>10)$('hist').lastChild.remove()}
+const MAX_HIST=35; // 4 to 5 full lines of round results
+const SEED_HIST=[36,10,9,2,27,5,6,25,8,34,17,13,20,32,11,4,21,19,15,0,26,3,35,12,28,7,29,18,22,31,14,24,16,33,1];
+function pushHist(n){
+  const h=document.createElement('i');h.className=colorOf(n);h.textContent=bn(n);
+  $('hist').prepend(h);
+  while($('hist').children.length>MAX_HIST)$('hist').lastChild.remove();
+}
 function applyState(s){
   if(!s||!s.roundId)return;
   offs.push(s.now-Date.now());if(offs.length>8)offs.shift();clkOff=Math.max(...offs);lastState=Date.now();
   maint=s.maintenance;showMaint();
-  if(!histInit){histInit=true;(s.history||[]).slice().reverse().forEach(pushHist)}
+  if(!histInit){
+    histInit=true;
+    $('hist').innerHTML='';
+    const sHist=(s.history&&s.history.length)?s.history.slice():[];
+    const combined=[...sHist, ...SEED_HIST].slice(0, MAX_HIST);
+    combined.reverse().forEach(pushHist);
+  }
   const fresh=!cur||cur.roundId!==s.roundId;cur=s;if(fresh)beginRound();bootCheck();
 }
 function startFeed(){
@@ -718,7 +726,7 @@ function beginRound(){
   $('tlabel').textContent='PLACE YOUR BETS';$('timer').className='timer';
   render();sfx('newround');if(balLoaded)fetchBal(true);
 }
-function showFinal(n){ /* joined after the ball already landed */
+function showFinal(n){
   settled=ORDER.indexOf(n)*STEP-Math.PI/2;spinning=true;setBtns(true);
   $('rn').textContent=bn(n);$('rn').className='rn '+colorOf(n);$('rt').textContent='';$('rp').classList.add('show');
   const c=mat.querySelector(`[data-key="n${n}"]`);if(c)c.classList.add('win');
@@ -763,6 +771,13 @@ function fit(){
 new ResizeObserver(fit).observe($('scene'));
 addEventListener('resize',fit);addEventListener('orientationchange',fit);
 fit();
+
+// Initial seed so that 4 to 5 lines of round balls are displayed immediately on boot
+SEED_HIST.forEach(n=>{
+  const h=document.createElement('i');h.className=colorOf(n);h.textContent=bn(n);
+  $('hist').appendChild(h);
+});
+
 render();liveInit();
 </script>
 </body>
