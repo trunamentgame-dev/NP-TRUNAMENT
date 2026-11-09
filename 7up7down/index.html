@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>7 Up 7 Down</title>
 <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Outfit:wght@500;700;800&family=Hind+Siliguri:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <style>
 :root{--gold:#ffd24a;--card:rgba(0,0,0,.45)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -403,6 +406,13 @@ html,body{height:100%;overflow:hidden}
 @media(min-height:875px){.app{zoom:1}}
 @media(max-width:400px){.mf{width:15px;height:15px;padding:1.5px}.mf i{width:3px;height:3px}.he span{width:17px}}
 @media(prefers-reduced-motion:reduce){.die{transition-duration:.01s}.wrap.toss,.grp.shake{animation:none}}
+#ld{position:fixed;inset:0;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:radial-gradient(ellipse at 50% 30%,#17623b,#06190f);text-align:center;padding:24px;transition:opacity .35s}
+#ld.off{opacity:0;pointer-events:none}
+#ld .sp2{width:46px;height:46px;border-radius:50%;border:4px solid #ffffff30;border-top-color:var(--gold);animation:spn 1s linear infinite}
+#ld.stop .sp2{display:none}
+@keyframes spn{to{transform:rotate(360deg)}}
+#ld p{margin:0;font-weight:700;font-size:15px;line-height:1.5;max-width:320px}
+#ld small{opacity:.7;font-size:12px;max-width:320px}
 </style></head><body>
 <div class="app">
  <div class="top"><button class="ib" onclick="if(history.length>1)history.back()" aria-label="ফিরে যান">‹</button><div class="logo" role="heading" aria-level="1"><i class="mk"></i><div><div class="lt"><span class="n">7</span><span class="u">UP</span><span class="n">7</span><span class="d">DOWN</span></div><small>DICE CASINO</small></div></div><div class="sp"></div><div class="wal"><span class="wi">৳</span><div><small>BALANCE</small><b id="bal2">0</b></div></div><button class="ib" id="snd" aria-label="সাউন্ড">🔊</button></div>
@@ -410,7 +420,6 @@ html,body{height:100%;overflow:hidden}
  <div class="hist" id="hist"></div>
  <div class="stage">
   <div class="pl" id="pl"></div><div class="side sl" id="sl"></div><div class="side sr" id="sr"></div>
-  <button class="free" id="free">🎁<small>FREE <span id="fc">1</span></small></button>
   <div class="rndtag">রাউন্ড #<span id="rnd">1</span></div>
   <div class="tb1"></div><div class="tb2"></div><div class="felt"></div>
   <div class="grp" id="grp"><div class="rimb"></div><div class="dice" id="board"></div><div class="dome"></div></div>
@@ -429,25 +438,31 @@ html,body{height:100%;overflow:hidden}
 </div>
 <div class="modal" id="rm"><div class="mc"><h3>Roadmap · শেষ ১০০ রাউন্ড</h3><div id="rg"></div><button id="rx">বন্ধ করুন</button></div></div>
 <div class="toast" id="toast"></div>
+<div id="ld"><div class="sp2"></div><p id="ldm">গেম লোড হচ্ছে…</p><small id="lds"></small></div>
 <script>
-// ===== Wallet: এখানে নিজের সাইটের আসল ব্যালেন্স (Firebase) যুক্ত করুন =====
-const Wallet={get(){try{const v=localStorage.getItem('u7d_bal');return v===null?5000:+v}catch(e){return this._m??5000}},set(v){try{localStorage.setItem('u7d_bal',v)}catch(e){this._m=v}}};
-// ===== সেটিংস =====
-const MIN=10,MAX=1000,BETTING=12,ROLL_MS=2000,RESULT_MS=3400;
-const SUMS=[2,3,4,5,6,8,9,10,11,12],PAY={2:20,3:12,4:8,5:6,6:5,8:5,9:6,10:8,11:12,12:20},ODD={down:1,up:1,lucky:4};
-const EXTRA={chance:.6,mult:2}; // Extra Pay: নির্দিষ্ট সংখ্যার পেআউট গুণ হয়
+// =====================================================================
+//  কনফিগ — শুধু নিচের API_BASE (Render সার্ভিসের URL) বদলাতে হবে
+// =====================================================================
+const API_BASE='https://crazytime-backend.onrender.com'; // <-- Render deploy শেষে পাওয়া আপনার URL বসান
+const HOME_URL='';                                     // user panel-এর লিংক (ঐচ্ছিক)
+const FB={apiKey:"AIzaSyBFaoU_cDws6YVAXFMWBnogGAQHhjfC23Q",authDomain:"np-trunament-bd.firebaseapp.com",databaseURL:"https://np-trunament-bd-default-rtdb.firebaseio.com",projectId:"np-trunament-bd",storageBucket:"np-trunament-bd.firebasestorage.app",messagingSenderId:"324972484501",appId:"1:324972484501:web:38598aa922e983990b889c",measurementId:"G-LMHCM7J1K5"};
+
+const SUMS=[2,3,4,5,6,8,9,10,11,12],PAY={2:20,3:12,4:8,5:6,6:5,8:5,9:6,10:8,11:12,12:20};
+let MIN=10,MAX=1000,betMs=12000;
 const $=id=>document.getElementById(id),Q=s=>document.querySelectorAll(s);
-let bets={},stack=[],last=null,extra={},auto=false,chip=10,phase='bet',round=1,freeC=1,rot=[[0,0],[0,0]],tick,tw,shown=Wallet.get(),H;
-const kind=s=>s<7?'down':s>7?'up':'lucky',sum=o=>Object.values(o).reduce((a,b)=>a+b,0),rnd6=()=>1+Math.random()*6|0;
-try{H=JSON.parse(localStorage.getItem('u7d_h'))}catch(e){}
-if(!Array.isArray(H)||!H.length)H=Array.from({length:100},()=>[rnd6(),rnd6(),0]);
-const saveH=()=>{try{localStorage.setItem('u7d_h',JSON.stringify(H))}catch(e){}};
+const kind=s=>s<7?'down':s>7?'up':'lucky',sum=o=>Object.values(o).reduce((a,b)=>a+b,0);
+const fmtB=v=>(+v).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+const Wallet={v:0,get(){return this.v},set(v){this.v=v}};
+let bets={},stack=[],last=null,extra={},auto=false,chip=10,phase='init',round=0,rot=[[0,0],[0,0]],tick,tw,shown=0,H=[],histV=-1;
+let srvOff=0,endsAt=0,pollT=null,pending=0,qq=Promise.resolve(),needSync=false,seq=0;
+let uid=null,token=null,balLoaded=false,gotState=false,readySent=false;
+const live={on:0,d:0,s:0,u:0,pool:0,win:[]};
+const now=()=>Date.now()+srvOff;
 const pips={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 // UI build
 $('zones').innerHTML=[['down','2 – 6','1:1'],['lucky','7','1:4'],['up','8 – 12','1:1']].map(([k,t,r],i)=>`<button class="z ${k}" data-k="${k}" data-w="${['DOWN','','UP'][i]}"><b>${t}</b><small>${r}</small><span class="amt"></span></button>`).join('');
 $('sums').innerHTML=SUMS.map(s=>`<button class="sm" data-k="n${s}"><b>${s}</b><small>1:${PAY[s]}</small><i class="xb" id="x${s}"></i><span class="amt"></span></button>`).join('');
 $('tray').innerHTML=[10,20,50,100,500].map(v=>`<button data-v="${v}">${v}</button>`).join('');
-const BOTS=['😎','🧔','👩'].map(e=>({e,k:null,amt:0}));
 function char(t){
  const sk=['#ffd6a8','#f3c08c','#ffdbc2'][t],dk=['#d08a55','#bf7a48','#e3a07a'][t],hr=['#c1272d','#2b2b2b','#4a2a12'][t];
  const ex=(y,d)=>[-d,d].map(x=>`<g class="eye"><ellipse cx="${30+x}" cy="${y}" rx="4.4" ry="5.2" fill="#fff" stroke="#0004" stroke-width=".5"/><circle cx="${31+x}" cy="${y+.8}" r="2.4" fill="#1a1a1a"/><circle cx="${32+x}" cy="${y-.4}" r=".9" fill="#fff"/></g>`).join('');
@@ -463,7 +478,7 @@ function char(t){
 `<ellipse cx="30" cy="99" rx="16" ry="2.2" fill="#000" opacity=".4"/><rect x="23" y="86" width="5" height="11" fill="${sk}"/><rect x="32" y="86" width="5" height="11" fill="${sk}"/><ellipse cx="25.5" cy="98" rx="5.5" ry="2.6" fill="#c8102e"/><ellipse cx="34.5" cy="98" rx="5.5" ry="2.6" fill="#c8102e"/><path d="M21 54h18l10 34H11z" fill="url(#b2)"/><ellipse cx="25" cy="64" rx="5" ry="3" fill="#fff" opacity=".25"/><g class="arm l"><rect x="12" y="56" width="5" height="18" rx="2.5" fill="${sk}"/><circle cx="14.5" cy="76" r="3.2" fill="${sk}"/></g><g class="arm r"><rect x="43" y="56" width="5" height="18" rx="2.5" fill="${sk}"/><circle cx="45.5" cy="76" r="3.2" fill="${sk}"/></g>`][t];
  return `<svg viewBox="0 0 60 100"><defs><linearGradient id="b${t}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${bc[0]}"/><stop offset="1" stop-color="${bc[1]}"/></linearGradient><radialGradient id="s${t}" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#fff2e0"/><stop offset=".5" stop-color="${sk}"/><stop offset="1" stop-color="${dk}"/></radialGradient></defs>${body}${face}<ellipse cx="22" cy="20" rx="7" ry="3" fill="#fff" opacity=".35"/></svg>`;
 }
-$('pl').innerHTML='<small>HIGH WIN<br>RATE</small>'+BOTS.map((b,i)=>`<div><div class="av">${char(i)}</div><b id="pb${i}"></b></div>`).join('');
+$('pl').innerHTML='<small>TOP<br>WINS</small>'+[0,1,2].map(i=>`<div><div class="av">${char(i)}</div><b id="pb${i}"></b></div>`).join('');
 const dice=[0,1].map(()=>{const w=document.createElement('div'),d=document.createElement('div');w.className='wrap';d.className='die';
  for(let n=1;n<=6;n++){const f=document.createElement('div');f.className='f f'+n;for(let k=0;k<9;k++){const i=document.createElement('i');if(pips[n].includes(k))i.className='on';f.appendChild(i)}d.appendChild(f)}
  const sl=document.createElement('div'),sh=document.createElement('div');sl.className='slot';sh.className='sh';w.appendChild(d);sl.append(w,sh);$('board').appendChild(sl);return{w,d}});
@@ -472,7 +487,6 @@ function setDie(i,v,spin){const[x,y]=face[v],n=spin?360*(2+Math.floor(Math.rando
  rot[i]=[rot[i][0]-rot[i][0]%360+x+(spin?n*(i?-1:1):0),rot[i][1]-rot[i][1]%360+y+(spin?n:0)];
  dice[i].d.style.transform=`rotateX(${rot[i][0]}deg) rotateY(${rot[i][1]}deg)`}
 setDie(0,3,0);setDie(1,4,0);
-// sound
 let snd=true,ac;const A=()=>ac||(ac=new(window.AudioContext||window.webkitAudioContext)());
 function beep(f,d,t='sine',v=.08,w=0){if(!snd)return;try{const c=A(),o=c.createOscillator(),g=c.createGain(),s=c.currentTime+w;o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+d)}catch(e){}}
 function rattle(){if(!snd)return;try{const c=A();for(let i=0;i<10;i++){const n=c.sampleRate*.04,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let k=0;k<n;k++)d[k]=(Math.random()*2-1)*(1-k/n);const s=c.createBufferSource(),g=c.createGain(),f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=1200+Math.random()*1500;g.gain.value=.25;s.buffer=b;s.connect(f);f.connect(g);g.connect(c.destination);s.start(c.currentTime+i*.17+Math.random()*.05)}}catch(e){}}
@@ -484,72 +498,174 @@ function burst(){const f=document.createElement('div');f.style.cssText='position
   f.appendChild(p);requestAnimationFrame(()=>requestAnimationFrame(()=>{p.style.transform=`translate(${dx}px,${dy}px) rotate(${r}deg)`;p.style.opacity=0}))}
  setTimeout(()=>f.remove(),1900)}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),1700)}
-// render
+
+// ===================== Firebase + লগইন সেশন (Aviator-এর মতোই) =====================
+let auth=null,rtdb=null;
+try{if(window.firebase){if(!firebase.apps.length)firebase.initializeApp(FB);auth=firebase.auth();rtdb=firebase.database()}}catch(e){console.warn('Firebase init:',e)}
+
+const ERR={INSUFFICIENT_BALANCE:'পর্যাপ্ত ব্যালেন্স নেই',BETTING_CLOSED:'এখন বেট ধরার সময় নয়',BAD_UID:'ইউজার চেনা যায়নি',BAD_INPUT:'ভুল বেট',MAX_BET:'এই ঘরে সর্বোচ্চ লিমিট শেষ',AUTH_REQUIRED:'লগইন সেশন প্রয়োজন',UID_MISMATCH:'UID মিলছে না',BAD_TOKEN:'লগইন সেশন মেয়াদোত্তীর্ণ — প্যানেল থেকে আবার গেম খুলুন',TOO_MANY_REQUESTS:'অনেক দ্রুত চাপছেন, একটু ধীরে',NETWORK:'সার্ভারের সাথে সংযোগ হচ্ছে না',NO_SUCH_BET:'বেট পাওয়া যায়নি'};
+
+function setLd(msg,sub,noSpin){const m=$('ldm'),s=$('lds');if(msg!=null)m.textContent=msg;if(sub!=null)s.textContent=sub;$('ld').classList.toggle('stop',!!noSpin)}
+function ready(){if(!gotState||!balLoaded)return;$('ld').classList.add('off');if(!readySent){readySent=true;try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'NP_GAME_READY'},'*')}catch(e){}}}
+
+async function refreshToken(){
+ try{if(auth&&auth.currentUser){token=await auth.currentUser.getIdToken(true);try{sessionStorage.setItem('u7d_token',token)}catch(e){}return true}}catch(e){}
+ try{const b=window.Android||window.AndroidBridge||window.TournamentApp||window.MostWinApp||window.JSBridge;if(b){const t=typeof b.getToken==='function'?b.getToken():typeof b.getIdToken==='function'?b.getIdToken():null;if(t){token=String(t);return true}}}catch(e){}
+ try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'NEED_TOKEN'},'*')}catch(e){}
+ return false}
+
+async function api(path,body,opt){opt=opt||{};
+ const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),opt.timeout||9000),h={};
+ if(token)h.Authorization='Bearer '+token;if(body)h['Content-Type']='application/json';
+ try{
+  const r=await fetch(API_BASE+path,{method:body?'POST':'GET',headers:h,body:body?JSON.stringify(body):undefined,cache:'no-store',signal:ctl.signal});
+  const j=await r.json().catch(()=>({success:false,error:'BAD_RESPONSE'}));
+  if(j&&(j.error==='BAD_TOKEN'||j.authErr==='BAD_TOKEN')&&!opt.retried&&await refreshToken())return api(path,body,Object.assign({},opt,{retried:1}));
+  return j
+ }catch(e){return{success:false,error:'NETWORK'}}finally{clearTimeout(t)}}
+
+// ব্যালেন্স
+let sessT=null;
+function setBalance(v){if(typeof v!=='number'||!isFinite(v))return;balLoaded=true;Wallet.set(v);render();clearTimeout(sessT);sessT=setTimeout(sessionSync,1000);ready()}
+async function fetchBalance(){if(!uid)return;const j=await api('/api/user/balance?uid='+encodeURIComponent(uid));if(j&&j.success&&typeof j.balance==='number'&&!pending)setBalance(j.balance)}
+
+// প্যানেলের গেম-সেশন (entry/exit ব্যালেন্স) — Aviator-এর মতোই
+const sidGet=()=>{try{return sessionStorage.getItem('np_active_game_session')||localStorage.getItem('np_active_game_session')}catch(e){return null}};
+function sessionSync(){const id=sidGet();if(!rtdb||!id||!balLoaded)return;
+ rtdb.ref('game_sessions/'+id).transaction(c=>{if(!c)return c;const en=typeof c.entryBalance==='number'?c.entryBalance:Wallet.get(),ex=Wallet.get();c.exitBalance=ex;c.netWinLoss=Math.round((ex-en)*100)/100;c.lastActiveTime=Date.now();return c}).catch(()=>{})}
+function sessionClose(){const id=sidGet();if(!rtdb||!id||!balLoaded)return;
+ rtdb.ref('game_sessions/'+id).transaction(c=>{if(!c)return c;const end=Date.now(),st=c.startTime||end,d=Math.max(1,Math.round((end-st)/1000));let ds=d+' সে.';if(d>=60){const m=Math.floor(d/60),s=d%60;ds=m+' মি. '+(s>0?s+' সে.':'')}
+  const en=typeof c.entryBalance==='number'?c.entryBalance:Wallet.get(),ex=Wallet.get();
+  c.endTime=end;c.endFormatted=new Date(end).toLocaleString('bn-BD');c.duration=ds;c.exitBalance=ex;c.netWinLoss=Math.round((ex-en)*100)/100;c.status='COMPLETED';return c}).catch(()=>{})}
+window.addEventListener('beforeunload',sessionClose);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)sessionClose();else{poll();fetchBalance()}});
+
+function attachWallet(u,bal,tok){
+ if(!u||typeof u!=='string')return;u=u.trim();if(!u)return;
+ const changed=u!==uid;uid=u;try{sessionStorage.setItem('u7d_uid',uid)}catch(e){}
+ if(tok&&typeof tok==='string'){token=tok.trim();try{sessionStorage.setItem('u7d_token',token)}catch(e){}}
+ if(typeof bal==='number')setBalance(bal);
+ fetchBalance();
+ if(rtdb&&changed){try{const r=rtdb.ref('users/'+uid+'/balance');r.off();r.on('value',s=>{const v=s.val();if(v!==null&&!isNaN(v)&&!pending)setBalance(Number(v))},()=>{})}catch(e){}}
+ if(changed)poll()}
+
+function detectUser(){
+ let u=null,t=null;
+ try{const p=new URLSearchParams(location.search);u=p.get('uid')||p.get('userId')||p.get('user_id')||p.get('user')||p.get('player_id')||p.get('u');t=p.get('token')||p.get('idToken')||p.get('t')||p.get('auth')}catch(e){}
+ if(!u||!t){try{const h=location.hash||'',mt=/[#&](?:t|token|idToken)=([A-Za-z0-9._-]+)/.exec(h);if(mt&&!t)t=mt[1];const mu=/[#&](?:uid|userId|user_id)=([A-Za-z0-9._-]+)/.exec(h);if(mu&&!u)u=mu[1];
+  if(t&&!u){const pr=t.split('.');if(pr.length>=2){const pl=JSON.parse(atob(pr[1].replace(/-/g,'+').replace(/_/g,'/')));u=pl.user_id||pl.sub||pl.uid}}}catch(e){}}
+ if(!u){try{const b=window.Android||window.AndroidBridge||window.TournamentApp||window.MostWinApp||window.JSBridge;if(b){u=typeof b.getUserId==='function'?b.getUserId():typeof b.getUid==='function'?b.getUid():typeof b.getUser==='function'?b.getUser():null;if(!t)t=typeof b.getToken==='function'?b.getToken():typeof b.getIdToken==='function'?b.getIdToken():null}}catch(e){}}
+ if(!u){try{u=sessionStorage.getItem('u7d_uid')||sessionStorage.getItem('aviator_uid')||localStorage.getItem('aviator_uid')||localStorage.getItem('userId')||localStorage.getItem('uid');if(!t)t=sessionStorage.getItem('u7d_token')||sessionStorage.getItem('aviator_token')||localStorage.getItem('aviator_token')}catch(e){}}
+ if(!u&&auth&&auth.currentUser&&!auth.currentUser.isAnonymous)u=auth.currentUser.uid;
+ if(u){attachWallet(String(u),undefined,t?String(t):undefined);return true}return false}
+
+if(auth)auth.onAuthStateChanged(async user=>{if(user&&!user.isAnonymous){try{attachWallet(user.uid,undefined,await user.getIdToken())}catch(e){attachWallet(user.uid)}}});
+function onMsg(ev){let d=ev.data;if(!d)return;if(typeof d==='string'){try{d=JSON.parse(d)}catch(e){return}}if(!d||typeof d!=='object')return;
+ if(d.type==='SET_USER_SESSION'||d.type==='USER_DATA'||d.type==='LOGIN_SUCCESS'){const u=d.uid||d.userId||d.user_id;if(u)attachWallet(String(u),typeof d.balance==='number'?d.balance:undefined,d.token||d.idToken)}
+ else if(d.type==='SET_BALANCE'&&typeof d.balance==='number')setBalance(d.balance)}
+window.addEventListener('message',onMsg);document.addEventListener('message',onMsg);
+// প্যানেল iframe হ্যান্ডশেক (Aviator-এর হ্যান্ডশেকই ব্যবহার করা হয়েছে যাতে প্যানেল সেশন পাঠায়)
+try{if(window.parent&&window.parent!==window){window.parent.postMessage({type:'AVITOR_READY'},'*');window.parent.postMessage({type:'GAME_READY',game:'7updown'},'*')}}catch(e){}
+detectUser();
+const detT=setInterval(()=>{if(uid){clearInterval(detT);return}detectUser()},1500);
+setTimeout(()=>{if(!uid)setLd('লগইন সেশন পাওয়া যায়নি। অনুগ্রহ করে ইউজার প্যানেল/অ্যাপ থেকে লগইন করে গেমটি খুলুন।','',true)},7000);
+setTimeout(()=>{if(uid&&!gotState)setLd(null,'সার্ভার চালু হচ্ছে, ৩০–৬০ সেকেন্ড লাগতে পারে…')},8000);
+setInterval(()=>{if(uid)fetchBalance()},15000);
+
+// ===================== রেন্ডার =====================
 function render(){const to=Wallet.get(),from=shown,t0=performance.now();cancelAnimationFrame(tw);
- const st=t=>{const p=Math.min(1,(t-t0)/500);shown=Math.round(from+(to-from)*(1-Math.pow(1-p,3)));$('bal').textContent=$('bal2').textContent=shown.toLocaleString();if(p<1)tw=requestAnimationFrame(st)};tw=requestAnimationFrame(st);
- Q('[data-k]').forEach(e=>{const v=bets[e.dataset.k]||'';e.querySelector('.amt').textContent=v;e.dataset.a=v});$('tot').textContent=sum(bets).toLocaleString();$('rno').textContent=round;drawSide();drawPct()}
+ const st=t=>{const p=Math.min(1,(t-t0)/500);shown=p>=1?to:from+(to-from)*(1-Math.pow(1-p,3));$('bal').textContent=$('bal2').textContent=fmtB(shown);if(p<1)tw=requestAnimationFrame(st)};tw=requestAnimationFrame(st);
+ Q('[data-k]').forEach(e=>{const v=bets[e.dataset.k]||'';e.querySelector('.amt').textContent=v;e.dataset.a=v});$('tot').textContent=fmtB(sum(bets));$('rno').textContent=round;drawSide();drawPct()}
 function drawHist(){const mf=n=>`<div class="mf">${[0,1,2,3,4,5,6,7,8].map(k=>`<i style="opacity:${pips[n].includes(k)?1:0}"></i>`).join('')}</div>`;
- const h=H.slice(-12);$('hist').innerHTML=h.map(([a,b,x],i)=>`<div class="he${i==h.length-1?' cur':''}"><em>${x?'★':''}</em>${mf(a)}${mf(b)}<span class="${kind(a+b)}">${a+b}</span></div>`).join('');
- const c={down:0,lucky:0,up:0};H.forEach(([a,b])=>c[kind(a+b)]++);const p=k=>Math.round(c[k]/H.length*100)+'%';$('pd').textContent=p('down');$('pu').textContent=p('up');$('pl7').textContent=p('lucky')}
-// betting
-function place(k,amt,quiet){if(phase!=='bet')return;const b=Wallet.get();
- if(amt>b){if(!quiet)toast('ব্যালেন্স কম');return}
- if((bets[k]||0)+amt>MAX){if(!quiet)toast('সর্বোচ্চ ৳'+MAX);return}
- Wallet.set(b-amt);bets[k]=(bets[k]||0)+amt;stack.push([k,amt]);if(!quiet)beep(900,.06,'square',.04);render()}
-Q('[data-k]').forEach(b=>b.onclick=()=>place(b.dataset.k,chip));
-$('undo').onclick=()=>{if(phase!=='bet'||!stack.length)return;const[k,a]=stack.pop();bets[k]-=a;if(!bets[k])delete bets[k];Wallet.set(Wallet.get()+a);render()};
-$('clear').onclick=()=>{if(phase!=='bet')return;Wallet.set(Wallet.get()+sum(bets));bets={};stack=[];render()};
-$('dbl').onclick=()=>{if(phase!=='bet')return;const s={...bets};if(sum(s)>Wallet.get())return toast('ব্যালেন্স কম');for(const k in s)place(k,s[k],true);beep(900,.06,'square',.04)};
+ const h=H.slice(-12);$('hist').innerHTML=h.map(([a,b,x],i)=>`<div class="he${i==h.length-1?' cur':''}"><em>${x?'★':''}</em>${mf(a)}${mf(b)}<span class="${kind(a+b)}">${a+b}</span></div>`).join('')}
+
+// ===================== বেটিং (সার্ভারে যায়) =====================
+const canBet=()=>phase==='bet'&&uid&&balLoaded&&endsAt-now()>250;
+function enqueue(fn){pending++;qq=qq.then(fn).catch(()=>{needSync=true}).then(()=>{pending--;if(!pending&&needSync){needSync=false;resync()}})}
+function betRes(j){
+ if(j&&j.success){if(pending<=1&&typeof j.balance==='number'){Wallet.set(j.balance);balLoaded=true;render()}return}
+ needSync=true;const e=j&&j.error;toast(ERR[e]||('সমস্যা: '+(e||'unknown')))}
+function placeMany(m,quiet){
+ if(!canBet()){if(!quiet)toast(!uid?'লগইন সেশন নেই':'এখন বেট বন্ধ');return false}
+ const tot=sum(m);if(tot>Wallet.get()){if(!quiet)toast('ব্যালেন্স কম');return false}
+ for(const k in m)if((bets[k]||0)+m[k]>MAX){if(!quiet)toast('সর্বোচ্চ ৳'+MAX);return false}
+ for(const k in m){bets[k]=(bets[k]||0)+m[k];stack.push([k,m[k]])}
+ Wallet.set(Wallet.get()-tot);if(!quiet)beep(900,.06,'square',.04);render();
+ const rnd=round,key=rnd+'_'+uid+'_'+(++seq);
+ enqueue(async()=>betRes(await api('/api/game/bet',{uid,bets:m,round:rnd,idempotencyKey:key})));return true}
+Q('[data-k]').forEach(b=>b.onclick=()=>placeMany({[b.dataset.k]:chip}));
+$('undo').onclick=()=>{if(!canBet()||!stack.length)return;const[k,a]=stack.pop();bets[k]-=a;if(!bets[k])delete bets[k];Wallet.set(Wallet.get()+a);render();
+ const rnd=round;enqueue(async()=>betRes(await api('/api/game/unbet',{uid,key:k,amount:a,round:rnd})))};
+$('clear').onclick=()=>{if(!canBet()||!sum(bets))return;Wallet.set(Wallet.get()+sum(bets));bets={};stack=[];render();
+ const rnd=round;enqueue(async()=>betRes(await api('/api/game/clear',{uid,round:rnd})))};
+$('dbl').onclick=()=>{if(!canBet())return;const s={...bets};if(!sum(s))return;if(sum(s)>Wallet.get())return toast('ব্যালেন্স কম');placeMany(s)};
 $('auto').onclick=()=>{auto=!auto;$('auto').classList.toggle('on',auto);toast(auto?'Auto চালু':'Auto বন্ধ')};
 $('chipbtn').onclick=()=>$('tray').classList.toggle('show');
 $('tray').onclick=e=>{const b=e.target.closest('button');if(!b)return;chip=+b.dataset.v;$('chipbtn').textContent=chip;$('chipbtn').dataset.v=chip;$('tray').classList.remove('show')};
 $('mm').onclick=()=>{const on=$('sums').style.display!=='none';$('sums').style.display=on?'none':'grid';$('mm').classList.toggle('on',!on)};
 $('road').onclick=()=>{$('rg').innerHTML=H.map(([a,b])=>{const s=a+b;return`<span class="${kind(s)}">${s}</span>`}).join('');$('rm').classList.add('show');$('rg').scrollLeft=1e4};
 $('rx').onclick=()=>$('rm').classList.remove('show');
-$('free').onclick=()=>{if(!freeC)return toast('ফ্রি শেষ');freeC--;$('fc').textContent=freeC;const r=[10,20,50,100][Math.random()*4|0];Wallet.set(Wallet.get()+r);render();winSnd();toast('+৳'+r+' ফ্রি')};
 const lock=on=>Q('.z,.sm,.cb,.bigchip').forEach(b=>b.disabled=on);
-// bots
-function botBets(){BOTS.forEach((b,i)=>{const r=Math.random();b.k=r<.4?'down':r<.8?'up':r<.88?'lucky':'n'+SUMS[Math.random()*10|0];b.amt=[100,200,500,1000,2000][Math.random()*5|0];const e=$('pb'+i);e.textContent=b.amt.toLocaleString();e.style.color='';e.previousElementSibling.classList.remove('happy','sad')})}
-function botSettle(s){BOTS.forEach((b,i)=>{const n=+b.k.slice(1),o=b.k===kind(s)?ODD[b.k]:b.k==='n'+s?PAY[n]*(extra[n]||1):0,e=$('pb'+i);e.textContent=o?'+'+(b.amt*o).toLocaleString():'-'+b.amt.toLocaleString();e.style.color=o?'#ffd24a':'#f99';const a=e.previousElementSibling;a.classList.remove('happy','sad');void a.offsetWidth;a.classList.add(o?'happy':'sad')})}
-// round loop
-function startBetting(){phase='bet';$('res').className='res';$('rnd').textContent=round;Q('.win').forEach(e=>e.classList.remove('win'));$('grp').classList.remove('lift');lock(false);
- if(Wallet.get()<=0){Wallet.set(5000);toast('নতুন ৳5000')}
- extra={};if(Math.random()<EXTRA.chance){const n=1+(Math.random()*2|0);while(Object.keys(extra).length<n)extra[SUMS[Math.random()*10|0]]=EXTRA.mult}
- SUMS.forEach(s=>{const x=$('x'+s);x.textContent=extra[s]?PAY[s]*extra[s]+'X':'';x.parentNode.classList.toggle('ex',!!extra[s])});
- if(Object.keys(extra).length){const e=$('extra');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
- botBets();if(auto&&last)for(const k in last)place(k,last[k],true);render();
- const end=Date.now()+BETTING*1000;clearInterval(tick);
- tick=setInterval(()=>{const l=Math.max(0,end-Date.now());$('bar').style.transform=`scaleX(${l/(BETTING*1000)})`;$('status').textContent='বেট ধরুন · '.split(' ·')[0];const sec=Math.ceil(l/1000);$('cdn').textContent=sec;$('cdr').style.strokeDashoffset=119.4*(1-l/(BETTING*1000));$('cd').className='cd show'+(sec<=3?' hot':sec<=5?' warn':'');if(l<=0){clearInterval(tick);roll()}},100)}
-function roll(){phase='roll';lock(true);$('cd').className='cd';$('tray').classList.remove('show');if(sum(bets))last={...bets};
- const a=rnd6(),b=rnd6(),g=$('grp');$('status').textContent='ডাইস গড়াচ্ছে…';rattle();setTimeout(()=>beep(110,.18,'sine',.2),ROLL_MS-500);
- g.classList.add('shake');dice.forEach(d=>{d.w.classList.remove('toss');void d.w.offsetWidth;d.w.classList.add('toss')});setDie(0,a,1);setDie(1,b,1);
- setTimeout(()=>{g.classList.remove('shake');g.classList.add('lift');setTimeout(()=>settle(a,b),600)},ROLL_MS)}
-function settle(a,b){const s=a+b,kd=kind(s);phase='result';let ret=0;const R=$('res');R.innerHTML=`<b>${s}</b><span>${kd==='down'?'7 DOWN':kd==='up'?'7 UP':'LUCKY 7'}</span>`;R.className='res show '+kd;
- for(const k in bets){const o=k===kd?ODD[k]:k==='n'+s?PAY[s]*(extra[s]||1):0;if(o)ret+=bets[k]*(o+1)}
- const stake=sum(bets);if(ret)Wallet.set(Wallet.get()+ret);
- $('status').textContent=`${s} · ${kd==='down'?'7 DOWN':kd==='up'?'7 UP':'LUCKY 7'}`;
- Q(`[data-k="${kd}"],[data-k="n${s}"]`).forEach(e=>e.classList.add('win'));botSettle(s);
- H.push([a,b,extra[s]?1:0]);if(H.length>100)H.shift();saveH();drawHist();
- if(ret){toast('+৳'+(ret-stake).toLocaleString()+' জিতেছেন');winSnd();burst()}else if(stake){toast('এবার হেরেছেন');beep(180,.35,'sawtooth',.05)}
- bets={};stack=[];round++;if(round%5===0){freeC++;$('fc').textContent=freeC}render();setTimeout(startBetting,RESULT_MS)}
-const demo={on:0,d:0,s:0,u:0,pool:0,win:[],ph:''},fmt=n=>n.toLocaleString(),nm=()=>String.fromCharCode(97+Math.random()*26|0)+'***'+(Math.random()*10|0);
-function drawSide(){if(!demo.win.length)demo.win=Array.from({length:3},()=>[nm(),[1000,2000,5000,10000][Math.random()*4|0]]);const t=demo.d+demo.s+demo.u+(sum(bets)?1:0)||1,pc=k=>Math.round(demo[k]/t*100);
- $('sl').innerHTML=`<h4>ONLINE</h4><div class="big"><span class="dot"></span>${demo.on}</div><h4 style="margin-top:6px">BETTING · ${t}</h4>`+[['d','DOWN','#14a34a'],['s','7','#2a8ae6'],['u','UP','#e23a40']].map(([k,n,c])=>`<div class="row"><span>${n}</span><span class="bar"><i style="width:${pc(k)}%;background:${c}"></i></span><span>${demo[k]}</span></div>`).join('');
- $('sr').innerHTML=`<h4>TOTAL BET</h4><div class="big">৳${fmt(demo.pool+sum(bets))}</div><h4 style="margin-top:6px">LAST WIN</h4>`+(demo.win.length?demo.win.map(w=>`<div class="row"><span>${w[0]}</span><span style="margin-left:auto;color:#ffd24a">+${fmt(w[1])}</span></div>`).join(''):'<div class="row">—</div>')}
-function drawPct(){const c={d:demo.d+(bets.down?1:0),s:demo.s+(bets.lucky?1:0),u:demo.u+(bets.up?1:0)},T=c.d+c.s+c.u,p=k=>T?Math.round(c[k]/T*100):0,w=k=>T?c[k]/T*100:33.3;
- $('pd').textContent=p('d')+'%';$('pl7').textContent=p('s')+'%';$('pu').textContent=p('u')+'%';
- $('bd').style.width=w('d')+'%';$('bs').style.width=w('s')+'%';$('bu').style.width=w('u')+'%'}
-setInterval(()=>{if(phase!==demo.ph){demo.ph=phase;
- if(phase==='bet'){demo.on=150+Math.random()*200|0;demo.d=demo.s=demo.u=0;demo.pool=0}
- if(phase==='result'){const[a,b]=H[H.length-1],o=kind(a+b)==='lucky'?5:2;demo.win=Array.from({length:3},()=>[nm(),[500,1000,2000,5000][Math.random()*4|0]*o])}}
- if(phase==='bet'){demo.on+=Math.random()*3|0;const r=Math.random(),k=r<.42?'d':r<.8?'u':'s',n=1+Math.random()*4|0;demo[k]+=n;demo.pool+=n*[50,100,200,500][Math.random()*4|0]}
- drawSide();drawPct()},500);
-function cnt(){const c={d:demo.d,s:demo.s,u:demo.u},m=new Set();for(const k in bets)if(bets[k])m.add(k==='down'?'d':k==='up'?'u':k==='lucky'?'s':(+k.slice(1)<7?'d':'u'));m.forEach(x=>c[x]++);return c}
-function drawPct(){const c=cnt(),T=c.d+c.s+c.u,p=k=>T?Math.round(c[k]/T*100):0,w=k=>T?c[k]/T*100:33.3;$('pd').textContent=p('d')+'%';$('pl7').textContent=p('s')+'%';$('pu').textContent=p('u')+'%';$('bd').style.width=w('d')+'%';$('bs').style.width=w('s')+'%';$('bu').style.width=w('u')+'%'}
-function drawSide(){if(!demo.win.length)demo.win=Array.from({length:3},()=>[nm(),[1000,2000,5000,10000][Math.random()*4|0]]);const c=cnt(),t=c.d+c.s+c.u,pc=k=>t?Math.round(c[k]/t*100):0;
- $('sl').innerHTML=`<h4>ONLINE</h4><div class="big"><span class="dot"></span>${demo.on}</div><h4 style="margin-top:6px">BETTING · ${t}</h4>`+[['d','DOWN','g'],['s','7','b'],['u','UP','r']].map(([k,n,cl])=>`<div class="row"><span>${n}</span><span class="bar"><i class="${cl}" style="width:${pc(k)}%"></i></span><span>${c[k]}</span></div>`).join('');
- $('sr').innerHTML=`<h4>TOTAL BET</h4><div class="big">৳${fmt(demo.pool+sum(bets))}</div><h4 style="margin-top:6px">LAST WIN</h4>`+demo.win.map(w=>`<div class="row"><span>${w[0]}</span><span style="margin-left:auto;color:#ffd24a">+${fmt(w[1])}</span></div>`).join('')}
-const HOME_URL=''; // নিজের user panel-এর লিংক এখানে দিন, যেমন 'https://.../index.html'
-$('home').onclick=()=>{try{if(window.AndroidBridge&&AndroidBridge.goHome){AndroidBridge.goHome();return}}catch(e){}if(HOME_URL)location.href=HOME_URL;else if(history.length>1)history.back();else location.href='/'};
-drawHist();startBetting();
+async function resync(){const j=await api('/api/game/state?hv='+histV+(uid?'&uid='+encodeURIComponent(uid):''));if(j&&j.success)applyState(j,true);await fetchBalance()}
+
+// ===================== সার্ভার স্টেট → UI =====================
+function setExtraUI(){SUMS.forEach(s=>{const x=$('x'+s);x.textContent=extra[s]?PAY[s]*extra[s]+'X':'';x.parentNode.classList.toggle('ex',!!extra[s])});
+ if(Object.keys(extra).length){const e=$('extra');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}}
+function runTick(){clearInterval(tick);tick=setInterval(()=>{if(phase!=='bet'){clearInterval(tick);return}
+ const l=Math.max(0,endsAt-now());$('bar').style.transform=`scaleX(${Math.min(1,l/betMs)})`;$('status').textContent='বেট ধরুন';
+ const sec=Math.ceil(l/1000);$('cdn').textContent=sec;$('cdr').style.strokeDashoffset=119.4*(1-Math.min(1,l/betMs));$('cd').className='cd show'+(sec<=3?' hot':sec<=5?' warn':'');
+ if(l<=0){$('cd').className='cd';$('status').textContent='বেট বন্ধ…';lock(true)}},100)}
+function startBetting(s){phase='bet';round=s.round;bets={};stack=[];extra=s.extra||{};
+ $('res').className='res';$('rnd').textContent=round;Q('.win').forEach(e=>e.classList.remove('win'));$('grp').classList.remove('lift');lock(false);setExtraUI();
+ if(s.me&&s.me.bets&&Object.keys(s.me.bets).length){bets={...s.me.bets};stack=Object.entries(bets)}
+ render();runTick();
+ if(auto&&last&&!sum(bets))setTimeout(()=>{if(phase==='bet')placeMany(last,true)},200)}
+function doRoll(s){phase='roll';round=s.round;clearInterval(tick);lock(true);$('cd').className='cd';$('tray').classList.remove('show');if(sum(bets))last={...bets};
+ const[a,b]=s.dice,g=$('grp'),lateMs=s.endsAt-now();$('status').textContent='ডাইস গড়াচ্ছে…';
+ if(lateMs<1800){setDie(0,a,0);setDie(1,b,0);g.classList.add('lift');return}
+ rattle();g.classList.add('shake');dice.forEach(d=>{d.w.classList.remove('toss');void d.w.offsetWidth;d.w.classList.add('toss')});setDie(0,a,1);setDie(1,b,1);
+ setTimeout(()=>{g.classList.remove('shake');g.classList.add('lift')},2000)}
+function doResult(s,wasRoll){phase='result';round=s.round;clearInterval(tick);lock(true);$('cd').className='cd';
+ const[a,b]=s.dice,sm=a+b,kd=kind(sm),g=$('grp');
+ if(!wasRoll){setDie(0,a,0);setDie(1,b,0)}g.classList.remove('shake');g.classList.add('lift');
+ const R=$('res');R.innerHTML=`<b>${sm}</b><span>${kd==='down'?'7 DOWN':kd==='up'?'7 UP':'LUCKY 7'}</span>`;R.className='res show '+kd;
+ $('status').textContent=`${sm} · ${kd==='down'?'7 DOWN':kd==='up'?'7 UP':'LUCKY 7'}`;
+ Q(`[data-k="${kd}"],[data-k="n${sm}"]`).forEach(e=>e.classList.add('win'));
+ const m=s.me&&s.me.last;
+ if(m&&m.round===s.round){const net=Math.round((m.ret-m.stake)*100)/100;
+  if(net>0){toast('+৳'+fmtB(net)+' জিতেছেন');winSnd();burst()}else if(m.stake){toast('এবার হেরেছেন');beep(180,.35,'sawtooth',.05)}}
+ bets={};stack=[];render();setTimeout(fetchBalance,900)}
+function applyState(s,force){
+ if(!s||!s.success)return;
+ srvOff=s.now-Date.now();
+ if(s.phase==='init'){$('status').textContent='সার্ভার প্রস্তুত হচ্ছে…';return}
+ MIN=s.min||MIN;MAX=s.max||MAX;betMs=s.betMs||betMs;
+ const iu=document.querySelector('.info u'),is=document.querySelector('.info s');if(iu)iu.textContent=MIN;if(is)is.textContent=MAX;
+ if(s.hist){H=s.hist;histV=s.hv;drawHist()}
+ live.on=s.online||0;live.d=s.stats.d;live.s=s.stats.s;live.u=s.stats.u;live.pool=s.stats.pool;live.win=s.winners||[];
+ endsAt=s.endsAt;gotState=true;ready();
+ if(s.authErr==='BAD_TOKEN')refreshToken();
+ const changed=s.round!==round||s.phase!==phase;
+ if(changed){const wasRoll=phase==='roll'&&round===s.round;
+  if(s.phase==='bet')startBetting(s);else if(s.phase==='roll'&&s.dice)doRoll(s);else if(s.phase==='result'&&s.dice)doResult(s,wasRoll)}
+ else if(force&&s.phase==='bet'&&s.me){bets={...s.me.bets};stack=Object.entries(bets);render()}
+ drawSide();drawPct()}
+async function poll(){clearTimeout(pollT);
+ const j=await api('/api/game/state?hv='+histV+(uid?'&uid='+encodeURIComponent(uid):''));
+ let wait=2000;
+ if(j&&j.success){applyState(j);if(j.endsAt)wait=Math.min(1000,Math.max(150,j.endsAt-(Date.now()+srvOff)+120))}
+ else if(!gotState)setLd(null,'সার্ভারের সাথে সংযোগ হচ্ছে…');
+ else $('status').textContent='সংযোগ হচ্ছে…';
+ pollT=setTimeout(poll,wait)}
+
+// ===================== সাইড প্যানেল (রিয়েল ডেটা) =====================
+function drawPct(){const T=live.d+live.s+live.u,p=k=>T?Math.round(live[k]/T*100):0,w=k=>T?live[k]/T*100:33.3;
+ $('pd').textContent=p('d')+'%';$('pl7').textContent=p('s')+'%';$('pu').textContent=p('u')+'%';$('bd').style.width=w('d')+'%';$('bs').style.width=w('s')+'%';$('bu').style.width=w('u')+'%'}
+function drawSide(){const t=live.d+live.s+live.u,pc=k=>t?Math.round(live[k]/t*100):0;
+ $('sl').innerHTML=`<h4>ONLINE</h4><div class="big"><span class="dot"></span>${live.on}</div><h4 style="margin-top:6px">PLAYERS · ${t}</h4>`+[['d','DOWN','g'],['s','7','b'],['u','UP','r']].map(([k,n,cl])=>`<div class="row"><span>${n}</span><span class="bar"><i class="${cl}" style="width:${pc(k)}%"></i></span><span>${live[k]}</span></div>`).join('');
+ $('sr').innerHTML=`<h4>TOTAL BET</h4><div class="big">৳${fmtB(live.pool)}</div><h4 style="margin-top:6px">LAST WIN</h4>`+(live.win.length?live.win.map(w=>`<div class="row"><span>${w.n}</span><span style="margin-left:auto;color:#ffd24a">+${fmtB(w.w)}</span></div>`).join(''):'<div class="row">—</div>');
+ [0,1,2].forEach(i=>{const e=$('pb'+i),w=live.win[i];if(!e)return;e.textContent=w?'+'+fmtB(w.w):'';e.style.color=w?'#ffd24a':''})}
+$('home').onclick=()=>{try{if(window.AndroidBridge&&AndroidBridge.goHome){AndroidBridge.goHome();return}}catch(e){}try{if(window.parent&&window.parent!==window){window.parent.postMessage({type:'GO_HOME'},'*')}}catch(e){}if(HOME_URL)location.href=HOME_URL;else if(history.length>1)history.back()};
+lock(true);drawHist();render();poll();
+
 </script></body></html>
