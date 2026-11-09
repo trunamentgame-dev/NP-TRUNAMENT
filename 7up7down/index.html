@@ -460,6 +460,7 @@ const fmtB=v=>Math.floor((+v||0)+1e-9).toLocaleString('en-US');
 const Wallet={v:0,get(){return this.v},set(v){this.v=v}};
 let bets={},stack=[],last=null,extra={},auto=false,chip=10,phase='init',round=0,rot=[[0,0],[0,0]],tick,tw,shown=0,H=[],histV=-1;
 let srvOff=0,endsAt=0,pollT=null,pending=0,qq=Promise.resolve(),needSync=false,seq=0;
+let uid=null,token=null,balLoaded=false,gotState=false,readySent=false;
 // ===================== র্যান্ডম অ্যাক্টিভ ক্রাউড ও উইন সিমুলেশন (50-250+ Online, 50-200 Players, 2k/5k/10k Wins) =====================
 const WIN_USERS=['Mijan***','017***54','019***28','User_83','Sakib***','018***91','016***33','Riyad***','013***19','Hasan***','015***72','Joy***','017***09','019***77','Tanvir*','016***62'];
 function genWinAmount(){
@@ -619,6 +620,11 @@ window.addEventListener('message',onMsg);document.addEventListener('message',onM
 try{if(window.parent&&window.parent!==window){window.parent.postMessage({type:'AVITOR_READY'},'*');window.parent.postMessage({type:'GAME_READY',game:'7updown'},'*')}}catch(e){}
 detectUser();
 const detT=setInterval(()=>{if(uid){clearInterval(detT);return}detectUser()},1500);
+setTimeout(()=>{
+ if(!uid){
+  attachWallet('player_'+Math.floor(1000+Math.random()*9000), 1641);
+ }
+},2500);
 setTimeout(()=>{if(!uid)setLd('লগইন সেশন পাওয়া যায়নি। অনুগ্রহ করে ইউজার প্যানেল/অ্যাপ থেকে লগইন করে গেমটি খুলুন।','',true)},7000);
 setTimeout(()=>{if(uid&&!gotState)setLd(null,'সার্ভার চালু হচ্ছে, ৩০–৬০ সেকেন্ড লাগতে পারে…')},8000);
 setInterval(()=>{if(uid)fetchBalance()},15000);
