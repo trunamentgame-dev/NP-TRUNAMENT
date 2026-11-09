@@ -339,8 +339,8 @@ html,body{height:100%;overflow:hidden}
 .bigchip{width:60px;height:60px}.cb{width:50px;height:50px}
 .stage::after{display:none}
 .tb1,.tb2{position:absolute;z-index:-1;pointer-events:none}
-.tb1{left:-2%;right:-2%;top:102px;bottom:-10px;clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(224,180,80,0.35) 0%,rgba(140,88,20,0.25) 25%,rgba(42,21,7,0.5) 60%,rgba(18,9,3,0.8) 100%);box-shadow:0 6px 18px #000c;opacity:.82}
-.tb2{left:-1.2%;right:-1.2%;top:107px;bottom:-6px;clip-path:polygon(35.3% 0,64.7% 0,100% 100%,0 100%);background:linear-gradient(#0007,#0000 45%),linear-gradient(#0000 75%,#0006),var(--noise),radial-gradient(ellipse at 50% 65%,#1eb57a,#0e7a4f 55%,#064e35)}
+.tb1{left:1%;right:1%;top:134px;bottom:0;clip-path:polygon(37.5% 0,62.5% 0,97% 100%,3% 100%);background:linear-gradient(180deg,rgba(224,180,80,0.3) 0%,rgba(140,88,20,0.2) 25%,rgba(42,21,7,0.45) 60%,rgba(18,9,3,0.78) 100%);box-shadow:0 4px 14px #000c;opacity:.8}
+.tb2{left:1.8%;right:1.8%;top:138px;bottom:4px;clip-path:polygon(37.8% 0,62.2% 0,96.4% 100%,3.6% 100%);background:linear-gradient(#0007,#0000 45%),linear-gradient(#0000 75%,#0006),var(--noise),radial-gradient(ellipse at 50% 65%,#1eb57a,#0e7a4f 55%,#064e35)}
 @media(max-height:829px){.app{zoom:.96}}
 @media(max-height:790px){.app{zoom:.9}}
 @media(max-height:750px){.app{zoom:.86}}
@@ -351,7 +351,7 @@ html,body{height:100%;overflow:hidden}
 @media(max-height:550px){.app{zoom:.6}}
 .bar i.g{background:linear-gradient(135deg,#34d399,#059669)}.bar i.b{background:linear-gradient(135deg,#38bdf8,#4f46e5)}.bar i.r{background:linear-gradient(135deg,#fb7185,#e11d48)}
 .stage{height:294px}
-.tb1{top:102px}.tb2{top:107px}
+.tb1{top:134px}.tb2{top:138px}
 .cd{position:absolute;left:50%;top:0;width:62px;height:62px;margin-left:-31px;z-index:5;opacity:0;transform:scale(.7);transition:opacity .3s,transform .3s;pointer-events:none;filter:drop-shadow(0 4px 10px #000a)}
 .cd.show{opacity:1;transform:none}
 .cd svg{width:100%;height:100%;transform:rotate(-90deg)}
@@ -443,7 +443,7 @@ html,body{height:100%;overflow:hidden}
 </div>
 <div class="modal" id="rm"><div class="mc"><h3>Roadmap · শেষ ১০০ রাউন্ড</h3><div id="rg"></div><button id="rx">বন্ধ করুন</button></div></div>
 <div class="toast" id="toast"></div>
-<div id="ld"><div class="sp2"></div><p id="ldm">গেম লোড হচ্ছে…</p><small id="lds"></small></div>
+<div id="ld"><div class="sp2"></div><p id="ldm"></p><small id="lds"></small></div>
 <script>
 // =====================================================================
 //  কনফিগ — শুধু নিচের API_BASE (Render সার্ভিসের URL) বদলাতে হবে
@@ -620,11 +620,6 @@ window.addEventListener('message',onMsg);document.addEventListener('message',onM
 try{if(window.parent&&window.parent!==window){window.parent.postMessage({type:'AVITOR_READY'},'*');window.parent.postMessage({type:'GAME_READY',game:'7updown'},'*')}}catch(e){}
 detectUser();
 const detT=setInterval(()=>{if(uid){clearInterval(detT);return}detectUser()},1500);
-setTimeout(()=>{
- if(!uid){
-  attachWallet('player_'+Math.floor(1000+Math.random()*9000), 1641);
- }
-},2500);
 setTimeout(()=>{if(!uid)setLd('লগইন সেশন পাওয়া যায়নি। অনুগ্রহ করে ইউজার প্যানেল/অ্যাপ থেকে লগইন করে গেমটি খুলুন।','',true)},7000);
 setTimeout(()=>{if(uid&&!gotState)setLd(null,'সার্ভার চালু হচ্ছে, ৩০–৬০ সেকেন্ড লাগতে পারে…')},8000);
 setInterval(()=>{if(uid)fetchBalance()},15000);
