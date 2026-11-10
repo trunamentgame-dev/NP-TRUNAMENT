@@ -4697,7 +4697,8 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       try {
         const tasks = [];
         if (auth && auth.currentUser) {
-          tasks.push(npWait(auth.currentUser.getIdToken(true).then(t => { gameIdToken = t; }).catch(() => {}), 5000));
+          // আগের মতো জোর করে নতুন টোকেন আনা হয় না (প্রতি Play-তে নেট-অপেক্ষা): টোকেন বৈধ থাকলে সঙ্গে সঙ্গে পাওয়া যায়, মেয়াদ ফুরানোর কাছাকাছি হলে SDK নিজেই নতুন আনে
+          tasks.push(npWait(auth.currentUser.getIdToken().then(t => { gameIdToken = t; }).catch(() => {}), 5000));
           if (db) {
             tasks.push(npWait(db.ref('users/' + auth.currentUser.uid + '/balance').once('value').then(snap => {
               const b = snap.val();
@@ -4706,10 +4707,14 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           }
         }
         if (npInfo.health) {
-          tasks.push(npWait(fetch(npInfo.health, { mode: 'no-cors', cache: 'no-store' }).catch(() => {}), 12000));
+          // সার্ভার জাগানো শুরু হয়ে যায়, কিন্তু লোডিং সর্বোচ্চ ২.৫ সেকেন্ড এর জন্য আটকে থাকে (গেম নিজেই সার্ভারে সংযোগের চেষ্টা চালিয়ে যায়)
+          tasks.push(npWait(fetch(npInfo.health, { mode: 'no-cors', cache: 'no-store' }).catch(() => {}), 2500));
         }
         await Promise.all(tasks);
       } catch (e) {}
+
+      // লোডিং স্ক্রিন আগে পুরোপুরি আঁকা হোক, তারপর ভারী গেম পেজ লোড শুরু (নইলে গেম লোডের চাপে লোডিং আটকে আটকে চলে)
+      await new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(function () { setTimeout(r, 80); }); }); });
 
       let finalUrl = url;
       if (gameIdToken && npInfo.sendToken) {   // বাইরের গেমে ইউজারের লগইন-টোকেন পাঠানো হয় না
@@ -7870,16 +7875,22 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     .npld-brand{font-family:'Arial Black',Impact,'Segoe UI',sans-serif;font-weight:900;letter-spacing:.32em;padding-left:.32em;font-size:clamp(12px,3.6vw,17px);color:#fde68a;opacity:.92;text-shadow:0 0 14px rgba(245,158,11,.5)}
     .npld-bar{width:min(220px,56vw);height:3px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
     .npld-bar i{display:block;height:100%;width:40%;border-radius:3px;background:linear-gradient(90deg,#f59e0b,#fde68a);animation:npldbar 1.3s ease-in-out infinite}
-    @keyframes npldbar{0%{transform:translateX(-110%)}100%{transform:translateX(280%)}}
+    @keyframes npldbar{0%{transform:translate3d(-110%,0,0)}100%{transform:translate3d(280%,0,0)}}
+    /* শুধু transform/opacity অ্যানিমেশন: ব্রাউজারের GPU-তে আলাদা লেয়ারে চলে, তাই গেম পেজ লোডের চাপেও আটকায় না */
+    @keyframes npldin{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+    @keyframes npldbreath{0%,100%{opacity:1;transform:translate3d(0,0,0) scale(1)}50%{opacity:.8;transform:translate3d(0,0,0) scale(.985)}}
+    .npld.npld-on .npld-wrap{animation:npldin .35s ease-out both;will-change:opacity,transform}
+    .npld-txt{will-change:transform,opacity;transform:translate3d(0,0,0);animation:npldbreath 2.2s ease-in-out infinite}
+    .npld-bar i{will-change:transform;transform:translate3d(-110%,0,0)}
     .npld-err{display:none;flex-direction:column;align-items:center;gap:12px;text-align:center;color:#e2e8f0;font-family:var(--font-bengali,sans-serif);font-size:14px;line-height:1.5;max-width:320px}
     .npld.npld-err-on .npld-err{display:flex}
     .npld.npld-err-on .npld-bar,.npld.npld-err-on .npld-txt{display:none}
     .npld-err-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
     .npld-err-btns button{border:0;cursor:pointer;padding:10px 18px;border-radius:10px;font-weight:700;font-size:13.5px;font-family:inherit;background:#f59e0b;color:#0f172a}
     .npld-err-btns button#npLoadClose{background:rgba(255,255,255,.12);color:#e2e8f0}
-    @media (prefers-reduced-motion:reduce){.npld-bar i{animation:none;width:100%}}
+    @media (prefers-reduced-motion:reduce){.npld-bar i{animation:none;width:100%;transform:none}.npld-txt,.npld.npld-on .npld-wrap{animation:none}}
   </style>
-  <div class="npld" id="npLoad" role="status" aria-label="Loading"><div class="npld-wrap"><div class="npld-txt" aria-hidden="true"><span class="npld-ch" style="--i:0">M</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">S</span><span class="npld-ch" style="--i:3">T</span><span class="npld-ch" style="--i:4">W</span><span class="npld-ch" style="--i:5">I</span><span class="npld-ch" style="--i:6">N</span><span class="npld-ch" style="--i:7">8</span><span class="npld-ch" style="--i:8">8</span></div><div class="npld-bar" aria-hidden="true"><i></i></div><div class="npld-err" id="npLoadErr" role="alert"><div id="npLoadErrMsg"></div><div class="npld-err-btns"><button type="button" id="npLoadRetry">আবার চেষ্টা করুন</button><button type="button" id="npLoadClose">বন্ধ করুন</button></div></div></div></div>
+  <div class="npld" id="npLoad" role="status" aria-label="Loading"><div class="npld-wrap"><div class="npld-brand" aria-hidden="true">MOSTWIN88</div><div class="npld-txt" aria-hidden="true"><span class="npld-ch" style="--i:0">L</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">A</span><span class="npld-ch" style="--i:3">D</span><span class="npld-ch" style="--i:4">I</span><span class="npld-ch" style="--i:5">N</span><span class="npld-ch" style="--i:6">G</span><span class="npld-ch" style="--i:7">.</span><span class="npld-ch" style="--i:8">.</span><span class="npld-ch" style="--i:9">.</span><span class="npld-ch" style="--i:10">.</span><span class="npld-ch" style="--i:11">.</span></div><div class="npld-bar" aria-hidden="true"><i></i></div><div class="npld-err" id="npLoadErr" role="alert"><div id="npLoadErrMsg"></div><div class="npld-err-btns"><button type="button" id="npLoadRetry">আবার চেষ্টা করুন</button><button type="button" id="npLoadClose">বন্ধ করুন</button></div></div></div></div>
   <script>
   (function () {
     var el = document.getElementById('npLoad'), t1 = null, t2 = null, tLimit = null, waiting = false, retryFn = null;
