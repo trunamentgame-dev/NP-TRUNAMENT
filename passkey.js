@@ -227,6 +227,23 @@
     '.npPkDev{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--border-subtle,#1e293b)}' +
     '.npPkDevName{font-size:14px;font-weight:600}.npPkDevMeta{font-size:11.5px;color:var(--text-muted,#64748b);margin-top:2px}' +
     '.npPkSmall{padding:8px 12px;width:auto;font-size:12.5px;border-radius:10px;border-color:var(--color-accent,#ef4444);color:var(--color-accent,#ef4444);white-space:nowrap}' +
+    '.npPkFp{position:relative;display:flex;align-items:center;justify-content:center;width:132px;height:132px;margin:6px auto 0;padding:0;border-radius:50%;border:1px solid rgba(245,158,11,.4);background:rgba(245,158,11,.08);color:#fcd34d;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .3s,border-color .3s,background .3s,box-shadow .3s}' +
+    '.npPkFp:before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(245,158,11,.55);animation:npPkRing 2.2s ease-out infinite;pointer-events:none}' +
+    '.npPkFpIn{position:absolute;inset:0;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center}' +
+    '.npPkFp .npPkIco{width:70px;height:70px;position:relative}' +
+    '.npPkScan{position:absolute;left:14%;right:14%;top:10%;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#fde68a,transparent);box-shadow:0 0 12px 3px rgba(251,191,36,.7);opacity:0}' +
+    '.npPkFp.scanning{box-shadow:0 0 34px rgba(245,158,11,.35);background:rgba(245,158,11,.14)}' +
+    '.npPkFp.scanning .npPkScan{opacity:1;animation:npPkScan 1.3s ease-in-out infinite alternate}' +
+    '.npPkFp.scanning .npPkIco path{stroke-dasharray:44;animation:npPkDraw 1.6s ease-in-out infinite}' +
+    '.npPkFp.scanning .npPkIco path:nth-child(2n){animation-delay:.2s}.npPkFp.scanning .npPkIco path:nth-child(3n){animation-delay:.4s}' +
+    '.npPkFp.ok{color:#4ade80;border-color:#4ade80;background:rgba(74,222,128,.12);box-shadow:0 0 40px rgba(74,222,128,.45);animation:npPkPop .45s ease}' +
+    '.npPkFp.ok:before{animation:none;opacity:0}.npPkFp.ok .npPkScan{opacity:0!important;animation:none!important}.npPkFp.ok .npPkIco path{animation:none!important;stroke-dasharray:none!important}' +
+    '.npPkFp.err{animation:npPkShake .4s ease}' +
+    '@keyframes npPkRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.55);opacity:0}}' +
+    '@keyframes npPkScan{0%{top:12%}100%{top:86%}}' +
+    '@keyframes npPkDraw{0%{stroke-dashoffset:44;opacity:.35}50%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:-44;opacity:.35}}' +
+    '@keyframes npPkPop{0%{transform:scale(.92)}60%{transform:scale(1.08)}100%{transform:scale(1)}}' +
+    '@keyframes npPkShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}' +
     '.npPkCard .npPkBtn{color:var(--text-primary,#f8fafc)}.npPkCard .npPkPrimary{color:#0f172a}.npPkCard .npPkBtn+.npPkBtn{margin-top:10px}';
   var st = document.createElement('style');
   st.id = 'npPkStyle';
@@ -251,7 +268,7 @@
   function setBusy(b) {
     busy = b;
     var btn = document.getElementById('npPkUnlockBtn');
-    if (btn) btn.disabled = b;
+    if (btn) { btn.classList.remove('err'); if (b) btn.classList.remove('ok'); btn.classList.toggle('scanning', b); }
   }
   function removeLock() { var n = document.getElementById('npPkLock'); if (n && n.parentNode) n.parentNode.removeChild(n); }
   function unlockDone() { removeLock(); G.release(); }
@@ -267,7 +284,7 @@
   function onUnlockClick(ev) {
     var auto = (ev === 'auto');
     if (busy) return;
-    setMsg(T('Please wait…', 'অপেক্ষা করুন…'), true); setBusy(true);
+    setMsg(''); setBusy(true);
     api('/api/passkey/login/options', {}).then(function (r) {
       return navigator.credentials.get({ publicKey: toGet(r.options) }).then(function (cred) {
         if (!cred) throw cancelErr();
@@ -276,12 +293,18 @@
     }).then(function (r) {
       var cu = (typeof auth !== 'undefined' && auth) ? auth.currentUser : null;
       var p = (cu && cu.uid === r.uid) ? Promise.resolve() : auth.signInWithCustomToken(r.token);
-      return p.then(function () { lsSet(LS_ENR, r.uid); unlockDone(); });
+      return p.then(function () {
+        lsSet(LS_ENR, r.uid);
+        var b = document.getElementById('npPkUnlockBtn');
+        if (b) { b.classList.remove('scanning'); b.classList.add('ok'); }
+        return new Promise(function (res) { setTimeout(res, 550); }).then(unlockDone);
+      });
     }).catch(function (e) {
       // অটো-চালুর সময় ব্রাউজার আটকালে বা বাতিল হলে ভয় না দেখিয়ে বাটন চাপতে বলি
-      if (auto && e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) {
-        setMsg(T('Tap "Unlock with Fingerprint" to continue.', '"ফিঙ্গারপ্রিন্ট দিয়ে আনলক করুন" বাটনে চাপ দিন।'), true);
-      } else { setMsg(errText(e)); }
+      var b = document.getElementById('npPkUnlockBtn');
+      if (b) { b.classList.remove('scanning'); b.classList.add('err'); setTimeout(function () { b.classList.remove('err'); }, 500); }
+      // বাতিল/টাইমআউটে কোনো লেখা নয়; শুধু আইকন কেঁপে ওঠে, আইকনে চাপলে আবার চেষ্টা
+      if (!(e && (e.name === 'NotAllowedError' || e.name === 'AbortError'))) setMsg(errText(e));
     }).then(function () { setBusy(false); });
   }
 
@@ -314,16 +337,13 @@
 
   function buildLock() {
     if (document.getElementById('npPkLock')) return;
-    var unlockBtn = el('button', { id: 'npPkUnlockBtn', class: 'npPkBtn npPkPrimary', type: 'button', onclick: onUnlockClick }, [
-      fpIcon(), T('Unlock with Fingerprint', 'ফিঙ্গারপ্রিন্ট দিয়ে আনলক করুন')
+    var unlockBtn = el('button', { id: 'npPkUnlockBtn', class: 'npPkFp', type: 'button', 'aria-label': 'Fingerprint', onclick: onUnlockClick }, [
+      el('span', { class: 'npPkFpIn' }, [el('span', { class: 'npPkScan' })]), fpIcon()
     ]);
     var panelFp = el('div', { id: 'npPkPanelFp' }, [
       unlockBtn,
       el('button', { class: 'npPkLink', type: 'button', onclick: function () { showPanel('pw'); } }, [
-        T('Cancel / Use Password Instead', 'বাতিল / পাসওয়ার্ড ব্যবহার করুন')
-      ]),
-      el('div', { class: 'npPkNote' }, [
-        T("Uses your device's fingerprint or screen lock.", 'আপনার ডিভাইসের ফিঙ্গারপ্রিন্ট বা স্ক্রিন লক ব্যবহার হবে।')
+        T('Use Password', 'পাসওয়ার্ড দিয়ে')
       ])
     ]);
     var userIn = el('input', { id: 'npPkUser', class: 'npPkField', type: 'text', autocomplete: 'username', autocapitalize: 'none', spellcheck: 'false',
@@ -343,8 +363,7 @@
     ]);
     var box = el('div', { class: 'npPkBox' }, [
       el('img', { class: 'npPkLogo', src: './icon-192.png', alt: '' }),
-      el('div', { class: 'npPkTitle' }, ['NP TOURNAMENT BD']),
-      el('div', { class: 'npPkSub' }, [T('App locked', 'অ্যাপ লক করা আছে')]),
+      el('div', { style: 'height:34px' }),
       panelFp, panelPw,
       el('div', { id: 'npPkLockMsg', class: 'npPkMsg', role: 'alert' })
     ]);
@@ -598,6 +617,33 @@
       if (!(e && e.name === 'NotAllowedError' && e.message === 'cancelled')) toast(errText(e), 'error');
     }).then(function () { refreshCard(true); });
   }
+
+  // ---------- অ্যাপ থেকে বের হলে (ব্যাকগ্রাউন্ডে গেলে) আবার লক ----------
+  // শুধু সেই ইউজারের জন্য, যে এই ডিভাইসে ফিঙ্গারপ্রিন্ট চালু করেছে। বাকিদের কিছুই বদলায় না।
+  // এই সময়ের বেশি অ্যাপের বাইরে থাকলে ফিরে আসার পর লক স্ক্রিন আসবে (মিলিসেকেন্ড; 0 দিলে সাথে সাথে লক)।
+  var RELOCK_AFTER_MS = 15000;
+  var hiddenAt = 0;
+  function relock() {
+    var cu = currentUser();
+    if (G.locked || !cu || lsGet(LS_ENR) !== cu.uid) return;
+    G.locked = true;
+    document.documentElement.classList.add('np-pk-lock');
+    try { sessionStorage.removeItem('np_pk_unlocked'); } catch (e) {}
+    autoTried = false; busy = false;
+    var old = document.getElementById('npPkLock'); if (old && old.parentNode) old.parentNode.removeChild(old);
+    buildLock();
+    showPanel('fp');
+    setTimeout(autoUnlock, 250);
+    if (card) card.style.display = 'none';
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') {
+      hiddenAt = Date.now();
+    } else if (document.visibilityState === 'visible' && hiddenAt) {
+      var away = Date.now() - hiddenAt; hiddenAt = 0;
+      if (away >= RELOCK_AFTER_MS) relock();
+    }
+  });
 
   // ---------- start ----------
   function afterLogin(u) { refreshCard(true); maybeOffer(u); }
