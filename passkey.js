@@ -148,15 +148,19 @@
   function api(path, body, token, method) {
     var headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
+    var ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var tm = ctl ? setTimeout(function () { try { ctl.abort(); } catch (e) {} }, 40000) : null;
     return fetch(API + path, {
       method: method || 'POST', headers: headers, cache: 'no-store',
+      signal: ctl ? ctl.signal : undefined,
       body: (method === 'GET') ? undefined : JSON.stringify(body || {})
     }).then(function (r) {
+      if (tm) clearTimeout(tm);
       return r.json().catch(function () { return {}; }).then(function (j) {
         if (!r.ok) { var e = new Error(j.error || ('HTTP ' + r.status)); e.status = r.status; throw e; }
         return j;
       });
-    });
+    }, function (e) { if (tm) clearTimeout(tm); throw e; });
   }
   function warmUp() { try { fetch(API + '/health', { mode: 'no-cors', cache: 'no-store' }).catch(function () {}); } catch (e) {} }
 
@@ -236,6 +240,20 @@
     '.npPkFp.busy{animation:npPkPulse 1.1s ease-in-out infinite}' +
     '.npPkFp.ok{color:#22c55e;border-color:#22c55e;box-shadow:0 0 36px rgba(34,197,94,.55);animation:none}' +
     '@keyframes npPkPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)}50%{box-shadow:0 0 0 16px rgba(245,158,11,0)}}' +
+    '.npPkFp{overflow:visible;border-width:2px;background:radial-gradient(circle at 50% 40%,rgba(245,158,11,.22),rgba(245,158,11,.04) 65%,rgba(245,158,11,0) 75%);box-shadow:0 0 28px rgba(245,158,11,.28),inset 0 0 22px rgba(245,158,11,.18)}' +
+    '.npPkFp::before{content:\"\";position:absolute;inset:-9px;border-radius:50%;border:2px solid rgba(245,158,11,.5);pointer-events:none;animation:npPkRing 2.2s ease-out infinite}' +
+    '.npPkFp::after{content:\"\";position:absolute;inset:0;border-radius:50%;pointer-events:none;' +
+    'background:linear-gradient(180deg,rgba(253,224,71,0),rgba(253,224,71,.65) 50%,rgba(253,224,71,0));background-size:100% 34%;background-repeat:no-repeat;background-position:0 -40%;' +
+    'animation:npPkScan 1.9s ease-in-out infinite}' +
+    '.npPkFp .npPkIco{position:relative;z-index:1;filter:drop-shadow(0 0 8px rgba(245,158,11,.75));animation:npPkGlow 1.9s ease-in-out infinite}' +
+    '.npPkFp.busy::after{animation-duration:.9s}.npPkFp.busy::before{animation-duration:1.1s}' +
+    '.npPkFp.ok::before,.npPkFp.ok::after{animation:none;opacity:0}.npPkFp.ok .npPkIco{animation:none;filter:drop-shadow(0 0 10px rgba(34,197,94,.9))}' +
+    '@keyframes npPkScan{0%{background-position:0 -40%}50%{background-position:0 140%}100%{background-position:0 -40%}}' +
+    '@keyframes npPkRing{0%{transform:scale(.92);opacity:.9}100%{transform:scale(1.28);opacity:0}}' +
+    '@keyframes npPkGlow{0%,100%{opacity:.82}50%{opacity:1}}' +
+    '.npPkSpin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(15,23,42,.3);border-top-color:#0f172a;animation:npPkSpinA .7s linear infinite;margin-right:8px;vertical-align:-2px}' +
+    '@keyframes npPkSpinA{to{transform:rotate(360deg)}}' +
+    '@media (prefers-reduced-motion:reduce){.npPkFp::before,.npPkFp::after,.npPkFp .npPkIco{animation:none}}' +
     '.npPkTiny{font-size:12px;color:#fca5a5;min-height:16px;margin-top:14px}' +
     '.npPkLogo{width:72px;height:72px;border-radius:18px}' +
     '.npPkModal{max-width:250px;padding:16px 14px;border-radius:18px}.npPkModal .npPkBtn{padding:10px 12px;font-size:14px;margin-bottom:8px}.npPkBigIco{width:40px;height:40px}.npPkModal p{font-size:12.5px;margin:0 0 14px}.npPkModal h3{font-size:17px;margin:8px 0 6px}';
@@ -445,9 +463,26 @@
       return navigator.credentials.create({ publicKey: toCreate(r.options) });
     }).then(function (cred) {
       if (!cred) throw cancelErr();
-      return user.getIdToken().then(function (t2) {
-        return api('/api/passkey/register/verify', { response: createResult(cred), label: deviceLabel() }, t2);
-      }).then(function () { setEnrolled(user.uid, cred.id); });
+      // আঙুল দেওয়ার সাথে সাথেই এই ডিভাইসে সেভ; সার্ভারে নিবন্ধন পেছনে চলে (UI আটকে থাকে না)
+      setEnrolled(user.uid, cred.id);
+      var payload = createResult(cred), label = deviceLabel();
+      function send(n) {
+        return user.getIdToken().then(function (t2) {
+          return api('/api/passkey/register/verify', { response: payload, label: label }, t2);
+        }).catch(function (e) {
+          // নেটওয়ার্ক/টাইমআউট হলে একবার আবার চেষ্টা (সার্ভার চ্যালেঞ্জ আগেই খরচ হলে retry কাজ করবে না, তখন নিচে বাতিল হবে)
+          if (n < 1 && e && !e.status) return send(n + 1);
+          throw e;
+        });
+      }
+      send(0).then(function () {
+        refreshCard(true);
+      }).catch(function (e) {
+        if (lsGet(LS_CRED) === cred.id) clearEnrolled();
+        toast(errText(e), 'error');
+        refreshCard(true);
+      });
+      return { ok: true };
     });
   }
 
@@ -462,6 +497,7 @@
     function later() { lsSet('np_pk_later_' + user.uid, '1'); hideSetup(); toast(T('You can enable it later from Profile > Security.', 'পরে প্রোফাইল > সিকিউরিটি থেকে চালু করতে পারবেন।'), 'info'); }
     function enable() {
       enableBtn.disabled = true; laterBtn.disabled = true; msg.textContent = '';
+      enableBtn.textContent = ''; enableBtn.appendChild(el('span', { class: 'npPkSpin' })); enableBtn.appendChild(document.createTextNode(T('Enabling…', 'চালু হচ্ছে…')));
       enroll().then(function () {
         hideSetup();
         toast(T('Fingerprint login enabled on this device.', 'এই ডিভাইসে ফিঙ্গারপ্রিন্ট লগইন চালু হয়েছে।'), 'success');
@@ -469,7 +505,7 @@
       }).catch(function (e) {
         if (e && e.name === 'InvalidStateError') { setEnrolled(user.uid, null); hideSetup(); refreshCard(true); return; }
         msg.textContent = (e && e.message === 'cancelled') ? errText(e) : errText(e);
-        enableBtn.disabled = false; laterBtn.disabled = false;
+        enableBtn.disabled = false; laterBtn.disabled = false; enableBtn.textContent = T('Enable', 'চালু করুন');
       });
     }
     enableBtn = el('button', { class: 'npPkBtn npPkPrimary', type: 'button', onclick: enable }, [T('Enable', 'চালু করুন')]);
@@ -598,6 +634,7 @@
 
   function onEnableClick() {
     var btns = actions.querySelectorAll('button'); btns.forEach(function (b) { b.disabled = true; });
+    if (btns[0]) { btns[0].textContent = ''; btns[0].appendChild(el('span', { class: 'npPkSpin' })); btns[0].appendChild(document.createTextNode(T('Enabling…', 'চালু হচ্ছে…'))); }
     warmUp();
     enroll().then(function () {
       toast(T('Fingerprint login enabled on this device.', 'এই ডিভাইসে ফিঙ্গারপ্রিন্ট লগইন চালু হয়েছে।'), 'success');
@@ -660,7 +697,7 @@
   }
 
   // ---------- start ----------
-  function afterLogin(u) { refreshCard(true); maybeOffer(u); }
+  function afterLogin(u) { warmUp(); refreshCard(true); maybeOffer(u); }
   G.afterRelease = function () { var u = currentUser(); if (u) afterLogin(u); };
 
   function start() {

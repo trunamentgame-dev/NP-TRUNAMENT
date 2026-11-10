@@ -3320,18 +3320,6 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           <span style="font-size:12px; color:var(--color-primary); font-weight:700;" id="menuLangBadge" data-no-i18n>বাংলা ❯</span>
         </div>
 
-        <!-- Support Helpline (অ্যাডমিন প্যানেল থেকে সেট করা নাম্বার; খালি থাকলে লুকানো থাকে) -->
-        <a id="supportPhoneRow" href="#" class="tx-item" style="display: none; border: none; border-bottom: 1px solid var(--border-subtle); border-radius: 0; text-decoration: none; color: inherit; cursor: pointer;">
-          <div class="tx-left">
-            <div class="tx-icon-box tx-entry">📞</div>
-            <div>
-              <div class="tx-title">সাপোর্ট হেল্পলাইন (Support)</div>
-              <div class="tx-date" id="supportPhoneText">-</div>
-            </div>
-          </div>
-          <span style="font-size:12px; color:var(--color-primary); font-weight:700;">কল করুন ❯</span>
-        </a>
-
         <!-- Rules -->
         <div class="tx-item" style="border: none; border-radius: 0; cursor: pointer;" onclick="window.app.openRulesModal()">
           <div class="tx-left">
@@ -8215,58 +8203,69 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     })();
   })();
   </script>
-  <!-- NP Games rows: দুই লাইনের গেম আলাদা আলাদা সময়ে উল্টো দিকে নিজে নিজে স্লাইড করে (শুধু scrollLeft বদলায়; কিছু রেন্ডার/ডাটা বদলায় না) -->
+  <!-- NP Games rows: হিরো ফটো স্লাইডারের মতো — নির্দিষ্ট সময় পরপর একবারে একটি করে গেম স্লাইড হয় (টানা চলা বন্ধ; শুধু scrollTo ব্যবহার, ডাটা/রেন্ডার অপরিবর্তিত) -->
   <script id="npGamesAutoSlide">
   (function () {
     'use strict';
     var rows = [
-      { id: 'gamesScrollTrack', speed: 26, dir: 1,  start: 'left',  snap: true },   // বাঁ থেকে ডানে, তারপর ফেরে
-      { id: 'gameBoxGrid',      speed: 34, dir: -1, start: 'right', snap: false }    // ডান থেকে বামে, তারপর ফেরে
+      { id: 'gamesScrollTrack', every: 4000, dir: 1  },   // বাঁ থেকে ডানে একটি একটি করে
+      { id: 'gameBoxGrid',      every: 5200, dir: -1 }    // ডান থেকে বামে একটি একটি করে (আলাদা সময়ে)
     ];
-    var RESUME_MS = 2500, EDGE_PAUSE = 900;
-    rows.forEach(function (r) { r.pos = null; r.pausedUntil = 0; r.edgeUntil = 0; r.visible = true; r.el = null; r.touching = false; });
+    var RESUME_MS = 6000;
+    rows.forEach(function (r) { r.el = null; r.pausedUntil = 0; r.visible = true; r.timer = null; r.touching = false; r.init = false; });
 
+    function stepOf(e) {
+      var kids = e.children;
+      if (kids.length > 1) {
+        var d = kids[1].offsetLeft - kids[0].offsetLeft;
+        if (d > 4) return d;
+      }
+      return kids.length ? kids[0].offsetWidth + 10 : 0;
+    }
     function bind(r) {
       var e = document.getElementById(r.id);
       if (!e || e === r.el) return;
-      r.el = e; r.pos = null;
-      var stop = function () { r.touching = true; r.pausedUntil = Infinity; if (r.snap) e.style.scrollSnapType = 'x mandatory'; };
-      var go = function () { r.touching = false; r.pos = null; r.pausedUntil = Date.now() + RESUME_MS; };
+      r.el = e; r.init = false;
+      var stop = function () { r.touching = true; r.pausedUntil = Infinity; };
+      var go = function () { r.touching = false; r.pausedUntil = Date.now() + RESUME_MS; };
       e.addEventListener('touchstart', stop, { passive: true });
       e.addEventListener('touchend', go, { passive: true });
       e.addEventListener('touchcancel', go, { passive: true });
       e.addEventListener('pointerdown', stop, { passive: true });
       e.addEventListener('pointerup', go, { passive: true });
-      e.addEventListener('wheel', function () { r.pausedUntil = Date.now() + RESUME_MS; r.pos = null; }, { passive: true });
+      e.addEventListener('wheel', function () { r.pausedUntil = Date.now() + RESUME_MS; }, { passive: true });
       if (window.IntersectionObserver) {
         new IntersectionObserver(function (en) { r.visible = !!(en[0] && en[0].isIntersecting); }).observe(e);
       }
     }
-
-    var last = 0;
-    function tick(t) {
-      requestAnimationFrame(tick);
-      var dt = last ? Math.min((t - last) / 1000, 0.1) : 0; last = t;
-      if (document.hidden || document.documentElement.classList.contains('np-pk-lock')) return;
-      var now = Date.now();
-      rows.forEach(function (r) {
-        bind(r);
-        var e = r.el; if (!e || !r.visible || r.touching || now < r.pausedUntil) return;
-        var max = e.scrollWidth - e.clientWidth;
-        if (max < 8) return;
-        if (r.pos === null) {
-          if (r.start === 'right' && !r.init) { r.init = true; e.scrollLeft = max; }
-          r.pos = e.scrollLeft;
-        }
-        if (now < r.edgeUntil) return;
-        if (r.snap) e.style.scrollSnapType = 'none';
-        r.pos += r.dir * r.speed * dt;
-        if (r.pos >= max) { r.pos = max; r.dir = -1; r.edgeUntil = now + EDGE_PAUSE; }
-        else if (r.pos <= 0) { r.pos = 0; r.dir = 1; r.edgeUntil = now + EDGE_PAUSE; }
-        e.scrollLeft = r.pos;
-      });
+    function step(r) {
+      bind(r);
+      var e = r.el;
+      if (!e || !r.visible || r.touching || Date.now() < r.pausedUntil) return;
+      var max = e.scrollWidth - e.clientWidth;
+      var w = stepOf(e);
+      if (max < 8 || w < 4) return;
+      if (r.dir === -1 && !r.init) { r.init = true; e.scrollLeft = max; }   // ডান প্রান্ত থেকে শুরু
+      var cur = e.scrollLeft, target;
+      if (r.dir === 1) {
+        target = cur + w;
+        if (cur >= max - 2) target = 0;                 // শেষে পৌঁছালে শুরুতে ফেরে
+        else if (target > max) target = max;
+      } else {
+        target = cur - w;
+        if (cur <= 2) target = max;                     // শুরুতে পৌঁছালে শেষে ফেরে
+        else if (target < 0) target = 0;
+      }
+      try { e.scrollTo({ left: target, behavior: 'smooth' }); } catch (x) { e.scrollLeft = target; }
     }
-    requestAnimationFrame(tick);
+    rows.forEach(function (r, i) {
+      setTimeout(function () {
+        r.timer = setInterval(function () {
+          if (document.hidden || document.documentElement.classList.contains('np-pk-lock')) return;
+          step(r);
+        }, r.every);
+      }, 1200 + i * 1700);
+    });
   })();
   </script>
   <script src="./passkey.js"></script>
