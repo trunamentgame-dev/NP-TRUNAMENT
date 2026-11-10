@@ -1173,13 +1173,13 @@
       width: 54px;
       height: 54px;
       padding: 0;
-      border: 2px solid #fff;
+      border: 2px solid var(--color-primary);
       border-radius: 50%;
-      background: linear-gradient(145deg, #ffb52e, #f04444 75%);
+      background: linear-gradient(145deg, #1c263f, #0e131f 75%);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 5px 15px rgba(239,68,68,.4);
+      box-shadow: 0 5px 15px var(--color-primary-glow), 0 0 0 3px rgba(245,158,11,.12);
       z-index: 9999;
       cursor: grab;
       touch-action: none;
@@ -1187,6 +1187,8 @@
       -webkit-user-select: none;
       overflow: hidden;
     }
+
+    .floating-support-btn.np-hide { display: none !important; }
 
     .floating-support-btn:active {
       cursor: grabbing;
@@ -1357,13 +1359,13 @@
       height: 92vh;
       height: 92dvh;
       max-height: 920px;
-      background: #ffffff;
-      border: 1px solid rgba(233, 30, 99, 0.35);
+      background: #0e131f;
+      border: 1px solid var(--border-gold);
       border-radius: 20px 20px 0 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 25px rgba(233, 30, 99, 0.2);
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 25px rgba(245, 158, 11, 0.2);
       position: relative;
       animation: supportSheetIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
       margin-top: auto;
@@ -1389,7 +1391,8 @@
     .support-modal-header {
       flex: 0 0 auto;
       height: 52px;
-      background: linear-gradient(135deg, #f06292, #c2185b);
+      background: linear-gradient(135deg, #1c263f, #0e131f);
+      border-top: 2px solid var(--color-primary);
       color: #ffffff;
       padding: 0 16px;
       display: flex;
@@ -1469,7 +1472,7 @@
       position: relative;
       width: 100%;
       height: calc(100% - 52px);
-      background: #fafbfe;
+      background: #0e131f;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -1487,14 +1490,14 @@
     .support-iframe-loader {
       position: absolute;
       inset: 0;
-      background: #fafbfe;
+      background: #0e131f;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 12px;
       z-index: 1;
-      color: #c2185b;
+      color: #f59e0b;
       font-size: 13px;
       font-weight: 600;
       transition: opacity 0.2s ease;
@@ -1503,8 +1506,8 @@
     .support-spinner {
       width: 34px;
       height: 34px;
-      border: 3px solid rgba(233, 30, 99, 0.2);
-      border-top-color: #e91e63;
+      border: 3px solid rgba(245, 158, 11, 0.2);
+      border-top-color: #f59e0b;
       border-radius: 50%;
       animation: supportSpin 0.75s linear infinite;
     }
@@ -1516,7 +1519,7 @@
     .support-iframe-error {
       position: absolute;
       inset: 0;
-      background: #fafbfe;
+      background: #0e131f;
       display: none;
       flex-direction: column;
       align-items: center;
@@ -1524,7 +1527,7 @@
       padding: 24px;
       text-align: center;
       z-index: 2;
-      color: #1e293b;
+      color: #e2e8f0;
     }
 
     /* Modals */
@@ -1708,9 +1711,9 @@
     }
 
     #exitYes {
-      background: #e91e63;
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+      background: #f59e0b;
+      color: #0f172a;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     }
 
     #exitNo {
@@ -2923,7 +2926,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 <!-- ==================== PAGE LOADING SCREEN (ইনট্রোর পর পেজ লোড না হওয়া পর্যন্ত দৃশ্যমান) ==================== -->
 <div id="pageLoadingScreen" class="npld npld-on" role="status" aria-label="Loading">
   <div class="npld-txt" aria-hidden="true">
-    <span class="npld-ch" style="--i:0">L</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">A</span><span class="npld-ch" style="--i:3">D</span><span class="npld-ch" style="--i:4">I</span><span class="npld-ch" style="--i:5">N</span><span class="npld-ch" style="--i:6">G</span><span class="npld-ch" style="--i:7">.</span><span class="npld-ch" style="--i:8">.</span><span class="npld-ch" style="--i:9">.</span><span class="npld-ch" style="--i:10">.</span><span class="npld-ch" style="--i:11">.</span>
+    <span class="npld-ch" style="--i:0">M</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">S</span><span class="npld-ch" style="--i:3">T</span><span class="npld-ch" style="--i:4">W</span><span class="npld-ch" style="--i:5">I</span><span class="npld-ch" style="--i:6">N</span><span class="npld-ch" style="--i:7">8</span><span class="npld-ch" style="--i:8">8</span>
   </div>
 </div>
 <!-- ==================== END INTRO ANIMATION & LOADER ==================== -->
@@ -3900,7 +3903,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         </div>
         <div class="support-iframe-error" id="supportIframeError">
           <div style="font-size: 32px; margin-bottom: 8px;">⚠️</div>
-          <div style="font-weight: 800; font-size: 15px; color: #e91e63; margin-bottom: 6px;">সাপোর্ট পেজ লোড করা যায়নি</div>
+          <div style="font-weight: 800; font-size: 15px; color: #f59e0b; margin-bottom: 6px;">সাপোর্ট পেজ লোড করা যায়নি</div>
           <div style="font-size: 12.5px; color: #64748b; margin-bottom: 16px; max-width: 300px; line-height: 1.5;">
             ফাইলটি একই GitHub রিপোজিটরিতে <b>support_center.html</b> নামে আছে কি না নিশ্চিত করুন।
           </div>
@@ -3908,7 +3911,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             <button type="button" class="btn btn-primary btn-sm" onclick="window.app.reloadSupportModal()">
               <span>🔄 আবার চেষ্টা করুন</span>
             </button>
-            <a id="supportFallbackDirectLink" href="./support_center.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="border-color:#c2185b; color:#c2185b;">
+            <a id="supportFallbackDirectLink" href="./support_center.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="border-color:#f59e0b; color:#f59e0b;">
               <span>ব্রাউজারে খুলুন ↗</span>
             </a>
           </div>
@@ -4659,7 +4662,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     // ---- গেম রেজিস্ট্রি: কোন গেমে টোকেন যাবে / প্রস্তুত সংকেতের অপেক্ষা হবে / কোন সার্ভার জাগানো হবে, তা এখন গেমের রেকর্ড (Firebase games/{id}) থেকে আসে ----
     // রেকর্ডের ফিল্ড:  integrated (true = নিজস্ব গেম, false = বাইরের লিংক)  ও  healthUrl (গেম সার্ভারের /health লিংক, ঐচ্ছিক)
     // integrated ফিল্ড না থাকা পুরোনো গেম আগের মতোই চলে।
-    const NP_LEGACY_GAME = /crazytime|creazy|aviator|avitor|crash|roulette|ludo|carrom|crambod/i;
+    const NP_LEGACY_GAME = /crazytime|creazy|aviator|avitor|crash|roulette|ludo|carrom|crambod|7up|updown|7-up|up-?down/i;
     function npGameRecord(url) {
       const clean = String(url || '').split('#')[0];
       const list = [].concat(typeof gamesForBoxes !== 'undefined' && Array.isArray(gamesForBoxes) ? gamesForBoxes : [], state.games || []);
@@ -4784,7 +4787,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         try { w.opener = null; } catch (e) {}
         try {
           w.document.open();
-          w.document.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050811"><meta name="referrer" content="no-referrer"><title>Loading</title><style>html,body{margin:0;height:100%;background:#050811}body{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);overflow:hidden}.t{display:flex;white-space:nowrap;font-family:"Arial Black",Impact,sans-serif;font-weight:900;font-size:clamp(22px,8.4vw,46px);letter-spacing:.03em}.t span{display:inline-block;color:#fcd34d;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:p 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.11s)}@keyframes p{0%,60%,100%{transform:scale(.8);opacity:.55}25%{transform:scale(1.35);opacity:1}}@media (prefers-reduced-motion:reduce){.t span{animation:none}}</style></head><body><div class="t">' + 'LOADING.....'.split('').map(function (c, i) { return '<span style="--i:' + i + '">' + c + '</span>'; }).join('') + '</div></body></html>');
+          w.document.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050811"><meta name="referrer" content="no-referrer"><title>MOSTWIN88</title><style>html,body{margin:0;height:100%;background:#050811}body{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);overflow:hidden}.t{display:flex;white-space:nowrap;font-family:"Arial Black",Impact,sans-serif;font-weight:900;font-size:clamp(22px,8.4vw,46px);letter-spacing:.03em}.t span{display:inline-block;color:#fcd34d;text-shadow:0 1px 0 #fde68a,1px 2px 0 #b45309,2px 3px 0 #a16207,3px 4px 0 #92400e,4px 5px 0 #78350f,5px 6px 0 #5a2a0c,6px 10px 14px rgba(0,0,0,.6),0 0 18px rgba(245,158,11,.45);animation:p 1.6s ease-in-out infinite;animation-delay:calc(var(--i)*.11s)}@keyframes p{0%,60%,100%{transform:scale(.8);opacity:.55}25%{transform:scale(1.35);opacity:1}}@media (prefers-reduced-motion:reduce){.t span{animation:none}}</style></head><body><div class="t">' + 'MOSTWIN88'.split('').map(function (c, i) { return '<span style="--i:' + i + '">' + c + '</span>'; }).join('') + '</div></body></html>');
           w.document.close();
         } catch (e) {}
         w.location.replace(finalUrl);
@@ -7918,6 +7921,27 @@ body[data-theme="light"] .pp-howto div{color:#475569}
   })();
   </script>
 
+  <script>
+  /* Support আইকন: শুধু হোম পেজে দেখাবে (অন্য পেজ ও গেম খেলার সময় লুকানো) */
+  (function () {
+    var btn = document.getElementById('floatingSupportBtn');
+    if (!btn) return;
+    function upd() {
+      var home = document.getElementById('viewHome');
+      var onHome = !!(home && home.classList.contains('active'));
+      var inGame = !!document.getElementById('npGameFrameWrap');
+      btn.classList.toggle('np-hide', !onHome || inGame);
+    }
+    upd();
+    document.querySelectorAll('.app-view').forEach(function (v) {
+      new MutationObserver(upd).observe(v, { attributes: true, attributeFilter: ['class'] });
+    });
+    new MutationObserver(upd).observe(document.body, { childList: true });
+    window.addEventListener('pageshow', upd);
+    setInterval(upd, 500);
+  })();
+  </script>
+
   <style>
     /* Play Now লোডিং পেজ (শুধু লেখা, কোনো ছবি/লোগো নেই) */
     .npld{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1c263f 0%,#0e131f 50%,#050811 100%);opacity:1;transition:opacity .25s ease}
@@ -7948,7 +7972,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     .npld-err-btns button#npLoadClose{background:rgba(255,255,255,.12);color:#e2e8f0}
     @media (prefers-reduced-motion:reduce){.npld-bar i{animation:none;width:100%;transform:none}.npld-txt,.npld.npld-on .npld-wrap{animation:none}}
   </style>
-  <div class="npld" id="npLoad" role="status" aria-label="Loading"><div class="npld-wrap"><div class="npld-brand" aria-hidden="true">MOSTWIN88</div><div class="npld-txt" aria-hidden="true"><span class="npld-ch" style="--i:0">L</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">A</span><span class="npld-ch" style="--i:3">D</span><span class="npld-ch" style="--i:4">I</span><span class="npld-ch" style="--i:5">N</span><span class="npld-ch" style="--i:6">G</span><span class="npld-ch" style="--i:7">.</span><span class="npld-ch" style="--i:8">.</span><span class="npld-ch" style="--i:9">.</span><span class="npld-ch" style="--i:10">.</span><span class="npld-ch" style="--i:11">.</span></div><div class="npld-bar" aria-hidden="true"><i></i></div><div class="npld-err" id="npLoadErr" role="alert"><div id="npLoadErrMsg"></div><div class="npld-err-btns"><button type="button" id="npLoadRetry">আবার চেষ্টা করুন</button><button type="button" id="npLoadClose">বন্ধ করুন</button></div></div></div></div>
+  <div class="npld" id="npLoad" role="status" aria-label="Loading"><div class="npld-wrap"><div class="npld-txt" aria-hidden="true"><span class="npld-ch" style="--i:0">M</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">S</span><span class="npld-ch" style="--i:3">T</span><span class="npld-ch" style="--i:4">W</span><span class="npld-ch" style="--i:5">I</span><span class="npld-ch" style="--i:6">N</span><span class="npld-ch" style="--i:7">8</span><span class="npld-ch" style="--i:8">8</span></div><div class="npld-err" id="npLoadErr" role="alert"><div id="npLoadErrMsg"></div><div class="npld-err-btns"><button type="button" id="npLoadRetry">আবার চেষ্টা করুন</button><button type="button" id="npLoadClose">বন্ধ করুন</button></div></div></div></div>
   <script>
   (function () {
     var el = document.getElementById('npLoad'), t1 = null, t2 = null, tLimit = null, waiting = false, retryFn = null;
