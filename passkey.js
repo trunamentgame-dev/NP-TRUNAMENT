@@ -101,13 +101,20 @@
     };
   }
   function toGet(o) {
-    return {
+    var out = {
       challenge: b64uToBuf(o.challenge),
       rpId: o.rpId,
       timeout: o.timeout,
       userVerification: o.userVerification,
       allowCredentials: descs(o.allowCredentials)
     };
+    // এই ডিভাইসের credential id জানা থাকলে সেটাই দিই: তাহলে অ্যাকাউন্ট বেছে নেওয়ার ধাপ বাদ যায়,
+    // সরাসরি ফিঙ্গারপ্রিন্ট চায়। সার্ভার যাচাই এতে বদলায় না (সার্ভার credential id থেকেই UID খোঁজে)।
+    var lc = lsGet(LS_CRED);
+    if (lc && !out.allowCredentials.length) {
+      try { out.allowCredentials = [{ type: 'public-key', id: b64uToBuf(lc), transports: ['internal', 'hybrid'] }]; } catch (e) {}
+    }
+    return out;
   }
   function createResult(c) {
     var r = c.response;
@@ -257,7 +264,8 @@
     if (which === 'pw') { var u = document.getElementById('npPkUser'); if (u) u.focus(); }
   }
 
-  function onUnlockClick() {
+  function onUnlockClick(ev) {
+    var auto = (ev === 'auto');
     if (busy) return;
     setMsg(T('Please wait…', 'অপেক্ষা করুন…'), true); setBusy(true);
     api('/api/passkey/login/options', {}).then(function (r) {
@@ -269,7 +277,26 @@
       var cu = (typeof auth !== 'undefined' && auth) ? auth.currentUser : null;
       var p = (cu && cu.uid === r.uid) ? Promise.resolve() : auth.signInWithCustomToken(r.token);
       return p.then(function () { lsSet(LS_ENR, r.uid); unlockDone(); });
-    }).catch(function (e) { setMsg(errText(e)); }).then(function () { setBusy(false); });
+    }).catch(function (e) {
+      // অটো-চালুর সময় ব্রাউজার আটকালে বা বাতিল হলে ভয় না দেখিয়ে বাটন চাপতে বলি
+      if (auto && e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) {
+        setMsg(T('Tap "Unlock with Fingerprint" to continue.', '"ফিঙ্গারপ্রিন্ট দিয়ে আনলক করুন" বাটনে চাপ দিন।'), true);
+      } else { setMsg(errText(e)); }
+    }).then(function () { setBusy(false); });
+  }
+
+  // অ্যাপ খুললেই নিজে থেকে ফিঙ্গারপ্রিন্ট চায় (একবারই); ব্রাউজার না দিলে বাটন থাকে
+  var autoTried = false;
+  function autoUnlock() {
+    if (autoTried || !G.locked || !document.getElementById('npPkLock')) return;
+    if (document.visibilityState && document.visibilityState !== 'visible') {
+      document.addEventListener('visibilitychange', function once() {
+        if (document.visibilityState === 'visible') { document.removeEventListener('visibilitychange', once); autoUnlock(); }
+      });
+      return;
+    }
+    autoTried = true;
+    onUnlockClick('auto');
   }
 
   function onPwSubmit() {
@@ -577,7 +604,7 @@
   G.afterRelease = function () { var u = currentUser(); if (u) afterLogin(u); };
 
   function start() {
-    if (G.locked) { buildLock(); warmUp(); }
+    if (G.locked) { buildLock(); warmUp(); setTimeout(autoUnlock, 250); }
     G.uiReady = true;
     buildCard();
     if (typeof auth !== 'undefined' && auth) {
