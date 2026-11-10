@@ -749,7 +749,7 @@ setInterval(()=>{
 
 /* loading + maintenance overlays */
 const bo=document.createElement('div');bo.id='boot';bo.className='ov';
-bo.innerHTML='<div class="bl">'+'MOSTWIN88'.split('').map((ch,i)=>`<i style="animation-delay:${i*.12}s">${ch}</i>`).join('')+'</div><p id="bmsg">লোড হচ্ছে…</p>';
+bo.innerHTML='<div class="bl">'+'MOSTWIN88'.split('').map((ch,i)=>`<i style="animation-delay:${i*.12}s">${ch}</i>`).join('')+'</div><p id="bmsg"></p>';
 const mo=document.createElement('div');mo.id='mnt';mo.className='ov off';
 document.body.append(bo,mo);
 function bootCheck(){if(balLoaded&&cur){bo.classList.add('off');try{if(window.parent&&window.parent!==window&&!window.__npRdy){window.__npRdy=1;window.parent.postMessage({type:'NP_GAME_READY'},'*')}}catch(e){}}}
@@ -759,7 +759,7 @@ function showMaint(){
     mo.classList.remove('off')}else mo.classList.add('off');
 }
 setTimeout(()=>{if(!uid)$('bmsg').textContent='ব্যবহারকারীকে চেনা যায়নি। অনুগ্রহ করে ইউজার প্যানেল থেকে লগইন করে গেমটি খুলুন।'},8000);
-setTimeout(()=>{if(uid&&!cur)$('bmsg').textContent=/YOUR-ROULETTE/.test(API_BASE)?'গেমের সার্ভার ঠিকানা (API_BASE) বসানো হয়নি — index.html এ Render URL বসান':'সার্ভারের সাথে সংযোগ হচ্ছে, একটু অপেক্ষা করুন…'},8000);
+setTimeout(()=>{if(uid&&!cur)$('bmsg').textContent=/YOUR-ROULETTE/.test(API_BASE)?'গেমের সার্ভার ঠিকানা (API_BASE) বসানো হয়নি — index.html এ Render URL বসান':''},8000);
 function liveInit(){detect();startFeed()}
 
 /* ---------- Fit everything to one screen ---------- */
