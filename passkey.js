@@ -25,6 +25,7 @@
   var CONFIGURED = API.indexOf('REPLACE') === -1;
   var LS_ENR = 'np_pk_enrolled';   // এই ডিভাইসে কোন UID-এর Passkey আছে
   var LS_CRED = 'np_pk_cred';      // এই ডিভাইসের credential id
+  var RELOCK_AFTER_MS = 1500;      // অ্যাপ থেকে বের হয়ে এতক্ষণ বা বেশি পর ফিরলে আবার ফিঙ্গারপ্রিন্ট চাইবে (০ দিলে সাথে সাথে)
 
   if (!SUPPORTED || !CONFIGURED) {
     // কিছু না দেখিয়ে স্বাভাবিক অ্যাপ চলবে (পাসওয়ার্ড লগইন অপরিবর্তিত)
@@ -112,7 +113,7 @@
     // সরাসরি ফিঙ্গারপ্রিন্ট চায়। সার্ভার যাচাই এতে বদলায় না (সার্ভার credential id থেকেই UID খোঁজে)।
     var lc = lsGet(LS_CRED);
     if (lc && !out.allowCredentials.length) {
-      try { out.allowCredentials = [{ type: 'public-key', id: b64uToBuf(lc), transports: ['internal', 'hybrid'] }]; } catch (e) {}
+      try { out.allowCredentials = [{ type: 'public-key', id: b64uToBuf(lc), transports: ['internal'] }]; } catch (e) {}
     }
     return out;
   }
@@ -227,34 +228,27 @@
     '.npPkDev{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--border-subtle,#1e293b)}' +
     '.npPkDevName{font-size:14px;font-weight:600}.npPkDevMeta{font-size:11.5px;color:var(--text-muted,#64748b);margin-top:2px}' +
     '.npPkSmall{padding:8px 12px;width:auto;font-size:12.5px;border-radius:10px;border-color:var(--color-accent,#ef4444);color:var(--color-accent,#ef4444);white-space:nowrap}' +
-    '.npPkFp{position:relative;display:flex;align-items:center;justify-content:center;width:132px;height:132px;margin:6px auto 0;padding:0;border-radius:50%;border:1px solid rgba(245,158,11,.4);background:rgba(245,158,11,.08);color:#fcd34d;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .3s,border-color .3s,background .3s,box-shadow .3s}' +
-    '.npPkFp:before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(245,158,11,.55);animation:npPkRing 2.2s ease-out infinite;pointer-events:none}' +
-    '.npPkFpIn{position:absolute;inset:0;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center}' +
-    '.npPkFp .npPkIco{width:70px;height:70px;position:relative}' +
-    '.npPkScan{position:absolute;left:14%;right:14%;top:10%;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#fde68a,transparent);box-shadow:0 0 12px 3px rgba(251,191,36,.7);opacity:0}' +
-    '.npPkFp.scanning{box-shadow:0 0 34px rgba(245,158,11,.35);background:rgba(245,158,11,.14)}' +
-    '.npPkFp.scanning .npPkScan{opacity:1;animation:npPkScan 1.3s ease-in-out infinite alternate}' +
-    '.npPkFp.scanning .npPkIco path{stroke-dasharray:44;animation:npPkDraw 1.6s ease-in-out infinite}' +
-    '.npPkFp.scanning .npPkIco path:nth-child(2n){animation-delay:.2s}.npPkFp.scanning .npPkIco path:nth-child(3n){animation-delay:.4s}' +
-    '.npPkFp.ok{color:#4ade80;border-color:#4ade80;background:rgba(74,222,128,.12);box-shadow:0 0 40px rgba(74,222,128,.45);animation:npPkPop .45s ease}' +
-    '.npPkFp.ok:before{animation:none;opacity:0}.npPkFp.ok .npPkScan{opacity:0!important;animation:none!important}.npPkFp.ok .npPkIco path{animation:none!important;stroke-dasharray:none!important}' +
-    '.npPkFp.err{animation:npPkShake .4s ease}' +
-    '@keyframes npPkRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.55);opacity:0}}' +
-    '@keyframes npPkScan{0%{top:12%}100%{top:86%}}' +
-    '@keyframes npPkDraw{0%{stroke-dashoffset:44;opacity:.35}50%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:-44;opacity:.35}}' +
-    '@keyframes npPkPop{0%{transform:scale(.92)}60%{transform:scale(1.08)}100%{transform:scale(1)}}' +
-    '@keyframes npPkShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}' +
-    '.npPkCard .npPkBtn{color:var(--text-primary,#f8fafc)}.npPkCard .npPkPrimary{color:#0f172a}.npPkCard .npPkBtn+.npPkBtn{margin-top:10px}';
+    '.npPkCard .npPkBtn{color:var(--text-primary,#f8fafc)}.npPkCard .npPkPrimary{color:#0f172a}.npPkCard .npPkBtn+.npPkBtn{margin-top:10px}' +
+    '.npPkFp{position:relative;width:128px;height:128px;border-radius:50%;border:2px solid rgba(245,158,11,.55);' +
+    'background:radial-gradient(circle,rgba(245,158,11,.14),rgba(245,158,11,0) 70%);color:#f59e0b;display:flex;align-items:center;justify-content:center;' +
+    'cursor:pointer;margin:24px auto 0;padding:0;-webkit-tap-highlight-color:transparent;transition:border-color .2s,color .2s,box-shadow .2s}' +
+    '.npPkFp .npPkIco{width:60px;height:60px}' +
+    '.npPkFp.busy{animation:npPkPulse 1.1s ease-in-out infinite}' +
+    '.npPkFp.ok{color:#22c55e;border-color:#22c55e;box-shadow:0 0 36px rgba(34,197,94,.55);animation:none}' +
+    '@keyframes npPkPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)}50%{box-shadow:0 0 0 16px rgba(245,158,11,0)}}' +
+    '.npPkTiny{font-size:12px;color:#fca5a5;min-height:16px;margin-top:14px}' +
+    '.npPkLogo{width:72px;height:72px;border-radius:18px}' +
+    '.npPkModal{max-width:250px;padding:16px 14px;border-radius:18px}.npPkModal .npPkBtn{padding:10px 12px;font-size:14px;margin-bottom:8px}.npPkBigIco{width:40px;height:40px}.npPkModal p{font-size:12.5px;margin:0 0 14px}.npPkModal h3{font-size:17px;margin:8px 0 6px}';
   var st = document.createElement('style');
   st.id = 'npPkStyle';
   st.textContent = css;
   document.head.appendChild(st);
 
   // ---------- lock screen ----------
-  var busy = false;
+  var busy = false, inEnroll = false, opEndedAt = 0, hiddenAt = 0;
   function setMsg(t, ok) {
     var m = document.getElementById('npPkLockMsg');
-    if (m) { m.textContent = t || ''; m.style.color = ok ? '#86efac' : ''; }
+    if (m) { m.textContent = t || ''; m.style.color = ok === 'n' ? '#94a3b8' : (ok ? '#86efac' : ''); }
   }
   // পাসওয়ার্ড রিসেট: বিদ্যমান handleForgotPassword এর মতোই একই Firebase ফাংশন; লক স্ক্রিনে টোস্ট লুকানো থাকে বলে বার্তা এখানেই দেখাই
   function onForgot() {
@@ -268,10 +262,16 @@
   function setBusy(b) {
     busy = b;
     var btn = document.getElementById('npPkUnlockBtn');
-    if (btn) { btn.classList.remove('err'); if (b) btn.classList.remove('ok'); btn.classList.toggle('scanning', b); }
+    if (btn) { btn.disabled = b; btn.classList.toggle('busy', !!b); }
   }
   function removeLock() { var n = document.getElementById('npPkLock'); if (n && n.parentNode) n.parentNode.removeChild(n); }
-  function unlockDone() { removeLock(); G.release(); }
+  function unlockDone() {
+    var b = document.getElementById('npPkUnlockBtn');
+    if (b && b.offsetParent) {
+      b.classList.remove('busy'); b.classList.add('ok');       // আঙুল সফল হলে সবুজ, তারপর হোম
+      setTimeout(function () { removeLock(); G.release(); }, 180);
+    } else { removeLock(); G.release(); }
+  }
 
   function showPanel(which) {
     var a = document.getElementById('npPkPanelFp'), b = document.getElementById('npPkPanelPw');
@@ -281,31 +281,46 @@
     if (which === 'pw') { var u = document.getElementById('npPkUser'); if (u) u.focus(); }
   }
 
+  // সার্ভার থেকে চ্যালেঞ্জ আগেই এনে রাখি, যাতে ফিঙ্গারপ্রিন্ট সাথে সাথে চায় (Render ধীর হলেও দেরি হয় না)
+  var pre = null;
+  function prefetchOpts() {
+    if (pre && Date.now() - pre.t < 90000) return pre.p;
+    var p = api('/api/passkey/login/options', {});
+    pre = { p: p, t: Date.now() };
+    p.catch(function () { if (pre && pre.p === p) pre = null; });
+    return p;
+  }
+  function takeOpts() {
+    var cur = (pre && Date.now() - pre.t < 90000) ? pre.p : null;
+    pre = null;
+    if (!cur) return api('/api/passkey/login/options', {});
+    return cur.catch(function () { return api('/api/passkey/login/options', {}); });
+  }
+
   function onUnlockClick(ev) {
     var auto = (ev === 'auto');
     if (busy) return;
     setMsg(''); setBusy(true);
-    api('/api/passkey/login/options', {}).then(function (r) {
+    takeOpts().then(function (r) {
       return navigator.credentials.get({ publicKey: toGet(r.options) }).then(function (cred) {
         if (!cred) throw cancelErr();
+        // আঙুল দেওয়ার সাথে সাথে সবুজ
+        var gb = document.getElementById('npPkUnlockBtn');
+        if (gb) { gb.classList.remove('busy'); gb.classList.add('ok'); }
+        if (cred.id) lsSet(LS_CRED, cred.id);   // পরের বার সরাসরি ফিঙ্গারপ্রিন্ট (Continue/অ্যাকাউন্ট বাছাই ছাড়া)
         return api('/api/passkey/login/verify', { sid: r.sid, response: getResult(cred) });
       });
     }).then(function (r) {
       var cu = (typeof auth !== 'undefined' && auth) ? auth.currentUser : null;
       var p = (cu && cu.uid === r.uid) ? Promise.resolve() : auth.signInWithCustomToken(r.token);
-      return p.then(function () {
-        lsSet(LS_ENR, r.uid);
-        var b = document.getElementById('npPkUnlockBtn');
-        if (b) { b.classList.remove('scanning'); b.classList.add('ok'); }
-        return new Promise(function (res) { setTimeout(res, 550); }).then(unlockDone);
-      });
+      return p.then(function () { lsSet(LS_ENR, r.uid); unlockDone(); });
     }).catch(function (e) {
+      var gb = document.getElementById('npPkUnlockBtn'); if (gb) gb.classList.remove('ok');
       // অটো-চালুর সময় ব্রাউজার আটকালে বা বাতিল হলে ভয় না দেখিয়ে বাটন চাপতে বলি
-      var b = document.getElementById('npPkUnlockBtn');
-      if (b) { b.classList.remove('scanning'); b.classList.add('err'); setTimeout(function () { b.classList.remove('err'); }, 500); }
-      // বাতিল/টাইমআউটে কোনো লেখা নয়; শুধু আইকন কেঁপে ওঠে, আইকনে চাপলে আবার চেষ্টা
-      if (!(e && (e.name === 'NotAllowedError' || e.name === 'AbortError'))) setMsg(errText(e));
-    }).then(function () { setBusy(false); });
+      if (auto && e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) {
+        setMsg(T('Tap the fingerprint', 'ফিঙ্গারপ্রিন্টে চাপ দিন'), 'n');
+      } else { setMsg(errText(e)); }
+    }).then(function () { setBusy(false); opEndedAt = Date.now(); if (G.locked) { try { prefetchOpts(); } catch (e) {} } });
   }
 
   // অ্যাপ খুললেই নিজে থেকে ফিঙ্গারপ্রিন্ট চায় (একবারই); ব্রাউজার না দিলে বাটন থাকে
@@ -337,13 +352,12 @@
 
   function buildLock() {
     if (document.getElementById('npPkLock')) return;
-    var unlockBtn = el('button', { id: 'npPkUnlockBtn', class: 'npPkFp', type: 'button', 'aria-label': 'Fingerprint', onclick: onUnlockClick }, [
-      el('span', { class: 'npPkFpIn' }, [el('span', { class: 'npPkScan' })]), fpIcon()
-    ]);
     var panelFp = el('div', { id: 'npPkPanelFp' }, [
-      unlockBtn,
-      el('button', { class: 'npPkLink', type: 'button', onclick: function () { showPanel('pw'); } }, [
-        T('Use Password', 'পাসওয়ার্ড দিয়ে')
+      el('button', { id: 'npPkUnlockBtn', class: 'npPkFp', type: 'button', 'aria-label': 'Unlock with Fingerprint', onclick: onUnlockClick }, [fpIcon()]),
+      el('div', null, [
+        el('button', { class: 'npPkLink', type: 'button', style: 'margin-top:30px', onclick: function () { showPanel('pw'); } }, [
+          T('Use password', 'পাসওয়ার্ড দিয়ে খুলুন')
+        ])
       ])
     ]);
     var userIn = el('input', { id: 'npPkUser', class: 'npPkField', type: 'text', autocomplete: 'username', autocapitalize: 'none', spellcheck: 'false',
@@ -351,21 +365,18 @@
     var passIn = el('input', { id: 'npPkPass', class: 'npPkField', type: 'password', autocomplete: 'current-password',
       placeholder: T('Password', 'পাসওয়ার্ড'),
       onkeydown: function (ev) { if (ev.key === 'Enter') onPwSubmit(); } });
-    var panelPw = el('div', { id: 'npPkPanelPw', style: 'display:none' }, [
+    var panelPw = el('div', { id: 'npPkPanelPw', style: 'display:none;margin-top:22px' }, [
       userIn, passIn,
       el('button', { id: 'npPkPwBtn', class: 'npPkBtn npPkPrimary', type: 'button', onclick: onPwSubmit }, [T('Unlock', 'আনলক')]),
-      el('button', { class: 'npPkLink', type: 'button', onclick: onForgot }, [
-        T('Forgot password?', 'পাসওয়ার্ড ভুলে গেছেন?')
-      ]),
+      el('button', { class: 'npPkLink', type: 'button', onclick: onForgot }, [T('Forgot password?', 'পাসওয়ার্ড ভুলে গেছেন?')]),
       el('div', null, [
-        el('button', { class: 'npPkLink', type: 'button', onclick: function () { showPanel('fp'); } }, [T('Back to fingerprint', 'ফিঙ্গারপ্রিন্টে ফিরে যান')])
+        el('button', { class: 'npPkLink', type: 'button', onclick: function () { showPanel('fp'); } }, [T('Back', 'ফিরে যান')])
       ])
     ]);
     var box = el('div', { class: 'npPkBox' }, [
       el('img', { class: 'npPkLogo', src: './icon-192.png', alt: '' }),
-      el('div', { style: 'height:34px' }),
       panelFp, panelPw,
-      el('div', { id: 'npPkLockMsg', class: 'npPkMsg', role: 'alert' })
+      el('div', { id: 'npPkLockMsg', class: 'npPkTiny', role: 'alert' })
     ]);
     document.body.appendChild(el('div', { id: 'npPkLock', role: 'dialog', 'aria-modal': 'true' }, [box]));
   }
@@ -421,6 +432,11 @@
   function clearEnrolled() { lsDel(LS_ENR); lsDel(LS_CRED); }
 
   function enroll() {
+    inEnroll = true;
+    return enrollInner().then(function (r) { inEnroll = false; opEndedAt = Date.now(); return r; },
+      function (e) { inEnroll = false; opEndedAt = Date.now(); throw e; });
+  }
+  function enrollInner() {
     var user = (typeof auth !== 'undefined' && auth) ? auth.currentUser : null;
     if (!user) return Promise.reject(new Error(T('Please login first.', 'আগে লগইন করুন।')));
     return freshToken(user).then(function (tok) {
@@ -456,16 +472,12 @@
         enableBtn.disabled = false; laterBtn.disabled = false;
       });
     }
-    enableBtn = el('button', { class: 'npPkBtn npPkPrimary', type: 'button', onclick: enable }, [fpIcon(), T('Enable Fingerprint', 'ফিঙ্গারপ্রিন্ট চালু করুন')]);
+    enableBtn = el('button', { class: 'npPkBtn npPkPrimary', type: 'button', onclick: enable }, [T('Enable', 'চালু করুন')]);
     laterBtn = el('button', { class: 'npPkBtn', type: 'button', onclick: later }, [T('Maybe Later', 'পরে')]);
     var ov = el('div', { id: 'npPkOverlay', role: 'dialog', 'aria-modal': 'true' }, [
       el('div', { class: 'npPkModal' }, [
         el('span', { class: 'npPkBigIco' }, [fpIcon()]),
-        el('h3', null, [T('Enable Fingerprint Login', 'ফিঙ্গারপ্রিন্ট লগইন চালু করুন')]),
-        el('p', null, [T(
-          "Open the app faster and more securely using your device's fingerprint or screen lock. You can still use your password anytime.",
-          'আপনার ডিভাইসের ফিঙ্গারপ্রিন্ট বা স্ক্রিন লক দিয়ে অ্যাপ দ্রুত ও নিরাপদে খুলুন। পাসওয়ার্ড দিয়ে যেকোনো সময় লগইন করা যাবে।'
-        )]),
+        el('h3', null, [T('Enable fingerprint?', 'ফিঙ্গারপ্রিন্ট চালু করবেন?')]),
         enableBtn, laterBtn, msg
       ])
     ]);
@@ -476,8 +488,12 @@
     if (document.querySelector('[id^="modal"].active') && n < 24) { setTimeout(function () { waitFree(cb, n + 1); }, 1500); return; }
     cb();
   }
+  // Google দিয়ে ঢোকা (পাসওয়ার্ডবিহীন) অ্যাকাউন্টে এখানে ফিঙ্গারপ্রিন্ট সেটআপ চালু নেই — সেটআপে পাসওয়ার্ড নিশ্চিতকরণ লাগে
+  function googleOnly(u) {
+    try { return !!(u && u.providerData && u.providerData.length && !u.providerData.some(function (p) { return p && p.providerId === 'password'; })); } catch (e) { return false; }
+  }
   function maybeOffer(u) {
-    if (offered || G.locked || !u) return;
+    if (offered || G.locked || !u || googleOnly(u)) return;
     if (lsGet(LS_ENR) === u.uid || lsGet('np_pk_later_' + u.uid)) return;
     offered = true;
     platformOK().then(function (ok) {
@@ -501,10 +517,7 @@
     actions = el('div', { id: 'npPkActions' });
     card = el('div', { id: 'npPkCard', class: 'npPkCard', style: 'display:none' }, [
       el('div', { class: 'npPkCardHead' }, [fpIcon(), T('Fingerprint Login', 'ফিঙ্গারপ্রিন্ট লগইন')]),
-      el('div', { class: 'npPkCardNote' }, [T(
-        "Uses your device's fingerprint or screen lock. Password login always stays available.",
-        'আপনার ডিভাইসের ফিঙ্গারপ্রিন্ট বা স্ক্রিন লক ব্যবহার হয়। পাসওয়ার্ড লগইন সবসময় থাকবে।'
-      )]),
+      el('div', { class: 'npPkCardNote' }, [T('Fingerprint or screen lock. Password always works.', 'ফিঙ্গারপ্রিন্ট বা স্ক্রিন লক। পাসওয়ার্ড সবসময় চলবে।')]),
       list, actions
     ]);
     btn.parentNode.insertBefore(card, btn);
@@ -521,7 +534,7 @@
     buildCard();
     if (!card) return;
     var u = currentUser();
-    if (!u || G.locked) { card.style.display = 'none'; return; }
+    if (!u || G.locked || googleOnly(u)) { card.style.display = 'none'; return; }
     card.style.display = '';
     while (list.firstChild) list.removeChild(list.firstChild);
     while (actions.firstChild) actions.removeChild(actions.firstChild);
@@ -618,40 +631,42 @@
     }).then(function () { refreshCard(true); });
   }
 
-  // ---------- অ্যাপ থেকে বের হলে (ব্যাকগ্রাউন্ডে গেলে) আবার লক ----------
-  // শুধু সেই ইউজারের জন্য, যে এই ডিভাইসে ফিঙ্গারপ্রিন্ট চালু করেছে। বাকিদের কিছুই বদলায় না।
-  // এই সময়ের বেশি অ্যাপের বাইরে থাকলে ফিরে আসার পর লক স্ক্রিন আসবে (মিলিসেকেন্ড; 0 দিলে সাথে সাথে লক)।
-  var RELOCK_AFTER_MS = 15000;
-  var hiddenAt = 0;
+  // ---------- অ্যাপ থেকে বের হয়ে ফিরলে আবার লক ----------
   function relock() {
+    if (G.locked || busy || inEnroll || !G.uiReady) return;
+    if (!lsGet(LS_ENR)) return;                         // এই ডিভাইসে Passkey চালু না থাকলে লক নয়
+    if (Date.now() - opEndedAt < 1500) return;          // ফিঙ্গারপ্রিন্ট শিটের নিজের ঝলকে নয়
     var cu = currentUser();
-    if (G.locked || !cu || lsGet(LS_ENR) !== cu.uid) return;
+    G.pending = null;
+    G.resumed = cu ? cu.uid : '';                       // আগে থেকে চালু ডাটা/লিসেনার দ্বিতীয়বার চালু হবে না
     G.locked = true;
-    document.documentElement.classList.add('np-pk-lock');
     try { sessionStorage.removeItem('np_pk_unlocked'); } catch (e) {}
-    autoTried = false; busy = false;
-    var old = document.getElementById('npPkLock'); if (old && old.parentNode) old.parentNode.removeChild(old);
-    buildLock();
-    showPanel('fp');
-    setTimeout(autoUnlock, 250);
+    document.documentElement.classList.add('np-pk-lock');
+    hideSetup();
+    var pw = document.getElementById('npPkPwOverlay'); if (pw && pw.parentNode) pw.parentNode.removeChild(pw);
     if (card) card.style.display = 'none';
+    buildLock(); showPanel('fp');
+    autoTried = false; try { prefetchOpts(); } catch (e) {} setTimeout(autoUnlock, 120);
   }
-  document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'hidden') {
-      hiddenAt = Date.now();
-    } else if (document.visibilityState === 'visible' && hiddenAt) {
-      var away = Date.now() - hiddenAt; hiddenAt = 0;
-      if (away >= RELOCK_AFTER_MS) relock();
+  function onVisibility() {
+    if (document.visibilityState === 'hidden') { hiddenAt = Date.now(); return; }
+    if (document.visibilityState !== 'visible') return;
+    var away = hiddenAt ? Date.now() - hiddenAt : 0; hiddenAt = 0;
+    if (G.locked) {
+      if (!busy && document.getElementById('npPkLock') && Date.now() - opEndedAt > 1500) { autoTried = false; autoUnlock(); }
+      return;
     }
-  });
+    if (away >= RELOCK_AFTER_MS) relock();
+  }
 
   // ---------- start ----------
   function afterLogin(u) { refreshCard(true); maybeOffer(u); }
   G.afterRelease = function () { var u = currentUser(); if (u) afterLogin(u); };
 
   function start() {
-    if (G.locked) { buildLock(); warmUp(); setTimeout(autoUnlock, 250); }
+    if (G.locked) { buildLock(); warmUp(); try { prefetchOpts(); } catch (e) {} setTimeout(autoUnlock, 120); }
     G.uiReady = true;
+    document.addEventListener('visibilitychange', onVisibility);
     buildCard();
     if (typeof auth !== 'undefined' && auth) {
       auth.onAuthStateChanged(function (u) {

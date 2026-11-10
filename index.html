@@ -2043,6 +2043,8 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     ['লগইন প্রয়োজন', 'Login Required', 'x'],
     ['গেম খেলতে হলে প্রথমে আপনার অ্যাকাউন্টে লগইন করুন।', 'To play games, please log in to your account first.'],
     ['বাতিল', 'Cancel', 'x'],
+    ['Google দিয়ে চালিয়ে যান', 'Continue with Google', 'x'],
+    ['অথবা', 'or', 'x'],
 
     // ---- Maintenance / notice / home ----
     ['🔧 রক্ষণাবেক্ষণ চলছে (App Maintenance)', '🔧 App Maintenance in Progress'],
@@ -3443,6 +3445,15 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           <span id="lblBtnAuth">লগইন করুন</span>
         </button>
       </form>
+
+      <!-- Google দিয়ে লগইন / নতুন অ্যাকাউন্ট -->
+      <div style="display:flex;align-items:center;gap:10px;margin:16px 0 12px;color:#64748b;font-size:12px;">
+        <span style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></span><span>অথবা</span><span style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></span>
+      </div>
+      <button type="button" id="btnGoogleSignIn" onclick="window.app.npGoogleSignIn()" style="width:100%;height:48px;display:flex;align-items:center;justify-content:center;gap:10px;background:#ffffff;border:none;border-radius:14px;color:#1f2937;font-size:14.5px;font-weight:700;cursor:pointer;font-family:var(--font-bengali);">
+        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        <span>Google দিয়ে চালিয়ে যান</span>
+      </button>
     </div>
   </div>
 
@@ -6055,6 +6066,73 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       }
     }
 
+    // Google দিয়ে লগইন: আগের অ্যাকাউন্ট থাকলে সরাসরি ঢোকে; নতুন হলে ইউজার রেকর্ড + ইউজারনেম নিজে তৈরি হয়
+    async function npGoogleSignIn() {
+      const btn = document.getElementById('btnGoogleSignIn');
+      if (!auth || !db) { showToast('সার্ভার প্রস্তুত নয়, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন', 'error'); return; }
+      if (btn) btn.disabled = true;
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        const res = await auth.signInWithPopup(provider);
+        const user = res.user;
+        const snap = await db.ref('users/' + user.uid).once('value');
+        if (!snap.exists()) {
+          if (!state.settings.allowRegistration) {
+            try { await user.delete(); } catch (e) { try { await auth.signOut(); } catch (e2) {} }
+            showToast('অ্যাডমিন কর্তৃক নতুন রেজিস্ট্রেশন সাময়িক বন্ধ রাখা হয়েছে।', 'error');
+            return;
+          }
+          const email = user.email || '';
+          const name = (user.displayName || '').trim() || (email.split('@')[0] || 'Player');
+          let base = (email.split('@')[0] || '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 16);
+          if (base.length < 3) base = ('user' + base).slice(0, 16);
+          let username = '';
+          for (let i = 0; i < 8 && !username; i++) {
+            const cand = i === 0 ? base : (base + Math.floor(100 + Math.random() * 9000)).slice(0, 20);
+            try {
+              const uSnap = await npFetchUsernameRecord(cand);
+              if (uSnap.exists()) continue;
+              await db.ref('usernames/' + cand).set({ uid: user.uid, email, createdAt: firebase.database.ServerValue.TIMESTAMP });
+              username = cand;
+            } catch (e) { /* পরের নাম চেষ্টা */ }
+          }
+          await npCreateUserRecord(user.uid, {
+            uid: user.uid,
+            username,
+            name,
+            email,
+            ffIgn: '',
+            ffUid: '',
+            balance: 0,
+            status: 'ACTIVE',
+            role: 'USER',
+            dpUrl: '',
+            dpWidth: '75px',
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+          });
+          showToast('🎉 অভিনন্দন! অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।', 'success');
+        } else {
+          showToast('লগইন সফল হয়েছে! স্বাগতম।', 'success');
+        }
+        const appRoot = document.getElementById('app-root');
+        if (appRoot) appRoot.style.display = 'block';
+        closeModal('modalAuth');
+      } catch (err) {
+        const c = err && err.code;
+        if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return;
+        let msg = (err && err.message) || 'Google লগইন ব্যর্থ হয়েছে';
+        if (c === 'auth/popup-blocked') msg = 'ব্রাউজার পপআপ আটকে দিয়েছে। পপআপ অনুমতি দিয়ে আবার চেষ্টা করুন।';
+        else if (c === 'auth/account-exists-with-different-credential') msg = 'এই ইমেইল দিয়ে আগেই পাসওয়ার্ড অ্যাকাউন্ট আছে। ইমেইল ও পাসওয়ার্ড দিয়ে লগইন করুন।';
+        else if (c === 'auth/network-request-failed') msg = 'ইন্টারনেট সংযোগ নেই।';
+        else if (c === 'auth/unauthorized-domain') msg = 'এই ডোমেইন Firebase-এ অনুমোদিত নয় (Authorized domains-এ যোগ করুন)।';
+        else if (c === 'auth/operation-not-allowed') msg = 'Firebase-এ Google লগইন চালু করা হয়নি।';
+        showToast(msg, 'error');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
     async function handleForgotPassword() {
       const email = prompt('আপনার অ্যাকাউন্টের রেজিস্টার্ড ইমেইল এড্রেস লিখুন:');
       if (!email) return;
@@ -7557,6 +7635,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       switchAuthMode,
       handleAuthSubmit,
       handleForgotPassword,
+      npGoogleSignIn,
       handleLogout,
       openEditProfileModal,
       handleProfileSave,
@@ -8134,6 +8213,60 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       } catch (e) {}
       if (++tries < 50) setTimeout(attach, 300);
     })();
+  })();
+  </script>
+  <!-- NP Games rows: দুই লাইনের গেম আলাদা আলাদা সময়ে উল্টো দিকে নিজে নিজে স্লাইড করে (শুধু scrollLeft বদলায়; কিছু রেন্ডার/ডাটা বদলায় না) -->
+  <script id="npGamesAutoSlide">
+  (function () {
+    'use strict';
+    var rows = [
+      { id: 'gamesScrollTrack', speed: 26, dir: 1,  start: 'left',  snap: true },   // বাঁ থেকে ডানে, তারপর ফেরে
+      { id: 'gameBoxGrid',      speed: 34, dir: -1, start: 'right', snap: false }    // ডান থেকে বামে, তারপর ফেরে
+    ];
+    var RESUME_MS = 2500, EDGE_PAUSE = 900;
+    rows.forEach(function (r) { r.pos = null; r.pausedUntil = 0; r.edgeUntil = 0; r.visible = true; r.el = null; r.touching = false; });
+
+    function bind(r) {
+      var e = document.getElementById(r.id);
+      if (!e || e === r.el) return;
+      r.el = e; r.pos = null;
+      var stop = function () { r.touching = true; r.pausedUntil = Infinity; if (r.snap) e.style.scrollSnapType = 'x mandatory'; };
+      var go = function () { r.touching = false; r.pos = null; r.pausedUntil = Date.now() + RESUME_MS; };
+      e.addEventListener('touchstart', stop, { passive: true });
+      e.addEventListener('touchend', go, { passive: true });
+      e.addEventListener('touchcancel', go, { passive: true });
+      e.addEventListener('pointerdown', stop, { passive: true });
+      e.addEventListener('pointerup', go, { passive: true });
+      e.addEventListener('wheel', function () { r.pausedUntil = Date.now() + RESUME_MS; r.pos = null; }, { passive: true });
+      if (window.IntersectionObserver) {
+        new IntersectionObserver(function (en) { r.visible = !!(en[0] && en[0].isIntersecting); }).observe(e);
+      }
+    }
+
+    var last = 0;
+    function tick(t) {
+      requestAnimationFrame(tick);
+      var dt = last ? Math.min((t - last) / 1000, 0.1) : 0; last = t;
+      if (document.hidden || document.documentElement.classList.contains('np-pk-lock')) return;
+      var now = Date.now();
+      rows.forEach(function (r) {
+        bind(r);
+        var e = r.el; if (!e || !r.visible || r.touching || now < r.pausedUntil) return;
+        var max = e.scrollWidth - e.clientWidth;
+        if (max < 8) return;
+        if (r.pos === null) {
+          if (r.start === 'right' && !r.init) { r.init = true; e.scrollLeft = max; }
+          r.pos = e.scrollLeft;
+        }
+        if (now < r.edgeUntil) return;
+        if (r.snap) e.style.scrollSnapType = 'none';
+        r.pos += r.dir * r.speed * dt;
+        if (r.pos >= max) { r.pos = max; r.dir = -1; r.edgeUntil = now + EDGE_PAUSE; }
+        else if (r.pos <= 0) { r.pos = 0; r.dir = 1; r.edgeUntil = now + EDGE_PAUSE; }
+        e.scrollLeft = r.pos;
+      });
+    }
+    requestAnimationFrame(tick);
   })();
   </script>
   <script src="./passkey.js"></script>
