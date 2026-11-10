@@ -15,6 +15,63 @@
   <meta name="msapplication-TileColor" content="#090d16">
 
   <!-- PWA Manifest & App Icons (Android Mobile Chrome) -->
+  <!-- NP Passkey gate: ফিঙ্গারপ্রিন্ট লক চালু থাকলে অ্যাপের কনটেন্ট আনলক পর্যন্ত লুকানো থাকে (passkey.js লোড না হলে ১০ সেকেন্ড পর নিজে খুলে যায়) -->
+  <style id="npPkGateCss">
+    html.np-pk-lock{background:#050811!important;overflow:hidden!important}
+    html.np-pk-lock body>*:not(#npPkLock){visibility:hidden!important}
+  </style>
+  <script id="npPkGate">
+  (function () {
+    var G = window.NPPasskey = { locked: false, pending: null, resumed: '', uiReady: false };
+    var de = document.documentElement;
+    try {
+      var sup = !!(window.PublicKeyCredential && navigator.credentials && window.isSecureContext);
+      if (sup && localStorage.getItem('np_pk_enrolled') && !sessionStorage.getItem('np_pk_unlocked')) {
+        G.locked = true; de.classList.add('np-pk-lock');
+      }
+    } catch (e) { G.locked = false; }
+    // হুক ১: লগইন করা ইউজার পাওয়া গেলে — লক থাকলে ধরে রাখে (true = এখনই প্রাইভেট ডাটা লোড করো না)
+    G.hold = function (u) {
+      try {
+        if (G.resumed && u && G.resumed === u.uid) return true;
+        if (!G.locked) return false;
+        G.pending = u; return true;
+      } catch (e) { return false; }
+    };
+    // হুক ২: লগআউট অবস্থায় — লক থাকলে লগইন মডাল দেখানো বন্ধ রাখে (লক স্ক্রিনই দেখায়)
+    G.holdLoggedOut = function () {
+      try { G.resumed = ''; G.pending = null; return !!G.locked; } catch (e) { return false; }
+    };
+    // আনলকের পর আগে থেমে থাকা ধাপগুলো ঠিক আগের মতোই চালায়
+    G.resume = function (user) {
+      try {
+        G.resumed = user.uid;
+        var ag = document.getElementById('authGateScreen'), ar = document.getElementById('app-root');
+        if (ag) ag.style.display = 'none';
+        if (ar) ar.style.display = 'block';
+        if (typeof closeModal === 'function') closeModal('modalAuth');
+        if (typeof restoreUserCache === 'function') restoreUserCache(user.uid);
+        if (typeof setupUserListeners === 'function') setupUserListeners(user.uid);
+        if (typeof resetUserInactivityTimer === 'function') resetUserInactivityTimer();
+        if (typeof checkTournamentRulesModal === 'function') checkTournamentRulesModal();
+        if (window.markPageLoaded) window.markPageLoaded();
+      } catch (e) { console.warn('[passkey] resume', e); }
+    };
+    G.release = function () {
+      try {
+        var p = G.pending; G.pending = null;
+        G.locked = false; de.classList.remove('np-pk-lock');
+        try { sessionStorage.setItem('np_pk_unlocked', '1'); } catch (e) {}
+        var cu = (typeof auth !== 'undefined' && auth) ? auth.currentUser : null;
+        if (p && cu && cu.uid === p.uid) G.resume(p);
+        else if (!cu && typeof showAuthModal === 'function') showAuthModal('login');
+        if (typeof G.afterRelease === 'function') G.afterRelease();
+      } catch (e) {}
+    };
+    setTimeout(function () { if (G.locked && !G.uiReady) G.release(); }, 10000);
+  })();
+  </script>
+
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
@@ -5464,6 +5521,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           if (user) {
             if (npIdleExpired()) { state.currentUser = user; npIdleLogout(); return; }
             state.currentUser = user;
+            if (window.NPPasskey && NPPasskey.hold(user)) return; // passkey lock hook 1
 
             if (authGate) authGate.style.display = 'none';
             if (appRoot) appRoot.style.display = 'block';
@@ -5510,7 +5568,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             renderTxHistoryFeed();
 
             // Prompt exact reference photo login popup
-            showAuthModal('login');
+            if (!(window.NPPasskey && NPPasskey.holdLoggedOut())) showAuthModal('login'); // passkey lock hook 2
             if (window.markPageLoaded) window.markPageLoaded();
           }
         });
@@ -8054,5 +8112,6 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     })();
   })();
   </script>
+  <script src="./passkey.js"></script>
 </body>
 </html>
