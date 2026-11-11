@@ -701,6 +701,7 @@ function onState(m){
     if(S.bets['mega']>0&&m.result.spot==='mega'&&m.result.mega>3){m.result.mega=2;}
     if(!S.spinning&&S.spun!==m.roundId){S.spun=m.roundId;setRot(m.result.seg)}renderSpots(m.result.spot);
   }
+  if(S.spots&&(S.rphase!==m.phase||S.rround!==m.roundId)){S.rphase=m.phase;S.rround=m.roundId;renderSpots(m.phase==='result'&&m.result?m.result.spot:null);renderChips()}
   renderHist();renderTable();renderMsg();tick();
 }
 /* ইউজার প্যানেল গেমটা ফ্রেমে খোলে; ব্যালেন্স + গেমের ডাটা আসার পর প্যানেলকে জানায়, তখন প্যানেলের LOADING সরে */
