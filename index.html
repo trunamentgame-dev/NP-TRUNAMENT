@@ -7897,8 +7897,22 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         history.pushState({ nrExitGuard: true }, "", location.href);
         return;
       }
-      showExitConfirm();
+      // ব্যাক বাটন: এক্সিট ডায়ালগ নেই। খোলা পপআপ থাকলে বন্ধ হবে, নইলে হোম পেজে যাবে
       history.pushState({ nrExitGuard: true }, "", location.href);
+      try {
+        var openModals = document.querySelectorAll('.modal-overlay.active');
+        var closed = false;
+        openModals.forEach(function (m) {
+          if (m.id === 'modalAuth') return;
+          m.classList.remove('active'); closed = true;
+        });
+        if (closed) return;
+        var home = document.getElementById('viewHome');
+        if (home && !home.classList.contains('active') &&
+            window.app && typeof window.app.switchView === 'function') {
+          window.app.switchView('viewHome');
+        }
+      } catch (e) {}
     });
   })();
   </script>
