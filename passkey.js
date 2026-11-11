@@ -257,10 +257,92 @@
     '.npPkTiny{font-size:12px;color:#fca5a5;min-height:16px;margin-top:14px}' +
     '.npPkLogo{width:72px;height:72px;border-radius:18px}' +
     '.npPkModal{max-width:250px;padding:16px 14px;border-radius:18px}.npPkModal .npPkBtn{padding:10px 12px;font-size:14px;margin-bottom:8px}.npPkBigIco{width:40px;height:40px}.npPkModal p{font-size:12.5px;margin:0 0 14px}.npPkModal h3{font-size:17px;margin:8px 0 6px}';
+  // ---- নতুন স্ক্যানার ডিজাইন ----
+  css += '' +
+    '#npPkLock{background:radial-gradient(circle at 50% 30%,rgba(34,211,238,.10) 0%,rgba(5,8,17,0) 55%),linear-gradient(rgba(34,211,238,.04) 1px,transparent 1px) 0 0/34px 34px,linear-gradient(90deg,rgba(34,211,238,.04) 1px,transparent 1px) 0 0/34px 34px,radial-gradient(circle at 50% 35%,#16213a 0%,#050811 75%)}' +
+    '.npPkBox{position:relative;padding-bottom:96px}' +
+    '.npPkBrand{position:absolute;left:0;right:0;bottom:100%;margin-bottom:30px;text-align:center}' +
+    '#npPkLock.npPkPwMode .npPkBox{padding-bottom:0}' +
+    '#npPkLock.npPkPwMode .npPkBrand{position:static;margin:0 0 6px}' +
+    '.npPkBrand .npPkLogo{width:76px;height:76px;border-radius:20px;box-shadow:0 0 0 1px rgba(245,158,11,.35),0 10px 30px rgba(245,158,11,.25)}' +
+    '.npPkBrand .npPkTitle{font-size:19px;margin:12px 0 2px;letter-spacing:2px}' +
+    '.npPkBrand .npPkSub{font-size:12px;margin:0;letter-spacing:.3px}' +
+    '.npPkSc{position:relative;display:block;width:176px;height:176px;margin:0 auto;padding:0;border:0;background:transparent;color:#22d3ee;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .25s}' +
+    '.npPkSc .npPkGlass{position:absolute;left:14px;right:14px;top:14px;bottom:14px;border-radius:14px;background:radial-gradient(circle at 50% 45%,rgba(34,211,238,.16),rgba(34,211,238,.03) 70%);box-shadow:inset 0 0 26px rgba(34,211,238,.18);transition:box-shadow .25s}' +
+    '.npPkSc .npPkIco{position:absolute;left:50%;top:50%;width:92px;height:92px;margin:-46px 0 0 -46px;filter:drop-shadow(0 0 10px currentColor);opacity:.92}' +
+    '.npPkSc .npPkCn{position:absolute;width:30px;height:30px;border:0 solid currentColor;filter:drop-shadow(0 0 5px currentColor)}' +
+    '.npPkSc .npPkCn.tl{left:0;top:0;border-width:3px 0 0 3px;border-top-left-radius:10px}' +
+    '.npPkSc .npPkCn.tr{right:0;top:0;border-width:3px 3px 0 0;border-top-right-radius:10px}' +
+    '.npPkSc .npPkCn.bl{left:0;bottom:0;border-width:0 0 3px 3px;border-bottom-left-radius:10px}' +
+    '.npPkSc .npPkCn.br{right:0;bottom:0;border-width:0 3px 3px 0;border-bottom-right-radius:10px}' +
+    '.npPkSc .npPkBeam{position:absolute;left:14px;right:14px;top:14px;height:2px;background:currentColor;box-shadow:0 0 14px 2px currentColor;animation:npPkBeam 2.4s ease-in-out infinite}' +
+    '.npPkSc .npPkBeam i{position:absolute;left:0;right:0;bottom:2px;height:38px;background:linear-gradient(to top,currentColor,rgba(0,0,0,0));opacity:.16}' +
+    '.npPkSc.busy .npPkBeam{animation-duration:1s}' +
+    '.npPkSc.busy{animation:npPkBreath 1.2s ease-in-out infinite}' +
+    '.npPkSc.ok{color:#22c55e;animation:none}' +
+    '.npPkSc.ok .npPkBeam,.npPkSc.err .npPkBeam{animation:none;opacity:0}' +
+    '.npPkSc.ok .npPkGlass{box-shadow:inset 0 0 30px rgba(34,197,94,.35)}' +
+    '.npPkSc.err{color:#ef4444;animation:npPkShake .45s}' +
+    '.npPkSc.err .npPkGlass{box-shadow:inset 0 0 30px rgba(239,68,68,.3)}' +
+    '@keyframes npPkBeam{0%{top:14px}50%{top:160px}100%{top:14px}}' +
+    '@keyframes npPkBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}' +
+    '@keyframes npPkShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}' +
+    '.npPkStat{width:230px;margin:20px auto 0;text-align:center}' +
+    '.npPkStatT{font-family:var(--font-esports,sans-serif);font-size:12.5px;color:#67e8f9;min-height:16px}' +
+    '.npPkBar{margin-top:9px;height:8px;background:rgba(34,211,238,.12);overflow:hidden;-webkit-mask:repeating-linear-gradient(90deg,#000 0,#000 4px,transparent 4px,transparent 6px);mask:repeating-linear-gradient(90deg,#000 0,#000 4px,transparent 4px,transparent 6px)}' +
+    '.npPkBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#0891b2,#22d3ee);transition:width .15s linear}' +
+    '.npPkStat[data-s=ok] .npPkStatT{color:#86efac}.npPkStat[data-s=ok] .npPkBar i{background:#22c55e}' +
+    '.npPkStat[data-s=err] .npPkStatT{color:#fca5a5}.npPkStat[data-s=err] .npPkBar i{background:#ef4444}' +
+    '.npPkBox .npPkLink{margin-top:26px;color:#7dd3fc;opacity:.85}' +
+    '.npPkFoot{position:fixed;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:#64748b;pointer-events:none}' +
+    '.npPkFoot svg{width:13px;height:13px}' +
+    '#npPkLock.npPkPwMode .npPkFoot{display:none}' +
+    '@media (prefers-reduced-motion:reduce){.npPkSc .npPkBeam,.npPkSc.busy{animation:none}}';
+
   var st = document.createElement('style');
   st.id = 'npPkStyle';
   st.textContent = css;
   document.head.appendChild(st);
+
+  // ---------- স্ক্যান প্রগ্রেস (শুধু দেখানোর জন্য; লগইন লজিক অপরিবর্তিত) ----------
+  var prog = { cur: 0, target: 0, timer: null, t2: null, state: 'idle', stage: 'scan' };
+  function isBn() { return typeof state !== 'undefined' && state && state.currentLang === 'bn'; }
+  function vib(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+  function progPaint() {
+    var t = document.getElementById('npPkProgTxt'), b = document.getElementById('npPkProgBar');
+    if (!t || !b) return;
+    var pct = Math.round(prog.cur), s = prog.state, txt;
+    if (s === 'ok') txt = T('UNLOCKED', 'আনলক হয়েছে');
+    else if (s === 'err') txt = T('SCAN FAILED', 'স্ক্যান ব্যর্থ');
+    else if (s === 'scan') txt = (prog.stage === 'verify' ? T('VERIFYING…', 'যাচাই হচ্ছে…') : T('SCANNING…', 'স্ক্যান হচ্ছে…')) + ' ' + pct + '%';
+    else txt = T('TOUCH SENSOR TO UNLOCK', 'আনলক করতে ফিঙ্গারপ্রিন্ট দিন');
+    t.textContent = txt;
+    t.style.letterSpacing = isBn() ? '0' : '2px';
+    b.style.width = (s === 'idle' ? 0 : pct) + '%';
+    var sb = document.getElementById('npPkStat'); if (sb) sb.setAttribute('data-s', s);
+    var btn = document.getElementById('npPkUnlockBtn'); if (btn) btn.classList.toggle('err', s === 'err');
+  }
+  function progClear() {
+    if (prog.timer) { clearInterval(prog.timer); prog.timer = null; }
+    if (prog.t2) { clearTimeout(prog.t2); prog.t2 = null; }
+  }
+  function progIdle() { progClear(); prog.cur = 0; prog.state = 'idle'; prog.stage = 'scan'; progPaint(); }
+  function progStart() {
+    progClear(); prog.cur = 0; prog.target = 30; prog.state = 'scan'; prog.stage = 'scan'; progPaint();
+    prog.timer = setInterval(function () {
+      prog.cur += Math.max(0.2, (prog.target - prog.cur) * 0.08);
+      if (prog.cur > prog.target) prog.cur = prog.target;
+      progPaint();
+    }, 100);
+  }
+  function progTo(t, stage) { if (prog.state !== 'scan') return; prog.target = t; if (stage) prog.stage = stage; }
+  function progDone() { progClear(); prog.cur = 100; prog.state = 'ok'; progPaint(); vib(30); }
+  function progFail(e) {
+    progClear();
+    if (e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) { progIdle(); return; }
+    prog.state = 'err'; progPaint(); vib([60, 40, 60]);
+    prog.t2 = setTimeout(function () { if (prog.state === 'err') progIdle(); }, 2600);
+  }
 
   // ---------- lock screen ----------
   var busy = false, inEnroll = false, opEndedAt = 0, hiddenAt = 0;
@@ -287,7 +369,8 @@
     var b = document.getElementById('npPkUnlockBtn');
     if (b && b.offsetParent) {
       b.classList.remove('busy'); b.classList.add('ok');       // আঙুল সফল হলে সবুজ, তারপর হোম
-      setTimeout(function () { removeLock(); G.release(); }, 180);
+      progDone();
+      setTimeout(function () { removeLock(); G.release(); }, 450);
     } else { removeLock(); G.release(); }
   }
 
@@ -295,6 +378,7 @@
     var a = document.getElementById('npPkPanelFp'), b = document.getElementById('npPkPanelPw');
     if (a) a.style.display = which === 'fp' ? '' : 'none';
     if (b) b.style.display = which === 'pw' ? '' : 'none';
+    var lk = document.getElementById('npPkLock'); if (lk) lk.classList.toggle('npPkPwMode', which === 'pw');
     setMsg('');
     if (which === 'pw') { var u = document.getElementById('npPkUser'); if (u) u.focus(); }
   }
@@ -318,22 +402,25 @@
   function onUnlockClick(ev) {
     var auto = (ev === 'auto');
     if (busy) return;
-    setMsg(''); setBusy(true);
+    setMsg(''); setBusy(true); progStart();
     takeOpts().then(function (r) {
       return navigator.credentials.get({ publicKey: toGet(r.options) }).then(function (cred) {
         if (!cred) throw cancelErr();
         // আঙুল দেওয়ার সাথে সাথে সবুজ
         var gb = document.getElementById('npPkUnlockBtn');
         if (gb) { gb.classList.remove('busy'); gb.classList.add('ok'); }
+        progTo(75, 'verify');
         if (cred.id) lsSet(LS_CRED, cred.id);   // পরের বার সরাসরি ফিঙ্গারপ্রিন্ট (Continue/অ্যাকাউন্ট বাছাই ছাড়া)
         return api('/api/passkey/login/verify', { sid: r.sid, response: getResult(cred) });
       });
     }).then(function (r) {
+      progTo(92, 'verify');
       var cu = (typeof auth !== 'undefined' && auth) ? auth.currentUser : null;
       var p = (cu && cu.uid === r.uid) ? Promise.resolve() : auth.signInWithCustomToken(r.token);
       return p.then(function () { lsSet(LS_ENR, r.uid); unlockDone(); });
     }).catch(function (e) {
       var gb = document.getElementById('npPkUnlockBtn'); if (gb) gb.classList.remove('ok');
+      progFail(e);
       // অটো-চালুর সময় ব্রাউজার আটকালে বা বাতিল হলে ভয় না দেখিয়ে বাটন চাপতে বলি
       if (auto && e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) {
         setMsg(T('Tap the fingerprint', 'ফিঙ্গারপ্রিন্টে চাপ দিন'), 'n');
@@ -371,9 +458,19 @@
   function buildLock() {
     if (document.getElementById('npPkLock')) return;
     var panelFp = el('div', { id: 'npPkPanelFp' }, [
-      el('button', { id: 'npPkUnlockBtn', class: 'npPkFp', type: 'button', 'aria-label': 'Unlock with Fingerprint', onclick: onUnlockClick }, [fpIcon()]),
+      el('button', { id: 'npPkUnlockBtn', class: 'npPkSc', type: 'button', 'aria-label': 'Unlock with Fingerprint', onclick: onUnlockClick }, [
+        el('span', { class: 'npPkGlass' }),
+        el('span', { class: 'npPkCn tl' }), el('span', { class: 'npPkCn tr' }),
+        el('span', { class: 'npPkCn bl' }), el('span', { class: 'npPkCn br' }),
+        fpIcon(),
+        el('span', { class: 'npPkBeam' }, [el('i')])
+      ]),
+      el('div', { id: 'npPkStat', class: 'npPkStat', 'data-s': 'idle' }, [
+        el('div', { id: 'npPkProgTxt', class: 'npPkStatT' }),
+        el('div', { class: 'npPkBar' }, [el('i', { id: 'npPkProgBar' })])
+      ]),
       el('div', null, [
-        el('button', { class: 'npPkLink', type: 'button', style: 'margin-top:30px', onclick: function () { showPanel('pw'); } }, [
+        el('button', { class: 'npPkLink', type: 'button', onclick: function () { showPanel('pw'); } }, [
           T('Use password', 'পাসওয়ার্ড দিয়ে খুলুন')
         ])
       ])
@@ -391,12 +488,20 @@
         el('button', { class: 'npPkLink', type: 'button', onclick: function () { showPanel('fp'); } }, [T('Back', 'ফিরে যান')])
       ])
     ]);
-    var box = el('div', { class: 'npPkBox' }, [
+    var brand = el('div', { class: 'npPkBrand' }, [
       el('img', { class: 'npPkLogo', src: './icon-192.png', alt: '' }),
-      panelFp, panelPw,
+      el('div', { class: 'npPkTitle', text: 'NP TRUNAMENT' }),
+      el('div', { class: 'npPkSub', text: T('Secure fingerprint login', 'নিরাপদ ফিঙ্গারপ্রিন্ট লগইন') })
+    ]);
+    var box = el('div', { class: 'npPkBox' }, [
+      brand, panelFp, panelPw,
       el('div', { id: 'npPkLockMsg', class: 'npPkTiny', role: 'alert' })
     ]);
-    document.body.appendChild(el('div', { id: 'npPkLock', role: 'dialog', 'aria-modal': 'true' }, [box]));
+    var lockIco = document.createElement('span');
+    lockIco.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+    var foot = el('div', { class: 'npPkFoot' }, [lockIco, T('Protected by your device security', 'আপনার ডিভাইসের নিরাপত্তা দিয়ে সুরক্ষিত')]);
+    document.body.appendChild(el('div', { id: 'npPkLock', role: 'dialog', 'aria-modal': 'true' }, [box, foot]));
+    progIdle();
   }
 
   // ---------- password confirm dialog (for sensitive actions) ----------
