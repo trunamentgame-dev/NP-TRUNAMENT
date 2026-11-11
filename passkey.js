@@ -190,7 +190,10 @@
     if (n === 'InvalidStateError') return T('This device is already registered.', 'এই ডিভাইস আগেই নিবন্ধিত।');
     if (n === 'NotSupportedError' || n === 'SecurityError') return T('This browser or device does not support fingerprint login.', 'এই ব্রাউজার বা ডিভাইসে ফিঙ্গারপ্রিন্ট লগইন সাপোর্ট করে না।');
     if (e && e.status === 429) return T('Too many attempts. Please wait a few minutes.', 'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ অপেক্ষা করুন।');
-    if (e && e.status === 401 && m === 'Passkey verification failed') return T('Fingerprint verification failed. Use your password instead.', 'ফিঙ্গারপ্রিন্ট যাচাই হয়নি। পাসওয়ার্ড ব্যবহার করুন।');
+    if (e && e.status === 401) {
+      if (m && m !== 'Passkey verification failed') return m;
+      return T('Fingerprint verification failed. Use your password instead.', 'ফিঙ্গারপ্রিন্ট যাচাই হয়নি। পাসওয়ার্ড ব্যবহার করুন।');
+    }
     if (e && e.status === 403 && m === 'REAUTH_REQUIRED') return T('Please confirm your password and try again.', 'পাসওয়ার্ড নিশ্চিত করে আবার চেষ্টা করুন।');
     if (e && e.status && m) return m;
     if (e && /Failed to fetch|NetworkError|Load failed/i.test(m || '')) return T('Cannot reach the server. Check your internet and try again.', 'সার্ভারে পৌঁছানো যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।');
@@ -251,34 +254,56 @@
     '.npPkSmall{padding:8px 12px;width:auto;font-size:12.5px;border-radius:10px;border-color:#ef4444;color:#ef4444;white-space:nowrap}' +
     '.npPkCard .npPkBtn{color:#f8fafc}.npPkCard .npPkPrimary{color:#0f172a}.npPkCard .npPkBtn+.npPkBtn{margin-top:10px}' +
     
-    /* স্ক্যানার বাটন ও রিয়ালিস্টিক লাইটিং এফেক্ট */
-    '.npPkScannerWrap{position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center;margin:16px auto 0}' +
-    '.npPkFp{position:relative;width:140px;height:140px;border-radius:50%;border:2px solid rgba(0,240,255,.4);' +
-    'background:radial-gradient(circle at 50% 50%, rgba(0,240,255,0.18) 0%, rgba(0,240,255,0.02) 65%, transparent 75%);' +
+    /* HUD সাইবার স্ক্যানার ফ্রেম (ইউজারের দেওয়া ছবির সাথে ১০০% হুবহু ডিজাইন) */
+    '.npPkScannerWrap{position:relative;width:240px;height:240px;margin:18px auto 6px;display:flex;align-items:center;justify-content:center}' +
+    '.npPkFp{position:relative;width:230px;height:230px;border-radius:36px;border:1px solid rgba(0,240,255,0.25);' +
+    'background:radial-gradient(circle at 50% 50%, #0d1a30 0%, #030814 85%);' +
+    'box-shadow:0 12px 35px rgba(0,0,0,0.7), inset 0 0 30px rgba(0,240,255,0.08);' +
     'display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;outline:none;' +
-    '-webkit-tap-highlight-color:transparent;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);' +
-    'box-shadow:0 0 25px rgba(0,240,255,0.25), inset 0 0 20px rgba(0,240,255,0.15)}' +
+    '-webkit-tap-highlight-color:transparent;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);overflow:hidden}' +
     
-    /* স্পর্শ করলে বা স্ক্যান চলার সময় তীব্র জ্বলন্ত লাইটিং */
+    /* গ্রিড লাইন ব্যাকগ্রাউন্ড */
+    '.npPkGridBack{position:absolute;inset:24px;border:1px solid rgba(0,240,255,0.2);pointer-events:none;' +
+    'background-image:linear-gradient(rgba(0,240,255,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(0,240,255,0.18) 1px, transparent 1px);' +
+    'background-size:24px 24px;border-radius:6px;opacity:0.85}' +
+
+    /* সার্কুলার রেডার রিং */
+    '.npPkRadarRing{position:absolute;width:150px;height:150px;border-radius:50%;border:1px solid rgba(0,240,255,0.35);' +
+    'box-shadow:0 0 12px rgba(0,240,255,0.15), inset 0 0 12px rgba(0,240,255,0.15);pointer-events:none}' +
+
+    /* চার কোনার সাইয়ান HUD কর্নার ব্র্যাকেট [ ] */
+    '.npPkCorner{position:absolute;width:26px;height:26px;border-color:#00f0ff;border-style:solid;border-width:0;pointer-events:none;filter:drop-shadow(0 0 6px #00f0ff)}' +
+    '.npPkCornerTL{top:20px;left:20px;border-top-width:4px;border-left-width:4px;border-top-left-radius:6px}' +
+    '.npPkCornerTR{top:20px;right:20px;border-top-width:4px;border-right-width:4px;border-top-right-radius:6px}' +
+    '.npPkCornerBL{bottom:20px;left:20px;border-bottom-width:4px;border-left-width:4px;border-bottom-left-radius:6px}' +
+    '.npPkCornerBR{bottom:20px;right:20px;border-bottom-width:4px;border-right-width:4px;border-bottom-right-radius:6px}' +
+
+    /* নিয়ন লেজার স্ক্যানিং লাইন (সরাসরি ছবির মতো ব্রাইট সাইয়ান বিম) */
+    '.npPkLaserBeam{position:absolute;left:10px;right:10px;height:3px;background:#00f0ff;' +
+    'box-shadow:0 0 16px #00f0ff, 0 0 32px #00f0ff, 0 0 45px rgba(0,240,255,0.8);' +
+    'pointer-events:none;animation:npPkLaserSweep 2.2s ease-in-out infinite}' +
+    
+    /* ফিঙ্গারপ্রিন্ট আইকন স্কেলিং */
+    '.npPkFp .npPkIco{position:relative;z-index:2;width:95px;height:120px;color:#00f0ff;' +
+    'filter:drop-shadow(0 0 10px rgba(0,240,255,0.85)) drop-shadow(0 0 20px rgba(0,240,255,0.45));' +
+    'transition:all 0.25s ease}' +
+
+    /* আঙুল দেওয়ার বা স্ক্যান করার সময় জীবন্ত আলো ও গ্লো */
     '.npPkFp:active, .npPkFp.touching, .npPkFp.busy{' +
-    'transform:scale(0.96);border-color:#00f0ff;color:#ffffff;' +
-    'background:radial-gradient(circle at 50% 50%, rgba(0,240,255,0.45) 0%, rgba(0,240,255,0.12) 60%, transparent 75%);' +
-    'box-shadow:0 0 45px rgba(0,240,255,0.7), inset 0 0 30px rgba(0,240,255,0.5)}' +
+    'transform:scale(0.97);border-color:#00f0ff;' +
+    'box-shadow:0 0 45px rgba(0,240,255,0.6), inset 0 0 35px rgba(0,240,255,0.3)}' +
     '.npPkFp:active .npPkIco, .npPkFp.touching .npPkIco, .npPkFp.busy .npPkIco{' +
-    'filter:drop-shadow(0 0 14px #00f0ff) drop-shadow(0 0 25px rgba(0,240,255,0.9));color:#ffffff}' +
+    'filter:drop-shadow(0 0 18px #00f0ff) drop-shadow(0 0 32px rgba(0,240,255,0.95));color:#ffffff}' +
+    '.npPkFp:active .npPkLaserBeam, .npPkFp.touching .npPkLaserBeam, .npPkFp.busy .npPkLaserBeam{' +
+    'animation-duration:1s;box-shadow:0 0 25px #00f0ff, 0 0 45px #00f0ff}' +
 
-    /* স্ক্যানিং লেজার রশ্মি ও রিং */
-    '.npPkFp::before{content:"";position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(0,240,255,0.45);pointer-events:none;animation:npPkRing 2s ease-out infinite}' +
-    '.npPkFp::after{content:"";position:absolute;left:0;right:0;height:4px;background:linear-gradient(90deg, transparent, #00f0ff 50%, transparent);' +
-    'box-shadow:0 0 14px #00f0ff, 0 0 24px #00f0ff;pointer-events:none;animation:npPkLaser 2.2s ease-in-out infinite}' +
-    
-    '.npPkFp.busy::after{animation-duration:1s;box-shadow:0 0 20px #00f0ff, 0 0 35px #00f0ff}' +
-    '.npPkFp.ok{border-color:#22c55e;background:radial-gradient(circle, rgba(34,197,94,0.3) 0%, transparent 70%);box-shadow:0 0 40px rgba(34,197,94,0.75)}' +
-    '.npPkFp.ok .npPkIco{color:#22c55e;filter:drop-shadow(0 0 16px rgba(34,197,94,0.9))}' +
-    '.npPkFp.ok::before, .npPkFp.ok::after{animation:none;display:none}' +
+    /* সফল হলে সবুজ ভেরিফিকেশন */
+    '.npPkFp.ok{border-color:#22c55e;box-shadow:0 0 45px rgba(34,197,94,0.7)}' +
+    '.npPkFp.ok .npPkIco{color:#22c55e;filter:drop-shadow(0 0 20px rgba(34,197,94,0.95))}' +
+    '.npPkFp.ok .npPkCorner{border-color:#22c55e;filter:drop-shadow(0 0 8px #22c55e)}' +
+    '.npPkFp.ok .npPkLaserBeam{background:#22c55e;box-shadow:0 0 25px #22c55e;animation:none}' +
 
-    '@keyframes npPkLaser{0%{top:15%;opacity:0.2}50%{top:80%;opacity:1}100%{top:15%;opacity:0.2}}' +
-    '@keyframes npPkRing{0%{transform:scale(0.92);opacity:0.9}100%{transform:scale(1.24);opacity:0}}' +
+    '@keyframes npPkLaserSweep{0%{top:22%;opacity:0.3}50%{top:78%;opacity:1}100%{top:22%;opacity:0.3}}' +
     '.npPkSpin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(15,23,42,.3);border-top-color:#0f172a;animation:npPkSpinA .7s linear infinite;margin-right:8px;vertical-align:-2px}' +
     '@keyframes npPkSpinA{to{transform:rotate(360deg)}}' +
     '.npPkTiny{font-size:12.5px;color:#fca5a5;min-height:18px;margin-top:14px}';
@@ -361,10 +386,15 @@
       return p.then(function () { lsSet(LS_ENR, r.uid); unlockDone(); });
     }).catch(function (e) {
       var gb = document.getElementById('npPkUnlockBtn'); if (gb) gb.classList.remove('ok', 'touching');
-      // অটো-চালুর সময় ব্রাউজার আটকালে বা বাতিল হলে ভয় না দেখিয়ে বাটন চাপতে বলি
+      // ভেরিফিকেশন ফেইল হলে পুরোনো ক্রেডেনশিয়াল আইডি লোকাল স্টোরেজ থেকে ক্লিয়ার করি
+      if (e && (e.status === 401 || e.status === 400)) {
+        try { localStorage.removeItem('np_pk_cred'); } catch (x) {}
+      }
       if (auto && e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) {
         setMsg(T('Tap the fingerprint', 'ফিঙ্গারপ্রিন্টে চাপ দিন'), 'n');
-      } else { setMsg(errText(e)); }
+      } else {
+        setMsg(errText(e));
+      }
     }).then(function () { setBusy(false); opEndedAt = Date.now(); if (G.locked) { try { prefetchOpts(); } catch (e) {} } });
   }
 
@@ -400,7 +430,16 @@
     var unlockBtn = el('button', {
       id: 'npPkUnlockBtn', class: 'npPkFp', type: 'button', 'aria-label': 'Unlock with Fingerprint',
       onclick: onUnlockClick
-    }, [fpIcon()]);
+    }, [
+      el('div', { class: 'npPkGridBack' }),
+      el('div', { class: 'npPkRadarRing' }),
+      el('div', { class: 'npPkCorner npPkCornerTL' }),
+      el('div', { class: 'npPkCorner TR', class: 'npPkCorner npPkCornerTR' }),
+      el('div', { class: 'npPkCorner BL', class: 'npPkCorner npPkCornerBL' }),
+      el('div', { class: 'npPkCorner BR', class: 'npPkCorner npPkCornerBR' }),
+      fpIcon(),
+      el('div', { class: 'npPkLaserBeam' })
+    ]);
 
     unlockBtn.addEventListener('touchstart', function () { unlockBtn.classList.add('touching'); }, { passive: true });
     unlockBtn.addEventListener('touchend', function () { setTimeout(function () { unlockBtn.classList.remove('touching'); }, 400); });
