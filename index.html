@@ -639,6 +639,117 @@
       width: 100%;
     }
 
+    /* ==================== বায়োমেট্রিক সিকিউরিটি স্লাইডার ব্যানার ==================== */
+    .bio-banner-wrap {
+      position: relative;
+      margin: 12px 0 14px 0;
+      padding: 1.5px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.4), rgba(245, 158, 11, 0.25), rgba(0, 240, 255, 0.2));
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), 0 0 14px rgba(0, 240, 255, 0.15);
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .bio-banner-wrap:active {
+      transform: scale(0.985);
+    }
+    .bio-slider-track {
+      position: relative;
+      background: radial-gradient(circle at 80% 50%, #151d31 0%, #0a0f1d 85%);
+      border-radius: 12px;
+      min-height: 68px;
+      overflow: hidden;
+    }
+    .bio-slide {
+      display: none;
+      padding: 12px 14px 18px 14px;
+      animation: bioFade 0.4s ease-in-out;
+    }
+    .bio-slide.active {
+      display: block;
+    }
+    .bio-slide-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .bio-slide-icon {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      border-radius: 10px;
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bio-slide-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    .bio-slide-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .bio-slide-text h4 {
+      margin: 0 0 2px 0;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bio-slide-text p {
+      margin: 0;
+      font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bio-slide-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, #00f0ff, #0284c7);
+      color: #030712;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0, 240, 255, 0.3);
+    }
+    .bio-dots {
+      position: absolute;
+      bottom: 5px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+    }
+    .bio-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      transition: all 0.3s ease;
+    }
+    .bio-dot.active {
+      width: 16px;
+      border-radius: 3px;
+      background: #00f0ff;
+    }
+    @keyframes bioFade {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .btn-sm {
       padding: 6px 12px;
       font-size: 12px;
@@ -3114,6 +3225,75 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
         <div id="gamesScrollTrack" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 8px 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory;">
           <!-- Dynamically populated from Firebase / Demo games -->
+        </div>
+      </div>
+
+      <!-- ==================== বায়োমেট্রিক সিকিউরিটি ব্যানার স্লাইডার ==================== -->
+      <div id="biometricSecuritySlider" class="bio-banner-wrap" onclick="if(window.npOpenBiometricSetup){window.npOpenBiometricSetup();}else if(window.app){window.app.switchView('viewProfile');}">
+        <div class="bio-slider-track" id="bioSliderTrack">
+          <!-- Slide 1 -->
+          <div class="bio-slide active">
+            <div class="bio-slide-content">
+              <div class="bio-slide-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="bio-slide-text">
+                <h4>🛡️ অ্যাকাউন্টের সুরক্ষার জন্য বায়োমেট্রিক যোগ করুন</h4>
+                <p>১-ট্যাপে ইনস্ট্যান্ট ফিঙ্গারপ্রিন্ট লগইন চালু করতে এখানে চাপ দিন</p>
+              </div>
+              <button type="button" class="bio-slide-btn">যুক্ত করুন</button>
+            </div>
+          </div>
+
+          <!-- Slide 2 -->
+          <div class="bio-slide">
+            <div class="bio-slide-content">
+              <div class="bio-slide-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.026.99-4.18.99-6.415 0-2.827-.58-5.503-1.63-7.925"/></svg>
+              </div>
+              <div class="bio-slide-text">
+                <h4>⚡ পাসওয়ার্ডের ঝামেলা শেষ — ফিঙ্গারপ্রিন্ট চালু করুন</h4>
+                <p>পাসওয়ার্ড টাইপ করার প্রয়োজন নেই, চোখের পলকে অ্যাপ আনলক করুন</p>
+              </div>
+              <button type="button" class="bio-slide-btn">চালু করুন</button>
+            </div>
+          </div>
+
+          <!-- Slide 3 -->
+          <div class="bio-slide">
+            <div class="bio-slide-content">
+              <div class="bio-slide-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              </div>
+              <div class="bio-slide-text">
+                <h4>🔒 ওয়ালেট ও টুর্নামেন্ট অ্যাকাউন্ট ১০০% সুরক্ষিত রাখুন</h4>
+                <p>আপনার ব্যালেন্স এবং উইনিং ফান্ড রাখুন সম্পূর্ণ সুরক্ষিত ও নিরাপদ</p>
+              </div>
+              <button type="button" class="bio-slide-btn">সুরক্ষিত করুন</button>
+            </div>
+          </div>
+
+          <!-- Slide 4 -->
+          <div class="bio-slide">
+            <div class="bio-slide-content">
+              <div class="bio-slide-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+              <div class="bio-slide-text">
+                <h4>🚀 সুপার-ফাস্ট বায়োমেট্রিক সিকিউরিটি সক্রিয় করুন</h4>
+                <p>এখনই বায়োমেট্রিক যুক্ত করে আধুনিক প্রযুক্তির সুবিধা গ্রহণ করুন</p>
+              </div>
+              <button type="button" class="bio-slide-btn">অ্যাক্টিভ করুন</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dots Indicator -->
+        <div class="bio-dots" id="bioSliderDots">
+          <span class="bio-dot active"></span>
+          <span class="bio-dot"></span>
+          <span class="bio-dot"></span>
+          <span class="bio-dot"></span>
         </div>
       </div>
 
@@ -7897,22 +8077,8 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         history.pushState({ nrExitGuard: true }, "", location.href);
         return;
       }
-      // ব্যাক বাটন: এক্সিট ডায়ালগ নেই। খোলা পপআপ থাকলে বন্ধ হবে, নইলে হোম পেজে যাবে
+      showExitConfirm();
       history.pushState({ nrExitGuard: true }, "", location.href);
-      try {
-        var openModals = document.querySelectorAll('.modal-overlay.active');
-        var closed = false;
-        openModals.forEach(function (m) {
-          if (m.id === 'modalAuth') return;
-          m.classList.remove('active'); closed = true;
-        });
-        if (closed) return;
-        var home = document.getElementById('viewHome');
-        if (home && !home.classList.contains('active') &&
-            window.app && typeof window.app.switchView === 'function') {
-          window.app.switchView('viewHome');
-        }
-      } catch (e) {}
     });
   })();
   </script>
@@ -8280,6 +8446,22 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         }, r.every);
       }, 1200 + i * 1700);
     });
+  })();
+
+  // বায়োমেট্রিক সিকিউরিটি স্লাইডার অটো-রোটেশন
+  (function initBioSlider() {
+    var slides = document.querySelectorAll('.bio-slide');
+    var dots = document.querySelectorAll('.bio-dot');
+    if (!slides || !slides.length) return;
+    var cur = 0;
+    setInterval(function () {
+      if (document.hidden || document.documentElement.classList.contains('np-pk-lock')) return;
+      slides[cur].classList.remove('active');
+      if (dots[cur]) dots[cur].classList.remove('active');
+      cur = (cur + 1) % slides.length;
+      slides[cur].classList.add('active');
+      if (dots[cur]) dots[cur].classList.add('active');
+    }, 4200);
   })();
   </script>
   <script src="./passkey.js"></script>
