@@ -379,11 +379,25 @@
   // ---------- Profile Card & Enable/Disable (100% লোকাল স্টোরেজ) ----------
   var card = null, list = null, actions = null;
 
-  function currentUser() { return (typeof auth !== 'undefined' && auth) ? auth.currentUser : null; }
+  function currentUser() {
+    try { if (typeof auth !== 'undefined' && auth && auth.currentUser) return auth.currentUser; } catch (e) {}
+    try { if (window.auth && window.auth.currentUser) return window.auth.currentUser; } catch (e) {}
+    try { if (window.firebase && window.firebase.auth && window.firebase.auth().currentUser) return window.firebase.auth().currentUser; } catch (e) {}
+    return null;
+  }
+
+  function findLogoutBtn() {
+    return document.querySelector('button[onclick="window.app.handleLogout()"]') ||
+           document.querySelector('[onclick*="handleLogout"]');
+  }
 
   function buildCard() {
-    if (card) return;
-    var btn = document.querySelector('button[onclick="window.app.handleLogout()"]');
+    var btn = findLogoutBtn();
+    if (card) {
+      // প্রোফাইল পেজ নতুন করে আঁকা হলে কার্ড DOM থেকে হারিয়ে যায় — আবার বসিয়ে দিই
+      if (!card.isConnected && btn && btn.parentNode) btn.parentNode.insertBefore(card, btn);
+      return;
+    }
     if (!btn || !btn.parentNode) return;
     list = el('div', { id: 'npPkList' });
     actions = el('div', { id: 'npPkActions' });
@@ -530,6 +544,19 @@
         if (u) { renderCard(); }
         else { renderCard(); }
       });
+    }
+    // প্রোফাইল পেজ দেরিতে লোড হলে বা বারবার আঁকা হলেও কার্ড যেন সবসময় দেখা যায়
+    var obsT = null;
+    function ensureCard() {
+      if (G.locked || !currentUser()) return;
+      if (card && card.isConnected && card.style.display !== 'none') return;
+      renderCard();
+    }
+    if (window.MutationObserver) {
+      new MutationObserver(function () {
+        clearTimeout(obsT);
+        obsT = setTimeout(ensureCard, 200);
+      }).observe(document.body, { childList: true, subtree: true });
     }
   }
 
