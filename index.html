@@ -4652,6 +4652,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
     function renderGamesCards(games) {
       gamesForBoxes = Array.isArray(games) ? games : [];
+      state.games = gamesForBoxes;
       try { renderGameBoxes(); } catch (e) {}
       const empty = document.getElementById('gamesEmptyState');
       const error = document.getElementById('gamesErrorState');
@@ -4671,7 +4672,8 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           const title = escapeHtml(g.name || g.title || 'Game');
           const category = escapeHtml(g.category || 'ক্র্যাশ গেম');
           const imageUrl = escapeHtml(g.image || g.imageUrl || g.banner || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=400&q=80');
-          const targetUrl = escapeHtml(g.url || g.gameUrl || g.link || '#');
+          const rawUrl = String(g.url || g.gameUrl || g.link || '#');
+          const targetUrl = escapeHtml(rawUrl.replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
           const isLudoGame = /ludo|ludu|lodu|লুডু/i.test([g.name, g.title, g.id, g.category, g.url, g.gameUrl, g.link].join(' '));
 
           return `
@@ -4869,8 +4871,8 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       }
     }
 
-    // ===== গেম প্যানেলের ভেতরেই ফ্রেমে খোলে; গেম "ব্যালেন্স এসেছে" জানালে তবেই প্যানেলের LOADING সরে =====
-    let npGameFrameEl = null, npGameIdleTimer = null;
+    // ===== গেম প্যানেলের ভেতরেই ফ্রেমে খোলে; গেম "ব্যালেন্স এসেছে" জানালে বা লোড সম্পূর্ণ হলে প্যানেলের LOADING সরে =====
+    let npGameFrameEl = null, npGameIdleTimer = null, npGameReadyTimer = null;
     function npOpenGameFrame(finalUrl, waitReady) {
       npCloseGameFrame(true);
       const wrap = document.createElement('div');
@@ -4880,8 +4882,21 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       fr.style.cssText = 'width:100%;height:100%;border:0;display:block;background:#07090e';
       fr.setAttribute('allow', 'fullscreen; autoplay');
       fr.setAttribute('allowfullscreen', '');
-      // যে গেম "ready" সংকেত পাঠায় না (Ludo, Carrom ইত্যাদি) তার জন্য পেজ লোড হলেই লোডিং সরবে
-      if (!waitReady) fr.addEventListener('load', function () { if (window.npHideLoad) window.npHideLoad(); });
+      fr.addEventListener('load', function () {
+        clearTimeout(npGameReadyTimer);
+        if (!waitReady) {
+          if (window.npHideLoad) window.npHideLoad();
+        } else {
+          // নিজস্ব গেম NP_GAME_READY না পাঠালেও পেজ লোড সম্পূর্ণ হওয়ার পর অল্প সময়ে লোডিং সরে যাবে
+          npGameReadyTimer = setTimeout(function () {
+            if (window.npHideLoad) window.npHideLoad();
+          }, 2500);
+        }
+      });
+      fr.addEventListener('error', function () {
+        clearTimeout(npGameReadyTimer);
+        if (window.npHideLoad) window.npHideLoad();
+      });
       fr.src = finalUrl;
       wrap.appendChild(fr);
       document.body.appendChild(wrap);
@@ -4891,6 +4906,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       npGameIdleTimer = setInterval(function () { npTouchActive(true); }, 30000);
     }
     function npCloseGameFrame(silent) {
+      clearTimeout(npGameReadyTimer);
       if (!npGameFrameEl) return;
       npGameFrameEl.remove();
       npGameFrameEl = null;
@@ -4904,7 +4920,10 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       if (!npGameFrameEl) return;
       const fr = npGameFrameEl.querySelector('iframe');
       if (!fr || e.source !== fr.contentWindow || !e.data) return;
-      if (e.data.type === 'NP_GAME_READY' && window.npHideLoad) window.npHideLoad();
+      if (e.data.type === 'NP_GAME_READY') {
+        clearTimeout(npGameReadyTimer);
+        if (window.npHideLoad) window.npHideLoad();
+      }
     });
 
     window.addEventListener('beforeunload', () => { closeActiveGameSession(); });
@@ -4915,11 +4934,14 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     // ---- গেম রেজিস্ট্রি: কোন গেমে টোকেন যাবে / প্রস্তুত সংকেতের অপেক্ষা হবে / কোন সার্ভার জাগানো হবে, তা এখন গেমের রেকর্ড (Firebase games/{id}) থেকে আসে ----
     // রেকর্ডের ফিল্ড:  integrated (true = নিজস্ব গেম, false = বাইরের লিংক)  ও  healthUrl (গেম সার্ভারের /health লিংক, ঐচ্ছিক)
     // integrated ফিল্ড না থাকা পুরোনো গেম আগের মতোই চলে।
-    const NP_LEGACY_GAME = /crazytime|creazy|aviator|avitor|crash|roulette|ludo|carrom|crambod|7up|updown|7-up|up-?down/i;
+    const NP_LEGACY_GAME = /crazytime|creazy|aviator|avitor|crash|roulette|7up|updown|7-up|up-?down/i;
     function npGameRecord(url) {
       const clean = String(url || '').split('#')[0];
+      const noSlash = clean.replace(/\/+$/, '');
       const list = [].concat(typeof gamesForBoxes !== 'undefined' && Array.isArray(gamesForBoxes) ? gamesForBoxes : [], state.games || []);
-      return list.find(g => g && [g.url, g.gameUrl, g.link].some(u => u && String(u).split('#')[0] === clean)) || null;
+      return list.find(g => g && [g.url, g.gameUrl, g.link].some(u => u && String(u).split('#')[0] === clean))
+        || list.find(g => g && [g.url, g.gameUrl, g.link].some(u => u && String(u).split('#')[0].replace(/\/+$/, '') === noSlash))
+        || null;
     }
     function npGameInfo(url) {
       const rec = npGameRecord(url) || {};
@@ -5046,7 +5068,14 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
       let finalUrl = url;
       if (gameIdToken && npInfo.sendToken) {   // বাইরের গেমে ইউজারের লগইন-টোকেন পাঠানো হয় না
-        finalUrl = String(url).split('#')[0] + '#t=' + gameIdToken;
+        const rawU = String(url);
+        const hIdx = rawU.indexOf('#');
+        const frag = hIdx >= 0 ? rawU.slice(hIdx + 1) : '';
+        if (hIdx === -1 || frag === '' || /^t=/.test(frag)) {
+          finalUrl = (hIdx === -1 ? rawU : rawU.slice(0, hIdx)) + '#t=' + gameIdToken;
+        } else {
+          finalUrl = rawU + '&t=' + gameIdToken;
+        }
       }
       if (sameWindow) { npOpenGameFrame(finalUrl, npInfo.waitReady); return; }
       try {
