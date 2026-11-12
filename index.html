@@ -4764,11 +4764,73 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       }
     }
 
+    // ===== লাইভ গেম সেশন ও প্রত্যেকটি বেট ট্র্যাকিং (Master Admin & User History) =====
+    let npLastTrackedGameBal = null;
+    window.npOnGameBalanceChange = function (newBal) {
+      const sessionId = sessionStorage.getItem('np_active_game_session');
+      if (!sessionId || !db || !state.currentUser) return;
+      if (npLastTrackedGameBal === null) {
+        const stored = sessionStorage.getItem('np_active_last_bal');
+        npLastTrackedGameBal = stored ? Number(stored) : newBal;
+      }
+      const prevBal = npLastTrackedGameBal;
+      const diff = Math.round((newBal - prevBal) * 100) / 100;
+      if (Math.abs(diff) < 0.01) return; // ব্যালেন্সে পরিবর্তন নেই
+
+      npLastTrackedGameBal = newBal;
+      sessionStorage.setItem('np_active_last_bal', String(newBal));
+
+      const isBet = diff < 0;
+      const amt = Math.abs(diff);
+      let betCount = Number(sessionStorage.getItem('np_active_bet_count')) || 0;
+      if (isBet) {
+        betCount += 1;
+        sessionStorage.setItem('np_active_bet_count', String(betCount));
+      }
+
+      const betId = db.ref(`game_sessions/${sessionId}/bets`).push().key;
+      const entryBal = Number(sessionStorage.getItem('np_active_entry_bal')) || prevBal;
+      const net = Math.round((newBal - entryBal) * 100) / 100;
+      const timeNow = Date.now();
+      const timeFmt = new Date(timeNow).toLocaleTimeString(window.npLocale ? window.npLocale() : 'bn-BD', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const betItem = {
+        id: betId,
+        sessionId: sessionId,
+        uid: state.currentUser.uid,
+        time: timeNow,
+        timeFormatted: timeFmt,
+        type: isBet ? 'BET' : 'WIN',
+        typeLabel: isBet ? 'বাজি (Bet)' : 'জয় / ক্যাশআউট (Win)',
+        amount: amt,
+        net: diff,
+        beforeBal: prevBal,
+        afterBal: newBal,
+        gameName: sessionStorage.getItem('np_active_game_name') || 'গেম'
+      };
+
+      const updates = {};
+      updates[`game_sessions/${sessionId}/exitBalance`] = newBal;
+      updates[`game_sessions/${sessionId}/netWinLoss`] = net;
+      updates[`game_sessions/${sessionId}/betCount`] = betCount;
+      updates[`game_sessions/${sessionId}/lastBetTime`] = timeNow;
+      updates[`game_sessions/${sessionId}/bets/${betId}`] = betItem;
+
+      updates[`users/${state.currentUser.uid}/game_sessions/${sessionId}/exitBalance`] = newBal;
+      updates[`users/${state.currentUser.uid}/game_sessions/${sessionId}/netWinLoss`] = net;
+      updates[`users/${state.currentUser.uid}/game_sessions/${sessionId}/betCount`] = betCount;
+      updates[`users/${state.currentUser.uid}/game_sessions/${sessionId}/lastBetTime`] = timeNow;
+      updates[`users/${state.currentUser.uid}/game_sessions/${sessionId}/bets/${betId}`] = betItem;
+
+      db.ref().update(updates).catch(() => {});
+    };
+
     async function closeActiveGameSession() {
       const sessionId = sessionStorage.getItem('np_active_game_session');
       if (!sessionId || !db) return;
       try {
         const curBal = typeof state.userData.balance === 'number' ? state.userData.balance : 0;
+        const entryBal = Number(sessionStorage.getItem('np_active_entry_bal')) || curBal;
+        const betCount = Number(sessionStorage.getItem('np_active_bet_count')) || 0;
         const snap = await db.ref(`game_sessions/${sessionId}`).once('value');
         if (snap.exists()) {
           const s = snap.val();
@@ -4777,19 +4839,31 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             const durMs = Math.max(1000, end - (s.startTime || end));
             const mins = Math.max(1, Math.round(durMs / 60000));
             const durText = mins >= 60 ? `${Math.floor(mins / 60)} ঘণ্টা ${mins % 60} মিনিট` : `${mins} মিনিট`;
-            const net = curBal - (Number(s.entryBalance) || 0);
-            await db.ref(`game_sessions/${sessionId}`).update({
+            const net = curBal - (Number(s.entryBalance !== undefined ? s.entryBalance : entryBal) || 0);
+            const finalBetsCount = s.betCount || betCount || (s.bets ? Object.keys(s.bets).length : 0);
+            const upObj = {
               endTime: end,
               endFormatted: new Date(end).toLocaleString(window.npLocale ? window.npLocale() : 'bn-BD'),
               exitBalance: curBal,
               netWinLoss: net,
               duration: durText,
               durationMs: durMs,
+              betCount: finalBetsCount,
               status: 'COMPLETED'
-            });
+            };
+            await db.ref(`game_sessions/${sessionId}`).update(upObj).catch(() => {});
+            if (state.currentUser && state.currentUser.uid) {
+              await db.ref(`users/${state.currentUser.uid}/game_sessions/${sessionId}`).update(upObj).catch(() => {});
+            }
           }
         }
         sessionStorage.removeItem('np_active_game_session');
+        sessionStorage.removeItem('np_active_game_name');
+        sessionStorage.removeItem('np_active_entry_bal');
+        sessionStorage.removeItem('np_active_last_bal');
+        sessionStorage.removeItem('np_active_bet_count');
+        npLastTrackedGameBal = null;
+        if (typeof npFetchUserGameHistory === 'function') npFetchUserGameHistory();
       } catch (e) {
         console.warn('Close game session error:', e);
       }
@@ -4914,14 +4988,29 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             entryBalance: entryBal,
             exitBalance: entryBal,
             netWinLoss: 0,
+            betCount: 0,
+            bets: {},
             ip: userIp || 'Unknown',
             deviceId: deviceId,
             device: deviceDesc,
             status: 'ACTIVE'
           };
-          try { sessionStorage.setItem('np_active_game_session', sessionId); } catch (e) {}
+          try {
+            sessionStorage.setItem('np_active_game_session', sessionId);
+            sessionStorage.setItem('np_active_game_name', gameName);
+            sessionStorage.setItem('np_active_entry_bal', String(entryBal));
+            sessionStorage.setItem('np_active_last_bal', String(entryBal));
+            sessionStorage.setItem('np_active_bet_count', '0');
+            npLastTrackedGameBal = entryBal;
+          } catch (e) {}
           // সেশন লেখা লোডিং আটকে রাখে না: সর্বোচ্চ ৩ সেকেন্ড অপেক্ষা, লেখা পিছনে চলতে থাকে
-          await Promise.race([sessionRef.set(sessionData).catch(function () {}), new Promise(function (r) { setTimeout(r, 3000); })]);
+          await Promise.race([
+            Promise.all([
+              sessionRef.set(sessionData).catch(function () {}),
+              db.ref(`users/${uid}/game_sessions/${sessionId}`).set(sessionData).catch(function () {})
+            ]),
+            new Promise(function (r) { setTimeout(r, 3000); })
+          ]);
         }
       } catch (err) {
         console.warn('Game session start error:', err);
@@ -4997,11 +5086,90 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       showAuthModal('login');
     }
 
+    // ===== ব্যবহারকারীর গেম হিস্ট্রি সিঙ্ক ও ৩ মিনিটে লাইভ অটো-আপডেট =====
+    state.gameSessions = [];
+    let npHist3MinTimer = null;
+    let npHistAccordionOpen = {};
+
+    async function npFetchUserGameHistory() {
+      if (!db || !state.currentUser) return;
+      const uid = state.currentUser.uid;
+      try {
+        let list = [];
+        // 1. Try fetching from users/{uid}/game_sessions
+        const uSnap = await db.ref(`users/${uid}/game_sessions`).limitToLast(50).once('value');
+        if (uSnap.exists()) {
+          const val = uSnap.val() || {};
+          list = Object.keys(val).map(k => ({ id: k, ...val[k] }));
+        }
+        // 2. Try fetching from root game_sessions
+        try {
+          const gSnap = await db.ref('game_sessions').orderByChild('uid').equalTo(uid).limitToLast(50).once('value');
+          if (gSnap.exists()) {
+            const val = gSnap.val() || {};
+            const gList = Object.keys(val).map(k => ({ id: k, ...val[k] }));
+            const seen = new Set(list.map(x => x.id));
+            gList.forEach(x => {
+              if (!seen.has(x.id)) list.push(x);
+              else {
+                const idx = list.findIndex(item => item.id === x.id);
+                if (idx >= 0 && x.bets) {
+                  list[idx].bets = Object.assign({}, list[idx].bets || {}, x.bets);
+                  if (typeof x.netWinLoss === 'number') list[idx].netWinLoss = x.netWinLoss;
+                  if (typeof x.exitBalance === 'number') list[idx].exitBalance = x.exitBalance;
+                  if (x.betCount) list[idx].betCount = x.betCount;
+                  if (x.status) list[idx].status = x.status;
+                }
+              }
+            });
+          }
+        } catch (eQuery) {}
+
+        list.sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
+        state.gameSessions = list;
+        renderTxHistoryFeed();
+      } catch (err) {
+        console.warn('Game sessions load error:', err);
+      }
+    }
+
+    function npStart3MinHistorySync(uid) {
+      if (npHist3MinTimer) clearInterval(npHist3MinTimer);
+      npFetchUserGameHistory();
+
+      // ব্যবহারকারীর রিকোয়েস্ট: "live 3 mnt pore pore histori update hobe user er"
+      // প্রতি ৩ মিনিটে (180,000 ms) স্বয়ংক্রিয় লাইভ হিস্ট্রি ও ব্যালেন্স রিফ্রেশ
+      npHist3MinTimer = setInterval(async function () {
+        if (!state.currentUser) return;
+        try {
+          // ১. ব্যালেন্স সিঙ্ক
+          const bSnap = await db.ref(`users/${uid}/balance`).once('value');
+          if (bSnap.exists() && typeof bSnap.val() === 'number') {
+            state.userData.balance = bSnap.val();
+            updateAuthStateUI();
+          }
+          // ২. গেম হিস্ট্রি ও বেট সিঙ্ক
+          await npFetchUserGameHistory();
+          // ৩. লেনদেন হিস্ট্রি সিঙ্ক
+          const txSnap = await db.ref('transactions').orderByChild('uid').equalTo(uid).limitToLast(40).once('value');
+          if (txSnap.exists()) {
+            const val = txSnap.val() || {};
+            state.transactions = Object.keys(val).map(k => ({ trxId: k, ...val[k] })).reverse();
+          }
+          renderTxHistoryFeed();
+          console.log('[NP Live History] ৩ মিনিটের লাইভ হিস্ট্রি আপডেট সম্পন্ন');
+        } catch (e) {
+          console.warn('[NP Live History] Auto refresh err:', e);
+        }
+      }, 3 * 60 * 1000);
+    }
+
     function setupUserListeners(uid) {
       if (!db || !uid) return;
 
       trackUserDeviceAndIp(uid);
       closeActiveGameSession();
+      npStart3MinHistorySync(uid);
 
       db.ref(`users/${uid}`).on('value', (snap) => {
         if (snap.exists()) {
@@ -5024,6 +5192,10 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           updateAuthStateUI();
           renderMyMatchesFeed();
           saveUserCache();
+
+          if (npGameFrameEl && typeof window.npOnGameBalanceChange === 'function') {
+            window.npOnGameBalanceChange(state.userData.balance);
+          }
 
           if (state.userData.status === 'SUSPENDED') {
             showToast('⚠️ আপনার অ্যাকাউন্টটি সাময়িক স্থগিত (Suspended) করা হয়েছে।', 'error');
@@ -6317,6 +6489,8 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
     async function handleLogout() {
       if (confirm('আপনি কি নিশ্চিত যে অ্যাকাউন্ট থেকে লগআউট করতে চান?')) {
+        if (npHist3MinTimer) { clearInterval(npHist3MinTimer); npHist3MinTimer = null; }
+        state.gameSessions = [];
         if (auth) await auth.signOut();
         state.currentUser = null;
         updateAuthStateUI();
@@ -7012,6 +7186,11 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         items.push({ src: 'tx', kind, ts: npItemTs(tx), raw: tx });
       });
 
+      // ব্যবহারকারীর গেম সেশনসমূহ (কোন গেম খেললো, ব্যালেন্স -+ হিসাব, মোট বেট)
+      (state.gameSessions || []).filter(npWithin7Days).forEach(gs => {
+        items.push({ src: 'game_session', kind: 'other', ts: gs.startTime || gs.startServerAt || 0, raw: gs });
+      });
+
       return items.sort((a, b) => b.ts - a.ts);
     }
 
@@ -7029,6 +7208,16 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       const shown = all.filter(i => i.kind === npHistTab);
 
       const tabDefs = [['deposit', 'ডিপোজিট হিস্ট্রি'], ['withdraw', 'উইথড্র হিস্ট্রি'], ['other', 'গেম হিস্ট্রি']];
+      const liveBarHtml = (npHistTab === 'other') ? `
+        <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:8px 12px;margin:6px 0 10px;font-size:11.5px;color:#10b981;">
+          <span style="display:flex;align-items:center;gap:6px;font-weight:600;">
+            <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;"></span>
+            লাইভ গেম হিস্ট্রি · প্রতি ৩ মিনিটে স্বয়ংক্রিয় আপডেট হচ্ছে
+          </span>
+          <button type="button" onclick="window.app.refreshHistoryNow()" style="background:#10b981;color:#070d19;border:0;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;">🔄 রিফ্রেশ</button>
+        </div>
+      ` : '';
+
       const tabsHtml = `
         <div class="np-hist-tabs">
           ${tabDefs.map(([k, label]) => `
@@ -7036,6 +7225,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
           `).join('')}
         </div>
         <div class="np-hist-note">গত ৭ দিনের হিস্ট্রি দেখানো হচ্ছে</div>
+        ${liveBarHtml}
       `;
 
       if (shown.length === 0) {
@@ -7071,6 +7261,87 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             </div>
           `;
         }
+
+        if (it.src === 'game_session') {
+          const gs = it.raw;
+          const entry = Number(gs.entryBalance) || 0;
+          const exit = typeof gs.exitBalance === 'number' ? gs.exitBalance : entry;
+          const net = typeof gs.netWinLoss === 'number' ? gs.netWinLoss : (exit - entry);
+          const isWin = net >= 0;
+          const netColor = isWin ? '#10b981' : '#ef4444';
+          const sign = isWin ? '+' : '-';
+          const betCount = Number(gs.betCount || (gs.bets ? Object.keys(gs.bets).length : 0));
+          const isActive = gs.status === 'ACTIVE';
+          const dateStr = gs.startTime ? new Date(gs.startTime).toLocaleString(window.npLocale ? window.npLocale() : 'bn-BD') : 'সম্প্রতি';
+          const isOpen = !!npHistAccordionOpen[gs.id];
+          const betsList = gs.bets ? Object.values(gs.bets).sort((a, b) => (b.time || 0) - (a.time || 0)) : [];
+
+          let betsHtml = '';
+          if (isOpen && betsList.length > 0) {
+            betsHtml = `
+              <div class="np-game-bets-box" style="margin-top:10px;padding:9px 12px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:10px;font-size:11px;">
+                <div style="font-weight:700;color:#cbd5e1;margin-bottom:6px;display:flex;justify-content:space-between;">
+                  <span>🎯 প্রত্যেকটি বাজি (${betsList.length}টি)</span>
+                  <span style="color:var(--text-muted);">এন্ট্রি ব্যালেন্স: ৳${entry.toLocaleString('bn-BD')}</span>
+                </div>
+                ${betsList.map((b) => {
+                  const bNet = typeof b.net === 'number' ? b.net : (b.type === 'WIN' ? Number(b.amount) : -Number(b.amount));
+                  const bWin = bNet >= 0;
+                  return `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px dashed rgba(255,255,255,0.06);">
+                      <div>
+                        <span style="font-weight:700;color:${bWin ? '#10b981' : '#ef4444'};">${bWin ? '🏆 জয়' : '🎲 বাজি'}: ৳${Number(b.amount || 0).toLocaleString('bn-BD')}</span>
+                        <span style="color:var(--text-muted);margin-left:6px;font-size:10px;">${b.timeFormatted || (b.time ? new Date(b.time).toLocaleTimeString('bn-BD') : '')}</span>
+                      </div>
+                      <div style="text-align:right;">
+                        <span style="font-weight:700;color:${bWin ? '#10b981' : '#ef4444'};">${bWin ? '+' : ''}${bNet}</span>
+                        ${typeof b.balance === 'number' ? `<span style="color:var(--text-muted);margin-left:6px;font-size:10px;">(ব্যালেন্স ৳${b.balance})</span>` : ''}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `;
+          }
+
+          return `
+            <div class="tx-item" style="display:block;padding:12px;margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+                <div class="tx-left" style="align-items:flex-start;">
+                  <div class="tx-icon-box" style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:16px;">🎮</div>
+                  <div>
+                    <div class="tx-title" style="font-size:14px;font-weight:700;color:#fff;">${escapeHtml(gs.gameName || 'গেম')}</div>
+                    <div class="tx-date" style="margin-top:2px;">${dateStr} · সময়: ${escapeHtml(gs.duration || '১ মিনিট')}</div>
+                    <div style="font-size:11.5px;color:var(--text-secondary);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;">
+                      <span>📥 এন্ট্রি: <b>৳ ${entry.toLocaleString('bn-BD', {minimumFractionDigits: 2})}</b></span>
+                      <span>📤 এক্সিট: <b>৳ ${exit.toLocaleString('bn-BD', {minimumFractionDigits: 2})}</b></span>
+                      ${betCount > 0 ? `<span>🎯 বাজি: <b>${betCount} বার</b></span>` : ''}
+                    </div>
+                  </div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <div class="t-val" style="font-size:16px;font-weight:800;color:${netColor};">
+                    ${sign} ৳ ${Math.abs(net).toLocaleString('bn-BD', {minimumFractionDigits: 2})}
+                  </div>
+                  <div>
+                    <span class="np-hist-chip" style="background:${isActive ? 'rgba(59,130,246,0.15)' : 'rgba(16,185,129,0.15)'};color:${isActive ? '#3b82f6' : '#10b981'};">
+                      ${isActive ? '🟢 খেলছেন (Live)' : '✅ সম্পন্ন'}
+                    </span>
+                  </div>
+                  ${betsList.length > 0 ? `
+                    <div style="margin-top:6px;">
+                      <button type="button" onclick="window.app.toggleSessionBets('${gs.id}')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#cbd5e1;padding:3px 7px;border-radius:6px;font-size:10.5px;cursor:pointer;font-family:inherit;">
+                        ${isOpen ? '▲ বেট লুকান' : `▼ বেট দেখুন (${betsList.length})`}
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+              ${betsHtml}
+            </div>
+          `;
+        }
+
         const tx = it.raw;
         const isDep = tx.type && (tx.type.includes('DEPOSIT') || tx.type.includes('CREDIT') || tx.type.includes('PRIZE'));
         const doneChip = (it.kind === 'deposit') ? `<span class="np-hist-chip" style="background:rgba(16,185,129,0.15); color:#10b981;">✅ সম্পন্ন</span>` : '';
@@ -7837,7 +8108,17 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       confirmGameLoginPrompt,
       openNotificationsModal,
       markNotificationRead,
-      markAllNotificationsRead
+      markAllNotificationsRead,
+      toggleSessionBets: function (id) {
+        npHistAccordionOpen[id] = !npHistAccordionOpen[id];
+        renderTxHistoryFeed();
+      },
+      refreshHistoryNow: async function () {
+        showToast('লাইভ হিস্ট্রি ও ব্যালেন্স রিফ্রেশ হচ্ছে...', 'info');
+        refreshWallet();
+        await npFetchUserGameHistory();
+        showToast('হিস্ট্রি সফলভাবে আপডেট হয়েছে ✅', 'success');
+      }
     };
   </script>
 
