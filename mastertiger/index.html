@@ -96,7 +96,57 @@ const IMG=["UklGRl4gAABXRUJQVlA4WAoAAAAQAAAA1QAAjQAAQUxQSK8FAAAFCgoO4MaNJOXOdP//
 const WILD=3,SC=6,WT=[8,11,9,4,12,9,3,11,13,7,12,11,6];
 const PAY={12:[2,8,25],9:[1.5,6,20],0:[1,4,15],2:[1,3,10],5:[.8,3,8],11:[.5,2,5],7:[.5,2,5],1:[.3,1,3],10:[.3,1,3],4:[.3,1,2],8:[.2,.8,2]};
 const BETS=[1,2,5,10,20,50,100];
-let bal=+localStorage.mt_bal||1000,bi=3,busy=false,auto=false,turbo=false,sound=true,fs=0,hist=[],grid=[];
+let bal=0,bi=3,busy=false,auto=false,turbo=false,sound=true,fs=0,hist=[],grid=[];
+
+/* ===================== REAL MONEY BACKEND ===================== */
+const API='https://slots-server-43dg.onrender.com';
+const GAME_ID='tiger';
+/* Firebase login (OPTIONAL): if the user panel and this game are on the same site/domain, paste the same firebaseConfig
+   you use in the user panel here. Then the game logs in the same user automatically and sends a secure ID token. */
+const FIREBASE_CONFIG=null; /* e.g. {apiKey:"...",authDomain:"...",databaseURL:"...",projectId:"...",appId:"..."} */
+const _qp=new URLSearchParams(location.search);
+const _ls=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const okUid=u=>typeof u==='string'&&u.length>0&&u.length<=128&&!/[.#$\[\]\/]/.test(u);
+let UID=[_qp.get('uid'),_qp.get('userId'),_qp.get('user'),_ls('uid'),_ls('userId')].find(okUid)||null;
+let TOKEN=_qp.get('token')||_qp.get('idToken')||_ls('idToken')||_ls('token')||null;
+let fbAuth=null;
+addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object')return;
+ const u=d.uid||d.userId,t=d.token||d.idToken;
+ if(okUid(u)&&u!==UID){UID=u;if(t)TOKEN=t;if(!busy)syncState()}else if(t)TOKEN=t});
+try{if(parent!==window)parent.postMessage({type:'GAME_READY',game:GAME_ID},'*')}catch(e){}
+if(FIREBASE_CONFIG){
+ ['https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js','https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js'].reduce((p,u)=>p.then(()=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=no;document.head.appendChild(s)})),Promise.resolve())
+ .then(()=>{if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);fbAuth=firebase.auth();
+  fbAuth.onAuthStateChanged(u=>{if(u&&u.uid!==UID){UID=u.uid;if(!busy)syncState()}})}).catch(()=>{});
+}
+async function getToken(){
+ try{if(fbAuth&&fbAuth.currentUser)return await fbAuth.currentUser.getIdToken()}catch(e){}
+ return TOKEN;
+}
+async function api(path,body){
+ const h={'Content-Type':'application/json'},t=await getToken();if(t)h.Authorization='Bearer '+t;
+ const r=await fetch(API+path,{method:body?'POST':'GET',headers:h,body:body?JSON.stringify(body):undefined});
+ let j;try{j=await r.json()}catch(e){j={success:false,error:'SERVER_ERROR'}}
+ return j;
+}
+const newKey=()=>Date.now().toString(36)+'_'+Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>b.toString(16).padStart(2,'0')).join('');
+const ERR={INSUFFICIENT_BALANCE:'ব্যালেন্স কম! Bet কমান',BUSY:'একটু অপেক্ষা করুন...',RATE_LIMITED:'অনেক দ্রুত! একটু থামুন',AUTH_REQUIRED:'লগইন করুন (User Panel থেকে খেলুন)',BAD_TOKEN:'লগইন মেয়াদ শেষ, আবার লগইন করুন',UID_MISMATCH:'লগইন মিলছে না',BAD_UID:'লগইন করুন (User Panel থেকে খেলুন)',NETWORK:'সার্ভারের সাথে সংযোগ হচ্ছে না',SERVER_ERROR:'সার্ভার সমস্যা, আবার চেষ্টা করুন'};
+const errMsg=e=>ERR[e]||'সমস্যা হয়েছে, আবার চেষ্টা করুন';
+async function syncState(){
+ if(!UID)return false;
+ try{const d=await api('/api/slot/state?game='+GAME_ID+'&uid='+encodeURIComponent(UID));
+  if(!d.success){toast(errMsg(d.error));return false}
+  bal=Number(d.balance)||0;fs=(d.free&&d.free.left)||0;
+  if(fs>0&&d.free.bet){const k=BETS.indexOf(d.free.bet);if(k>=0)bi=k}
+  ui();return true}catch(e){toast(errMsg('NETWORK'));return false}
+}
+async function initGame(){
+ for(let i=0;i<30&&!UID;i++)await new Promise(r=>setTimeout(r,100));   /* wait up to 3s for login info */
+ if(!UID){toast('লগইন করুন (User Panel থেকে খেলুন)');return}
+ toast('লোড হচ্ছে...');
+ if(await syncState()&&fs>0&&!busy&&!auto){await wait(800);spin()}      /* resume unfinished free spins */
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!busy&&UID)syncState()});
 const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const R=()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296};
 function pick(reel){const w=WT.map((v,i)=>i==WILD&&(reel<1||reel>3)?0:v);let r=R()*w.reduce((a,b)=>a+b),i=0;while(r>=w[i]){r-=w[i];i++}return i}
@@ -107,7 +157,7 @@ const cell=(s,w)=>`<div class="c${w?' w':''}"><img src="${IMG[s]}" draggable="fa
 function show(i){const s=strips[i];s.style.transition='none';s.className='strip';s.innerHTML=grid[i].map(x=>cell(x)).join('');s.style.transform='translateY(0)'}
 function lay(){const s=Math.min(innerWidth/400,innerHeight/780);g.style.transform=`translate(-50%,-50%) scale(${s})`}
 addEventListener('resize',lay);lay();grid.forEach((_,i)=>show(i));
-function ui(){$('cBet').textContent=fmt(BETS[bi]);$('cBal').textContent=fmt(bal);localStorage.mt_bal=bal;
+function ui(){$('cBet').textContent=fmt(BETS[bi]);$('cBal').textContent=fmt(bal);
  $('auto').classList.toggle('on',auto);$('turbo').classList.toggle('on',turbo);$('spin').classList.toggle('busy',busy);
  const f=$('fs');f.style.display=fs>0?'block':'none';f.textContent='FREE SPINS '+fs}
 /* ===== Pro sound engine (WebAudio, no audio files) ===== */
@@ -147,19 +197,24 @@ function bell(f,d,v,w=0,bus){[[1,1],[2.76,.5],[5.4,.25],[8.93,.12]].forEach(([m,
 function pluck(f,v,w,p){tone(f,1.8,{t:'sine',v,w,bus:musBus,a:.01,p});
  tone(f*2,.7,{v:v*.18,w,bus:musBus,a:.01,p})}
 /* --- background music: soft Asian pentatonic loop, generated live --- */
-const PENT=[62,64,66,69,71,74,76,78,81,83],ROOT=[50,47,43,45],mf=m=>440*Math.pow(2,(m-69)/12);
-let arpI=5;
+const mf=m=>440*Math.pow(2,(m-69)/12),STEP=.7;
+/* slow casino lounge, NO drums: deep sub bass + long warm jazz chords (Dm9 - G13 - Cmaj9 - A7b9) + soft slot sparkle */
+const CH=[{r:38,c:[53,57,60,64]},{r:43,c:[53,59,62,64]},{r:36,c:[55,59,62,64]},{r:33,c:[55,58,61,64]}];
+function bassN(f,w,v,d){tone(f,d,{t:'triangle',v:v*.7,w,bus:musBus,a:.08,lp:320});tone(f,d,{t:'sine',v:v,w,bus:musBus,a:.06})}
+function keyN(f,w,v,d,pn){tone(f,d,{t:'triangle',v:v,w,bus:musBus,a:.05,lp:1400,p:pn});tone(f*2,d*.6,{t:'sine',v:v*.2,w,bus:musBus,a:.05,p:pn})}
 function musStepAt(s,t){
- const bar=Math.floor(s/8)%4,st=s%8,w=t-ac.currentTime;
- if(st==0){const r=mf(ROOT[bar]);
-  [[r,'triangle',.5],[r*1.5,'sine',.3],[r*2,'sine',.2]].forEach(([f,ty,vv])=>
-   tone(f,4.4,{t:ty,v:vv*.4,w,a:1.3,bus:musBus,lp:520}));}
- if(st%4==0||(st%2==0&&Math.random()<.35)){
-  arpI=Math.max(3,Math.min(8,arpI+[-2,-1,1,2][Math.floor(Math.random()*4)]));
-  pluck(mf(PENT[arpI]),.22,w,(Math.random()-.5)*.6)}}
+ const bar=Math.floor(s/8)%4,st=s%8,ch=CH[bar],w=t-ac.currentTime;
+ if(st==0){                                                    /* deep sub + warm pad, one slow swell per bar */
+  bassN(mf(ch.r-12),w,.5,4.6);bassN(mf(ch.r),w,.28,3.4);
+  ch.c.forEach(m=>tone(mf(m-12),5.2,{t:'sine',v:.07,w,a:1.4,bus:musBus,lp:500}));
+  const pn=(Math.random()-.5)*.4;ch.c.forEach((m,i)=>keyN(mf(m),w+i*.09,.07,3.4,pn))}   /* soft rolled chord */
+ if(st==4)bassN(mf(ch.r+7),w,.3,2.2);                          /* gentle 5th, no beat */
+ if(st==4&&Math.random()<.5){const pn=(Math.random()-.5)*.5;[ch.c[1],ch.c[3]].forEach((m,i)=>keyN(mf(m),w+i*.1,.05,2,pn))}
+ if(Math.random()<.16)bell(mf(ch.c[Math.floor(Math.random()*4)]+24),1.8,.035,w,musBus);   /* soft slot-machine sparkle */
+}
 function musicStart(){if(musTimer||!sound||!musicOn)return;A();
- musNext=ac.currentTime+.15;musBus.gain.setTargetAtTime(.17,ac.currentTime,.8);
- musTimer=setInterval(()=>{while(musNext<ac.currentTime+.5){musStepAt(musStep++,musNext);musNext+=.55}},120)}
+ musNext=ac.currentTime+.15;musBus.gain.setTargetAtTime(.24,ac.currentTime,1.2);
+ musTimer=setInterval(()=>{while(musNext<ac.currentTime+.5){musStepAt(musStep++,musNext);musNext+=STEP}},120)}
 function musicStop(){if(!musTimer)return;clearInterval(musTimer);musTimer=null;
  if(ac)musBus.gain.setTargetAtTime(0,ac.currentTime,.12)}
 function musicSync(){if(sound&&musicOn&&!document.hidden)musicStart();else musicStop()}
@@ -204,22 +259,32 @@ function ways(gr,bet){let total=0,marks=[];
  return{total,marks}}
 function countUp(v){const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/600);$('cWin').textContent=fmt(v*p);if(p<1)requestAnimationFrame(f)})(t0)}
 async function spin(){
- if(busy)return;const bet=BETS[bi];
- if(fs<=0){if(bal<bet){toast('ব্যালেন্স কম! Bet কমান');SFX.err();auto=false;ui();return}bal-=bet}else fs--;
- busy=true;$('cWin').textContent='0.00';ui();SFX.spin(turbo);
- const T=turbo?.4:1,prev=grid,res=[];
+ if(busy)return;
+ if(!UID){toast('লগইন করুন (User Panel থেকে খেলুন)');SFX.err();auto=false;ui();return}
+ const bet=BETS[bi];
+ if(fs<=0&&bal<bet){toast('ব্যালেন্স কম! Bet কমান');SFX.err();auto=false;ui();return}
+ busy=true;$('cWin').textContent='0.00';ui();
+ /* ---- the SERVER takes the bet, makes the result and pays the win ---- */
+ const key=newKey();let d;
+ try{d=await api('/api/slot/spin',{game:GAME_ID,bet,uid:UID,idempotencyKey:key})}
+ catch(e){try{await wait(1200);d=await api('/api/slot/spin',{game:GAME_ID,bet,uid:UID,idempotencyKey:key})}catch(e2){d={success:false,error:'NETWORK'}}}   /* same key = never charged twice */
+ if(!d.success){auto=false;busy=false;ui();await syncState();toast(errMsg(d.error));SFX.err();return}
+ bal=d.isFree?bal:d.balanceAfterBet;fs=d.freeAfterDebit;ui();
+ SFX.spin(turbo);
+ const T=turbo?.4:1,prev=grid,res=d.result.grid.map(c=>c.slice());
  await Promise.all(strips.map(async(s,i)=>{
-  const n=(turbo?9:13)+i*(turbo?1:4),col=[pick(i),pick(i),pick(i)];res.push(col);
+  const n=(turbo?9:13)+i*(turbo?1:4),col=res[i];
   const arr=[...prev[i]];for(let k=3;k<n-3;k++)arr.push(pick(i));arr.push(...col);
   s.style.transition='none';s.className='strip';s.innerHTML=arr.map(x=>cell(x)).join('');s.style.transform='translateY(0)';
-  await wait(30);s.className='strip mov';const d=(1.1+i*.35)*T;SFX.ticks(i,n-3,d);s.style.transition=`transform ${d}s cubic-bezier(.3,.7,.3,1)`;
-  s.style.transform=`translateY(calc(var(--ch) * -${n-3}))`;await wait(d*1000);s.className='strip';SFX.stop(i)}));
+  await wait(30);s.className='strip mov';const dd=(1.1+i*.35)*T;SFX.ticks(i,n-3,dd);s.style.transition=`transform ${dd}s cubic-bezier(.3,.7,.3,1)`;
+  s.style.transform=`translateY(calc(var(--ch) * -${n-3}))`;await wait(dd*1000);s.className='strip';SFX.stop(i)}));
  grid=res;SFX.spinEnd();
- const {total,marks}=ways(res,bet);let win=total*(fs>0?2:1);
- const sc=res.flat().filter(x=>x==SC).length;
- if(sc>=3){win+=bet*(sc==3?2:sc==4?10:50);fs+=8;marks.push(...res.flatMap((c,r)=>c.map((s,j)=>s==SC?[r,j]:null)).filter(Boolean));toast('🐯 FREE SPINS +8');SFX.scatter()}
- if(win>0){marks.forEach(([r,j])=>{const c=strips[r].children[j];if(c)c.classList.add('w')});bal+=win;countUp(win);if(win<bet*20)SFX.win(win/bet);burst(30);
+ const win=Number(d.win)||0,marks=d.result.marks||[];
+ if(d.awarded>0){toast('🐯 FREE SPINS +'+d.awarded);SFX.scatter()}
+ fs=d.freeLeft;
+ if(win>0){marks.forEach(([r,j])=>{const c=strips[r].children[j];if(c)c.classList.add('w')});countUp(win);if(win<bet*20)SFX.win(win/bet);burst(30);
   if(win>=bet*20){SFX.big();burst(80);big('BIG WIN<br>'+fmt(win))}}
+ bal=d.balance;
  hist.unshift({t:new Date().toLocaleTimeString(),bet,win});hist=hist.slice(0,15);
  busy=false;ui();
  await wait(win>0?1200:350);
@@ -233,10 +298,9 @@ $('turbo').onclick=()=>{SFX.click(0);turbo=!turbo;ui()};
 function openMenu(){$('pbox').innerHTML=`<h3 style="margin:0 0 6px">Settings</h3>
 <button onclick="togSound(this)">Sound: ${sound?'ON':'OFF'}</button>
 <button onclick="togMusic(this)">Music: ${musicOn?'ON':'OFF'}</button>
-<button onclick="bal=1000;ui();$('pop').classList.remove('show')">Balance 1,000 রিসেট</button>
 <h4 style="margin:8px 0 2px">Game History</h4>${hist.map(h=>`<div class="hr">${h.t} | Bet ${h.bet} | <b style="color:${h.win?'#7dff8a':'#ff9a8a'}">${h.win?'+'+fmt(h.win):'0'}</b></div>`).join('')||'এখনো কোনো খেলা নেই'}
 <br><button onclick="$('pop').classList.remove('show')">বন্ধ করুন</button>`;$('pop').classList.add('show')}
 $('menu').onclick=$('gear').onclick=openMenu;
 addEventListener('keydown',e=>{if(e.code=='Space'){e.preventDefault();spin()}});
-ui();musicSync();
+ui();musicSync();initGame();
 </script></body></html>
