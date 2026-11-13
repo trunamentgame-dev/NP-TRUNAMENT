@@ -2634,6 +2634,22 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     };
   })();
   </script>
+<style id="npGridTabsFix">
+/* Game boxes: 3 per row x 2 rows */
+#gameBoxGrid.game-box-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;overflow:visible;flex-wrap:wrap;margin:0 0 10px;padding-bottom:0}
+#gameBoxGrid .game-box{width:100%;height:auto;aspect-ratio:1/1;flex:none;transition:opacity .28s ease,transform .28s ease,box-shadow .12s ease}
+#gameBoxMore{display:none;width:100%;margin:0 0 16px;padding:9px 12px;align-items:center;justify-content:center;gap:6px;border-radius:var(--radius-md);border:1px solid var(--border-gold);background:linear-gradient(135deg,rgba(245,158,11,.22),rgba(239,68,68,.1));color:var(--color-primary);font-family:inherit;font-size:13px;font-weight:800;cursor:pointer}
+#gameBoxMore:active{transform:scale(.98)}
+.np-allg-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding-bottom:6px}
+.np-allg-item{padding:0;border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;background:var(--bg-card);cursor:pointer;font-family:inherit;display:flex;flex-direction:column}
+.np-allg-item:active{transform:scale(.96)}
+.np-allg-item img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#0e1424}
+.np-allg-item span{display:block;padding:5px 4px;font-size:11px;font-weight:700;color:var(--text-primary);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* History tabs: always fit the screen, nothing cut */
+.np-hist-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;overflow:visible!important}
+.np-hist-tab{min-width:0;flex:none!important;padding:8px 3px!important;font-size:11.5px!important;line-height:1.25;white-space:normal!important;border-radius:14px!important;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.np-hist-tab .np-cnt{display:block;margin:2px 0 0!important;font-size:10.5px!important}
+</style>
 </head>
 <body data-theme="dark">
 
@@ -3299,6 +3315,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
       <!-- Game Boxes: ৬টি বক্স (শুধু ছবি, কোনো লেখা নেই), বক্সে ক্লিক করলে সরাসরি গেম খোলে -->
       <div id="gameBoxGrid" class="game-box-grid" aria-label="Games"></div>
+      <button type="button" id="gameBoxMore" data-no-i18n onclick="window.npOpenAllGames()"></button>
 
       <!-- Game Selector Switch Bar -->
       <div class="game-switch-bar" id="gameSwitchBar">
@@ -3985,6 +4002,18 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     </div>
   </div>
 
+  <!-- ALL GAMES MODAL -->
+  <div class="modal-overlay" id="modalAllGames">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">
+        <span data-no-i18n>🎮 All Games • সব গেম</span>
+        <button class="modal-close-btn" onclick="window.app.closeModal('modalAllGames')">✕</button>
+      </div>
+      <div id="allGamesList" class="np-allg-grid"></div>
+    </div>
+  </div>
+
   <!-- 7. DRAGGABLE FLOATING SUPPORT BUTTON -->
   <button
     id="floatingSupportBtn"
@@ -4523,7 +4552,59 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       const url = g.url || g.gameUrl || g.link || '';
       const image = g.image || g.imageUrl || g.banner || g.img || '';
       if (!url && !image) return null;
-      return { url: String(url), image: String(image) };
+      return { url: String(url), image: String(image), name: String(g.name || g.title || '') };
+    }
+
+    let npBoxAll = [], npBoxShown = [], npBoxSig = '', npBoxTick = 0, npBoxNext = 6, npBoxTimer = null;
+    const npBoxOk = (s) => !!(s && s.url && s.url !== '#');
+
+    function npBoxFill(btn, slot) {
+      btn.innerHTML = '';
+      if (!npBoxOk(slot)) {
+        btn.className = 'game-box empty';
+        btn.tabIndex = -1;
+        btn.setAttribute('aria-hidden', 'true');
+        btn.onclick = null;
+        return;
+      }
+      btn.className = 'game-box';
+      btn.removeAttribute('aria-hidden');
+      btn.tabIndex = 0;
+      if (slot.image) {
+        const img = document.createElement('img');
+        img.alt = slot.name || '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        img.onerror = function () { this.style.display = 'none'; };
+        img.src = slot.image;
+        btn.appendChild(img);
+      }
+      btn.onclick = function () { window.app.playGameUrl(slot.url); };
+    }
+
+    function npBoxStartTimer() {
+      if (npBoxTimer) return;
+      // 6টির বেশি গেম থাকলে নির্দিষ্ট সময় পরপর একটি একটি বক্সে নতুন গেম আসে
+      npBoxTimer = setInterval(function () {
+        if (document.hidden || npBoxAll.length <= 6) return;
+        if (document.documentElement.classList.contains('np-pk-lock')) return;
+        const grid = document.getElementById('gameBoxGrid');
+        if (!grid || grid.children.length < 6) return;
+        const s = npBoxTick % 6; npBoxTick++;
+        let idx = npBoxNext % npBoxAll.length, guard = 0;
+        while (npBoxShown.indexOf(idx) !== -1 && guard++ < npBoxAll.length) idx = (idx + 1) % npBoxAll.length;
+        npBoxNext = (idx + 1) % npBoxAll.length;
+        npBoxShown[s] = idx;
+        const btn = grid.children[s];
+        btn.style.opacity = '0';
+        btn.style.transform = 'scale(.9)';
+        setTimeout(function () {
+          npBoxFill(btn, npBoxAll[idx]);
+          btn.style.opacity = '1';
+          btn.style.transform = '';
+        }, 280);
+      }, 3000);
     }
 
     function renderGameBoxes() {
@@ -4547,32 +4628,57 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         slots = (gamesForBoxes || []).map(normalizeBoxSlot);
       }
 
+      const valid = slots.filter(npBoxOk);
+      const sig = JSON.stringify(valid.length > 6 ? valid : slots.slice(0, 6));
+      if (sig === npBoxSig && grid.children.length === 6) return;
+      npBoxSig = sig;
+      npBoxAll = valid;
+      npBoxTick = 0;
+      npBoxNext = 6;
+
+      const tiles = valid.length > 6 ? valid.slice(0, 6) : slots.slice(0, 6);
+      npBoxShown = valid.length > 6 ? [0, 1, 2, 3, 4, 5] : [];
+
       grid.innerHTML = '';
       for (let i = 0; i < 6; i++) {
-        const slot = slots[i];
         const btn = document.createElement('button');
         btn.type = 'button';
-        if (slot && slot.url && slot.url !== '#') {
-          btn.className = 'game-box';
-          if (slot.image) {
-            const img = document.createElement('img');
-            img.alt = '';
-            img.loading = 'lazy';
-            img.decoding = 'async';
-            img.referrerPolicy = 'no-referrer';
-            img.onerror = function () { this.style.display = 'none'; };
-            img.src = slot.image;
-            btn.appendChild(img);
-          }
-          btn.onclick = function () { window.app.playGameUrl(slot.url); };
-        } else {
-          btn.className = 'game-box empty';
-          btn.tabIndex = -1;
-          btn.setAttribute('aria-hidden', 'true');
-        }
+        npBoxFill(btn, tiles[i]);
         grid.appendChild(btn);
       }
+
+      const more = document.getElementById('gameBoxMore');
+      if (more) {
+        more.style.display = valid.length > 0 ? 'flex' : 'none';
+        more.textContent = '⋯ More Games • আরও গেম (' + valid.length + ')';
+      }
+      npBoxStartTimer();
     }
+
+    function npOpenAllGames() {
+      const list = document.getElementById('allGamesList');
+      if (!list) return;
+      list.innerHTML = '';
+      npBoxAll.forEach(function (s) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'np-allg-item';
+        if (s.image) {
+          const img = document.createElement('img');
+          img.alt = s.name || '';
+          img.loading = 'lazy';
+          img.referrerPolicy = 'no-referrer';
+          img.onerror = function () { this.style.display = 'none'; };
+          img.src = s.image;
+          b.appendChild(img);
+        }
+        if (s.name) { const n = document.createElement('span'); n.textContent = s.name; b.appendChild(n); }
+        b.onclick = function () { closeModal('modalAllGames'); window.app.playGameUrl(s.url); };
+        list.appendChild(b);
+      });
+      openModal('modalAllGames');
+    }
+    window.npOpenAllGames = npOpenAllGames;
 
     function setupGameBoxesListener() {
       try {
