@@ -35,11 +35,58 @@ button.cr{border:0;padding:0;cursor:pointer;background-color:transparent}
 #pop.show{display:grid}
 #pbox{width:330px;max-height:640px;overflow:auto;background:linear-gradient(#3a260e,#120c05);border:3px solid #e8b83a;border-radius:16px;padding:14px;text-align:center;font-size:14px;color:#ffe7a2}
 #pbox button{margin:6px;padding:8px 16px;border-radius:20px;border:2px solid #e8b83a;background:#7a4a08;color:#fff;font-weight:700;font-size:inherit}
-.hr{border-bottom:1px solid #fff3;padding:3px;text-align:left}</style></head><body>
+.hr{border-bottom:1px solid #fff3;padding:3px;text-align:left}
+/* Reference-style lower HUD */
+#bottomHud{position:absolute;left:0;right:0;bottom:0;height:150px;z-index:5;
+  background:linear-gradient(180deg,#421d10 0%,#2b100b 48%,#190906 100%);
+  border-top:3px solid #9b5b24;box-shadow:0 -5px 18px #0009,inset 0 2px 0 #f2bd6540}
+.hud-icons{height:70px;display:flex;align-items:center;justify-content:space-around;padding:0 5px;position:relative}
+.hud-icon{width:42px;height:42px;border-radius:50%;border:3px solid #8c4815;
+  background:radial-gradient(circle at 35% 25%,#ffb63e,#c75b08 58%,#612707);
+  color:#ffe8a5;display:grid;place-items:center;padding:0;box-shadow:0 2px 5px #000b,inset 0 1px 3px #ffe7a080}
+.hud-icon span{font-size:25px;line-height:1;text-shadow:0 2px 2px #562000}
+.hud-icon.on{box-shadow:0 0 12px #ffe36a,inset 0 0 0 2px #fff0a0}
+.hud-spin{position:relative;width:68px;height:68px;border-radius:50%;border:5px solid #c99b4a;
+  background:radial-gradient(circle at 35% 25%,#d8fff0,#27856a 35%,#064735 68%,#061d19);
+  box-shadow:0 0 0 3px #39200e,0 0 15px #b8f7cf99,inset 0 0 9px #eaffdf;
+  color:#ffe88b;font-weight:1000;padding:0;display:grid;place-items:center;margin-top:-7px}
+.spin-ring{width:47px;height:47px;border-radius:50%;border:2px solid #e4c36b;
+  display:grid;place-items:center;font-family:Georgia,serif;font-size:18px;
+  text-shadow:0 2px 2px #613400;background:linear-gradient(#fff1a4,#d9a83a 48%,#276b4d 52%,#06402d)}
+.hud-info{padding:1px 12px 0;text-align:center}
+.hud-bet{height:22px;display:flex;align-items:center;justify-content:center;gap:5px;
+  font-size:16px;font-weight:900;color:#fff0c6}
+.hud-label{color:#fff;font-size:14px}
+.hud-bet b{color:#ffcf42}
+.bet-step{width:20px;height:20px;border:1px solid #b8792a;border-radius:50%;
+  color:#ffe7a5;background:linear-gradient(#8e4b15,#4b210c);font-weight:900;line-height:15px;padding:0}
+.hud-balance{height:24px;display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:19px;font-weight:1000;white-space:nowrap}
+.level-tag{font-size:10px;background:#777;color:#fff;border-radius:3px;padding:2px 5px;margin-right:2px}
+.balance-label{color:#ffd43f}
+.hud-balance b{color:#fff}
+.hud-win{font-size:10px;color:#d8b78b;font-weight:800;opacity:.8;margin-top:1px}
+.hud-win b{color:#ffe08a}
+#fs{z-index:6}
+</style></head><body>
 <div id="g"><div id="bg"></div>
 <div class="cr "  style="left:0px;top:0px;width:400.0px;height:164.5px;background-size:698.2px 465.5px;background-position:-68.2px 0.0px;"></div>
 <div id="ways">243 WAYS</div><div id="fr"></div><div id="reels"></div><div id="fs"></div>
-<div class="cr "  style="left:6px;top:166px;width:188.5px;height:62.5px;background-size:768.0px 512.0px;background-position:-511.5px -4.0px;"></div><div class="cr "  style="left:204px;top:172px;width:166.0px;height:40.5px;background-size:768.0px 512.0px;background-position:-528.5px -61.0px;"></div><div class="cr "  style="left:26px;top:234px;width:145.5px;height:35.5px;background-size:768.0px 512.0px;background-position:-547.5px -101.5px;"></div><div class="cr "  style="left:224px;top:236px;width:120.5px;height:34.5px;background-size:768.0px 512.0px;background-position:-569.5px -138.0px;"></div><div class="cr "  style="left:8px;top:574px;width:190.0px;height:51.4px;background-size:858.4px 572.2px;background-position:-42.5px -497.4px;"><div class="cv" id="cBet" style="left:27.94%;top:39.13%;width:43.82%;height:43.48%;background:#1c1006">10.00</div><button class="hit" id="minus" aria-label="Bet -" style="left:2%;top:5%;width:23%;height:90%"></button><button class="hit" id="plus" aria-label="Bet +" style="left:77%;top:5%;width:23%;height:90%"></button></div><div class="cr "  style="left:10px;top:646px;width:143.0px;height:51.4px;background-size:858.0px 572.0px;background-position:-240.2px -497.1px;"><div class="cv" id="cBal" style="left:19.53%;top:39.13%;width:60.16%;height:43.48%;background:#221309">1,000.00</div></div><div class="cr "  style="left:10px;top:706px;width:146.0px;height:51.7px;background-size:862.5px 575.0px;background-position:-393.1px -499.8px;"><div class="cv" id="cWin" style="left:16.54%;top:39.13%;width:65.77%;height:43.48%;background:#1e1208">0.00</div></div><button class="cr " id=auto style="left:206px;top:574px;width:78.0px;height:63.6px;background-size:921.6px 614.4px;background-position:-585.0px -530.4px;border-radius:12px"></button><button class="cr " id=turbo style="left:290px;top:578px;width:54.0px;height:54.0px;background-size:782.5px 521.7px;background-position:-671.4px -449.3px;border-radius:50%"></button><button class="cr " id=menu style="left:346px;top:578px;width:54.0px;height:54.0px;background-size:782.5px 521.7px;background-position:-727.0px -449.3px;border-radius:50%"></button><button class="cr " id=spin style="left:172px;top:640px;width:126.0px;height:126.0px;background-size:987.4px 658.3px;background-position:-719.4px -535.5px;border-radius:50%"></button><button class="cr " id=gear style="left:342px;top:6px;width:48.0px;height:48.0px;background-size:737.3px 491.5px;background-position:-678.2px -0.5px;border-radius:50%"></button><div class="cr "  style="left:10px;top:6px;width:48.0px;height:48.0px;background-size:737.3px 491.5px;background-position:-14.4px -0.5px;border-radius:50%"></div>
+<div class="cr "  style="left:6px;top:166px;width:188.5px;height:62.5px;background-size:768.0px 512.0px;background-position:-511.5px -4.0px;"></div><div class="cr "  style="left:204px;top:172px;width:166.0px;height:40.5px;background-size:768.0px 512.0px;background-position:-528.5px -61.0px;"></div><div class="cr "  style="left:26px;top:234px;width:145.5px;height:35.5px;background-size:768.0px 512.0px;background-position:-547.5px -101.5px;"></div><div class="cr "  style="left:224px;top:236px;width:120.5px;height:34.5px;background-size:768.0px 512.0px;background-position:-569.5px -138.0px;"></div>
+<div id="bottomHud">
+  <div class="hud-icons">
+    <button id="gear" class="hud-icon gear" aria-label="Settings"><span>⚙</span></button>
+    <button id="auto" class="hud-icon coins" aria-label="Auto play"><span>🪙</span></button>
+    <button id="spin" class="hud-spin" aria-label="Spin"><span class="spin-ring">JILI</span></button>
+    <button id="turbo" class="hud-icon refresh" aria-label="Turbo"><span>⟳</span></button>
+    <button id="menu" class="hud-icon lightning" aria-label="Menu"><span>ϟ</span></button>
+  </div>
+  <div class="hud-info">
+    <div class="hud-bet"><span class="hud-label">Bet Tk</span><button id="minus" class="bet-step" aria-label="Decrease bet">−</button><b id="cBet">10.00</b><button id="plus" class="bet-step" aria-label="Increase bet">+</button></div>
+    <div class="hud-balance"><span class="level-tag">LVO</span><span class="balance-label">Balance</span><b> Tk <span id="cBal">1,000.00</span></b></div>
+    <div class="hud-win">WIN Tk <b id="cWin">0.00</b></div>
+  </div>
+</div>
 <canvas id="cv" width="400" height="780"></canvas><div id="big"></div><div id="tt"></div>
 <div id="pop"><div id="pbox"></div></div></div>
 <script>
@@ -63,10 +110,87 @@ addEventListener('resize',lay);lay();grid.forEach((_,i)=>show(i));
 function ui(){$('cBet').textContent=fmt(BETS[bi]);$('cBal').textContent=fmt(bal);localStorage.mt_bal=bal;
  $('auto').classList.toggle('on',auto);$('turbo').classList.toggle('on',turbo);$('spin').classList.toggle('busy',busy);
  const f=$('fs');f.style.display=fs>0?'block':'none';f.textContent='FREE SPINS '+fs}
-/* sound */
-let ac;function snd(f,d,t='sine',v=.12,w=0){if(!sound)return;try{ac=ac||new(AudioContext||webkitAudioContext)();const o=ac.createOscillator(),k=ac.createGain();o.type=t;o.frequency.value=f;k.gain.value=v;k.gain.exponentialRampToValueAtTime(.001,ac.currentTime+w+d);o.connect(k);k.connect(ac.destination);o.start(ac.currentTime+w);o.stop(ac.currentTime+w+d)}catch(e){}}
-const coin=()=>[880,1175,1568].forEach((f,i)=>snd(f,.18,'triangle',.15,i*.08));
-const jack=()=>[523,659,784,1047,1319,1568].forEach((f,i)=>snd(f,.3,'triangle',.2,i*.1));
+/* ===== Pro sound engine (WebAudio, no audio files) ===== */
+let ac,mix,sfxBus,musBus,noiseBuf,spinNode=null,musTimer=null,musNext=0,musStep=0;
+let musicOn=localStorage.mt_music!=='0';
+function A(){
+ if(!ac){ac=new(window.AudioContext||window.webkitAudioContext)();
+  const cp=ac.createDynamicsCompressor();cp.threshold.value=-16;cp.knee.value=12;cp.ratio.value=4;cp.attack.value=.004;cp.release.value=.22;
+  mix=ac.createGain();mix.gain.value=.8;mix.connect(cp);cp.connect(ac.destination);
+  sfxBus=ac.createGain();sfxBus.connect(mix);
+  musBus=ac.createGain();musBus.gain.value=0;musBus.connect(mix);
+  const dl=ac.createDelay(1);dl.delayTime.value=.46;const fb=ac.createGain();fb.gain.value=.38;
+  const dlp=ac.createBiquadFilter();dlp.type='lowpass';dlp.frequency.value=1800;
+  const dg=ac.createGain();dg.gain.value=.55;
+  musBus.connect(dl);dl.connect(dlp);dlp.connect(fb);fb.connect(dl);dlp.connect(dg);dg.connect(mix);
+  noiseBuf=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);
+  const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+ if(ac.state==='suspended')ac.resume();return ac}
+function tone(f,d,o={}){const t0=ac.currentTime+(o.w||0),a=o.a||.005,v=o.v||.2;
+ const osc=ac.createOscillator(),g=ac.createGain();osc.type=o.t||'sine';
+ osc.frequency.setValueAtTime(f,t0);if(o.to)osc.frequency.exponentialRampToValueAtTime(o.to,t0+d);
+ g.gain.setValueAtTime(.0001,t0);g.gain.linearRampToValueAtTime(v,t0+a);g.gain.exponentialRampToValueAtTime(.0001,t0+Math.max(d,a+.01));
+ let n=osc;if(o.lp){const fl=ac.createBiquadFilter();fl.type='lowpass';fl.frequency.value=o.lp;osc.connect(fl);n=fl}
+ n.connect(g);let out=g;
+ if(o.p!==undefined&&ac.createStereoPanner){const p=ac.createStereoPanner();p.pan.value=o.p;g.connect(p);out=p}
+ out.connect(o.bus||sfxBus);osc.start(t0);osc.stop(t0+d+.06)}
+function nz(d,type,f,q,v,o={}){const t0=ac.currentTime+(o.w||0);
+ const s=ac.createBufferSource();s.buffer=noiseBuf;s.loop=true;
+ const fl=ac.createBiquadFilter();fl.type=type;fl.frequency.setValueAtTime(f,t0);
+ if(o.to)fl.frequency.exponentialRampToValueAtTime(o.to,t0+d);fl.Q.value=q;
+ const g=ac.createGain();g.gain.setValueAtTime(.0001,t0);g.gain.linearRampToValueAtTime(v,t0+(o.a||.01));
+ g.gain.exponentialRampToValueAtTime(.0001,t0+d);
+ s.connect(fl);fl.connect(g);let out=g;
+ if(o.p!==undefined&&ac.createStereoPanner){const p=ac.createStereoPanner();p.pan.value=o.p;g.connect(p);out=p}
+ out.connect(o.bus||sfxBus);s.start(t0,Math.random());s.stop(t0+d+.06)}
+function bell(f,d,v,w=0,bus){[[1,1],[2.76,.5],[5.4,.25],[8.93,.12]].forEach(([m,a])=>tone(f*m,d/Math.pow(m,.3),{v:v*a,w,bus,a:.003}))}
+function pluck(f,v,w,p){tone(f,1.8,{t:'sine',v,w,bus:musBus,a:.01,p});
+ tone(f*2,.7,{v:v*.18,w,bus:musBus,a:.01,p})}
+/* --- background music: soft Asian pentatonic loop, generated live --- */
+const PENT=[62,64,66,69,71,74,76,78,81,83],ROOT=[50,47,43,45],mf=m=>440*Math.pow(2,(m-69)/12);
+let arpI=5;
+function musStepAt(s,t){
+ const bar=Math.floor(s/8)%4,st=s%8,w=t-ac.currentTime;
+ if(st==0){const r=mf(ROOT[bar]);
+  [[r,'triangle',.5],[r*1.5,'sine',.3],[r*2,'sine',.2]].forEach(([f,ty,vv])=>
+   tone(f,4.4,{t:ty,v:vv*.4,w,a:1.3,bus:musBus,lp:520}));}
+ if(st%4==0||(st%2==0&&Math.random()<.35)){
+  arpI=Math.max(3,Math.min(8,arpI+[-2,-1,1,2][Math.floor(Math.random()*4)]));
+  pluck(mf(PENT[arpI]),.22,w,(Math.random()-.5)*.6)}}
+function musicStart(){if(musTimer||!sound||!musicOn)return;A();
+ musNext=ac.currentTime+.15;musBus.gain.setTargetAtTime(.17,ac.currentTime,.8);
+ musTimer=setInterval(()=>{while(musNext<ac.currentTime+.5){musStepAt(musStep++,musNext);musNext+=.55}},120)}
+function musicStop(){if(!musTimer)return;clearInterval(musTimer);musTimer=null;
+ if(ac)musBus.gain.setTargetAtTime(0,ac.currentTime,.12)}
+function musicSync(){if(sound&&musicOn&&!document.hidden)musicStart();else musicStop()}
+function togSound(b){sound=!sound;b.textContent='Sound: '+(sound?'ON':'OFF');musicSync()}
+function togMusic(b){musicOn=!musicOn;localStorage.mt_music=musicOn?'1':'0';b.textContent='Music: '+(musicOn?'ON':'OFF');musicSync()}
+['pointerdown','touchend','keydown'].forEach(e=>addEventListener(e,()=>{if(sound){A();musicSync()}},{passive:true}));
+document.addEventListener('visibilitychange',musicSync);
+/* --- sound effects --- */
+const SFX={
+ click(d){if(!sound)return;A();tone(d<0?520:d>0?820:660,.08,{t:'square',v:.05,lp:2600})},
+ err(){if(!sound)return;A();tone(190,.28,{t:'sawtooth',v:.07,lp:700,to:120})},
+ spin(tb){if(!sound)return;A();
+  nz(tb?.22:.34,'bandpass',500,2.5,.4,{to:3800,a:.05});tone(1046,.07,{t:'triangle',v:.045,w:.02})},
+ spinEnd(){},
+ ticks(i,N,d){if(!sound)return;A();const p=(i-2)*.4,f0=2300+i*140;
+  for(let k=1;k<=N;k++){const w=d*(1-Math.pow(1-(k-.5)/N,1/2.2)),v=.22*(.75+Math.random()*.25);
+   nz(.022,'bandpass',f0*1.6,5,v,{w,p,a:.001});tone(f0*(1+Math.random()*.03),.02,{t:'triangle',v:v*.5,w,a:.001,p})}},
+ stop(i){if(!sound)return;A();const p=(i-2)*.45;
+  tone(160+i*16,.13,{to:60,v:.32,p});nz(.04,'lowpass',1500,.7,.13,{p,a:.002});tone(1400+i*70,.05,{t:'triangle',v:.05,p})},
+ win(r){if(!sound)return;A();const n=r<1?3:r<3?5:r<8?8:12,F=[1319,1568,1760,2093,2349];
+  for(let i=0;i<n;i++){const w=i*.07+Math.random()*.02,f=F[i%5]*(1+Math.random()*.01),p=(Math.random()-.5)*.9;
+   tone(f,.3,{v:.1,w,a:.002,p});tone(f*2.01,.12,{v:.035,w,a:.002,p})}
+  bell(784,1,.1);
+  if(r>=3)[587,740,880,1175].forEach((f,i)=>bell(f,.8,.09,.25+i*.1))},
+ big(){if(!sound)return;A();bell(98,3.2,.34);tone(49,2.4,{v:.35});
+  [587,740,880,1175,1480,1760,2349].forEach((f,i)=>bell(f,.9,.11,.12+i*.09));
+  for(let i=0;i<24;i++)tone(1500+Math.random()*2200,.2,{v:.05,w:.5+i*.06,a:.002,p:(Math.random()-.5)*1.4});
+  nz(1.2,'bandpass',800,.9,.14,{to:5000,a:.8})},
+ scatter(){if(!sound)return;A();bell(131,2.4,.3);
+  [784,988,1175,1568,1976].forEach((f,i)=>bell(f,.7,.1,.2+i*.08));nz(.9,'bandpass',500,1,.13,{to:4000,a:.6})}
+};
 /* coins */
 const cv=$('cv'),cx=cv.getContext('2d');let P=[];
 function burst(n){for(let i=0;i<n;i++)P.push({x:200+(R()-.5)*100,y:430,vx:(R()-.5)*10,vy:-R()*12-3,r:4+R()*5,l:100})}
@@ -81,37 +205,38 @@ function ways(gr,bet){let total=0,marks=[];
 function countUp(v){const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/600);$('cWin').textContent=fmt(v*p);if(p<1)requestAnimationFrame(f)})(t0)}
 async function spin(){
  if(busy)return;const bet=BETS[bi];
- if(fs<=0){if(bal<bet){toast('ব্যালেন্স কম! Bet কমান');auto=false;ui();return}bal-=bet}else fs--;
- busy=true;$('cWin').textContent='0.00';ui();
+ if(fs<=0){if(bal<bet){toast('ব্যালেন্স কম! Bet কমান');SFX.err();auto=false;ui();return}bal-=bet}else fs--;
+ busy=true;$('cWin').textContent='0.00';ui();SFX.spin(turbo);
  const T=turbo?.4:1,prev=grid,res=[];
  await Promise.all(strips.map(async(s,i)=>{
   const n=(turbo?9:13)+i*(turbo?1:4),col=[pick(i),pick(i),pick(i)];res.push(col);
   const arr=[...prev[i]];for(let k=3;k<n-3;k++)arr.push(pick(i));arr.push(...col);
   s.style.transition='none';s.className='strip';s.innerHTML=arr.map(x=>cell(x)).join('');s.style.transform='translateY(0)';
-  await wait(30);s.className='strip mov';const d=(1.1+i*.35)*T;s.style.transition=`transform ${d}s cubic-bezier(.3,.7,.3,1)`;
-  s.style.transform=`translateY(calc(var(--ch) * -${n-3}))`;await wait(d*1000);s.className='strip';snd(200+i*30,.1,'sine',.18)}));
- grid=res;
+  await wait(30);s.className='strip mov';const d=(1.1+i*.35)*T;SFX.ticks(i,n-3,d);s.style.transition=`transform ${d}s cubic-bezier(.3,.7,.3,1)`;
+  s.style.transform=`translateY(calc(var(--ch) * -${n-3}))`;await wait(d*1000);s.className='strip';SFX.stop(i)}));
+ grid=res;SFX.spinEnd();
  const {total,marks}=ways(res,bet);let win=total*(fs>0?2:1);
  const sc=res.flat().filter(x=>x==SC).length;
- if(sc>=3){win+=bet*(sc==3?2:sc==4?10:50);fs+=8;marks.push(...res.flatMap((c,r)=>c.map((s,j)=>s==SC?[r,j]:null)).filter(Boolean));toast('🐯 FREE SPINS +8')}
- if(win>0){marks.forEach(([r,j])=>{const c=strips[r].children[j];if(c)c.classList.add('w')});bal+=win;countUp(win);coin();burst(30);
-  if(win>=bet*20){jack();burst(80);big('BIG WIN<br>'+fmt(win))}}
+ if(sc>=3){win+=bet*(sc==3?2:sc==4?10:50);fs+=8;marks.push(...res.flatMap((c,r)=>c.map((s,j)=>s==SC?[r,j]:null)).filter(Boolean));toast('🐯 FREE SPINS +8');SFX.scatter()}
+ if(win>0){marks.forEach(([r,j])=>{const c=strips[r].children[j];if(c)c.classList.add('w')});bal+=win;countUp(win);if(win<bet*20)SFX.win(win/bet);burst(30);
+  if(win>=bet*20){SFX.big();burst(80);big('BIG WIN<br>'+fmt(win))}}
  hist.unshift({t:new Date().toLocaleTimeString(),bet,win});hist=hist.slice(0,15);
  busy=false;ui();
  await wait(win>0?1200:350);
  if(fs>0||auto){if(bal>=BETS[bi]||fs>0)spin();else{auto=false;ui();toast('ব্যালেন্স কম!')}}
 }
 $('spin').onclick=spin;
-$('minus').onclick=()=>{if(!busy&&fs<=0&&bi>0){bi--;ui();snd(500,.05)}};
-$('plus').onclick=()=>{if(!busy&&fs<=0&&bi<BETS.length-1){bi++;ui();snd(600,.05)}};
-$('auto').onclick=()=>{auto=!auto;ui();if(auto&&!busy)spin()};
-$('turbo').onclick=()=>{turbo=!turbo;ui()};
+$('minus').onclick=()=>{if(!busy&&fs<=0&&bi>0){bi--;ui();SFX.click(-1)}};
+$('plus').onclick=()=>{if(!busy&&fs<=0&&bi<BETS.length-1){bi++;ui();SFX.click(1)}};
+$('auto').onclick=()=>{SFX.click(0);auto=!auto;ui();if(auto&&!busy)spin()};
+$('turbo').onclick=()=>{SFX.click(0);turbo=!turbo;ui()};
 function openMenu(){$('pbox').innerHTML=`<h3 style="margin:0 0 6px">Settings</h3>
-<button onclick="sound=!sound;this.textContent='Sound: '+(sound?'ON':'OFF')">Sound: ${sound?'ON':'OFF'}</button>
+<button onclick="togSound(this)">Sound: ${sound?'ON':'OFF'}</button>
+<button onclick="togMusic(this)">Music: ${musicOn?'ON':'OFF'}</button>
 <button onclick="bal=1000;ui();$('pop').classList.remove('show')">Balance 1,000 রিসেট</button>
 <h4 style="margin:8px 0 2px">Game History</h4>${hist.map(h=>`<div class="hr">${h.t} | Bet ${h.bet} | <b style="color:${h.win?'#7dff8a':'#ff9a8a'}">${h.win?'+'+fmt(h.win):'0'}</b></div>`).join('')||'এখনো কোনো খেলা নেই'}
 <br><button onclick="$('pop').classList.remove('show')">বন্ধ করুন</button>`;$('pop').classList.add('show')}
 $('menu').onclick=$('gear').onclick=openMenu;
 addEventListener('keydown',e=>{if(e.code=='Space'){e.preventDefault();spin()}});
-ui();
+ui();musicSync();
 </script></body></html>
