@@ -30,7 +30,10 @@
   @keyframes reelColumnLand{0%{transform:translate3d(0,-30%,0);opacity:.85}78%{transform:translate3d(0,4px,0);opacity:1}100%{transform:translate3d(0,0,0);opacity:1}}
   .cell{position:relative;flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;border-radius:6px;padding:2px;transition:opacity .2s ease,transform .2s ease}
   .cell svg{display:block;width:100%;height:100%;filter:drop-shadow(0 3px 4px rgba(69,26,3,.48))}
-  .cell.win{animation:tileWin .42s infinite alternate;z-index:5;background:rgba(254,243,199,.28)}
+  .cell{transition:opacity .25s ease,transform .25s ease,filter .25s ease}
+  .cell.win{animation:tileWin .42s infinite alternate;z-index:5;background:rgba(254,243,199,.4)}
+  .cell.win svg{filter:drop-shadow(0 0 6px #fff6c0) brightness(1.18) saturate(1.25)}
+  .cell.dim{opacity:.3;filter:grayscale(.7) blur(1.3px) brightness(.72);transform:scale(.93)}
   @keyframes tileWin{from{box-shadow:0 0 8px #fff,0 0 18px #fbbf24;transform:scale(1.02)}to{box-shadow:0 0 16px #fff,0 0 28px #f59e0b;transform:scale(1.08)}}
   .plaque-wrap{flex-shrink:0;border-bottom:3px solid #59240a;background:linear-gradient(180deg,#4a1e08,#2e1204);padding:6px 12px}
   .plaque{width:100%;border:2px solid #b45309;border-radius:8px;background:#160802;padding:4px 10px;text-align:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.9)}
@@ -156,6 +159,7 @@
     </div>
     <div>
       <button class="mbtn" id="msnd">Sound: চালু</button>
+      <button class="mbtn" id="mmus">Music: চালু</button>
       <button class="mbtn" id="mcls">বন্ধ</button>
     </div>
     <h4 style="margin:8px 0 4px;color:#fcd34d;font-size:12px">Game History (শেষ ১৫)</h4>
@@ -208,20 +212,95 @@ try{
 }catch(_){}
 function save(){try{localStorage.setItem("ab5000_standalone_v1",JSON.stringify({bi,hist}))}catch(_){}}
 
-let ac=null;
-function tone(f,d,t="sine",g=.06){
-  if(!snd)return;
-  try{
-    ac=ac||new(window.AudioContext||window.webkitAudioContext)();
-    if(ac.state==="suspended")ac.resume();
-    const o=ac.createOscillator(),v=ac.createGain();
-    o.type=t;o.frequency.value=f;
-    v.gain.setValueAtTime(g,ac.currentTime);
-    v.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);
-    o.connect(v);v.connect(ac.destination);o.start();o.stop(ac.currentTime+d);
-  }catch(_){}
-}
-function fanfare(m=1){[523,659,784,1046].forEach((f,i)=>setTimeout(()=>tone(f*(1+m*.04),.16,"triangle",.07),i*60))}
+/* ===== Pro sound engine (WebAudio, no audio files) ===== */
+let ac,mix,sfxBus,musBus,noiseBuf,musTimer=null,musNext=0,musStep=0,tkTimer=null,tkG=null;
+let musicOn=true;try{musicOn=localStorage.ab_music!=='0'}catch(_){}
+const tkOn=[0,0,0,0,0],tkNext=[0,0,0,0,0];
+function A(){
+ if(!ac){ac=new(window.AudioContext||window.webkitAudioContext)();
+  const cp=ac.createDynamicsCompressor();cp.threshold.value=-16;cp.knee.value=12;cp.ratio.value=4;cp.attack.value=.004;cp.release.value=.22;
+  mix=ac.createGain();mix.gain.value=.8;mix.connect(cp);cp.connect(ac.destination);
+  sfxBus=ac.createGain();sfxBus.connect(mix);
+  musBus=ac.createGain();musBus.gain.value=0;musBus.connect(mix);
+  const dl=ac.createDelay(1);dl.delayTime.value=.46;const fb=ac.createGain();fb.gain.value=.36;
+  const dlp=ac.createBiquadFilter();dlp.type='lowpass';dlp.frequency.value=1800;
+  const dg=ac.createGain();dg.gain.value=.5;
+  musBus.connect(dl);dl.connect(dlp);dlp.connect(fb);fb.connect(dl);dlp.connect(dg);dg.connect(mix);
+  tkG=[0,1,2,3,4].map(()=>{const g=ac.createGain();g.connect(sfxBus);return g});
+  noiseBuf=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);
+  const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+ if(ac.state==='suspended')ac.resume();return ac}
+function tone(f,d,o={}){const t0=ac.currentTime+(o.w||0),a=o.a||.005,v=o.v||.2;
+ const osc=ac.createOscillator(),g=ac.createGain();osc.type=o.t||'sine';
+ osc.frequency.setValueAtTime(f,t0);if(o.to)osc.frequency.exponentialRampToValueAtTime(o.to,t0+d);
+ g.gain.setValueAtTime(.0001,t0);g.gain.linearRampToValueAtTime(v,t0+a);g.gain.exponentialRampToValueAtTime(.0001,t0+Math.max(d,a+.01));
+ let n=osc;if(o.lp){const fl=ac.createBiquadFilter();fl.type='lowpass';fl.frequency.value=o.lp;osc.connect(fl);n=fl}
+ n.connect(g);let out=g;
+ if(o.p!==undefined&&ac.createStereoPanner){const p=ac.createStereoPanner();p.pan.value=o.p;g.connect(p);out=p}
+ out.connect(o.bus||sfxBus);osc.start(t0);osc.stop(t0+d+.06)}
+function nz(d,type,f,q,v,o={}){const t0=ac.currentTime+(o.w||0);
+ const s=ac.createBufferSource();s.buffer=noiseBuf;s.loop=true;
+ const fl=ac.createBiquadFilter();fl.type=type;fl.frequency.setValueAtTime(f,t0);
+ if(o.to)fl.frequency.exponentialRampToValueAtTime(o.to,t0+d);fl.Q.value=q;
+ const g=ac.createGain();g.gain.setValueAtTime(.0001,t0);g.gain.linearRampToValueAtTime(v,t0+(o.a||.01));
+ g.gain.exponentialRampToValueAtTime(.0001,t0+d);
+ s.connect(fl);fl.connect(g);let out=g;
+ if(o.p!==undefined&&ac.createStereoPanner){const p=ac.createStereoPanner();p.pan.value=o.p;g.connect(p);out=p}
+ out.connect(o.bus||sfxBus);s.start(t0,Math.random());s.stop(t0+d+.06)}
+function bell(f,d,v,w=0,bus){[[1,1],[2.76,.5],[5.4,.25],[8.93,.12]].forEach(([m,a])=>tone(f*m,d/Math.pow(m,.3),{v:v*a,w,bus,a:.003}))}
+/* --- background music: quiet casino lounge (soft electric piano, brushes, distant slot pings) --- */
+const mf=m=>440*Math.pow(2,(m-69)/12),CH=[[60,64,67,71],[57,60,64,67],[57,60,62,65],[55,59,62,65]];
+function epn(m,v,w,p){const f=mf(m);tone(f,1.9,{v,w,bus:musBus,a:.012,lp:2400,p});tone(f*2,.9,{v:v*.22,w,bus:musBus,a:.012,p})}
+function musStepAt(s,t){
+ const bar=Math.floor(s/4)%4,st=s%4,w=Math.max(0,t-ac.currentTime),ch=CH[bar];
+ if(st==0||(st==2&&Math.random()<.7))ch.forEach((m,i)=>epn(m,st==0?.13:.09,w+i*.012,(i-1.5)*.25));
+ if((st==1||st==3)&&Math.random()<.35)epn(ch[Math.floor(Math.random()*4)]+12,.08,w+.2,(Math.random()-.5)*.6);
+ nz(.05,'highpass',6500,.7,.02,{w:w+.4,bus:musBus,a:.003});nz(.04,'highpass',6500,.7,.01,{w,bus:musBus,a:.003});
+ if(st==0&&Math.random()<.3){const f=[2093,2349,2637,3136][Math.floor(Math.random()*4)],p=(Math.random()-.5)*1.4,d=w+.3+Math.random()*1.5;
+  tone(f,.5,{v:.03,w:d,bus:musBus,a:.002,p});tone(f*1.5,.3,{v:.015,w:d+.07,bus:musBus,a:.002,p})}}
+function musicStart(){if(musTimer||!snd||!musicOn)return;A();
+ musNext=ac.currentTime+.15;musBus.gain.setTargetAtTime(.05,ac.currentTime,1.5);
+ musTimer=setInterval(()=>{while(musNext<ac.currentTime+.5){musStepAt(musStep++,musNext);musNext+=.6}},120)}
+function musicStop(){if(!musTimer)return;clearInterval(musTimer);musTimer=null;
+ if(ac)musBus.gain.setTargetAtTime(0,ac.currentTime,.12)}
+function musicSync(){if(snd&&musicOn&&!document.hidden)musicStart();else musicStop()}
+['pointerdown','touchend','keydown'].forEach(e=>addEventListener(e,()=>{if(snd){A();musicSync()}},{passive:true}));
+document.addEventListener('visibilitychange',()=>{musicSync();if(document.hidden)SFX.reelAbort()});
+/* --- sound effects --- */
+const SFX={
+ click(d){if(!snd)return;A();tone(d<0?520:d>0?820:660,.08,{t:'square',v:.05,lp:2600})},
+ err(){},
+ spin(tb){if(!snd)return;A();
+  nz(tb?.22:.34,'bandpass',500,2.5,.4,{to:3800,a:.05});tone(1046,.07,{t:'triangle',v:.045,w:.02});
+  SFX.reelStart()},
+ /* ratchet "kir kir" ticks while reels scroll (one cell every ~75ms), stopped per reel on landing */
+ reelStart(){if(!snd)return;A();const t=ac.currentTime+.03;
+  tkG.forEach(g=>{g.gain.cancelScheduledValues(0);g.gain.setValueAtTime(1,ac.currentTime)});
+  for(let c=0;c<5;c++){tkOn[c]=1;tkNext[c]=t+c*.017}
+  if(!tkTimer)tkTimer=setInterval(()=>{
+   if(!ac)return;let any=0;
+   for(let c=0;c<5;c++){if(!tkOn[c])continue;any=1;
+    while(tkNext[c]<ac.currentTime+.2){const w=Math.max(0,tkNext[c]-ac.currentTime),f0=2300+c*140,p=(c-2)*.4,v=.2*(.75+Math.random()*.25);
+     nz(.022,'bandpass',f0*1.6,5,v,{w,p,a:.001,bus:tkG[c]});tone(f0*(1+Math.random()*.03),.02,{t:'triangle',v:v*.5,w,a:.001,p,bus:tkG[c]});
+     tkNext[c]+=.075}}
+   if(!any){clearInterval(tkTimer);tkTimer=null}},50)},
+ muteReel(c){if(ac&&tkG){const g=tkG[c].gain;g.cancelScheduledValues(ac.currentTime);g.setTargetAtTime(0,ac.currentTime,.004)}},
+ reelAbort(){for(let c=0;c<5;c++){tkOn[c]=0;SFX.muteReel(c)}},
+ land(c){tkOn[c]=0;SFX.muteReel(c)},
+ wildAcc(c){if(!snd)return;A();const p=(c-2)*.45;[1568,2093,2637].forEach((f,i)=>tone(f,.25,{v:.07,w:i*.06,a:.002,p}))},
+ scatAcc(n){if(!snd)return;A();bell(660*Math.pow(1.122,n),.9,.12);tone(1320*Math.pow(1.122,n),.3,{v:.05,w:.04})},
+ win(r){if(!snd)return;A();const n=r<1?3:r<3?5:r<8?8:12,F=[1319,1568,1760,2093,2349];
+  for(let i=0;i<n;i++){const w=i*.07+Math.random()*.02,f=F[i%5]*(1+Math.random()*.01),p=(Math.random()-.5)*.9;
+   tone(f,.3,{v:.1,w,a:.002,p});tone(f*2.01,.12,{v:.035,w,a:.002,p})}
+  bell(784,1,.1);
+  if(r>=3)[587,740,880,1175].forEach((f,i)=>bell(f,.8,.09,.25+i*.1))},
+ big(){if(!snd)return;A();bell(196,2.6,.2);
+  [587,740,880,1175,1480,1760,2349].forEach((f,i)=>bell(f,.9,.11,.7+i*.09));
+  for(let i=0;i<24;i++)tone(1500+Math.random()*2200,.2,{v:.05,w:.9+i*.06,a:.002,p:(Math.random()-.5)*1.4});
+  nz(1.2,'bandpass',800,.9,.14,{to:5000,a:.8,w:.5})},
+ scatter(){if(!snd)return;A();bell(220,2,.2);
+  [784,988,1175,1568,1976].forEach((f,i)=>bell(f,.7,.1,.2+i*.08));nz(.9,'bandpass',500,1,.13,{to:4000,a:.6})}
+};
 
 const $=id=>document.getElementById(id);
 const fmt=n=>(Math.round(n*100)/100).toFixed(2);
@@ -298,6 +377,7 @@ function hud(){
   renderPlaque();
   $("snd-btn").textContent=snd?"🔊":"🔇";
   $("msnd").textContent="Sound: "+(snd?"চালু":"বন্ধ");
+  $("mmus").textContent="Music: "+(musicOn?"চালু":"বন্ধ");
   $("turbo-btn").classList.toggle("on",turbo);
   $("auto-btn").classList.toggle("on",auto);
   $("spin-btn").classList.toggle("spinning",busy);
@@ -349,26 +429,26 @@ function showBigWin(amt){
     c.style.left=Math.random()*95+"vw";c.style.animationDuration=(1.1+Math.random()*.9)+"s";
     $("ov").appendChild(c);setTimeout(()=>c.remove(),2200);
   }
-  fanfare(3);return new Promise(r=>setTimeout(()=>{$("ov").style.display="none";r()},2400));
+  SFX.big();return new Promise(r=>setTimeout(()=>{$("ov").style.display="none";r()},2400));
 }
 
 async function spin(){
   if(busy)return;
-  if(!uid){$("msg").textContent="লগইন প্রয়োজন — অ্যাপ থেকে গেমটি খুলুন";auto=false;hud();detectUser();return;}
+  if(!uid){$("msg").textContent="লগইন প্রয়োজন — অ্যাপ থেকে গেমটি খুলুন";SFX.err();auto=false;hud();detectUser();return;}
   const bet=BETS[bi],isF=fg>0;
-  if(!isF&&bal<bet){$("msg").textContent="Balance কম! Bet কমান";auto=false;hud();return;}
+  if(!isF&&bal<bet){$("msg").textContent="Balance কম! Bet কমান";SFX.err();auto=false;hud();return;}
   busy=true;win=0;winMarks=new Set();winGroups=[];activeWinIdx=0;pendBal=null;
   if(cycleTimer){clearInterval(cycleTimer);cycleTimer=null;}
   $("msg").textContent="";$("wboost").style.display="none";
   if(isF)fg--;else bal=Math.round((bal-bet)*100)/100;
   hud();
   for(let c=0;c<5;c++){const w=$("colw_"+c);w.classList.remove("landed");w.classList.add("spinning");}
-  tone(190,.14,"square",.04);
+  SFX.spin(turbo);
 
   const r=await apiSpin(bet);                       // result (grid, wins, free games, balance) comes from the server
   if(!r||!r.success){
     for(let c=0;c<5;c++){const w=$("colw_"+c);w.classList.remove("spinning");}
-    busy=false;auto=false;
+    busy=false;auto=false;SFX.reelAbort();SFX.err();
     await syncState();
     $("msg").textContent=(r&&ERR[r.error])||ERR.SERVER_ERROR;hud();return;
   }
@@ -381,7 +461,8 @@ async function spin(){
     await sleep(c===0?d0:dg);
     grid[c]=nextGrid[c].map(x=>({...x}));
     const w=$("colw_"+c);w.classList.remove("spinning");w.classList.add("landed");
-    drawCol(c);tone(260+c*38,.07,"square",.05);
+    drawCol(c);SFX.land(c);
+    {const sc=nextGrid[c].filter(x=>x.s===12).length;if(sc)SFX.scatAcc(c);}
   }
   await sleep(turbo?120:240);
   for(let c=0;c<5;c++)$("colw_"+c).classList.remove("landed");
@@ -392,11 +473,11 @@ async function spin(){
     if(winGroups.length>1){cycleTimer=setInterval(()=>{activeWinIdx=(activeWinIdx+1)%winGroups.length;drawAll();},1100);}
     if(res.wildBoost>1){$("wboost").textContent="· "+res.wildBoost+"x Wild";$("wboost").style.display="inline";}
     $("msg").textContent=res.wildBoost>1?"🦬 "+res.waysCount+" Ways · "+res.wildBoost+"x Wild Win!":"🦬 "+res.waysCount+" Ways Win!";
-    fanfare(1);hud();
+    SFX.win(res.total/bet);hud();
     await sleep(turbo?340:720);
   }
 
-  if(r.award>0){$("msg").textContent="🎉 "+r.award+" Free Game পেয়েছেন!";tone(880,.4,"triangle",.09);}
+  if(r.award>0){$("msg").textContent="🎉 "+r.award+" Free Game পেয়েছেন!";SFX.scatter();}
   fg=r.fg;
   bal=Math.round(r.balance*100)/100;balLoaded=true;pendBal=null;
   hist.unshift({bet,win:res.total,mult:res.wildBoost,f:isF,t:new Date().toLocaleTimeString()});
@@ -484,17 +565,18 @@ async function apiSpin(bet){
 /* ===================================================================================================== */
 
 $("spin-btn").onclick=spin;
-$("bu").onclick=()=>{if(!busy){bi=Math.min(BETS.length-1,bi+1);tone(460,.05);hud();save();}};
-$("bd").onclick=()=>{if(!busy){bi=Math.max(0,bi-1);tone(360,.05);hud();save();}};
-$("turbo-btn").onclick=()=>{turbo=!turbo;hud();};
-$("auto-btn").onclick=()=>{auto=!auto;hud();if(auto&&!busy)spin();};
-$("snd-btn").onclick=$("msnd").onclick=()=>{snd=!snd;hud();};
+$("bu").onclick=()=>{if(!busy){bi=Math.min(BETS.length-1,bi+1);SFX.click(1);hud();save();}};
+$("bd").onclick=()=>{if(!busy){bi=Math.max(0,bi-1);SFX.click(-1);hud();save();}};
+$("turbo-btn").onclick=()=>{SFX.click(0);turbo=!turbo;hud();};
+$("auto-btn").onclick=()=>{SFX.click(0);auto=!auto;hud();if(auto&&!busy)spin();};
+$("snd-btn").onclick=$("msnd").onclick=()=>{snd=!snd;if(!snd)SFX.reelAbort();hud();musicSync();};
+$("mmus").onclick=()=>{musicOn=!musicOn;try{localStorage.ab_music=musicOn?'1':'0'}catch(_){}hud();musicSync();};
 $("menu-btn").onclick=()=>{
   $("hist").innerHTML=hist.length?hist.map(h=>`<div class="hrow"><span>${h.t}${h.f?" (F)":""}</span><span>Bet ${fmt(h.bet)}</span><span style="color:${h.win>0?"#bef264":"#999"}">Win ${fmt(h.win)}</span></div>`).join(""):'<div style="opacity:.6;padding:8px 0">এখনো খেলা হয়নি</div>';
   $("menu").style.display="flex";
 };
 $("mcls").onclick=()=>{$("menu").style.display="none";};
-drawAll();hud();
+drawAll();hud();musicSync();
 })();
 </script>
 </body>
