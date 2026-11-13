@@ -61,105 +61,47 @@
 
   // ---------- styles (Cyber-Bio HUD UI) ----------
   var css = '' +
-    '#npPkLock{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:flex-start;justify-content:center;padding:12vh 20px 20px;' +
-    'background:radial-gradient(circle at 50% 30%,#151d33 0%,#040711 75%);color:#f8fafc;font-family:var(--font-bengali,sans-serif);overflow:auto}' +
-    '.npPkBox{width:100%;max-width:360px;text-align:center;display:flex;flex-direction:column;align-items:center}' +
-    '.npPkLogo{width:86px;height:86px;border-radius:20px;border:2px solid #6e5019;box-shadow:0 8px 24px rgba(245,158,11,.22);margin-bottom:8px}' +
-    '.npPkTitle{font-family:var(--font-esports,sans-serif);font-size:22px;font-weight:700;letter-spacing:3px;margin:16px 0 4px;color:#f7c948;text-transform:uppercase}' +
-    '.npPkSub{font-size:14px;color:#8b97ab;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}' +
-    '.npPkBtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(245,158,11,.35);' +
-    'background:transparent;color:#f8fafc;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}' +
+    '#npPkLock{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:24px 20px;color:#f8fafc;font-family:var(--font-bengali,sans-serif);overflow:auto;background:radial-gradient(120% 80% at 50% 0%,#1b2540 0%,#0a1020 55%,#04060d 100%)}' +
+    '#npPkLock::before{content:"";position:absolute;width:360px;height:360px;left:50%;top:40%;margin:-180px 0 0 -180px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.15),transparent 68%);pointer-events:none}' +
+    '.npPkBox{position:relative;width:100%;max-width:340px;margin:auto;text-align:center;display:flex;flex-direction:column;align-items:center}' +
+    '.npPkLogo{width:64px;height:64px;border-radius:18px;border:1px solid rgba(245,158,11,.45);box-shadow:0 8px 26px rgba(245,158,11,.25)}' +
+    '.npPkTitle{font-family:var(--font-esports,sans-serif);font-size:20px;font-weight:800;letter-spacing:3px;margin:14px 0 4px;background:linear-gradient(90deg,#fde68a,#f59e0b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}' +
+    '.npPkSub{font-size:12px;color:#8b97ab;letter-spacing:1.5px;text-transform:uppercase}' +
+    '.npPkBtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(245,158,11,.35);background:transparent;color:#f8fafc;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}' +
     '.npPkBtn:disabled{opacity:.6;cursor:default}' +
     '.npPkPrimary{background:linear-gradient(135deg,#f59e0b,#d97706);border-color:transparent;color:#0f172a;box-shadow:0 6px 18px rgba(245,158,11,.3)}' +
-    '.npPkLink{background:none;border:none;color:#a9b4c8;font-size:17px;margin-top:30px;cursor:pointer;text-decoration:underline;font-family:inherit;transition:color .2s}' +
-    '.npPkLink:hover{color:#f8fafc}' +
+    '.npPkLink{margin-top:26px;padding:10px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#cbd5e1;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}' +
+    '.npPkLink:hover{background:rgba(255,255,255,.1);color:#fff}' +
+    '.npPkLink:active{transform:scale(.97)}' +
     '.npPkMsg{min-height:20px;margin:12px 0 0;font-size:13px;color:#fca5a5}' +
-    '.npPkField{width:100%;box-sizing:border-box;padding:13px 14px;margin-bottom:10px;border-radius:12px;border:1px solid #1e293b;background:#0a0f1a;color:#f8fafc;font-size:15px;font-family:inherit}' +
-    '.npPkField:focus{outline:none;border-color:#00f0ff}' +
-    
-    /* স্ক্রিনশটের মতো স্ক্যানার: শুধু কোণা + গ্রিড + পাশে বিন্দুসহ লেজার লাইন */
-    '.npPkScannerWrap{position:relative;width:200px;height:220px;margin:26px auto 0;display:flex;align-items:center;justify-content:center}' +
-    '.npPkFp{position:relative;width:190px;height:210px;border:0;border-radius:0;background:transparent;box-shadow:none;' +
-    'display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;outline:none;' +
-    '-webkit-tap-highlight-color:transparent;transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);overflow:visible}' +
-
-    '.npPkGridBack{position:absolute;inset:8px;pointer-events:none;' +
-    'background-image:linear-gradient(rgba(0,170,225,0.20) 1px, transparent 1px), linear-gradient(90deg, rgba(0,170,225,0.20) 1px, transparent 1px);' +
-    'background-size:14px 14px;opacity:0.9}' +
-
-    '.npPkRadarRing{display:none}' +
-
-    '.npPkCorner{position:absolute;width:30px;height:30px;border-color:#19b4e4;border-style:solid;border-width:0;pointer-events:none;filter:drop-shadow(0 0 5px rgba(25,180,228,0.8))}' +
-    '.npPkCornerTL{top:0;left:0;border-top-width:4px;border-left-width:4px}' +
-    '.npPkCornerTR{top:0;right:0;border-top-width:4px;border-right-width:4px}' +
-    '.npPkCornerBL{bottom:0;left:0;border-bottom-width:4px;border-left-width:4px}' +
-    '.npPkCornerBR{bottom:0;right:0;border-bottom-width:4px;border-right-width:4px}' +
-
-    '.npPkLaserBeam{position:absolute;left:0;right:0;height:4px;border-radius:2px;background:#2aa6e6;z-index:3;' +
-    'box-shadow:0 0 10px rgba(42,166,230,0.9), 0 0 22px rgba(42,166,230,0.5);' +
-    'pointer-events:none;animation:npPkLaserSweep 2.4s ease-in-out infinite}' +
-    '.npPkLaserBeam::before,.npPkLaserBeam::after{content:"";position:absolute;top:50%;width:16px;height:16px;border-radius:50%;' +
-    'background:#2a8fe0;transform:translateY(-50%);box-shadow:0 0 10px rgba(42,143,224,0.9)}' +
-    '.npPkLaserBeam::before{left:-8px}' +
-    '.npPkLaserBeam::after{right:-8px}' +
-
-    /* "BIOMETRIC SCANNING..." লেখা + প্রোগ্রেস বার */
-    '.npPkScanTxt{margin-top:26px;font-family:var(--font-esports,sans-serif);font-size:14px;font-weight:700;letter-spacing:4px;color:#2aa6e6;text-transform:uppercase}' +
-    '.npPkBar{position:relative;width:130px;height:5px;margin:14px auto 0;border-radius:3px;background:#101e30;border:1px solid #1b2f48;overflow:hidden}' +
-    '.npPkBarFill{position:absolute;top:0;left:0;height:100%;width:28%;border-radius:3px;background:#1fa3e8;animation:npPkBarMove 1.3s ease-in-out infinite alternate}' +
-    '@keyframes npPkBarMove{0%{left:0}100%{left:72%}}' +
-
+    '.npPkField{width:100%;box-sizing:border-box;padding:14px 16px;margin-bottom:10px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#f8fafc;font-size:15px;font-family:inherit}' +
+    '.npPkField::placeholder{color:#64748b}' +
+    '.npPkField:focus{outline:none;border-color:#f59e0b;background:rgba(255,255,255,.08)}' +
+    '.npPkScannerWrap{position:relative;width:176px;height:176px;margin:38px auto 0;display:flex;align-items:center;justify-content:center}' +
+    '.npPkFp{--npc:#f59e0b;position:relative;width:132px;height:132px;border-radius:50%;border:1px solid rgba(255,255,255,.14);padding:0;cursor:pointer;outline:none;overflow:visible;-webkit-tap-highlight-color:transparent;background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.12),rgba(255,255,255,.03) 60%),#0d1426;box-shadow:0 14px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;transition:transform .25s ease,box-shadow .3s ease,border-color .3s ease}' +
+    '.npPkFp:active,.npPkFp.touching,.npPkFp.busy,.npPkFp.ok{--npc:#22c55e}' +
+    '.npPkFp:active,.npPkFp.touching,.npPkFp.ok{transform:scale(.97);border-color:rgba(34,197,94,.55);box-shadow:0 0 0 1px rgba(34,197,94,.35),0 0 44px rgba(34,197,94,.35),0 14px 40px rgba(0,0,0,.55)}' +
+    '.npPkOrbit{position:absolute;inset:-10px;border-radius:50%;pointer-events:none;background:conic-gradient(from 0deg,transparent 0 55%,var(--npc) 100%);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2px));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2px));animation:npPkSpin 3s linear infinite}' +
+    '.npPkFp.busy .npPkOrbit,.npPkFp.touching .npPkOrbit{animation-duration:1.1s}' +
+    '.npPkFp.ok .npPkOrbit{animation:none;background:var(--npc)}' +
+    '.npPkPulse{position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--npc);opacity:0;pointer-events:none;animation:npPkPulse 2.8s ease-out infinite}' +
+    '.npPkPulse2{animation-delay:1.4s}' +
+    '.npPkFp.ok .npPkPulse{animation:npPkPulse .9s ease-out 1}' +
+    '.npPkChk{position:absolute;right:0;bottom:2px;width:34px;height:34px;border-radius:50%;background:#22c55e;color:#04210f;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;transform:scale(0);transition:transform .35s cubic-bezier(.2,1.6,.4,1);z-index:5;box-shadow:0 4px 14px rgba(34,197,94,.5);pointer-events:none}' +
+    '.npPkFp.ok .npPkChk{transform:scale(1)}' +
+    '.npPkScanTxt{margin-top:20px;font-size:15px;font-weight:700;color:#e2e8f0;letter-spacing:.3px;transition:color .3s}' +
     '.npPkIco{display:inline-block;position:relative;line-height:0}' +
     '.npPkIco svg{display:block;width:100%;height:100%}' +
     '.npPkBtn .npPkIco{width:20px;height:24px}' +
-    '.npPkFp .npPkIco svg{stroke-width:1.2}' +
-    '.npPkFp .npPkIco{position:relative;z-index:2;width:104px;height:129px;color:#1fd0f2;' +
-    'filter:drop-shadow(0 0 3px rgba(31,208,242,0.7));' +
-    'transition:all 0.25s ease}' +
-
-    /* সবুজ ভরাট স্তর: টাচ করলে নিচ থেকে ওপরে উঠে পুরো ফিঙ্গারপ্রিন্ট সবুজ হয় */
-    '.npPkFpFill{position:absolute;left:0;top:0;color:#22c55e;' +
-    'filter:drop-shadow(0 0 1.5px #4ade80) drop-shadow(0 0 5px rgba(34,197,94,0.3));' +
-    'clip-path:inset(100% 0 0 0);-webkit-clip-path:inset(100% 0 0 0);' +
-    'transition:clip-path .35s ease-out,-webkit-clip-path .35s ease-out}' +
-
-    '.npPkFp:active, .npPkFp.touching, .npPkFp.busy{' +
-    'transform:scale(0.97)}' +
-    '.npPkFp:active .npPkFpFill, .npPkFp.touching .npPkFpFill, .npPkFp.ok .npPkFpFill{' +
-    'clip-path:inset(0 0 0 0);-webkit-clip-path:inset(0 0 0 0);' +
-    'transition:clip-path .8s linear,-webkit-clip-path .8s linear}' +
-    '.npPkFp:active .npPkLaserBeam, .npPkFp.touching .npPkLaserBeam, .npPkFp.busy .npPkLaserBeam{' +
-    'animation-duration:1s}' +
-
-    '.npPkFp.ok{transform:scale(0.97)}' +
-    '.npPkFp.ok .npPkIco{color:#22c55e;filter:drop-shadow(0 0 2px rgba(74,222,128,0.8))}' +
-    '.npPkFp.ok .npPkCorner{border-color:#22c55e;filter:drop-shadow(0 0 8px #22c55e)}' +
-    '.npPkFp.ok .npPkLaserBeam{top:50%;background:#22c55e;box-shadow:0 0 18px #22c55e;animation:none}' +
-    '.npPkFp.ok .npPkLaserBeam::before,.npPkFp.ok .npPkLaserBeam::after{background:#22c55e;box-shadow:0 0 10px #22c55e}' +
-
-    '@keyframes npPkLaserSweep{0%{top:12%;opacity:0.5}50%{top:86%;opacity:1}100%{top:12%;opacity:0.5}}' +
-    /* ===== সিনেমাটিক টাচ ইফেক্ট: আঙুল ছুঁলেই ফিঙ্গারপ্রিন্ট সবুজ আলোয় জ্বলে ওঠে ===== */
-    '.npPkBloom{position:absolute;left:50%;top:50%;width:210px;height:210px;margin:-105px 0 0 -105px;border-radius:50%;' +
-    'background:radial-gradient(circle,rgba(34,197,94,0.40) 0%,rgba(34,197,94,0.14) 42%,transparent 70%);opacity:0;transition:opacity .5s ease;pointer-events:none}' +
-    '.npPkFp:active .npPkBloom,.npPkFp.touching .npPkBloom,.npPkFp.ok .npPkBloom{opacity:1}' +
-    '.npPkRipple{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;' +
-    'border:2px solid rgba(74,222,128,0.8);box-shadow:0 0 14px rgba(34,197,94,0.6);opacity:0;pointer-events:none}' +
-    '.npPkFp:active .npPkRipple,.npPkFp.touching .npPkRipple{animation:npPkRip 1.3s ease-out infinite}' +
-    '.npPkFp:active .npPkRipple2,.npPkFp.touching .npPkRipple2{animation-delay:.65s}' +
-    '.npPkFp.ok .npPkRipple{animation:npPkRip .9s ease-out 1}' +
-    '.npPkBand{position:absolute;left:50%;top:168px;width:126px;height:7px;margin-left:-63px;border-radius:4px;z-index:4;' +
-    'background:linear-gradient(90deg,transparent,#bbf7d0,transparent);box-shadow:0 0 16px 4px rgba(34,197,94,0.9);opacity:0;pointer-events:none}' +
-    '.npPkFp:active .npPkBand,.npPkFp.touching .npPkBand{animation:npPkBandUp .8s linear forwards}' +
-    '.npPkFp:active .npPkCorner,.npPkFp.touching .npPkCorner,.npPkFp.ok .npPkCorner{border-color:#22c55e;filter:drop-shadow(0 0 7px rgba(34,197,94,0.95))}' +
-    '.npPkFp:active .npPkGridBack,.npPkFp.touching .npPkGridBack,.npPkFp.ok .npPkGridBack{' +
-    'background-image:linear-gradient(rgba(34,197,94,0.24) 1px, transparent 1px), linear-gradient(90deg, rgba(34,197,94,0.24) 1px, transparent 1px)}' +
-    '.npPkFp:active .npPkLaserBeam,.npPkFp.touching .npPkLaserBeam{visibility:hidden}' +
+    '.npPkFp .npPkIco{position:relative;z-index:2;width:58px;height:72px;color:#e2e8f0;filter:drop-shadow(0 0 6px rgba(245,158,11,.35));transition:all .25s ease}' +
+    '.npPkFp .npPkIco svg{stroke-width:2.2}' +
+    '.npPkFpFill{position:absolute;left:0;top:0;color:#22c55e;filter:drop-shadow(0 0 4px rgba(34,197,94,.7));clip-path:inset(100% 0 0 0);-webkit-clip-path:inset(100% 0 0 0);transition:clip-path .35s ease-out,-webkit-clip-path .35s ease-out}' +
+    '.npPkFp:active .npPkFpFill,.npPkFp.touching .npPkFpFill,.npPkFp.ok .npPkFpFill{clip-path:inset(0 0 0 0);-webkit-clip-path:inset(0 0 0 0);transition:clip-path .8s linear,-webkit-clip-path .8s linear}' +
     '.npPkFp.ok .npPkIco{animation:npPkPop .55s ease-out}' +
-    '.npPkGreen .npPkBarFill{background:#22c55e;animation-duration:.6s}' +
-    '.npPkGreen .npPkBar{border-color:#166534}' +
-    '@keyframes npPkRip{0%{transform:scale(.45);opacity:.9}100%{transform:scale(1.75);opacity:0}}' +
-    '@keyframes npPkBandUp{0%{top:168px;opacity:1}88%{opacity:1}100%{top:38px;opacity:0}}' +
-    '@keyframes npPkPop{0%{transform:scale(1)}40%{transform:scale(1.1)}100%{transform:scale(1)}}' +
+    '@keyframes npPkSpin{to{transform:rotate(360deg)}}' +
+    '@keyframes npPkPulse{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.6);opacity:0}}' +
+    '@keyframes npPkPop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}' +
+    '@media (prefers-reduced-motion:reduce){.npPkOrbit,.npPkPulse{animation:none}}' +
     '.npPkCard{background:var(--bg-card,#141b2d);border:1px solid var(--border-subtle,#1e293b);border-radius:14px;padding:16px;margin-bottom:16px;color:var(--text-primary,#f8fafc)}' +
     '.npPkCardHead{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;margin-bottom:6px}' +
     '.npPkCardHead .npPkIco{width:22px;height:26px;color:#00f0ff}' +
@@ -182,6 +124,7 @@
     var btn = document.getElementById('npPkUnlockBtn');
     if (btn) { btn.disabled = b; btn.classList.toggle('busy', !!b); }
   }
+  function IDLE() { return T('Touch the sensor to unlock', 'আনলক করতে ফিঙ্গারপ্রিন্ট ছুঁয়ে দিন'); }
   function setScanTxt(t, green) {
     var x = document.getElementById('npPkScanTxt');
     if (x) { x.textContent = t; x.style.color = green ? '#22c55e' : ''; }
@@ -194,7 +137,7 @@
     var b = document.getElementById('npPkUnlockBtn');
     if (b && b.offsetParent) {
       b.classList.remove('busy', 'touching'); b.classList.add('ok');
-      setScanTxt('ACCESS GRANTED', true); buzz([25, 45, 25]);
+      setScanTxt(T('Unlocked', 'আনলক হয়েছে'), true); buzz([25, 45, 25]);
       setTimeout(function () { removeLock(); G.release(); }, 750);
     } else { removeLock(); G.release(); }
   }
@@ -272,7 +215,7 @@
     var auto = (ev === 'auto');
     if (busy) return;
     var gb = document.getElementById('npPkUnlockBtn');
-    if (gb && !auto) { gb.classList.add('touching'); setScanTxt('READING FINGERPRINT...', true); }
+    if (gb && !auto) { gb.classList.add('touching'); setScanTxt(T('Verifying…', 'যাচাই হচ্ছে…'), true); }
     setMsg(''); setBusy(true);
 
     requestDeviceBiometric().then(function () {
@@ -280,7 +223,7 @@
       unlockDone();
     }).catch(function (e) {
       if (gb) gb.classList.remove('ok', 'touching');
-      setScanTxt('BIOMETRIC SCANNING...', false);
+      setScanTxt(IDLE(), false);
       if (auto && e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) {
         setMsg(T('Tap the fingerprint scanner', 'ফিঙ্গারপ্রিন্ট স্ক্যানারে চাপ দিন'));
       } else {
@@ -318,36 +261,29 @@
       id: 'npPkUnlockBtn', class: 'npPkFp', type: 'button', 'aria-label': 'Unlock with Fingerprint',
       onclick: onUnlockClick
     }, [
-      el('div', { class: 'npPkBloom' }),
-      el('div', { class: 'npPkGridBack' }),
-      el('div', { class: 'npPkRipple' }),
-      el('div', { class: 'npPkRipple npPkRipple2' }),
-      el('div', { class: 'npPkCorner npPkCornerTL' }),
-      el('div', { class: 'npPkCorner npPkCornerTR' }),
-      el('div', { class: 'npPkCorner npPkCornerBL' }),
-      el('div', { class: 'npPkCorner npPkCornerBR' }),
+      el('div', { class: 'npPkOrbit' }),
+      el('div', { class: 'npPkPulse' }),
+      el('div', { class: 'npPkPulse npPkPulse2' }),
       fpIcon(),
-      el('div', { class: 'npPkLaserBeam' }),
-      el('div', { class: 'npPkBand' })
+      el('div', { class: 'npPkChk' }, ['✓'])
     ]);
 
     unlockBtn.addEventListener('touchstart', function () {
       unlockBtn.classList.add('touching');
-      setScanTxt('FINGERPRINT DETECTED', true);
+      setScanTxt(T('Scanning…', 'স্ক্যান হচ্ছে…'), true);
       buzz(15);
     }, { passive: true });
     unlockBtn.addEventListener('touchend', function () {
       setTimeout(function () {
         if (busy || unlockBtn.classList.contains('ok')) return;
         unlockBtn.classList.remove('touching');
-        setScanTxt('BIOMETRIC SCANNING...', false);
+        setScanTxt(IDLE(), false);
       }, 400);
     });
 
     var panelFp = el('div', { id: 'npPkPanelFp' }, [
       el('div', { class: 'npPkScannerWrap' }, [unlockBtn]),
-      el('div', { id: 'npPkScanTxt', class: 'npPkScanTxt' }, ['BIOMETRIC SCANNING...']),
-      el('div', { class: 'npPkBar' }, [el('div', { class: 'npPkBarFill' })]),
+      el('div', { id: 'npPkScanTxt', class: 'npPkScanTxt' }, [IDLE()]),
       el('div', null, [
         el('button', { class: 'npPkLink', type: 'button', onclick: function () { showPanel('pw'); } }, [
           T('Use password', 'পাসওয়ার্ড দিয়ে খুলুন')
@@ -359,7 +295,7 @@
     var passIn = el('input', { id: 'npPkPass', class: 'npPkField', type: 'password', autocomplete: 'current-password',
       placeholder: T('Password', 'পাসওয়ার্ড'),
       onkeydown: function (ev) { if (ev.key === 'Enter') onPwSubmit(); } });
-    var panelPw = el('div', { id: 'npPkPanelPw', style: 'display:none;margin-top:22px' }, [
+    var panelPw = el('div', { id: 'npPkPanelPw', style: 'display:none;margin-top:30px;width:100%' }, [
       userIn, passIn,
       el('button', { id: 'npPkPwBtn', class: 'npPkBtn npPkPrimary', type: 'button', onclick: onPwSubmit }, [T('Unlock', 'আনলক')]),
       el('div', null, [
@@ -369,7 +305,7 @@
     var box = el('div', { class: 'npPkBox' }, [
       el('img', { class: 'npPkLogo', src: './icon-192.png', alt: '' }),
       el('div', { class: 'npPkTitle' }, ['NP TOURNAMENT']),
-      el('div', { class: 'npPkSub' }, ['SECURITY AUTHENTICATION']),
+      el('div', { class: 'npPkSub' }, ['🔒 ' + T('Secure Unlock', 'নিরাপদ আনলক')]),
       panelFp, panelPw,
       el('div', { id: 'npPkLockMsg', class: 'npPkTiny', role: 'alert' })
     ]);
