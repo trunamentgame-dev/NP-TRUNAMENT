@@ -413,7 +413,7 @@ async function spin(){
 
 /* ===================== REAL BALANCE (server + Firebase) — same as the Crash game ===================== */
 const firebaseConfig={apiKey:"AIzaSyBFaoU_cDws6YVAXFMWBnogGAQHhjfC23Q",authDomain:"np-trunament-bd.firebaseapp.com",databaseURL:"https://np-trunament-bd-default-rtdb.firebaseio.com",projectId:"np-trunament-bd",storageBucket:"np-trunament-bd.firebasestorage.app",messagingSenderId:"324972484501",appId:"1:324972484501:web:38598aa922e983990b889c"};
-const API_BASE='https://YOUR-BUFFALO-SERVER.onrender.com';   // <-- Render URL of the Buffalo server (server.js)
+const API_BASE='https://buffalo-server.onrender.com';   // <-- Render URL of the Buffalo server (server.js)
 let auth=null,rtdb=null,uid=null,idToken=null,pendBal=null,balLoaded=false;
 try{if(window.firebase){if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);auth=firebase.auth();rtdb=firebase.database();}}catch(e){console.warn('Firebase init',e);}
 const ERR={INSUFFICIENT_BALANCE:"Balance কম! Bet কমান",BUSY:"আগের Spin চলছে, একটু অপেক্ষা করুন",BAD_UID:"ব্যবহারকারীকে চেনা যায়নি",AUTH_REQUIRED:"লগইন সেশন প্রয়োজন",UID_MISMATCH:"UID মিলছে না",BAD_TOKEN:"লগইন সেশন মেয়াদোত্তীর্ণ — অ্যাপ থেকে আবার খুলুন",RATE_LIMITED:"অনেক দ্রুত Spin — একটু থামুন",BAD_INPUT:"ভুল Bet",NETWORK:"নেটওয়ার্ক সমস্যা, আবার চেষ্টা করুন",SERVER_ERROR:"সার্ভার সমস্যা, আবার চেষ্টা করুন"};
