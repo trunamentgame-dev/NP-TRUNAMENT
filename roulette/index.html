@@ -9,14 +9,14 @@
 <meta property="og:description" content="Interactive MostWin88 casino roulette game with real-time wheel simulation, multi-line result history, and customizable betting chips." />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://roulette-server-om2j.onrender.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Cinzel:wght@600;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Cinzel:wght@600;800&display=swap" rel="stylesheet"></noscript>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <style>
 :root{--gold:#e8c35a;--gold2:#a8791c;--felt:#0f7339;--u:min(1cqw,.64cqh)}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
+html,body{height:100%;overflow:hidden;touch-action:manipulation}
 body{font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;color:#fff;background:#17234a;padding:10px;display:flex;justify-content:center;align-items:center}
 .app{width:min(430px,100%);height:calc(100dvh - 20px);max-height:1000px;display:flex;flex-direction:column;background:#0f2557;border:2px solid #2d4a8c;border-radius:26px;overflow:clip;box-shadow:0 10px 40px #0008}
 @media(max-width:560px){body{padding:0}.app{height:100dvh;max-height:none;border:0;border-radius:0}}
@@ -37,9 +37,10 @@ display:flex;flex-direction:row;gap:calc(2*var(--u));padding:calc(2*var(--u)) ca
 .veil{position:absolute;inset:0;background:radial-gradient(circle,#3a0a18cc,#12030af5);opacity:0;pointer-events:none;transition:opacity 1s;z-index:5}
 .veil.on{opacity:1}
 .left{flex:none;width:calc(39*var(--u));display:flex;flex-direction:column;justify-content:flex-start;gap:calc(0.9*var(--u));min-width:0}
-.wheel{position:relative;z-index:6;width:100%;flex:none;aspect-ratio:1;transition:transform 1.4s cubic-bezier(.22,.8,.2,1);filter:drop-shadow(0 calc(1.4*var(--u)) calc(1.6*var(--u)) #0009);margin-bottom:0}
+.wheel{position:relative;z-index:6;width:100%;flex:none;aspect-ratio:1;transition:transform 1.4s cubic-bezier(.22,.8,.2,1);margin-bottom:0}
 .wheel.big{transform:translate(var(--tx,0),var(--ty,0)) scale(var(--ts,1))}
-.wheel canvas{width:100%;height:100%;display:block}
+.wheel canvas{width:100%;height:100%;display:block;border-radius:50%;box-shadow:0 calc(1.4*var(--u)) calc(1.6*var(--u)) #0009}
+.wheel::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(48.6% 48.6% at 34.3% 31.4%,rgba(255,255,255,.24) 2.9%,rgba(255,255,255,.06) 36.9%,rgba(255,255,255,0) 100%)}
 .info{min-width:0;display:flex;flex-direction:column;gap:calc(0.9*var(--u))}
 .timer{display:flex;align-items:center;justify-content:space-between;gap:calc(1.2*var(--u));font-weight:700;font-size:calc(2.5*var(--u));line-height:1.15}
 .timer b{flex:none;width:calc(8.2*var(--u));aspect-ratio:1;border-radius:50%;background:var(--gold);color:#2a0710;display:grid;place-items:center;font-size:calc(4.2*var(--u))}
@@ -274,7 +275,7 @@ $('cin').addEventListener('keydown',e=>{if(e.key==='Enter')saveChip();else if(e.
 cp.addEventListener('pointerdown',e=>{if(e.target===cp)closeChipEdit()});
 
 /* ---------- Wheel (high-res canvas, K x supersampled) ---------- */
-const cv=$('cv'),ctx=cv.getContext('2d'),K=2,D=700,C=D/2;
+const cv=$('cv'),ctx=cv.getContext('2d'),K=1,D=700,C=D/2;
 cv.width=cv.height=D*K;
 const mk=()=>{const c=document.createElement('canvas');c.width=c.height=D*K;const g=c.getContext('2d');g.scale(K,K);return[c,g]};
 const [off,g]=mk(),[deco,gd]=mk(),[gloss,gl]=mk();
@@ -363,6 +364,7 @@ wheelImg.src='/assets/aistudio/wheel_hubohub.png';
 
 let wAng=0,ball={on:false},last=performance.now(),settled=null;
 function frame(now){
+  if(!ball.on&&now-last<30){requestAnimationFrame(frame);return}
   const dt=Math.min(.05,(now-last)/1000);last=now;
   wAng+=dt*(ball.on?.75:.35);
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,D*K,D*K);ctx.setTransform(K,0,0,K,0,0);
@@ -392,7 +394,6 @@ function frame(now){
     sphere(ctx,x,y,8.5,'#ffffff','#f4f4f8','#a9a9b6','#4a4a56');
     ctx.fillStyle='rgba(255,255,255,.95)';ctx.beginPath();ctx.arc(x-2.6,y-3,1.8,0,Math.PI*2);ctx.fill();
   }
-  ctx.drawImage(gloss,0,0,D,D);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
@@ -449,7 +450,7 @@ function audioInit(){
   master=ac.createGain();master.gain.value=muted?0:VOL;
   master.connect(comp);comp.connect(ac.destination);
   /* small room reverb (generated impulse response) */
-  const len=Math.floor(ac.sampleRate*1.3),ir=ac.createBuffer(2,len,ac.sampleRate);
+  const len=Math.floor(ac.sampleRate*.8),ir=ac.createBuffer(2,len,ac.sampleRate);
   for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3)}
   const conv=ac.createConvolver();conv.buffer=ir;revIn=ac.createGain();revIn.connect(conv);conv.connect(master);
   noiseBuf=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);
@@ -582,6 +583,7 @@ function spinStart(){
 }
 function spinRoll(p){
   if(!spin)return;
+  const nw=performance.now();if(nw-(spinRoll.t||0)<90&&p<.999)return;spinRoll.t=nw;
   const s=Math.pow(1-p,2),t=T(),lvl=(p<.72?.15:.09)*Math.sqrt(s);
   spin.bg.gain.setTargetAtTime(lvl,t,.06);
   spin.bf.frequency.setTargetAtTime(500+s*1500,t,.06);
