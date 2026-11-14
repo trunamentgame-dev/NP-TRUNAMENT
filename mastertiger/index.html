@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="bn"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#092b1b"><title>Master Tiger</title>
+<meta name="theme-color" content="#092b1b"><link rel="preconnect" href="https://slots-server-w1r9.onrender.com" crossorigin><title>Master Tiger</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{margin:0;height:100%;background:#0a2a12;overflow:hidden;font-family:Arial,sans-serif;color:#fff}
 #g{position:absolute;left:50%;top:50%;width:400px;height:780px;transform-origin:center;--ch:88px;overflow:hidden;background:#0a2a12}
@@ -303,26 +303,35 @@ function ways(gr,bet){let total=0,marks=[];
   if(cnt.length>=3){total+=PAY[k][cnt.length-3]*bet*cnt.reduce((a,b)=>a*b);for(let r=0;r<cnt.length;r++)gr[r].forEach((s,j)=>{if(s==sym||s==WILD)marks.push([r,j])})}}
  return{total,marks}}
 function countUp(v){const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/600);$('cWin').textContent=fmt(v*p);if(p<1)requestAnimationFrame(f)})(t0)}
+let pre=null;
+function preSpin(){pre=[];strips.forEach((s,i)=>{const arr=[...grid[i]];for(let k=0;k<60;k++)arr.push(pick(i));pre[i]=arr;
+  s.style.transition='none';s.className='strip mov';s.innerHTML=arr.map(x=>cell(x)).join('');s.style.transform='translateY(0)';void s.offsetWidth;
+  s.style.transition='transform 6s linear';s.style.transform='translateY(calc(var(--ch) * -57))'})}
+function stopPre(){pre=null;grid.forEach((_,i)=>show(i))}
 async function spin(){
  if(busy)return;
  if(!UID){toast('লগইন করুন (User Panel থেকে খেলুন)');SFX.err();auto=false;ui();return}
  const bet=BETS[bi];
  if(fs<=0&&bal<bet){toast('ব্যালেন্স কম! Bet কমান');SFX.err();auto=false;ui();return}
- busy=true;$('cWin').textContent='0.00';ui();
+ busy=true;$('cWin').textContent='0.00';if(fs<=0)bal=Math.round((bal-bet)*100)/100;ui();
+ SFX.spin(turbo);preSpin();                 /* reels start moving at once, no waiting for the server */
  /* ---- the SERVER takes the bet, makes the result and pays the win ---- */
  const key=newKey();let d;
  try{d=await api('/api/slot/spin',{game:GAME_ID,bet,uid:UID,idempotencyKey:key})}
  catch(e){try{await wait(1200);d=await api('/api/slot/spin',{game:GAME_ID,bet,uid:UID,idempotencyKey:key})}catch(e2){d={success:false,error:'NETWORK'}}}   /* same key = never charged twice */
- if(!d.success){auto=false;busy=false;ui();await syncState();toast(errMsg(d.error));SFX.err();return}
+ if(!d.success){auto=false;busy=false;stopPre();try{SFX.spinEnd()}catch(e){}ui();await syncState();toast(errMsg(d.error));SFX.err();return}
  bal=d.isFree?bal:d.balanceAfterBet;fs=d.freeAfterDebit;ui();
- SFX.spin(turbo);
  const T=turbo?.4:1,prev=grid,res=d.result.grid.map(c=>c.slice());
  await Promise.all(strips.map(async(s,i)=>{
   const n=(turbo?9:13)+i*(turbo?1:4),col=res[i];
-  const arr=[...prev[i]];for(let k=3;k<n-3;k++)arr.push(pick(i));arr.push(...col);
-  s.style.transition='none';s.className='strip';s.innerHTML=arr.map(x=>cell(x)).join('');s.style.transform='translateY(0)';
-  await wait(30);s.className='strip mov';const dd=(1.1+i*.35)*T;SFX.ticks(i,n-3,dd);s.style.transition=`transform ${dd}s cubic-bezier(.3,.7,.3,1)`;
-  s.style.transform=`translateY(calc(var(--ch) * -${n-3}))`;await wait(dd*1000);s.className='strip';SFX.stop(i)}));
+  let head=prev[i],frac=0;
+  if(pre&&pre[i]){try{const CH=parseFloat(getComputedStyle(g).getPropertyValue('--ch'))||88,ty=new DOMMatrix(getComputedStyle(s).transform).m42,off=Math.max(0,-ty/CH),ix=Math.floor(off);
+   head=pre[i].slice(ix,ix+4);frac=off-ix;if(head.length<4){head=prev[i];frac=0}}catch(e){head=prev[i];frac=0}}
+  const arr=[...head];for(let k=0;k<n-4;k++)arr.push(pick(i));arr.push(...col);
+  s.style.transition='none';s.className='strip mov';s.innerHTML=arr.map(x=>cell(x)).join('');s.style.transform=`translateY(calc(var(--ch) * -${frac}))`;
+  void s.offsetWidth;const dd=(1.1+i*.35)*T;SFX.ticks(i,arr.length-3,dd);s.style.transition=`transform ${dd}s cubic-bezier(.3,.7,.3,1)`;
+  s.style.transform=`translateY(calc(var(--ch) * -${arr.length-3}))`;await wait(dd*1000);s.className='strip';SFX.stop(i)}));
+ pre=null;
  grid=res;SFX.spinEnd();
  const win=Number(d.win)||0,marks=d.result.marks||[];
  if(d.awarded>0){toast('🐯 FREE SPINS +'+d.awarded);SFX.scatter()}
