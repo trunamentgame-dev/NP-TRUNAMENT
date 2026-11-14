@@ -103,24 +103,65 @@ const API='https://slots-server-w1r9.onrender.com';
 const GAME_ID='tiger';
 /* Firebase login (OPTIONAL): if the user panel and this game are on the same site/domain, paste the same firebaseConfig
    you use in the user panel here. Then the game logs in the same user automatically and sends a secure ID token. */
-const FIREBASE_CONFIG=null; /* e.g. {apiKey:"...",authDomain:"...",databaseURL:"...",projectId:"...",appId:"..."} */
+const FIREBASE_CONFIG={apiKey:"AIzaSyBFaoU_cDws6YVAXFMWBnogGAQHhjfC23Q",authDomain:"np-trunament-bd.firebaseapp.com",databaseURL:"https://np-trunament-bd-default-rtdb.firebaseio.com",projectId:"np-trunament-bd",storageBucket:"np-trunament-bd.firebasestorage.app",messagingSenderId:"324972484501",appId:"1:324972484501:web:38598aa922e983990b889c"}; /* e.g. {apiKey:"...",authDomain:"...",databaseURL:"...",projectId:"...",appId:"..."} */
 const _qp=new URLSearchParams(location.search);
-const _hp=new URLSearchParams((location.hash||'').replace(/^#/,''));
-const _ls=k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)}catch(e){return null}};
 const okUid=u=>typeof u==='string'&&u.length>0&&u.length<=128&&!/[.#$\[\]\/]/.test(u);
-let UID=[_qp.get('uid'),_qp.get('userId'),_qp.get('user'),_hp.get('uid'),_ls('uid'),_ls('userId')].find(okUid)||null;
-let TOKEN=_qp.get('token')||_qp.get('idToken')||_hp.get('token')||_ls('idToken')||_ls('token')||null;
-let fbAuth=null;
-addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object')return;
- const u=d.uid||d.userId,t=d.token||d.idToken;
- if(okUid(u)&&u!==UID){UID=u;if(t)TOKEN=t;if(!busy)syncState()}else if(t)TOKEN=t});
-const askParent=()=>{try{if(parent!==window)parent.postMessage({type:'GAME_READY',game:GAME_ID},'*')}catch(e){}};
-askParent();{let n=0;const iv=setInterval(()=>{if(UID||++n>20)return clearInterval(iv);askParent()},500)}
+const _ss=(k,v)=>{try{if(v==null)return sessionStorage.getItem(k)||localStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}};
+let UID=null,TOKEN=null,fbAuth=null,rtdb=null,_listenUid=null;
+/* ---------- loading gate: game stays locked until the user's real balance is loaded ---------- */
+const ld=document.createElement('div');ld.id='ld';
+ld.style.cssText='position:fixed;inset:0;z-index:9999;background:#0a2a12;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font:16px Arial,sans-serif;text-align:center;padding:24px';
+document.body.appendChild(ld);
+function showLoad(msg,retry){ld.style.display='flex';ld.innerHTML='<div style="font-size:22px;font-weight:700;color:#ffd54a">Master Tiger</div><div>'+msg+'</div>'+(retry?'<button id="ldb" style="padding:10px 22px;border:0;border-radius:8px;background:#ffd54a;color:#1a1200;font-weight:700;font-size:15px">আবার চেষ্টা করুন</button>':'');
+ if(retry)document.getElementById('ldb').onclick=()=>{showLoad('লোড হচ্ছে...');detectUser();if(UID)syncState()}}
+function hideLoad(){ld.style.display='none';try{if(parent!==window&&!window.__npRdy){window.__npRdy=1;parent.postMessage({type:'NP_GAME_READY',game:GAME_ID},'*')}}catch(e){}}
+showLoad('লোড হচ্ছে...');
+/* ---------- find the logged-in user: URL, #hash, JWT, Android bridge, storage, Firebase ---------- */
+function attach(uid,tok,b){
+ if(!okUid(uid))return false;
+ const changed=uid!==UID;UID=uid;if(tok&&typeof tok==='string')TOKEN=tok.trim();
+ _ss('tiger_uid',UID);if(TOKEN)_ss('tiger_token',TOKEN);
+ if(typeof b==='number'&&!busy){bal=b;ui();hideLoad()}
+ if(changed&&!busy)syncState();
+ listenBal();return true}
+function detectUser(){
+ let u=null,t=null;
+ try{u=_qp.get('uid')||_qp.get('userId')||_qp.get('user_id')||_qp.get('user')||_qp.get('player_id')||_qp.get('u');
+  t=_qp.get('token')||_qp.get('idToken')||_qp.get('t')||_qp.get('auth')}catch(e){}
+ try{const h=location.hash||'';const mt=/[#&](?:t|token|idToken)=([A-Za-z0-9._-]+)/.exec(h),mu=/[#&](?:uid|userId|user_id)=([A-Za-z0-9_-]+)/.exec(h);
+  if(mt&&!t)t=mt[1];if(mu&&!u)u=mu[1];
+  if(t&&!u){const p=t.split('.');if(p.length>=2){const j=JSON.parse(atob(p[1].replace(/-/g,'+').replace(/_/g,'/')));u=j.user_id||j.sub||j.uid}}}catch(e){}
+ if(!u){try{const br=window.Android||window.AndroidBridge||window.TournamentApp||window.MostWinApp||window.JSBridge;
+  if(br){u=(br.getUserId&&br.getUserId())||(br.getUid&&br.getUid())||(br.getUser&&br.getUser())||null;
+   if(!t)t=(br.getToken&&br.getToken())||(br.getIdToken&&br.getIdToken())||null}}catch(e){}}
+ if(!u){u=_ss('tiger_uid')||_ss('aviator_uid')||_ss('uid')||_ss('userId');if(!t)t=_ss('tiger_token')||_ss('aviator_token')||_ss('idToken')||_ss('token')}
+ if(!u&&fbAuth&&fbAuth.currentUser&&!fbAuth.currentUser.isAnonymous)u=fbAuth.currentUser.uid;
+ return u?attach(u,t):false}
+/* ---------- messages from the user panel (iframe / WebView) ---------- */
+function onMsg(e){let d=e.data;if(!d)return;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
+ if(!d||typeof d!=='object')return;
+ if(d.type==='SET_BALANCE'&&typeof d.balance==='number'){if(!busy){bal=d.balance;ui();hideLoad()}return}
+ const u=d.uid||d.userId||d.user_id,t=d.token||d.idToken;
+ if(u)attach(u,t,typeof d.balance==='number'?d.balance:undefined);else if(t)TOKEN=t}
+addEventListener('message',onMsg);document.addEventListener('message',onMsg);
+const askParent=()=>{try{if(parent!==window){parent.postMessage({type:'GAME_READY',game:GAME_ID},'*');parent.postMessage({type:'AVITOR_READY',game:GAME_ID},'*')}}catch(e){}};
+detectUser();askParent();
+{let n=0;const iv=setInterval(()=>{if(UID||++n>40)return clearInterval(iv);detectUser();askParent()},500)}
+/* ---------- Firebase (same project as the user panel): login + live balance ---------- */
 if(FIREBASE_CONFIG){
- ['https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js','https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js'].reduce((p,u)=>p.then(()=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=no;document.head.appendChild(s)})),Promise.resolve())
- .then(()=>{if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);fbAuth=firebase.auth();
-  fbAuth.onAuthStateChanged(u=>{if(u&&u.uid!==UID){UID=u.uid;if(!busy)syncState()}})}).catch(()=>{});
+ ['app','auth','database'].map(n=>'https://www.gstatic.com/firebasejs/10.14.1/firebase-'+n+'-compat.js').reduce((p,u)=>p.then(()=>new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=u;sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)})),Promise.resolve())
+ .then(()=>{if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);fbAuth=firebase.auth();rtdb=firebase.database();
+  fbAuth.onAuthStateChanged(async u=>{if(u&&!u.isAnonymous){let t;try{t=await u.getIdToken()}catch(e){}attach(u.uid,t)}});
+  if(UID)listenBal()}).catch(()=>{});
 }
+function listenBal(){
+ if(!rtdb||!UID||_listenUid===UID)return;_listenUid=UID;
+ try{rtdb.ref('users/'+UID+'/balance').on('value',sn=>{const v=sn.val();if(v===null||isNaN(v))return;
+  if(!busy){bal=Number(v);ui();hideLoad()}syncSession(Number(v))},()=>{/* rules block client read: server polling is used instead */})}catch(e){}}
+function syncSession(cur){
+ try{const id=_ss('np_active_game_session');if(!rtdb||!id)return;
+  rtdb.ref('game_sessions/'+id).transaction(c=>{if(!c)return c;const en=typeof c.entryBalance==='number'?c.entryBalance:cur;
+   c.exitBalance=cur;c.netWinLoss=Math.round((cur-en)*100)/100;c.lastActiveTime=Date.now();return c}).catch(()=>{})}catch(e){}}
 async function getToken(){
  try{if(fbAuth&&fbAuth.currentUser)return await fbAuth.currentUser.getIdToken()}catch(e){}
  return TOKEN;
@@ -138,17 +179,18 @@ const errMsg=e=>ERR[e]||'সমস্যা হয়েছে, আবার চ
 async function syncState(){
  if(!UID)return false;
  try{const d=await api('/api/slot/state?game='+GAME_ID+'&uid='+encodeURIComponent(UID));
-  if(!d.success){toast(errMsg(d.error));return false}
+  if(!d.success){const m=errMsg(d.error);toast(m);if(ld.style.display!=='none')showLoad(m,true);return false}
   bal=Number(d.balance)||0;fs=(d.free&&d.free.left)||0;
   if(fs>0&&d.free.bet){const k=BETS.indexOf(d.free.bet);if(k>=0)bi=k}
-  ui();return true}catch(e){toast(errMsg('NETWORK'));return false}
+  ui();hideLoad();return true}
+ catch(e){const m=errMsg('NETWORK');toast(m);if(ld.style.display!=='none')showLoad(m+'<br><small>(Render সার্ভার জেগে উঠতে ৩০-৬০ সেকেন্ড লাগতে পারে)</small>',true);return false}
 }
 async function initGame(){
- for(let i=0;i<30&&!UID;i++)await new Promise(r=>setTimeout(r,100));   /* wait up to 3s for login info */
- if(!UID){toast('লগইন করুন (User Panel থেকে খেলুন)');setTimeout(()=>{if(!UID)toast('User Panel থেকে গেম খুললে তবেই UID আসবে')},2200);return}
- toast('লোড হচ্ছে...');
+ for(let i=0;i<80&&!UID;i++)await new Promise(r=>setTimeout(r,100));   /* wait up to 8s for login info */
+ if(!UID){showLoad('ব্যবহারকারীকে চেনা যায়নি!<br>অনুগ্রহ করে User Panel থেকে লগইন করে গেমটি খুলুন।',true);return}
  if(await syncState()&&fs>0&&!busy&&!auto){await wait(800);spin()}      /* resume unfinished free spins */
 }
+setInterval(()=>{if(busy)return;if(UID)syncState();else detectUser()},12000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!busy&&UID)syncState()});
 const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const R=()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296};
