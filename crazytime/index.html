@@ -719,8 +719,8 @@ function handle(m){
   else if(m.t==='fatal'){const f=$('fatal');f.textContent=m.msg;f.style.display='flex';npReady()}
 }
 /* ⚠️ নিচের লাইনে আপনার Render সার্ভারের ঠিকানা বসান (https নয়, wss:// দিয়ে শুরু হবে)।
-   উদাহরণ: 'wss://crazytime-backend-abcd.onrender.com'  (অথবা পেজ লোডের আগে window.CRAZY_SERVER_URL সেট করুন) */
-const CT_SERVER=window.CRAZY_SERVER_URL||'wss://crazytime-backend.onrender.com';
+   উদাহরণ: 'wss://crazytime-backend-2bcq.onrender.com'  (অথবা পেজ লোডের আগে window.CRAZY_SERVER_URL সেট করুন) */
+const CT_SERVER=window.CRAZY_SERVER_URL||'wss://crazytime-backend-2bcq.onrender.com';
 /* ইউজার প্যানেলের Firebase ওয়েব কনফিগ (প্রকাশ্য তথ্য; প্যানেলের সাথে একই ডোমেইনে থাকলে লগইন আপনাআপনি পাওয়া যায়) */
 let fbAuth=null;
 try{if(window.firebase){if(!firebase.apps.length)firebase.initializeApp({apiKey:"AIzaSyBFaoU_cDws6YVAXFMWBnogGAQHhjfC23Q",authDomain:"np-trunament-bd.firebaseapp.com",databaseURL:"https://np-trunament-bd-default-rtdb.firebaseio.com",projectId:"np-trunament-bd",storageBucket:"np-trunament-bd.firebasestorage.app",messagingSenderId:"324972484501",appId:"1:324972484501:web:38598aa922e983990b889c"});fbAuth=firebase.auth()}}catch(e){}
