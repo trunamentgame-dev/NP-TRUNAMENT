@@ -3245,61 +3245,22 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       </div>
 
       <!-- ==================== বায়োমেট্রিক সিকিউরিটি ব্যানার স্লাইডার ==================== -->
+      <!-- প্রমোশন ব্যানার: ফিঙ্গারপ্রিন্ট সেট করা থাকলে বায়োমেট্রিক ব্যানারের জায়গায় এটি দেখায় -->
+      <div id="homePromoBanner" class="hp-wrap" style="display:none"></div>
+
       <div id="biometricSecuritySlider" class="bio-banner-wrap" onclick="if(window.npOpenBiometricSetup){window.npOpenBiometricSetup();}else if(window.app){window.app.switchView('viewProfile');}">
         <div class="bio-slider-track" id="bioSliderTrack">
-          <!-- Slide 1 -->
+          <!-- শুধু ফিঙ্গারপ্রিন্ট যোগ করার একটি ব্যানার -->
           <div class="bio-slide active">
             <div class="bio-slide-content">
               <div class="bio-slide-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
               </div>
               <div class="bio-slide-text">
-                <h4>🛡️ অ্যাকাউন্টের সুরক্ষার জন্য বায়োমেট্রিক যোগ করুন</h4>
-                <p>১-ট্যাপে ইনস্ট্যান্ট ফিঙ্গারপ্রিন্ট লগইন চালু করতে এখানে চাপ দিন</p>
+                <h4>ফিঙ্গারপ্রিন্ট যোগ করুন</h4>
+                <p>এক ট্যাপে লগইন</p>
               </div>
               <button type="button" class="bio-slide-btn">যুক্ত করুন</button>
-            </div>
-          </div>
-
-          <!-- Slide 2 -->
-          <div class="bio-slide">
-            <div class="bio-slide-content">
-              <div class="bio-slide-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.026.99-4.18.99-6.415 0-2.827-.58-5.503-1.63-7.925"/></svg>
-              </div>
-              <div class="bio-slide-text">
-                <h4>⚡ পাসওয়ার্ডের ঝামেলা শেষ — ফিঙ্গারপ্রিন্ট চালু করুন</h4>
-                <p>পাসওয়ার্ড টাইপ করার প্রয়োজন নেই, চোখের পলকে অ্যাপ আনলক করুন</p>
-              </div>
-              <button type="button" class="bio-slide-btn">চালু করুন</button>
-            </div>
-          </div>
-
-          <!-- Slide 3 -->
-          <div class="bio-slide">
-            <div class="bio-slide-content">
-              <div class="bio-slide-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              </div>
-              <div class="bio-slide-text">
-                <h4>🔒 ওয়ালেট ও টুর্নামেন্ট অ্যাকাউন্ট ১০০% সুরক্ষিত রাখুন</h4>
-                <p>আপনার ব্যালেন্স এবং উইনিং ফান্ড রাখুন সম্পূর্ণ সুরক্ষিত ও নিরাপদ</p>
-              </div>
-              <button type="button" class="bio-slide-btn">সুরক্ষিত করুন</button>
-            </div>
-          </div>
-
-          <!-- Slide 4 -->
-          <div class="bio-slide">
-            <div class="bio-slide-content">
-              <div class="bio-slide-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              </div>
-              <div class="bio-slide-text">
-                <h4>🚀 সুপার-ফাস্ট বায়োমেট্রিক সিকিউরিটি সক্রিয় করুন</h4>
-                <p>এখনই বায়োমেট্রিক যুক্ত করে আধুনিক প্রযুক্তির সুবিধা গ্রহণ করুন</p>
-              </div>
-              <button type="button" class="bio-slide-btn">অ্যাক্টিভ করুন</button>
             </div>
           </div>
         </div>
@@ -8968,6 +8929,94 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     ['click','touchstart','pointerdown','keydown'].forEach(function(ev){document.addEventListener(ev,req,{passive:true});});
     window.addEventListener('pageshow',req);window.addEventListener('focus',req);
     req();
+  })();
+  </script>
+
+  <style>
+    /* ফিঙ্গারপ্রিন্ট ব্যানার: বড় আইকন, ছোট লেখা, কিছুই কাটবে না */
+    #biometricSecuritySlider .bio-slider-track{min-height:0}
+    #biometricSecuritySlider .bio-slide{padding:12px 14px}
+    #biometricSecuritySlider .bio-slide-icon{width:58px;height:58px;min-width:58px;border-radius:16px;animation:bioFpGlow 2.4s ease-in-out infinite}
+    #biometricSecuritySlider .bio-slide-icon svg{width:42px;height:42px}
+    #biometricSecuritySlider .bio-slide-text h4{font-size:12.5px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35}
+    #biometricSecuritySlider .bio-slide-text p{font-size:10px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35}
+    #biometricSecuritySlider .bio-slide-btn{flex:none}
+    #bioSliderDots{display:none}
+    @keyframes bioFpGlow{0%,100%{box-shadow:0 0 0 0 rgba(0,240,255,.0)}50%{box-shadow:0 0 14px 2px rgba(0,240,255,.45)}}
+    @media (prefers-reduced-motion:reduce){#biometricSecuritySlider .bio-slide-icon{animation:none}}
+  </style>
+
+  <style>
+    /* হোম প্রমোশন ব্যানার */
+    .hp-wrap{margin:12px 0 14px;overflow:hidden;border-radius:14px}
+    .hp-track{display:flex;transition:transform .55s cubic-bezier(.22,.8,.3,1)}
+    .hp-slide{flex:0 0 100%;min-width:0;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;border-radius:14px;border:1px solid rgba(255,203,73,.45);background:radial-gradient(circle at 100% 0,rgba(255,203,73,.22),transparent 55%),linear-gradient(135deg,#2a2210,#141b2d 70%);box-shadow:inset 0 1px rgba(255,255,255,.08),0 4px 14px rgba(0,0,0,.3)}
+    .hp-badge{flex:none;width:58px;height:58px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(145deg,#ffe36a,#ff9825);color:#321900;box-shadow:0 6px 16px rgba(255,150,30,.35)}
+    .hp-badge b{font-family:Rajdhani,sans-serif;font-size:20px;font-weight:800;line-height:1}
+    .hp-badge span{font-size:8px;font-weight:900;letter-spacing:1.4px;margin-top:2px}
+    .hp-info{flex:1;min-width:0}
+    .hp-info strong{display:block;font-size:13px;color:#fff;font-weight:800;line-height:1.35}
+    .hp-info small{display:block;margin-top:2px;font-size:10px;line-height:1.45;color:#cbd5e1}
+    .hp-btn{flex:none;padding:7px 12px;border-radius:9px;background:linear-gradient(135deg,#ffe36a,#ff9825);color:#321900;font-size:11.5px;font-weight:800;white-space:nowrap}
+    .hp-dots{display:flex;justify-content:center;gap:6px;margin-top:7px}
+    .hp-dots i{width:6px;height:6px;border-radius:99px;background:rgba(255,255,255,.28);cursor:pointer;transition:.3s}
+    .hp-dots i.on{width:18px;background:#ffcb49}
+  </style>
+  <script>
+  /* ফিঙ্গারপ্রিন্ট সেট হলে: বায়োমেট্রিক ব্যানার লুকিয়ে প্রমোশন (ডিপোজিট অফার) ব্যানার দেখায় */
+  (function(){
+    var idx=0,n=0,timer=null,sig='';
+    function enrolled(){try{return !!localStorage.getItem('np_pk_enrolled');}catch(e){return false;}}
+    function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+    function go(i){
+      var tr=document.getElementById('hpTrack');if(!tr||!n)return;
+      idx=((i%n)+n)%n;tr.style.transform='translateX('+(-100*idx)+'%)';
+      document.querySelectorAll('#hpDots i').forEach(function(d,k){d.classList.toggle('on',k===idx);});
+    }
+    function start(){if(timer)clearInterval(timer);timer=setInterval(function(){if(n>1&&!document.hidden)go(idx+1);},3500);}
+    // ওয়ালেটের অফার স্লাইডার থেকে অফারগুলো পড়ে হোম ব্যানারে বসায়
+    function build(){
+      var box=document.getElementById('homePromoBanner');if(!box)return;
+      var src=document.querySelectorAll('#walletPromoStrip .np-sl-slide'),items=[];
+      src.forEach(function(sl){
+        var b=sl.querySelector('.np-sl-badge b'),st=sl.querySelector('.np-sl-info strong'),sm=sl.querySelector('.np-sl-info small');
+        items.push({pct:b?b.textContent:'',name:st?st.textContent:'',sub:sm?sm.textContent:'',go:sl.getAttribute('onclick')||''});
+      });
+      var key=JSON.stringify(items);if(key===sig)return;sig=key;
+      n=items.length;if(!n){box.innerHTML='';return;}
+      if(idx>=n)idx=0;
+      box.innerHTML='<div class="hp-track" id="hpTrack">'+items.map(function(x){
+        return '<div class="hp-slide" data-go="'+esc(x.go)+'"><div class="hp-badge"><b>'+esc(x.pct)+'</b><span>BONUS</span></div><div class="hp-info"><strong>'+esc(x.name)+'</strong><small>'+esc(x.sub)+'</small></div><div class="hp-btn">অফার নিন</div></div>';
+      }).join('')+'</div>'+(n>1?'<div class="hp-dots" id="hpDots">'+items.map(function(){return '<i></i>';}).join('')+'</div>':'');
+      box.querySelectorAll('.hp-slide').forEach(function(el){
+        el.addEventListener('click',function(){var c=el.getAttribute('data-go');if(c){try{(new Function(c))();}catch(e){}}else{try{window.app.openDepositModal();}catch(e){}}});
+      });
+      box.querySelectorAll('#hpDots i').forEach(function(d,k){d.addEventListener('click',function(e){e.stopPropagation();go(k);start();});});
+      var x0=null;
+      box.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
+      box.addEventListener('touchend',function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40){go(idx+(dx<0?1:-1));start();}x0=null;},{passive:true});
+      go(idx);start();
+    }
+    function sync(){
+      var bio=document.getElementById('biometricSecuritySlider'),box=document.getElementById('homePromoBanner');
+      if(!bio||!box)return;
+      if(enrolled()){
+        bio.style.display='none';
+        build();
+        box.style.display=n?'block':'none';
+      }else{
+        bio.style.display='';
+        box.style.display='none';
+      }
+    }
+    function init(){
+      sync();setInterval(sync,1500);
+      var w=document.getElementById('walletPromoStrip');
+      if(w&&window.MutationObserver)new MutationObserver(function(){sig='';sync();}).observe(w,{childList:true,subtree:true});
+      window.addEventListener('storage',sync);
+      document.addEventListener('visibilitychange',sync);
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
   })();
   </script>
 </body>
