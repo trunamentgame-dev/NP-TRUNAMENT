@@ -603,14 +603,15 @@ function spinTo(seg,dur){
 function setRot(seg){S.rot=-((seg+.5)*(2*Math.PI/S.layout.length));draw()}
 
 /* bet ui */
+function wsSend(o){if(ws&&ws.readyState===1){ws.send(JSON.stringify(o));return true}toast('সার্ভারের সাথে সংযোগ হচ্ছে, একটু অপেক্ষা করুন');return false}
 function renderSpots(win){
   const open=S.st&&S.st.phase==='betting';
   $('spots').innerHTML=S.spots.map(s=>{const b=S.bets[s.id]||0,c=colorOf(s.id);
     return `<button class="spot ${b?'mine':''} ${win===s.id?'win':''}" style="--c:${c}" data-id="${s.id}" ${open?'':'disabled'}>${s.label}<small>${b?money(b):(s.m?s.m+'x রিটার্ন':'৩x–৪০x')}</small></button>`}).join('');
   $('spots').className='spots'+(S.spots.length===5?' five':'');
   $('clr').disabled=!open;const ab=$('allBtn');if(ab)ab.disabled=!open;
-  $('spots').querySelectorAll('.spot').forEach(b=>b.onclick=()=>{beep(660,.12,.035);ws.send(JSON.stringify({t:'bet',spot:b.dataset.id,amount:S.chip}))});
-  $('clr').onclick=()=>ws.send(JSON.stringify({t:'clear'}));
+  $('spots').querySelectorAll('.spot').forEach(b=>b.onclick=()=>{if(!(S.st&&S.st.phase==='betting'))return toast('বেটিং বন্ধ আছে');if(wsSend({t:'bet',spot:b.dataset.id,amount:S.chip}))beep(660,.12,.035)});
+  $('clr').onclick=()=>wsSend({t:'clear'});
 }
 function totalBet(){return Object.values(S.bets).reduce((a,b)=>a+(+b||0),0)}
 function renderMsg(){
@@ -632,7 +633,7 @@ function betAll(){
   const a=S.chip,n=S.spots.length;if(!a||!n)return;
   if((S.bal||0)<a*n)return toast('ব্যালেন্স যথেষ্ট নয়');
   beep(660,.12,.035);
-  S.spots.forEach((s,i)=>setTimeout(()=>ws.send(JSON.stringify({t:'bet',spot:s.id,amount:a})),i*40));
+  S.spots.forEach((s,i)=>setTimeout(()=>wsSend({t:'bet',spot:s.id,amount:a}),i*40));
 }
 function renderChips(){
   const open=S.st&&S.st.phase==='betting';
@@ -701,6 +702,7 @@ function onState(m){
     if(S.bets['mega']>0&&m.result.spot==='mega'&&m.result.mega>3){m.result.mega=2;}
     if(!S.spinning&&S.spun!==m.roundId){S.spun=m.roundId;setRot(m.result.seg)}renderSpots(m.result.spot);
   }
+  if(m.phase!=='result'){renderSpots();renderChips()}  /* বেটিং শুরু হলে বাটন চালু, স্পিনে বন্ধ */
   renderHist();renderTable();renderMsg();tick();
 }
 /* ইউজার প্যানেল গেমটা ফ্রেমে খোলে; ব্যালেন্স + গেমের ডাটা আসার পর প্যানেলকে জানায়, তখন প্যানেলের LOADING সরে */
