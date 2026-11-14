@@ -483,7 +483,7 @@ input{background:#1b2d4ecc!important;border-color:#8fb0dd66!important;box-shadow
 .die,.die .sc,.die .cube{filter:none!important;backface-visibility:visible}
 </style>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://ludo-server-p6e0.onrender.com">
+<link rel="preconnect" href="https://ludo-server-zxl2.onrender.com">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js">
 </head>
@@ -1089,8 +1089,8 @@ DIE[0].onclick=()=>{if(S&&S.hot&&S.turn!==0)return;userRoll()};
 [1,2,3].forEach(s=>{DIE[s].onclick=()=>{if(S&&S.hot&&S.turn===s)userRoll()}});
 /* ---------- অনলাইন ম্যাচ: Render সার্ভারের সাথে WebSocket ---------- */
 /* ⚠️ নিচের লাইনে আপনার Render সার্ভারের ঠিকানা বসান (https নয়, wss:// দিয়ে শুরু হবে)।
-   উদাহরণ: 'wss://ludo-server-abcd.onrender.com'  (অথবা পেজ লোডের আগে window.LUDO_SERVER_URL সেট করুন) */
-const LUDO_SERVER=window.LUDO_SERVER_URL||'wss://ludo-server-p6e0.onrender.com';
+   উদাহরণ: 'wss://ludo-server-zxl2.onrender.com'  (অথবা পেজ লোডের আগে window.LUDO_SERVER_URL সেট করুন) */
+const LUDO_SERVER=window.LUDO_SERVER_URL||'wss://ludo-server-zxl2.onrender.com';
 /* ইউজার প্যানেলের Firebase ওয়েব কনফিগ (এটা প্রকাশ্য তথ্য; একই ডোমেইনে থাকলে লগইন আপনাআপনি পাওয়া যায়) */
 const FB_CFG={apiKey:"AIzaSyBFaoU_cDws6YVAXFMWBnogGAQHhjfC23Q",authDomain:"np-trunament-bd.firebaseapp.com",databaseURL:"https://np-trunament-bd-default-rtdb.firebaseio.com",projectId:"np-trunament-bd",appId:"1:324972484501:web:38598aa922e983990b889c"};
 const HASH_TOKEN=((location.hash.match(/[#&]t=([^&]+)/)||[])[1])||null;
