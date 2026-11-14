@@ -45,6 +45,7 @@ body.ingame{overflow:hidden;height:100vh;height:100dvh;min-height:0;padding:max(
 .cn{display:inline-block;vertical-align:-3px;width:17px;height:17px;margin-right:5px;border-radius:50%;border:1px solid #0007}
 .cn.lt{background:radial-gradient(circle,#fff 0 30%,#d2cecb 32% 40%,#f3f1ef 42%);box-shadow:0 2px 0 #a9a4a1,0 3px 4px #0006}
 .cn.dk{background:radial-gradient(circle,#4a4a4f 0 30%,#1e1e20 32% 40%,#3b3b3e 42%);box-shadow:0 2px 0 #0d0d0e,0 3px 4px #0006}
+.stk{font-size:.62rem;font-weight:800;color:#ffd23f;line-height:1.3;margin:1px 0;white-space:nowrap;transition:transform .25s,color .25s}.stk.pop{transform:scale(1.18);color:#fff}.stk.hide{display:none}
 .betp{font-size:.6rem;line-height:1.2;color:var(--ac);font-weight:700}.betp i{display:block;font-style:normal;font-size:.95rem;color:#fff}.betp.free{font-size:0}.betp.free i{display:none}.betp.free::after{content:"ফ্রি ম্যাচ";font-size:.72rem;color:var(--ac);font-weight:800}
 #mid{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
 canvas{width:min(96vw,440px,calc(100dvh - 290px));aspect-ratio:1;touch-action:none;border-radius:5.5%;box-shadow:0 12px 26px #000c,0 0 0 1px #0006}
@@ -68,7 +69,7 @@ canvas{width:min(96vw,440px,calc(100dvh - 290px));aspect-ratio:1;touch-action:no
 .sum{background:#0b1c45;border:1px solid #ffffff22;border-radius:14px;padding:10px;font-weight:600}
 /* vs */
 .vs{position:fixed;inset:0;z-index:80;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;overflow:hidden;background:radial-gradient(ellipse 80% 45% at 50% 0,#2f7bff88,transparent 70%),radial-gradient(circle at 100% 100%,#8b3dff66,transparent 55%),radial-gradient(circle at 0 100%,#00e0ff44,transparent 50%),linear-gradient(180deg,#0b1d46,#050c22);clip-path:circle(150% at 50% 50%)}
-.vs.on{display:flex}.vs.out{animation:vsout .75s cubic-bezier(.7,0,.3,1) forwards}
+.vs.on{display:flex}.vs.out{animation:vsout .35s cubic-bezier(.7,0,.3,1) forwards}
 @keyframes vsout{to{clip-path:circle(0 at 50% 50%)}}
 .vs::before{content:"";position:absolute;left:50%;top:50%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(#ffffff12 0 7deg,transparent 7deg 14deg);-webkit-mask-image:radial-gradient(circle,#000 8%,transparent 55%);mask-image:radial-gradient(circle,#000 8%,transparent 55%);animation:spin 14s linear infinite}
 .vs>*{position:relative;z-index:1}
@@ -82,7 +83,7 @@ canvas{width:min(96vw,440px,calc(100dvh - 290px));aspect-ratio:1;touch-action:no
 .vnm{font-weight:700;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vsmark{font-size:3rem;font-weight:900;font-style:italic;color:#ffd23f;text-shadow:0 3px 0 #a86f00,0 0 22px #ffb300cc;animation:slam .6s .7s cubic-bezier(.2,2,.4,1) both}
 @keyframes slam{from{transform:scale(4) rotate(-14deg);opacity:0}to{transform:scale(1) rotate(-6deg);opacity:1}}
-.vbar{width:170px;height:5px;border-radius:3px;background:#ffffff22;overflow:hidden}.vbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd23f,#ff7a18);animation:fill 2.3s linear forwards}
+.vbar{width:170px;height:5px;border-radius:3px;background:#ffffff22;overflow:hidden}.vbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd23f,#ff7a18);animation:fill 1.2s linear forwards}
 @keyframes fill{to{width:100%}}
 .mbtn{position:fixed;top:max(12px,env(safe-area-inset-top));right:14px;width:46px;height:46px;padding:0;border-radius:14px;font-size:1.5rem;line-height:1;background:#1c3c80;color:#fff;border:1.5px solid #7fb4ff99;box-shadow:0 4px 10px #0006;z-index:20}
 .mi{width:100%;display:flex;gap:12px;align-items:center;text-align:left;background:#27498f;color:var(--tx);border:1.5px solid #ffffff22;box-shadow:none;padding:14px 16px;font-size:1.05rem}
@@ -159,9 +160,9 @@ try{fetch("https://carrom-server-ub7h.onrender.com/health",{mode:"no-cors",cache
 
 <div class="screen hide" id="game">
  <div class="drow">
-  <div class="dp" id="d0"><div class="ph" id="a0"></div><div><p class="nm" id="n0"></p><p class="ct"><span id="s0">0</span>/27</p></div><i class="cn lt"></i></div>
+  <div class="dp" id="d0"><div class="ph" id="a0"></div><div><p class="nm" id="n0"></p><p class="ct"><span id="s0">0</span>/27</p><p class="stk" id="k0w">💰 ৳<span id="k0">0</span></p></div><i class="cn lt"></i></div>
   <div class="betp">বাজি<i>৳<span id="bt">0</span></i>জিতলে ৳<span id="pot">0</span></div>
-  <div class="dp" id="d1"><div class="ph" id="a1"></div><div><p class="nm" id="n1"></p><p class="ct"><span id="s1">0</span>/27</p><p class="tg">🤖 বট</p></div><i class="cn dk"></i></div>
+  <div class="dp" id="d1"><div class="ph" id="a1"></div><div><p class="nm" id="n1"></p><p class="ct"><span id="s1">0</span>/27</p><p class="stk" id="k1w">💰 স্ট্যাক ৳<span id="k1">0</span></p><p class="tg">🤖 বট</p></div><i class="cn dk"></i></div>
  </div>
  <div id="mid"><canvas id="c" width="880" height="880"></canvas></div>
  <p id="status"></p>
@@ -206,7 +207,7 @@ const RENDER_WS='wss://carrom-server-ub7h.onrender.com',BR=window.AndroidBridge|
 const ss=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){}};
 const isLocal=/^(localhost|127\.|192\.168\.)/.test(location.hostname);
 let API=(BR&&BR.getServerUrl)?BR.getServerUrl():(window.CK_API||(isLocal?'ws://'+location.hostname+':3100':(/onrender\.com$/.test(location.hostname)?'wss://'+location.host:RENDER_WS)));
-let TOKEN=(BR&&BR.getAuthToken)?BR.getAuthToken():(((location.hash.match(/[#&](?:token|t)=([^&]+)/)||[])[1])||ss('ck-tk')||'');
+let TOKEN=(BR&&BR.getAuthToken)?BR.getAuthToken():(((location.hash.match(/[#&](?:token|t)=([^&]+)/)||[])[1])||((location.search.match(/[?&](?:token|t)=([^&]+)/)||[])[1])||ss('ck-tk')||'');
 if(TOKEN&&!(BR&&BR.getAuthToken))ss('ck-tk',TOKEN);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
 let bal=0,bonus=0,bet=100,opp='',avMe='',avOp='',mt,ws,view='p',coins=[],s={x:200,y:345,r:17,out:false,vx:0,vy:0},turn='p',phase='over',sc={p:0,b:0},aim=null,rec=[],on=false;
 const fx=v=>view=='b'?400-v:v,STK=[50,100,250,500,750,1000];
@@ -219,7 +220,7 @@ function connect(){
  clearTimeout(tm);if(stopped)return;
  if(BR&&BR.getAuthToken)TOKEN=BR.getAuthToken()||TOKEN;
  if(BR&&BR.getServerUrl)API=BR.getServerUrl()||API;
- if(!TOKEN){mwHide();$('play').disabled=true;cs('User Panel-এ লগইন করে Play চাপুন','#ff8a80');return}
+ if(!TOKEN){mwHide();$('play').disabled=true;cs('User Panel-এ লগইন করে Play চাপুন','#ff8a80');askTok();return}
  cs(retry?'সার্ভার চালু হচ্ছে… ১ মিনিট পর্যন্ত লাগতে পারে, অপেক্ষা করুন':'সার্ভারের সাথে যুক্ত হচ্ছে…');
  try{fetch(API.replace(/^ws/,'http')+'/health',{mode:'no-cors',cache:'no-store'}).catch(()=>{})}catch(e){} // wakes a sleeping Render server
  let w;try{w=new WebSocket(API)}catch(e){return later()}
@@ -230,9 +231,11 @@ function later(){if(stopped)return;const d=Math.min(30000,1000*Math.pow(2,retry)
  if(inGame())$('status').textContent='সংযোগ হারিয়েছে, পুনরায় যুক্ত হচ্ছে…';
  cs('সংযোগ হয়নি, '+Math.round(d/1000)+' সেকেন্ড পর আবার চেষ্টা হবে…','#ffd23f');tm=setTimeout(connect,d)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!on&&!stopped&&(!ws||ws.readyState>1)){retry=0;connect()}});
+window.addEventListener('message',e=>{try{const d=e.data;if(!d||typeof d!=='object')return;const tk=d.token||d.idToken||d.authToken;if(typeof tk!=='string'||tk.length<100)return;if(!/^(NP_TOKEN|NP_AUTH|NP_GAME_TOKEN|NP_USER)$/.test(String(d.type||'')))return;TOKEN=tk;ss('ck-tk',tk);if(stopped){stopped=false;retry=0;$('play').disabled=false}if(!on&&(!ws||ws.readyState>1)){retry=0;connect()}}catch(x){}});
+const askTok=()=>{try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'NP_TOKEN_REQUEST'},'*')}catch(e){}};
 function on_(m){
  if(m.t=='hello'){on=true;retry=0;if(m.name)$('nm').value=m.name;cs('সংযুক্ত ✓','#8bf29b');setTimeout(()=>{if($('cs').textContent=='সংযুক্ত ✓')cs('')},2500);clearInterval(hb);hb=setInterval(()=>{if(Date.now()-lastRx>50000){try{ws.close()}catch(e){}return}tx({t:'ping'})},20000);bal=m.bal;bonus=m.bonus;refresh();mwHide();try{if(window.parent&&window.parent!==window&&!window.__npRdy){window.__npRdy=1;window.parent.postMessage({type:'NP_GAME_READY'},'*')}}catch(e){};if(window.AndroidBridge&&window.AndroidBridge.onBalanceChanged)window.AndroidBridge.onBalanceChanged(bal,bonus);stakes();if(first&&!inGame())sheet('sheet',true);first=false}
- else if(m.t=='autherr'){mwHide();stopped=true;clearInterval(hb);$('play').disabled=true;cs(m.msg,'#ff8a80');try{ws.close()}catch(e){}alert(m.msg)}
+ else if(m.t=='autherr'){ss('ck-tk','');askTok();mwHide();stopped=true;clearInterval(hb);$('play').disabled=true;cs(m.msg,'#ff8a80');try{ws.close()}catch(e){}alert(m.msg)}
  else if(m.t=='pong'){}
  else if(m.t=='slide'){if(turn=='b'&&phase=='place'&&Number.isFinite(m.x)){const nx=Math.min(310,Math.max(90,fx(m.x)));s.tx=nx;s.ty=s.y}}
  else if(m.t=='room'){clearInterval(mt);show('find');$('fi').textContent='রুম কোড: '+m.code+' • বাজি ৳'+m.stake;$('nt').textContent='এই কোডটি বন্ধুকে দিন। বন্ধু যোগ দিলে ম্যাচ শুরু হবে। ৫ মিনিটে কেউ না এলে টাকা ফেরত যাবে।';const f=()=>$('cd').textContent=Math.max(0,Math.ceil((m.endsAt-Date.now())/1000));f();mt=setInterval(f,250)}
@@ -243,12 +246,12 @@ function on_(m){
  else if(m.t=='queue'){clearInterval(mt);$('nt').textContent=NT0;sheet('cpS',false);show('find');$('fi').textContent='বাজি ৳'+m.stake;const f=()=>$('cd').textContent=Math.max(0,Math.ceil((m.endsAt-Date.now())/1000));f();mt=setInterval(f,250)}
  else if(m.t=='nomatch'){clearInterval(mt);sheet('cpS',true)}
  else if(m.t=='match'){clearInterval(mt);sheet('cpS',false);LP.stop();view=m.side;opp=m.opp;if(!m.free)bet=m.stake;sc={p:0,b:0};avMe=ls('ck-av')||cartoon();ls('ck-av',avMe);avOp=cartoon();
-  $('n0').textContent=m.me;$('n1').textContent=opp;$('a0').innerHTML=avMe;$('a1').innerHTML=avOp;$('bt').textContent=m.stake;$('pot').textContent=m.pot;document.querySelector('.betp').classList.toggle('free',!!m.free);
+  $('n0').textContent=m.me;$('n1').textContent=opp;$('a0').innerHTML=avMe;$('a1').innerHTML=avOp;$('bt').textContent=m.stake;$('pot').textContent=m.pot;['k0','k1'].forEach(i=>{const e=$(i);e.textContent=m.stake;const w=$(i+'w');w.classList.toggle('hide',!!m.free);w.classList.add('pop');setTimeout(()=>w.classList.remove('pop'),400)});document.querySelector('.betp').classList.toggle('free',!!m.free);
   const tg=m.oppBot?'🤖 Computer Player':'👤 Real Player';document.querySelector('#d1 .tg').textContent=tg;
   $('vsL').innerHTML='<div class="vcard" style="--rc:#4fc3f7"><div class="vph">'+avMe+'<i class="gl"></i></div><div class="vnm">'+m.me+'</div><small class="sub">আপনি</small></div>';
   $('vsR').innerHTML='<div class="vcard" style="--rc:#ff8a65"><div class="vph">'+avOp+'<i class="gl"></i></div><div class="vnm">'+opp+'</div><small class="sub">'+tg+'</small></div>';
   $('vsInfo').textContent=m.free?'🎮 ফ্রি ম্যাচ • কোনো বাজি নেই':'বাজি ৳'+m.stake+' • জিতলে ৳'+m.pot+' • ম্যাচ ID '+m.id;
-  if(m.re){show('game')}else{$('vs').classList.remove('out');$('vs').classList.add('on');setTimeout(()=>{show('game');$('vs').classList.add('out')},2300);setTimeout(()=>$('vs').classList.remove('on','out'),3100)}}
+  if(m.re){show('game')}else{$('vs').classList.remove('out');$('vs').classList.add('on');setTimeout(()=>{show('game');$('vs').classList.add('out')},1200);setTimeout(()=>$('vs').classList.remove('on','out'),1600)}}
  else if(m.t=='start'){LP.stop();RAW={ok:false,c:[]};META={};m.coins.forEach(c=>META[c.id]=c.c);coins=m.coins.map(c=>({id:c.id,c:c.c,x:200,y:200,r:11.5}))}
  else if(m.t=='f'){
   if(m.e){RAW={ok:true,c:m.c.map(a=>({id:a[0],x:a[1],y:a[2]}))}}else RAW.ok=false;
@@ -390,7 +393,7 @@ function draw(){
 function ease(o,f){const dx=o.tx-o.x,dy=o.ty-o.y;if(!(Math.abs(dx)>0||Math.abs(dy)>0))return;if(Math.abs(dx)<.03&&Math.abs(dy)<.03){o.x=o.tx;o.y=o.ty;return}o.x+=dx*f;o.y+=dy*f}
 let _lt=0;
 function loop(t){const dt=_lt?Math.min(100,t-_lt):16;_lt=t;
- LP.update(dt);const f=1-Math.exp(-dt/42);
+ LP.update(dt);const f=1-Math.exp(-dt/30);
  for(const o of coins)if(o.tx!==undefined)ease(o,f);
  if(s.tx!==undefined)ease(s,f);
  draw();requestAnimationFrame(loop)}
