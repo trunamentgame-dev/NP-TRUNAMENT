@@ -1,5 +1,5 @@
 /**
- * NP TOURNAMENT BD — 100% Offline / Local Biometric Lock
+ * MostWin88 — 100% Offline / Local Biometric Lock
  * কোনো সার্ভার, Render বা ইন্টারনেটের সংযোগ লাগবে না।
  * সরাসরি ব্যবহারকারীর ফোনের ইন্টারনাল সিকিউর স্টোরেজে (Device Biometric / Screen Lock) সেভ হবে।
  */
@@ -170,8 +170,8 @@
     return navigator.credentials.create({
       publicKey: {
         challenge: rnd(32),
-        rp: { name: 'NP TOURNAMENT BD', id: window.location.hostname || undefined },
-        user: { id: rnd(16), name: 'np-device-lock', displayName: 'NP Device Lock' },
+        rp: { name: 'MostWin88', id: window.location.hostname || undefined },
+        user: { id: rnd(16), name: 'np-device-lock', displayName: 'MostWin88 Device Lock' },
         pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
         authenticatorSelection: {
           authenticatorAttachment: 'platform',
@@ -304,7 +304,7 @@
     ]);
     var box = el('div', { class: 'npPkBox' }, [
       el('img', { class: 'npPkLogo', src: './icon-192.png', alt: '' }),
-      el('div', { class: 'npPkTitle' }, ['NP TOURNAMENT']),
+      el('div', { class: 'npPkTitle' }, ['MostWin88']),
       el('div', { class: 'npPkSub' }, ['🔒 ' + T('Secure Unlock', 'নিরাপদ আনলক')]),
       panelFp, panelPw,
       el('div', { id: 'npPkLockMsg', class: 'npPkTiny', role: 'alert' })
