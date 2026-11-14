@@ -105,15 +105,17 @@ const GAME_ID='tiger';
    you use in the user panel here. Then the game logs in the same user automatically and sends a secure ID token. */
 const FIREBASE_CONFIG=null; /* e.g. {apiKey:"...",authDomain:"...",databaseURL:"...",projectId:"...",appId:"..."} */
 const _qp=new URLSearchParams(location.search);
-const _ls=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const _hp=new URLSearchParams((location.hash||'').replace(/^#/,''));
+const _ls=k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)}catch(e){return null}};
 const okUid=u=>typeof u==='string'&&u.length>0&&u.length<=128&&!/[.#$\[\]\/]/.test(u);
-let UID=[_qp.get('uid'),_qp.get('userId'),_qp.get('user'),_ls('uid'),_ls('userId')].find(okUid)||null;
-let TOKEN=_qp.get('token')||_qp.get('idToken')||_ls('idToken')||_ls('token')||null;
+let UID=[_qp.get('uid'),_qp.get('userId'),_qp.get('user'),_hp.get('uid'),_ls('uid'),_ls('userId')].find(okUid)||null;
+let TOKEN=_qp.get('token')||_qp.get('idToken')||_hp.get('token')||_ls('idToken')||_ls('token')||null;
 let fbAuth=null;
 addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object')return;
  const u=d.uid||d.userId,t=d.token||d.idToken;
  if(okUid(u)&&u!==UID){UID=u;if(t)TOKEN=t;if(!busy)syncState()}else if(t)TOKEN=t});
-try{if(parent!==window)parent.postMessage({type:'GAME_READY',game:GAME_ID},'*')}catch(e){}
+const askParent=()=>{try{if(parent!==window)parent.postMessage({type:'GAME_READY',game:GAME_ID},'*')}catch(e){}};
+askParent();{let n=0;const iv=setInterval(()=>{if(UID||++n>20)return clearInterval(iv);askParent()},500)}
 if(FIREBASE_CONFIG){
  ['https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js','https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js'].reduce((p,u)=>p.then(()=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=no;document.head.appendChild(s)})),Promise.resolve())
  .then(()=>{if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);fbAuth=firebase.auth();
@@ -125,7 +127,8 @@ async function getToken(){
 }
 async function api(path,body){
  const h={'Content-Type':'application/json'},t=await getToken();if(t)h.Authorization='Bearer '+t;
- const r=await fetch(API+path,{method:body?'POST':'GET',headers:h,body:body?JSON.stringify(body):undefined});
+ const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),20000);
+ let r;try{r=await fetch(API+path,{method:body?'POST':'GET',mode:'cors',cache:'no-store',headers:h,body:body?JSON.stringify(body):undefined,signal:ac.signal})}finally{clearTimeout(tm)}
  let j;try{j=await r.json()}catch(e){j={success:false,error:'SERVER_ERROR'}}
  return j;
 }
@@ -142,7 +145,7 @@ async function syncState(){
 }
 async function initGame(){
  for(let i=0;i<30&&!UID;i++)await new Promise(r=>setTimeout(r,100));   /* wait up to 3s for login info */
- if(!UID){toast('লগইন করুন (User Panel থেকে খেলুন)');return}
+ if(!UID){toast('লগইন করুন (User Panel থেকে খেলুন)');setTimeout(()=>{if(!UID)toast('User Panel থেকে গেম খুললে তবেই UID আসবে')},2200);return}
  toast('লোড হচ্ছে...');
  if(await syncState()&&fs>0&&!busy&&!auto){await wait(800);spin()}      /* resume unfinished free spins */
 }
