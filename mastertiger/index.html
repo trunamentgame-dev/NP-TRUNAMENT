@@ -17,13 +17,14 @@ button.cr{border:0;padding:0;cursor:pointer;background-color:transparent}
 .strip{position:absolute;left:0;right:0;top:0;will-change:transform}
 .c{height:var(--ch);display:grid;place-items:center;overflow:hidden}
 .c img{width:122%;max-width:none;display:block}
-.mov .c img{filter:blur(2px)}
-.c.w img{animation:pulse .5s infinite alternate;filter:drop-shadow(0 0 8px #ffe27a)}
+.hl .c:not(.w) img{filter:blur(2.5px) brightness(.5);transition:filter .25s}
+.hl .c.w{position:relative;z-index:2}
+.c.w img{animation:pulse .5s infinite alternate;filter:drop-shadow(0 0 10px #ffe27a) brightness(1.15)}
 @keyframes pulse{to{transform:scale(1.1)}}
 .cv{position:absolute;display:grid;place-items:center;font-weight:900;color:#fff4d6;font-size:18px;text-shadow:0 1px 0 #000a;font-family:'Arial Black',Arial,sans-serif;pointer-events:none}
 .hit{position:absolute;background:transparent;border:0;border-radius:50%;cursor:pointer;padding:0}
 .on{box-shadow:0 0 14px #7dff8a,inset 0 0 0 3px #7dff8a}
-#spin:active{transform:scale(.93)}#spin.busy{filter:grayscale(.6)}
+#spin.busy{filter:grayscale(.6)}
 #fs{position:absolute;left:50%;top:560px;transform:translateX(-50%);padding:2px 14px;border-radius:14px;background:linear-gradient(#ffd96a,#b9791a);color:#4a2400;font-weight:900;font-size:13px;display:none;border:2px solid #fff3b0;box-shadow:0 0 12px #ffd23a;z-index:3}
 #big{position:absolute;inset:0;display:none;place-items:center;text-align:center;font-weight:900;font-size:48px;color:#ffe27a;background:radial-gradient(#ffcf3a55,#000a);text-shadow:0 0 20px #ff9a1a,0 4px 0 #7a4a00;font-family:'Arial Black',Arial;line-height:1.1;z-index:8}
 #big.show{display:grid;animation:zm .5s}
@@ -37,10 +38,10 @@ button.cr{border:0;padding:0;cursor:pointer;background-color:transparent}
 #pbox button{margin:6px;padding:8px 16px;border-radius:20px;border:2px solid #e8b83a;background:#7a4a08;color:#fff;font-weight:700;font-size:inherit}
 .hr{border-bottom:1px solid #fff3;padding:3px;text-align:left}
 /* Reference-style lower HUD */
-#bottomHud{position:absolute;left:0;right:0;bottom:0;height:150px;z-index:5;
+#bottomHud{position:absolute;left:0;right:0;bottom:0;height:104px;z-index:5;
   background:linear-gradient(180deg,#421d10 0%,#2b100b 48%,#190906 100%);
   border-top:3px solid #9b5b24;box-shadow:0 -5px 18px #0009,inset 0 2px 0 #f2bd6540}
-.hud-icons{height:70px;display:flex;align-items:center;justify-content:space-around;padding:0 5px;position:relative}
+.hud-icons{height:104px;display:flex;align-items:center;justify-content:space-around;padding:0 5px;position:relative}
 .hud-icon{width:42px;height:42px;border-radius:50%;border:3px solid #8c4815;
   background:radial-gradient(circle at 35% 25%,#ffb63e,#c75b08 58%,#612707);
   color:#ffe8a5;display:grid;place-items:center;padding:0;box-shadow:0 2px 5px #000b,inset 0 1px 3px #ffe7a080}
@@ -67,12 +68,35 @@ button.cr{border:0;padding:0;cursor:pointer;background-color:transparent}
 .hud-balance b{color:#fff}
 .hud-win{font-size:10px;color:#d8b78b;font-weight:800;opacity:.8;margin-top:1px}
 .hud-win b{color:#ffe08a}
-#fs{z-index:6}
+#fs{z-index:6;top:546px}
+/* bet / balance / win sit right under the reels */
+#infoBar{position:absolute;left:0;right:0;top:562px;height:110px;z-index:5;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(#0000,#000a 22%,#000a 78%,#0000);pointer-events:none;text-shadow:0 2px 3px #000}
+#infoBar .hud-info{pointer-events:auto;width:100%;padding:0 12px}
+#infoBar .hud-bet{height:32px;font-size:19px;gap:8px}
+#infoBar .hud-label{font-size:16px}
+#infoBar .bet-step{width:26px;height:26px;line-height:20px;font-size:17px}
+#infoBar .hud-balance{height:36px;font-size:24px}
+#infoBar .hud-win{font-size:13px;opacity:1;margin-top:0}
+/* real push-button feel */
+#spin,.hud-icon,.bet-step{transition:transform .07s ease-out,box-shadow .07s ease-out,filter .07s;touch-action:manipulation}
+#spin{margin-top:-4px;box-shadow:0 5px 0 #2a1608,0 0 0 3px #39200e,0 0 15px #b8f7cf99,inset 0 0 9px #eaffdf}
+#spin:active,#spin.pr{transform:translateY(4px) scale(.95);box-shadow:0 1px 0 #2a1608,0 0 0 3px #39200e,0 0 8px #b8f7cf66,inset 0 4px 12px #0007;filter:brightness(.92)}
+.hud-icon{box-shadow:0 4px 0 #4a2208,0 2px 5px #000b,inset 0 1px 3px #ffe7a080}
+.hud-icon:active{transform:translateY(3px);box-shadow:0 1px 0 #4a2208,inset 0 3px 8px #0006;filter:brightness(.92)}
+.bet-step:active{transform:scale(.88)}
 </style></head><body>
 <div id="g"><div id="bg"></div>
 <div class="cr "  style="left:0px;top:0px;width:400.0px;height:164.5px;background-size:698.2px 465.5px;background-position:-68.2px 0.0px;"></div>
 <div id="ways">243 WAYS</div><div id="fr"></div><div id="reels"></div><div id="fs"></div>
 <div class="cr "  style="left:6px;top:166px;width:188.5px;height:62.5px;background-size:768.0px 512.0px;background-position:-511.5px -4.0px;"></div><div class="cr "  style="left:204px;top:172px;width:166.0px;height:40.5px;background-size:768.0px 512.0px;background-position:-528.5px -61.0px;"></div><div class="cr "  style="left:26px;top:234px;width:145.5px;height:35.5px;background-size:768.0px 512.0px;background-position:-547.5px -101.5px;"></div><div class="cr "  style="left:224px;top:236px;width:120.5px;height:34.5px;background-size:768.0px 512.0px;background-position:-569.5px -138.0px;"></div>
+<div id="infoBar">
+  <div class="hud-info">
+    <div class="hud-bet"><span class="hud-label">Bet Tk</span><button id="minus" class="bet-step" aria-label="Decrease bet">−</button><b id="cBet">10.00</b><button id="plus" class="bet-step" aria-label="Increase bet">+</button></div>
+    <div class="hud-balance"><span class="level-tag">LVO</span><span class="balance-label">Balance</span><b> Tk <span id="cBal">1,000.00</span></b></div>
+    <div class="hud-win">WIN Tk <b id="cWin">0.00</b></div>
+  </div>
+</div>
 <div id="bottomHud">
   <div class="hud-icons">
     <button id="gear" class="hud-icon gear" aria-label="Settings"><span>⚙</span></button>
@@ -81,11 +105,7 @@ button.cr{border:0;padding:0;cursor:pointer;background-color:transparent}
     <button id="turbo" class="hud-icon refresh" aria-label="Turbo"><span>⟳</span></button>
     <button id="menu" class="hud-icon lightning" aria-label="Menu"><span>ϟ</span></button>
   </div>
-  <div class="hud-info">
-    <div class="hud-bet"><span class="hud-label">Bet Tk</span><button id="minus" class="bet-step" aria-label="Decrease bet">−</button><b id="cBet">10.00</b><button id="plus" class="bet-step" aria-label="Increase bet">+</button></div>
-    <div class="hud-balance"><span class="level-tag">LVO</span><span class="balance-label">Balance</span><b> Tk <span id="cBal">1,000.00</span></b></div>
-    <div class="hud-win">WIN Tk <b id="cWin">0.00</b></div>
-  </div>
+
 </div>
 <canvas id="cv" width="400" height="780"></canvas><div id="big"></div><div id="tt"></div>
 <div id="pop"><div id="pbox"></div></div></div>
@@ -304,10 +324,10 @@ function ways(gr,bet){let total=0,marks=[];
  return{total,marks}}
 function countUp(v){const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/600);$('cWin').textContent=fmt(v*p);if(p<1)requestAnimationFrame(f)})(t0)}
 let pre=null;
-function preSpin(){pre=[];strips.forEach((s,i)=>{const arr=[...grid[i]];for(let k=0;k<60;k++)arr.push(pick(i));pre[i]=arr;
-  s.style.transition='none';s.className='strip mov';s.innerHTML=arr.map(x=>cell(x)).join('');s.style.transform='translateY(0)';void s.offsetWidth;
-  s.style.transition='transform 6s linear';s.style.transform='translateY(calc(var(--ch) * -57))'})}
-function stopPre(){pre=null;grid.forEach((_,i)=>show(i))}
+function preSpin(){$('reels').classList.remove('hl');pre=[];strips.forEach((s,i)=>{const arr=[];for(let k=0;k<84;k++)arr.push(pick(i));arr.push(...grid[i]);pre[i]=arr;
+  s.style.transition='none';s.className='strip mov';s.innerHTML=arr.map(x=>cell(x)).join('');s.style.transform='translateY(calc(var(--ch) * -84))';void s.offsetWidth;
+  s.style.transition='transform 6s linear';s.style.transform='translateY(0)'})}   /* symbols move DOWN */
+function stopPre(){pre=null;$('reels').classList.remove('hl');grid.forEach((_,i)=>show(i))}
 async function spin(){
  if(busy)return;
  if(!UID){toast('লগইন করুন (User Panel থেকে খেলুন)');SFX.err();auto=false;ui();return}
@@ -324,27 +344,30 @@ async function spin(){
  const T=turbo?.4:1,prev=grid,res=d.result.grid.map(c=>c.slice());
  await Promise.all(strips.map(async(s,i)=>{
   const n=(turbo?9:13)+i*(turbo?1:4),col=res[i];
-  let head=prev[i],frac=0;
+  let head=prev[i],frac=0,nh=3;
   if(pre&&pre[i]){try{const CH=parseFloat(getComputedStyle(g).getPropertyValue('--ch'))||88,ty=new DOMMatrix(getComputedStyle(s).transform).m42,off=Math.max(0,-ty/CH),ix=Math.floor(off);
-   head=pre[i].slice(ix,ix+4);frac=off-ix;if(head.length<4){head=prev[i];frac=0}}catch(e){head=prev[i];frac=0}}
-  const arr=[...head];for(let k=0;k<n-4;k++)arr.push(pick(i));arr.push(...col);
-  s.style.transition='none';s.className='strip mov';s.innerHTML=arr.map(x=>cell(x)).join('');s.style.transform=`translateY(calc(var(--ch) * -${frac}))`;
-  void s.offsetWidth;const dd=(1.1+i*.35)*T;SFX.ticks(i,arr.length-3,dd);s.style.transition=`transform ${dd}s cubic-bezier(.3,.7,.3,1)`;
-  s.style.transform=`translateY(calc(var(--ch) * -${arr.length-3}))`;await wait(dd*1000);s.className='strip';SFX.stop(i)}));
+   const h=pre[i].slice(ix,ix+4);if(h.length==4){head=h;frac=off-ix;nh=4}}catch(e){}}
+  const arr=[...col];for(let k=0;k<n;k++)arr.push(pick(i));arr.push(...head);   /* result on top, old symbols at the bottom */
+  const L=arr.length,st=L-nh+frac;
+  s.style.transition='none';s.className='strip mov';s.innerHTML=arr.map(x=>cell(x)).join('');s.style.transform=`translateY(calc(var(--ch) * -${st}))`;
+  void s.offsetWidth;const dd=(.85+i*.25)*T;SFX.ticks(i,L-nh,dd);s.style.transition=`transform ${dd}s cubic-bezier(.25,.8,.3,1)`;
+  s.style.transform='translateY(0)';await wait(dd*1000);s.className='strip';SFX.stop(i)}));
  pre=null;
  grid=res;SFX.spinEnd();
  const win=Number(d.win)||0,marks=d.result.marks||[];
  if(d.awarded>0){toast('🐯 FREE SPINS +'+d.awarded);SFX.scatter()}
  fs=d.freeLeft;
- if(win>0){marks.forEach(([r,j])=>{const c=strips[r].children[j];if(c)c.classList.add('w')});countUp(win);if(win<bet*20)SFX.win(win/bet);burst(30);
+ if(win>0){marks.forEach(([r,j])=>{const c=strips[r].children[j];if(c)c.classList.add('w')});if(marks.length)$('reels').classList.add('hl');countUp(win);if(win<bet*20)SFX.win(win/bet);burst(30);
   if(win>=bet*20){SFX.big();burst(80);big('BIG WIN<br>'+fmt(win))}}
  bal=d.balance;
  hist.unshift({t:new Date().toLocaleTimeString(),bet,win});hist=hist.slice(0,15);
  busy=false;ui();
- await wait(win>0?1200:350);
+ await wait(win>0?1600:350);
  if(fs>0||auto){if(bal>=BETS[bi]||fs>0)spin();else{auto=false;ui();toast('ব্যালেন্স কম!')}}
 }
 $('spin').onclick=spin;
+{const sp=$('spin');sp.addEventListener('pointerdown',()=>{sp.classList.add('pr');try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}});
+ ['pointerup','pointerleave','pointercancel'].forEach(ev=>sp.addEventListener(ev,()=>sp.classList.remove('pr')))}
 $('minus').onclick=()=>{if(!busy&&fs<=0&&bi>0){bi--;ui();SFX.click(-1)}};
 $('plus').onclick=()=>{if(!busy&&fs<=0&&bi<BETS.length-1){bi++;ui();SFX.click(1)}};
 $('auto').onclick=()=>{SFX.click(0);auto=!auto;ui();if(auto&&!busy)spin()};
