@@ -3055,7 +3055,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 <!-- ==================== PAGE LOADING SCREEN (ইনট্রোর পর পেজ লোড না হওয়া পর্যন্ত দৃশ্যমান) ==================== -->
 <div id="pageLoadingScreen" class="npld npld-on" role="status" aria-label="Loading">
   <div class="npld-txt" aria-hidden="true">
-    <span class="npld-ch" style="--i:0">M</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">S</span><span class="npld-ch" style="--i:3">T</span><span class="npld-ch" style="--i:4">W</span><span class="npld-ch" style="--i:5">I</span><span class="npld-ch" style="--i:6">N</span><span class="npld-ch" style="--i:7">8</span><span class="npld-ch" style="--i:8">8</span>
+    <div class="mwl" aria-hidden="true"><span class="mwl-lm"><span class="mwl-w">M</span><span class="mwl-lo"><svg viewBox="0 0 100 100" aria-hidden="true"><g class="mwl-r"><circle cx="50" cy="50" r="43" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="14"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="7.4 3.86"/></g><circle cx="50" cy="50" r="18" fill="#ffd23f"/><circle cx="50" cy="50" r="18" fill="none" stroke="#fff2b3" stroke-width="3"/></svg></span><span class="mwl-w">ST</span>WIN<span class="mwl-w">88</span></span><span class="mwl-tag">PLAY BIG, WIN BIGGER</span></div>
   </div>
 </div>
 <!-- ==================== END INTRO ANIMATION & LOADER ==================== -->
@@ -5434,19 +5434,18 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       window.addEventListener('focus', npCheckIdle);
     }
 
-    function checkTournamentRulesModal() {
-      if (!state.currentUser) return;
-      const dismissed = sessionStorage.getItem('NP_RULES_DISMISSED_V1');
-      if (!dismissed) {
-        const modal = document.getElementById('modalTournamentRules');
-        if (modal) modal.classList.add('active');
-      }
-    }
+    // ইউজার প্যানেলে ঢুকলে আর নোটিশ আসবে না — শুধু টুর্নামেন্টে "জয়েন" ক্লিক করলে দেখাবে
+    function checkTournamentRulesModal() { /* অটো-শো বন্ধ */ }
 
+    window.__npPendingJoin = null;
     function dismissRulesModal() {
       sessionStorage.setItem('NP_RULES_DISMISSED_V1', 'true');
       const modal = document.getElementById('modalTournamentRules');
       if (modal) modal.classList.remove('active');
+      // OK চাপার পর যে টুর্নামেন্টে জয়েন ক্লিক করেছিল সেটা আবার চালু হবে
+      const pid = window.__npPendingJoin;
+      window.__npPendingJoin = null;
+      if (pid) initiateJoinTournament(pid);
     }
 
     // --- Settings Applier ---
@@ -6863,6 +6862,16 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         showToast('টুর্নামেন্টে অংশগ্রহণের জন্য অনুগ্রহ করে আগে লগইন করুন!', 'warning');
         showAuthModal('login');
         return;
+      }
+
+      // জয়েন ক্লিক করলে নিয়মাবলী ও গুরুত্বপূর্ণ নোটিশ দেখাবে (প্রতি সেশনে একবার, OK চাপলে জয়েন চলবে)
+      if (!sessionStorage.getItem('NP_RULES_DISMISSED_V1')) {
+        const rm = document.getElementById('modalTournamentRules');
+        if (rm) {
+          window.__npPendingJoin = tournamentId;
+          rm.classList.add('active');
+          return;
+        }
       }
 
       if (state.userData.status === 'SUSPENDED') {
@@ -8493,9 +8502,31 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         history.pushState({ nrExitGuard: true }, "", location.href);
         return;
       }
-      showExitConfirm();
+      // ব্যাক বাটন: কনফার্মেশন পপআপ নেই। ২ সেকেন্ডের মধ্যে ২ বার চাপলে অ্যাপ বন্ধ হবে।
+      var now = Date.now();
+      if (window.__npBackAt && now - window.__npBackAt < 2000) {
+        window.__npBackAt = 0;
+        npDoExit();
+        return;
+      }
+      window.__npBackAt = now;
       history.pushState({ nrExitGuard: true }, "", location.href);
+      try {
+        if (typeof showToast === 'function') showToast('বের হতে আবার Back চাপুন', 'info');
+      } catch (e) {}
     });
+
+    function npDoExit() {
+      try {
+        if (window.Android && typeof window.Android.exitApp === "function") { window.Android.exitApp(); return; }
+        if (window.HopWeb && typeof window.HopWeb.exitApp === "function") { window.HopWeb.exitApp(); return; }
+        if (window.navigator && window.navigator.app && typeof window.navigator.app.exitApp === "function") { window.navigator.app.exitApp(); return; }
+      } catch (e) {}
+      try { window.close(); } catch (e) {}
+      try { window.open('', '_self', ''); window.close(); } catch (e) {}
+      // গার্ড এন্ট্রি আর যোগ না করে আরেক ধাপ পিছনে গেলে ব্রাউজার/PWA থেকে বের হয়ে যায়
+      try { history.back(); } catch (e) {}
+    }
   })();
   </script>
 
@@ -8635,7 +8666,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     .npld-err-btns button#npLoadClose{background:rgba(255,255,255,.12);color:#e2e8f0}
     @media (prefers-reduced-motion:reduce){.npld-bar i{animation:none;width:100%;transform:none}.npld-txt,.npld.npld-on .npld-wrap{animation:none}}
   </style>
-  <div class="npld" id="npLoad" role="status" aria-label="Loading"><div class="npld-wrap"><div class="npld-txt" aria-hidden="true"><span class="npld-ch" style="--i:0">M</span><span class="npld-ch" style="--i:1">O</span><span class="npld-ch" style="--i:2">S</span><span class="npld-ch" style="--i:3">T</span><span class="npld-ch" style="--i:4">W</span><span class="npld-ch" style="--i:5">I</span><span class="npld-ch" style="--i:6">N</span><span class="npld-ch" style="--i:7">8</span><span class="npld-ch" style="--i:8">8</span></div><div class="npld-err" id="npLoadErr" role="alert"><div id="npLoadErrMsg"></div><div class="npld-err-btns"><button type="button" id="npLoadRetry">আবার চেষ্টা করুন</button><button type="button" id="npLoadClose">বন্ধ করুন</button></div></div></div></div>
+  <div class="npld" id="npLoad" role="status" aria-label="Loading"><div class="npld-wrap"><div class="npld-txt" aria-hidden="true"><div class="mwl" aria-hidden="true"><span class="mwl-lm"><span class="mwl-w">M</span><span class="mwl-lo"><svg viewBox="0 0 100 100" aria-hidden="true"><g class="mwl-r"><circle cx="50" cy="50" r="43" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="14"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="7.4 3.86"/></g><circle cx="50" cy="50" r="18" fill="#ffd23f"/><circle cx="50" cy="50" r="18" fill="none" stroke="#fff2b3" stroke-width="3"/></svg></span><span class="mwl-w">ST</span>WIN<span class="mwl-w">88</span></span><span class="mwl-tag">PLAY BIG, WIN BIGGER</span></div></div><div class="npld-err" id="npLoadErr" role="alert"><div id="npLoadErrMsg"></div><div class="npld-err-btns"><button type="button" id="npLoadRetry">আবার চেষ্টা করুন</button><button type="button" id="npLoadClose">বন্ধ করুন</button></div></div></div></div>
   <script>
   (function () {
     var el = document.getElementById('npLoad'), t1 = null, t2 = null, tLimit = null, waiting = false, retryFn = null;
@@ -8881,5 +8912,63 @@ body[data-theme="light"] .pp-howto div{color:#475569}
   })();
   </script>
   <script src="./passkey.js"></script>
+
+  <style>
+    /* নতুন MOSTWIN88 লোগো লোডিং (দুটো লোডারেই) */
+    #pageLoadingScreen,#npLoad{background:radial-gradient(circle at 50% 45%,#0e1c3f 0,#050B1A 62%)}
+    .npld-txt{display:block;font-size:inherit;letter-spacing:0;padding:0;animation:none!important;will-change:auto}
+    .mwl{--fs:clamp(34px,min(13vw,20vh),110px);display:block;width:max-content;text-align:left;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+    .mwl-lm{display:block;width:max-content;white-space:nowrap;font-weight:900;letter-spacing:.5px;line-height:1;font-size:var(--fs);color:#ffd23f}
+    .mwl-w{color:#fff}
+    .mwl-lo{display:inline-block;position:relative;width:.76em;height:.76em;margin:0 .035em;vertical-align:baseline;overflow:visible;filter:drop-shadow(0 0 .04em #ffffff77)}
+    .mwl-lo svg{position:absolute;left:0;top:0;width:100%;height:100%;display:block;overflow:visible;transform:scale(1.12);transform-origin:50% 50%}
+    .mwl-r{transform-box:view-box;transform-origin:50px 50px;animation:mwlSpin 6s cubic-bezier(.2,.7,.2,1) infinite}
+    @keyframes mwlSpin{0%,25%{transform:rotate(0deg)}70%,100%{transform:rotate(1440deg)}}
+    .mwl-tag{display:block;white-space:nowrap;font-weight:700;color:#ffd23f;font-size:calc(var(--fs)*.17);margin-top:.7em;overflow:visible}
+    @media (prefers-reduced-motion:reduce){.mwl-r{animation:none}}
+  </style>
+  <script>
+  /* ট্যাগলাইনকে লোগোর প্রস্থের সমান করে দেয় */
+  (function(){
+    var BEAR=.035;
+    function fit(){
+      document.querySelectorAll('.mwl').forEach(function(root){
+        var m=root.querySelector('.mwl-lm'),t=root.querySelector('.mwl-tag');if(!m||!t)return;
+        var fs=parseFloat(getComputedStyle(m).fontSize),b=fs*BEAR,W=m.getBoundingClientRect().width-2*b;
+        if(W<=0)return;
+        t.style.letterSpacing='0px';t.style.width='auto';t.style.display='inline-block';t.style.marginRight='0';t.style.marginLeft=b+'px';
+        var w0=t.getBoundingClientRect().width,n=t.textContent.length,ls=(W-w0)/(n-1);
+        t.style.letterSpacing=ls+'px';t.style.marginRight=(-ls)+'px';t.style.display='block';t.style.width=W+'px';
+      });
+    }
+    window.addEventListener('load',fit);window.addEventListener('resize',fit);
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+    if(window.ResizeObserver){
+      var ro=new ResizeObserver(fit);
+      document.querySelectorAll('.mwl-lm').forEach(function(e){ro.observe(e);});
+    }
+    fit();setTimeout(fit,50);setTimeout(fit,400);
+  })();
+  </script>
+
+  <script>
+  /* অ্যাপ খোলা থাকলে মোবাইলের স্ক্রিন লাইট অফ হবে না (Screen Wake Lock) */
+  (function(){
+    var lock=null;
+    function req(){
+      try{
+        if(!('wakeLock' in navigator)||document.visibilityState!=='visible'||lock)return;
+        navigator.wakeLock.request('screen').then(function(l){
+          lock=l;
+          l.addEventListener('release',function(){lock=null;});
+        }).catch(function(){lock=null;});
+      }catch(e){lock=null;}
+    }
+    document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')req();});
+    ['click','touchstart','pointerdown','keydown'].forEach(function(ev){document.addEventListener(ev,req,{passive:true});});
+    window.addEventListener('pageshow',req);window.addEventListener('focus',req);
+    req();
+  })();
+  </script>
 </body>
 </html>
