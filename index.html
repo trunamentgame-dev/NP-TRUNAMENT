@@ -2208,6 +2208,20 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     ['Mines (মাইনস)', 'Mines'],
     ['চলছে (Playing)', 'Playing'],
 
+    ['পেমেন্ট মাধ্যম', 'Payment Methods'],
+    ['তথ্য ও নীতিমালা', 'Information & Policies'],
+    ['শর্তাবলী (Terms & Conditions)', 'Terms & Conditions'],
+    ['এই প্ল্যাটফর্ম ব্যবহার করে আপনি আমাদের সকল শর্তাবলী মেনে নিচ্ছেন। প্রতি ব্যক্তির জন্য একটি মাত্র অ্যাকাউন্ট অনুমোদিত। ভুল তথ্য, একাধিক অ্যাকাউন্ট বা প্রতারণা ধরা পড়লে অ্যাকাউন্ট স্থগিত বা বন্ধ করা হতে পারে।', 'By using this platform you accept all our terms. Only one account per person is allowed. Accounts may be suspended or closed if false information, multiple accounts or fraud is detected.'],
+    ['প্রাইভেসি পলিসি', 'Privacy Policy'],
+    ['আপনার ব্যক্তিগত ও লেনদেনের তথ্য সুরক্ষিত রাখা হয় এবং অনুমতি ছাড়া তৃতীয় পক্ষের কাছে শেয়ার করা হয় না। পাসওয়ার্ড, পিন বা ওটিপি কাউকে দেবেন না।', 'Your personal and transaction information is kept secure and is not shared with third parties without permission. Never share your password, PIN or OTP with anyone.'],
+    ['ডিপোজিট ও উইথড্র নীতি', 'Deposit & Withdrawal Policy'],
+    ['ডিপোজিট ও উইথড্র বিকাশ, নগদ ও রকেটের মাধ্যমে করা যাবে। সঠিক নম্বর ও TrxID দিন। যাচাই শেষে ব্যালেন্সে যোগ বা পেমেন্ট প্রদান করা হবে।', 'Deposits and withdrawals are available via bKash, Nagad and Rocket. Provide the correct number and TrxID. Balance is added or payment is sent after verification.'],
+    ['বোনাস নীতি', 'Bonus Policy'],
+    ['বোনাস অফার নির্দিষ্ট শর্তসাপেক্ষে প্রযোজ্য। অপব্যবহার বা প্রতারণা ধরা পড়লে বোনাস বাতিল করার অধিকার কর্তৃপক্ষ সংরক্ষণ করে।', 'Bonus offers are subject to specific conditions. The management reserves the right to cancel a bonus if abuse or fraud is detected.'],
+    ['দায়িত্বশীল গেমিং', 'Responsible Gaming'],
+    ['গেম খেলা শুধুমাত্র বিনোদনের জন্য। সামর্থ্যের বেশি খেলবেন না এবং ক্ষতি পুষিয়ে নিতে বাজি বাড়াবেন না। ১৮ বছরের কম বয়সীদের জন্য সম্পূর্ণ নিষিদ্ধ।', 'Gaming is for entertainment only. Do not play beyond your means and do not raise stakes to recover losses. Strictly prohibited for anyone under 18.'],
+    ['শুধুমাত্র ১৮ বছর বা তার বেশি বয়সীদের জন্য। দায়িত্বের সাথে খেলুন।', 'For ages 18 and above only. Play responsibly.'],
+    ['সর্বস্বত্ব সংরক্ষিত।', 'All rights reserved.'],
     // ---- Wallet ----
     ['আমার ওয়ালেট (Wallet)', 'My Wallet'],
     ['বর্তমান ব্যালেন্স', 'Current Balance'],
@@ -2955,7 +2969,12 @@ body[data-theme="light"] .pp-howto div{color:#475569}
   }
 </style>
 
-<div id="np-intro" aria-label="NP Tournament BD intro">
+<style>
+  #np-intro .np-mwl-wrap{display:flex;justify-content:center;opacity:0;transform:translateY(40px) scale(.8);animation:npLogoReveal .8s .05s cubic-bezier(.16,1,.3,1) forwards}
+  #np-intro .mwl{--fs:clamp(40px,13vw,84px);margin:0 auto}
+  #np-intro .np-underline{margin-top:22px}
+</style>
+<div id="np-intro" aria-label="MOSTWIN88 intro">
 
   <div class="np-particles" id="np-particles"></div>
 
@@ -2964,17 +2983,9 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
   <div class="np-brand">
 
-    <h1 class="np-logo">NP</h1>
-
-    <div class="np-brand-name">
-      NP TOURNAMENT BD
-    </div>
+    <div class="np-mwl-wrap"><div class="mwl" aria-label="MOSTWIN88"><span class="mwl-lm"><span class="mwl-w">M</span><span class="mwl-lo"><svg viewBox="0 0 100 100" aria-hidden="true"><g class="mwl-r"><circle cx="50" cy="50" r="43" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="14"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="7.4 3.86"/></g><circle cx="50" cy="50" r="18" fill="#ffd23f"/><circle cx="50" cy="50" r="18" fill="none" stroke="#fff2b3" stroke-width="3"/></svg></span><span class="mwl-w">ST</span>WIN<span class="mwl-w">88</span></span><span class="mwl-tag">PLAY BIG, WIN BIGGER</span></div></div>
 
     <div class="np-underline"></div>
-
-    <div class="np-provider">
-      Provided by <span>Mostwin88</span>
-    </div>
 
   </div>
 </div>
@@ -3278,6 +3289,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       <div id="gameBoxGrid" class="game-box-grid" aria-label="Games"></div>
       <button type="button" id="gameBoxMore" data-no-i18n onclick="window.npOpenAllGames()"></button>
 
+      <div id="npTournamentHidden" style="display:none" aria-hidden="true">
       <!-- Game Selector Switch Bar -->
       <div class="game-switch-bar" id="gameSwitchBar">
         <button type="button" class="game-switch-btn active" id="btnFilterAllGames" onclick="window.app.setGameFilter('ALL')">
@@ -3328,9 +3340,21 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         </div>
       </div>
 
-      <div style="text-align: center; font-size: 11px; color: var(--text-muted); padding: 20px 14px 10px 14px; line-height: 1.5;">
-        NP TOURNAMENT BD একটি স্বাধীন ই-স্পোর্টস কমিউনিটি প্ল্যাটফর্ম। এটি Garena বা Free Fire-এর অফিসিয়াল কোনো অংশ নয়।
-      </div>
+      </div><!-- /npTournamentHidden -->
+
+      <footer class="mw-foot">
+        <div class="mw-foot-brand"><div class="mwl mw-foot-mwl" aria-label="MOSTWIN88"><span class="mwl-lm"><span class="mwl-w">M</span><span class="mwl-lo"><svg viewBox="0 0 100 100" aria-hidden="true"><g class="mwl-r"><circle cx="50" cy="50" r="43" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="14"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="7.4 3.86"/></g><circle cx="50" cy="50" r="18" fill="#ffd23f"/><circle cx="50" cy="50" r="18" fill="none" stroke="#fff2b3" stroke-width="3"/></svg></span><span class="mwl-w">ST</span>WIN<span class="mwl-w">88</span></span><span class="mwl-tag">PLAY BIG, WIN BIGGER</span></div></div>
+        <div class="mw-foot-title">পেমেন্ট মাধ্যম</div>
+        <div class="mw-pay-row"><span class="mw-pay"><img src="https://i.postimg.cc/K4hz9m0W/Whats-App-Image-2026-10-23-at-4-14-08-PM.jpg" alt="bKash" loading="lazy" onerror="this.outerHTML='<b>bKash</b>'"></span><span class="mw-pay"><img src="https://i.postimg.cc/QtVHC4B2/Whats-App-Image-2026-10-23-at-4-14-08-PM-%281%29.jpg" alt="Nagad" loading="lazy" onerror="this.outerHTML='<b>Nagad</b>'"></span><span class="mw-pay"><img src="https://i.postimg.cc/BnGLpByx/Whats-App-Image-2026-10-23-at-4-14-08-PM-%282%29.jpg" alt="Rocket" loading="lazy" onerror="this.outerHTML='<b>Rocket</b>'"></span></div>
+        <div class="mw-foot-title">তথ্য ও নীতিমালা</div>
+        <details class="mw-det"><summary>শর্তাবলী (Terms & Conditions)</summary><p>এই প্ল্যাটফর্ম ব্যবহার করে আপনি আমাদের সকল শর্তাবলী মেনে নিচ্ছেন। প্রতি ব্যক্তির জন্য একটি মাত্র অ্যাকাউন্ট অনুমোদিত। ভুল তথ্য, একাধিক অ্যাকাউন্ট বা প্রতারণা ধরা পড়লে অ্যাকাউন্ট স্থগিত বা বন্ধ করা হতে পারে।</p></details>
+        <details class="mw-det"><summary>প্রাইভেসি পলিসি</summary><p>আপনার ব্যক্তিগত ও লেনদেনের তথ্য সুরক্ষিত রাখা হয় এবং অনুমতি ছাড়া তৃতীয় পক্ষের কাছে শেয়ার করা হয় না। পাসওয়ার্ড, পিন বা ওটিপি কাউকে দেবেন না।</p></details>
+        <details class="mw-det"><summary>ডিপোজিট ও উইথড্র নীতি</summary><p>ডিপোজিট ও উইথড্র বিকাশ, নগদ ও রকেটের মাধ্যমে করা যাবে। সঠিক নম্বর ও TrxID দিন। যাচাই শেষে ব্যালেন্সে যোগ বা পেমেন্ট প্রদান করা হবে।</p></details>
+        <details class="mw-det"><summary>বোনাস নীতি</summary><p>বোনাস অফার নির্দিষ্ট শর্তসাপেক্ষে প্রযোজ্য। অপব্যবহার বা প্রতারণা ধরা পড়লে বোনাস বাতিল করার অধিকার কর্তৃপক্ষ সংরক্ষণ করে।</p></details>
+        <details class="mw-det"><summary>দায়িত্বশীল গেমিং</summary><p>গেম খেলা শুধুমাত্র বিনোদনের জন্য। সামর্থ্যের বেশি খেলবেন না এবং ক্ষতি পুষিয়ে নিতে বাজি বাড়াবেন না। ১৮ বছরের কম বয়সীদের জন্য সম্পূর্ণ নিষিদ্ধ।</p></details>
+        <div class="mw-age"><span class="mw-age-badge">18+</span><span>শুধুমাত্র ১৮ বছর বা তার বেশি বয়সীদের জন্য। দায়িত্বের সাথে খেলুন।</span></div>
+        <div class="mw-copy">© <span id="mwFootYear">2026</span> MOSTWIN88. <span>সর্বস্বত্ব সংরক্ষিত।</span></div>
+      </footer>
     </main>
 
     <!-- ==================== VIEW 2: MY MATCHES ==================== -->
@@ -9077,9 +9101,33 @@ body[data-theme="light"] .pp-howto div{color:#475569}
   <style>
     /* হেডারে MOSTWIN88 লোগো + নিচে ট্যাগলাইন (লোগোর প্রস্থের সমান) */
     .app-header .brand-group{min-width:0}
-    .app-header .mwl{--fs:clamp(22px,7.2vw,32px)}
+    .app-header .mwl{--fs:clamp(16px,5vw,22px)}
     .app-header .mwl-tag{font-size:calc(var(--fs)*.25);margin-top:.5em}
     /* নিচের নেভ: ৫টি বাটন; ম্যাচ ট্যাব লুকানো */
+
+    /* নিচের নেভ: হোম মাঝখানে, ওয়ালেট একদম ডানে */
+    .bottom-nav [data-view="viewPromo"]{order:1}
+    .bottom-nav #navSupportBtn{order:2}
+    .bottom-nav [data-view="viewHome"]{order:3}
+    .bottom-nav [data-view="viewProfile"]{order:4}
+    .bottom-nav [data-view="viewWallet"]{order:5}
+    /* হোম ফুটার */
+    .mw-foot{margin:18px 0 6px;padding:18px 14px 14px;border-radius:16px;background:var(--bg-card);border:1px solid var(--border-subtle);text-align:center}
+    .mw-foot-brand{display:flex;justify-content:center;margin-bottom:14px}
+    .mw-foot .mw-foot-mwl{--fs:22px}
+    .mw-foot-title{font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--color-primary);margin:12px 0 8px;text-transform:uppercase}
+    .mw-pay-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+    .mw-pay{display:flex;align-items:center;justify-content:center;background:#fff;border-radius:10px;padding:5px 10px;min-width:70px;height:38px;color:#111;font-size:12px}
+    .mw-pay img{max-height:26px;max-width:72px;width:auto;object-fit:contain;display:block}
+    .mw-det{text-align:left;background:rgba(255,255,255,.03);border:1px solid var(--border-subtle);border-radius:10px;margin-bottom:8px;overflow:hidden}
+    .mw-det summary{cursor:pointer;list-style:none;padding:11px 12px;font-size:13px;font-weight:700;color:var(--text-main,#fff);display:flex;justify-content:space-between;align-items:center}
+    .mw-det summary::-webkit-details-marker{display:none}
+    .mw-det summary::after{content:"+";font-size:17px;color:var(--color-primary);line-height:1}
+    .mw-det[open] summary::after{content:"\2212"}
+    .mw-det p{margin:0;padding:0 12px 12px;font-size:12px;line-height:1.65;color:var(--text-muted)}
+    .mw-age{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;font-size:11.5px;color:var(--text-muted);text-align:left}
+    .mw-age-badge{flex:none;width:38px;height:38px;border-radius:50%;border:2px solid #ef4444;color:#ef4444;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center}
+    .mw-copy{margin-top:12px;padding-top:12px;border-top:1px solid var(--border-subtle);font-size:11px;color:var(--text-muted)}
     .nav-item[hidden]{display:none!important}
     .bottom-nav .nav-item{min-width:0}
     .bottom-nav .nav-label{white-space:nowrap}
@@ -9118,5 +9166,6 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     };
   })();
   </script>
+  <script>try{var y=document.getElementById("mwFootYear");if(y)y.textContent=new Date().getFullYear()}catch(e){}</script>
 </body>
 </html>
