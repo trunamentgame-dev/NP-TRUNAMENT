@@ -2695,15 +2695,13 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 #np-intro .ni-orbit:before{content:"";position:absolute;left:8%;top:17%;width:7px;height:7px;border-radius:50%;background:#ffe28a;box-shadow:0 0 8px 3px #ffd34d99,0 0 24px #ffd34d}
 #np-intro .ni-brand{position:relative;display:flex;flex-direction:column;align-items:center;transform:translateY(-1vh);animation:niBrandReveal 1.2s cubic-bezier(.16,1,.3,1) both}
 #np-intro .ni-logo{position:relative;width:max-content;max-width:100%;text-align:left}
-#np-intro .ni-lm{display:block;white-space:nowrap;font-size:clamp(36px,min(13vw,17vh),145px);font-weight:900;letter-spacing:.5px;line-height:1;color:#ffd23f;text-shadow:0 3px 0 #9a6412,0 0 18px #ffd34d55,0 0 55px #ffd34d25}
+#np-intro .ni-lm{display:block;white-space:nowrap;font-size:clamp(36px,min(13vw,17vh),145px);font-weight:900;letter-spacing:.5px;line-height:1;color:#fff;text-shadow:0 0 18px #ffffff35,0 0 42px #ffffff12}
 #np-intro .ni-w,#np-intro .ni-r{color:#fff;text-shadow:0 0 18px #ffffff45}
-#np-intro .ni-lm > span:not(.ni-lo){opacity:0;transform:translateY(18px) scale(.72);animation:niLettersArrive .65s cubic-bezier(.16,1,.3,1) forwards}
-#np-intro .ni-lm > span:nth-child(1){animation-delay:.9s}
-#np-intro .ni-lm > span:nth-child(3){animation-delay:1.12s}
-#np-intro .ni-lm > span:nth-child(4){animation-delay:1.34s}
-#np-intro .ni-lo{display:inline-block;position:relative;width:.76em;height:.76em;margin:0 .035em;vertical-align:baseline;filter:drop-shadow(0 0 8px #fff9);animation:niBigOtoSmall 1.35s cubic-bezier(.16,1,.3,1) both}
+#np-intro .ni-win{color:#ffd23f;text-shadow:0 0 16px #ffd34d88,0 0 34px #ffd34d35}
+#np-intro .ni-lm .ni-letter{display:inline-block;opacity:0;transform:translateX(calc(var(--from) * 1em)) scale(.08);transform-origin:center;animation:niLetterFromO .48s cubic-bezier(.16,1,.3,1) forwards;animation-delay:var(--d)}
+#np-intro .ni-lo{display:inline-block;position:relative;width:.76em;height:.76em;margin:0 .035em;vertical-align:baseline;filter:drop-shadow(0 0 8px #fff9);animation:niBigOtoSmall 2.45s cubic-bezier(.16,1,.3,1) both}
 #np-intro .ni-lo svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transform:scale(1.12)}
-#np-intro .ni-lo-r{transform-box:view-box;transform-origin:50px 50px;animation:niLogoSpin 1.35s cubic-bezier(.18,.7,.2,1) both}
+#np-intro .ni-lo-r{transform-box:view-box;transform-origin:50px 50px;animation:niLogoSpin 2.45s cubic-bezier(.18,.7,.2,1) both}
 #np-intro .ni-tag{display:block;text-align:center;white-space:nowrap;margin-top:.8em;color:#ffe08a;font-size:clamp(9px,2.2vw,18px);font-weight:800;letter-spacing:.34em;padding-left:.34em;opacity:0;text-shadow:0 0 15px #ffd34d55;animation:niTagReveal .8s ease-out 1s forwards}
 #np-intro .ni-line{height:1px;width:min(62vw,300px);margin:24px auto 0;position:relative;overflow:hidden;background:linear-gradient(90deg,transparent,#ffd34d70,transparent);opacity:0;animation:niFade .5s ease 1.25s forwards}
 #np-intro .ni-line:after{content:"";position:absolute;inset:0;width:35%;background:linear-gradient(90deg,transparent,#fff,transparent);animation:niShine 1.8s ease-in-out 1.3s infinite}
@@ -2718,9 +2716,9 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 #np-intro .ni-s3{bottom:27%;left:27%;animation-delay:1.4s}
 #np-intro .ni-s4{bottom:30%;right:25%;animation-delay:2s}
 @keyframes niBrandReveal{0%{opacity:0;transform:translateY(22px) scale(.78);filter:blur(12px)}65%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translateY(-1vh) scale(1);filter:blur(0)}}
-@keyframes niLogoSpin{0%{transform:rotate(-360deg) scale(.65)}65%{transform:rotate(720deg) scale(1.08)}100%{transform:rotate(1080deg) scale(1)}}
-@keyframes niBigOtoSmall{0%{transform:scale(2.8) rotate(-180deg);filter:drop-shadow(0 0 28px #fff)}55%{transform:scale(2.15) rotate(540deg);filter:drop-shadow(0 0 22px #fff)}100%{transform:scale(1) rotate(1080deg);filter:drop-shadow(0 0 8px #fff9)}}
-@keyframes niLettersArrive{to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes niLogoSpin{0%{transform:rotate(-360deg) scale(.65)}65%{transform:rotate(900deg) scale(1.08)}100%{transform:rotate(1440deg) scale(1)}}
+@keyframes niBigOtoSmall{0%{transform:scale(2.8) rotate(-180deg);filter:drop-shadow(0 0 28px #fff)}55%{transform:scale(2.15) rotate(720deg);filter:drop-shadow(0 0 22px #fff)}100%{transform:scale(1) rotate(1440deg);filter:drop-shadow(0 0 8px #fff9)}}
+@keyframes niLetterFromO{0%{opacity:0;transform:translateX(calc(var(--from) * 1em)) scale(.08)}65%{opacity:1;transform:translateX(0) scale(1.12)}100%{opacity:1;transform:translateX(0) scale(1)}}
 @keyframes niTagReveal{from{opacity:0;transform:translateY(10px);letter-spacing:.6em}to{opacity:1;transform:translateY(0);letter-spacing:.34em}}
 @keyframes niBreathe{0%,100%{transform:scale(.82);opacity:.08}50%{transform:scale(1.15);opacity:.2}}
 @keyframes niRingFloat{0%,100%{transform:rotateX(68deg) rotate(-20deg) scale(.94)}50%{transform:rotateX(68deg) rotate(0deg) scale(1.04)}}
@@ -2738,7 +2736,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
   <i class="ni-spark ni-s1"></i><i class="ni-spark ni-s2"></i><i class="ni-spark ni-s3"></i><i class="ni-spark ni-s4"></i>
   <section class="ni-brand">
     <div class="ni-logo">
-      <span class="ni-lm"><span class="ni-w">M</span><span class="ni-lo"><svg viewBox="0 0 100 100" aria-hidden="true"><g class="ni-lo-r"><circle cx="50" cy="50" r="43" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="14"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="7.4 3.86"/></g><circle cx="50" cy="50" r="18" fill="#ffd23f"/><circle cx="50" cy="50" r="18" fill="none" stroke="#fff2b3" stroke-width="3"/></svg></span><span class="ni-w">ST</span><span class="ni-w">WIN</span><span class="ni-r">88</span></span>
+      <span class="ni-lm"><span class="ni-letter ni-w" style="--from:1.1;--d:.62s">M</span><span class="ni-lo"><svg viewBox="0 0 100 100" aria-hidden="true"><g class="ni-lo-r"><circle cx="50" cy="50" r="43" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="14"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="7.4 3.86"/></g><circle cx="50" cy="50" r="18" fill="#ffd23f"/><circle cx="50" cy="50" r="18" fill="none" stroke="#fff2b3" stroke-width="3"/></svg></span><span class="ni-letter ni-w" style="--from:-1.0;--d:.82s">S</span><span class="ni-letter ni-w" style="--from:-1.7;--d:1.02s">T</span><span class="ni-letter ni-win" style="--from:-2.4;--d:1.22s">W</span><span class="ni-letter ni-win" style="--from:-3.1;--d:1.42s">I</span><span class="ni-letter ni-win" style="--from:-3.8;--d:1.62s">N</span><span class="ni-letter ni-r" style="--from:-4.5;--d:1.82s">8</span><span class="ni-letter ni-r" style="--from:-5.2;--d:2.02s">8</span></span></span>
       <span class="ni-tag">PLAY BIG, WIN BIGGER</span>
     </div>
     <div class="ni-line"></div>
@@ -2776,7 +2774,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
   };
 
   // পুরো অ্যানিমেশন (≈৩.৫ সেকেন্ড) শেষ হলে এবং পেজ রেডি হলে সরাসরি হোম পেজ
-  window.setTimeout(function () { timerDone = true; maybeHide(); }, 3500);
+  window.setTimeout(function () { timerDone = true; maybeHide(); }, 4200);
   // নিরাপত্তা: পেজ রেডি সংকেত না এলেও সর্বোচ্চ ১০ সেকেন্ডে ইন্ট্রো সরে যাবে
   window.setTimeout(hideIntro, 10000);
 })();
