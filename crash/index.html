@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Aviator Crash Game</title>
     <meta name="description" content="Aviator Crash Multiplier Game with Authoritative Global Round Synchronization and Realtime Payout Limit Protection" />
-    <meta property="og:title" content="Aviator" />
+    <meta property="og:title" content="Aviator Crash Game" />
     <meta property="og:description" content="Aviator Crash Multiplier Game with Authoritative Global Round Synchronization and Realtime Payout Limit Protection" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -550,7 +550,7 @@ function mwHide(){window.__mwDone=1}
       <!-- Direct Play Header: Clean Aviator, Real Balance, Sound -->
       <header>
         <div style="display:flex;align-items:center;gap:8px;">
-          <button type="button" onclick="window.history.length > 1 ? window.history.back() : (window.location.href = 'user_index__8__cd3b4f5f.html')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:6px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" title="হোমে ফিরুন" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+          <button type="button" aria-label="হোমে ফিরুন" onclick="window.history.length > 1 ? window.history.back() : (window.location.href = 'user_index__8__cd3b4f5f.html')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:6px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" title="হোমে ফিরুন" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           </button>
           <div class="logo" aria-label="Aviator">
@@ -567,7 +567,7 @@ function mwHide(){window.__mwDone=1}
         </div>
         <div class="header-right">
           <div class="balance-pill" id="headerBalance">৳0.00</div>
-          <button class="btn-sound" id="btnSound" title="Toggle Sound">
+          <button class="btn-sound" id="btnSound" title="Toggle Sound" aria-label="Toggle Sound">
             <svg id="iconSoundOn" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/>
               <path d="M16 9a5 5 0 0 1 0 6"/>
@@ -595,7 +595,7 @@ function mwHide(){window.__mwDone=1}
 
       <!-- 60FPS Flight Canvas Arena -->
       <div class="arena-box">
-        <canvas id="flightCanvas"></canvas>
+        <canvas id="flightCanvas" data-testid="flight-canvas"></canvas>
         <div class="player-counter">
           <span class="pc-avatars">
             <span class="pc-av" id="pcAv1" style="background:#e11d48;"></span>
@@ -618,9 +618,9 @@ function mwHide(){window.__mwDone=1}
           <div class="card-grid">
             <div>
               <div class="stepper-box">
-                <button class="step-btn" id="btnMinus1">-</button>
+                <button class="step-btn" id="btnMinus1" aria-label="Decrease bet 1">-</button>
                 <div class="bet-val-display" id="dispAmount1">৳10.00</div>
-                <button class="step-btn" id="btnPlus1">+</button>
+                <button class="step-btn" id="btnPlus1" aria-label="Increase bet 1">+</button>
               </div>
               <div class="presets-grid">
                 <button class="preset-btn active" data-p="1" data-val="10">৳10</button>
@@ -642,9 +642,9 @@ function mwHide(){window.__mwDone=1}
               <label class="check-label"><input type="checkbox" id="chkAutoCash1"> Auto Cash</label>
             </div>
             <div class="multiplier-stepper" id="autoCashBox1" style="display:none;">
-              <button class="m-step-btn" id="btnCashMinus1">-</button>
+              <button class="m-step-btn" id="btnCashMinus1" aria-label="Decrease auto cash 1">-</button>
               <span id="dispCashoutM1" style="font-weight:900; color:#fff;">2.00x</span>
-              <button class="m-step-btn" id="btnCashPlus1">+</button>
+              <button class="m-step-btn" id="btnCashPlus1" aria-label="Increase auto cash 1">+</button>
             </div>
           </div>
         </div>
@@ -660,9 +660,9 @@ function mwHide(){window.__mwDone=1}
           <div class="card-grid">
             <div>
               <div class="stepper-box">
-                <button class="step-btn" id="btnMinus2">-</button>
+                <button class="step-btn" id="btnMinus2" aria-label="Decrease bet 2">-</button>
                 <div class="bet-val-display" id="dispAmount2">৳10.00</div>
-                <button class="step-btn" id="btnPlus2">+</button>
+                <button class="step-btn" id="btnPlus2" aria-label="Increase bet 2">+</button>
               </div>
               <div class="presets-grid">
                 <button class="preset-btn active" data-p="2" data-val="10">৳10</button>
@@ -684,9 +684,9 @@ function mwHide(){window.__mwDone=1}
               <label class="check-label"><input type="checkbox" id="chkAutoCash2"> Auto Cash</label>
             </div>
             <div class="multiplier-stepper" id="autoCashBox2" style="display:none;">
-              <button class="m-step-btn" id="btnCashMinus2">-</button>
+              <button class="m-step-btn" id="btnCashMinus2" aria-label="Decrease auto cash 2">-</button>
               <span id="dispCashoutM2" style="font-weight:900; color:#fff;">2.00x</span>
-              <button class="m-step-btn" id="btnCashPlus2">+</button>
+              <button class="m-step-btn" id="btnCashPlus2" aria-label="Increase auto cash 2">+</button>
             </div>
           </div>
         </div>
@@ -882,8 +882,8 @@ function mwHide(){window.__mwDone=1}
         function updateBalanceUI(bal) {
           isBalanceLoaded = true;
           currentBalance = typeof bal === 'number' ? bal : Number(bal || 0);
-          if (window.mwHide) mwHide(); // ব্যালেন্স এসে গেছে, লোডিং পেজ সরাও
-          try{if(window.parent&&window.parent!==window&&!window.__npRdy){window.__npRdy=1;window.parent.postMessage({type:'NP_GAME_READY'},'*')}}catch(e){} // প্যানেলকে জানাও: গেম প্রস্তুত
+          if (window.mwHide) mwHide();
+          try{if(window.parent&&window.parent!==window&&!window.__npRdy){window.__npRdy=1;window.parent.postMessage({type:'NP_GAME_READY'},'*')}}catch(e){}
           const el = document.getElementById('headerBalance');
           if (el) {
             el.innerText = '৳' + currentBalance.toLocaleString('en-US', {
@@ -1036,7 +1036,6 @@ function mwHide(){window.__mwDone=1}
           return o;
         }
 
-        // Authoritative server balance fetch with caching promise to prevent race conditions
         async function fetchUserBalance(uid) {
           const target = uid || currentUid;
           if (!target) return currentBalance;
@@ -1059,7 +1058,6 @@ function mwHide(){window.__mwDone=1}
                   return data.balance;
                 }
               } else if (res.status === 401 && gameIdToken) {
-                // If token expired, retry without bad token header so server can use bodyUid if allowed
                 const retryRes = await fetch(`${API_BASE}/api/user/balance?uid=${encodeURIComponent(target)}`, { cache: 'no-store' });
                 if (retryRes.ok) {
                   const retryData = await retryRes.json();
@@ -1080,7 +1078,6 @@ function mwHide(){window.__mwDone=1}
           return balanceFetchPromise;
         }
 
-        // Attach verified wallet listener
         function attachWalletListener(uid, initialBal, token) {
           if (!uid || typeof uid !== 'string') return;
           const cleanUid = uid.trim();
@@ -1088,7 +1085,6 @@ function mwHide(){window.__mwDone=1}
 
           currentUid = cleanUid;
 
-          // Save to sessionStorage for WebView navigation resilience
           try { sessionStorage.setItem('aviator_uid', cleanUid); } catch(e){}
 
           if (token && typeof token === 'string') {
@@ -1100,22 +1096,17 @@ function mwHide(){window.__mwDone=1}
             updateBalanceUI(initialBal);
           }
 
-          // Immediately fetch authoritative server balance
           fetchUserBalance(cleanUid);
 
-          // Direct live listener from Firebase RTDB (users/{uid}/balance)
           if (rtdb) {
             try {
-              // Unsubscribe previous if exists
               rtdb.ref('users/' + cleanUid + '/balance').off();
               rtdb.ref('users/' + cleanUid + '/balance').on('value', (snap) => {
                 const val = snap.val();
                 if (val !== null && !isNaN(val)) {
                   updateBalanceUI(Number(val));
                 }
-              }, (err) => {
-                // If client permission denied (e.g. WebView without JS Firebase Auth),
-                // smoothly rely on server-side authoritative balance polling!
+              }, () => {
                 console.log('RTDB direct listener restricted; falling back to authoritative server balance.');
               });
             } catch(e) {
@@ -1124,14 +1115,10 @@ function mwHide(){window.__mwDone=1}
           }
         }
 
-        // -------------------------------------------------------------
-        // Comprehensive Multi-Channel User Identification Resolver
-        // -------------------------------------------------------------
         function detectUserSession() {
           let resolvedUid = null;
           let resolvedToken = null;
 
-          // 1. Check URL Query Parameters: ?uid=..., ?userId=..., ?user_id=..., ?token=...
           try {
             const urlParams = new URLSearchParams(window.location.search);
             resolvedUid = urlParams.get('uid') ||
@@ -1147,7 +1134,6 @@ function mwHide(){window.__mwDone=1}
                             urlParams.get('auth');
           } catch(e){}
 
-          // 2. Check URL Hash: #uid=..., #userId=..., #t=..., #token=...
           if (!resolvedUid || !resolvedToken) {
             try {
               const hash = window.location.hash || '';
@@ -1160,7 +1146,6 @@ function mwHide(){window.__mwDone=1}
                 resolvedUid = mUid[1];
               }
 
-              // Extract UID from JWT payload if available
               if (resolvedToken && !resolvedUid) {
                 try {
                   const parts = resolvedToken.split('.');
@@ -1174,7 +1159,6 @@ function mwHide(){window.__mwDone=1}
             } catch(e){}
           }
 
-          // 3. Check Android JavascriptInterface (window.Android, window.AndroidBridge, window.TournamentApp)
           if (!resolvedUid) {
             try {
               const bridge = window.Android || window.AndroidBridge || window.TournamentApp || window.MostWinApp || window.JSBridge;
@@ -1189,7 +1173,6 @@ function mwHide(){window.__mwDone=1}
             } catch(e){}
           }
 
-          // 4. Check Web Storage (sessionStorage / localStorage)
           if (!resolvedUid) {
             try {
               resolvedUid = sessionStorage.getItem('aviator_uid') || localStorage.getItem('aviator_uid') || localStorage.getItem('userId') || localStorage.getItem('uid');
@@ -1199,7 +1182,6 @@ function mwHide(){window.__mwDone=1}
             } catch(e){}
           }
 
-          // 5. Check Firebase Auth Current User
           if (!resolvedUid && auth && auth.currentUser && !auth.currentUser.isAnonymous) {
             resolvedUid = auth.currentUser.uid;
           }
@@ -1211,10 +1193,8 @@ function mwHide(){window.__mwDone=1}
           return false;
         }
 
-        // Execute immediate session detection
         detectUserSession();
 
-        // Firebase Auth State Listener (handles desktop Chrome login / token refresh)
         if (auth) {
           auth.onAuthStateChanged(async (user) => {
             if (user && !user.isAnonymous) {
@@ -1228,12 +1208,10 @@ function mwHide(){window.__mwDone=1}
           });
         }
 
-        // PostMessage listener (supports both window and document for Android WebView / Flutter / React Native)
         function handleIncomingMessage(event) {
           let d = event.data;
           if (!d) return;
 
-          // Parse stringified JSON if sent as string from WebView
           if (typeof d === 'string') {
             try { d = JSON.parse(d); } catch (e) { return; }
           }
@@ -1251,23 +1229,18 @@ function mwHide(){window.__mwDone=1}
         window.addEventListener('message', handleIncomingMessage);
         document.addEventListener('message', handleIncomingMessage);
 
-        // Iframe parent handshake
         if (window.parent && window.parent !== window) {
           window.parent.postMessage({ type: 'AVITOR_READY' }, '*');
         }
 
-        // লোডিং পেজ থাকা পর্যন্ত দ্রুত বারবার ব্যালেন্স আনার চেষ্টা; লগইন না পেলে লোডিং পেজেই বার্তা (গেমে ঢোকা যাবে না)
         (function () {
-          let tries = 0;
           const iv = setInterval(() => {
             if (window.__mwDone) { clearInterval(iv); return; }
-            tries++;
             if (currentUid) { fetchUserBalance(currentUid); }
             else { try { detectUserSession(); } catch (e) {} }
           }, 1500);
         })();
 
-        // Periodically keep balance fresh (and on window refocus)
         setInterval(() => { if (currentUid) fetchUserBalance(currentUid); }, 12000);
         document.addEventListener('visibilitychange', () => {
           if (!document.hidden && currentUid) fetchUserBalance(currentUid);
@@ -1290,7 +1263,6 @@ function mwHide(){window.__mwDone=1}
 
         // 5. Authoritative Bet and Cashout Transactions
         async function executeBetTransaction(panel, amount, round) {
-          // Guard 1: Detect user identity if not already established
           if (!currentUid) {
             detectUserSession();
           }
@@ -1299,12 +1271,10 @@ function mwHide(){window.__mwDone=1}
             return false;
           }
 
-          // Guard 2: Silently ensure balance is actually loaded before verifying
           if (!isBalanceLoaded && currentUid) {
             await fetchUserBalance(currentUid);
           }
 
-          // Guard 3: Genuine balance verification
           if (currentBalance < amount) {
             showGameMsg('পর্যাপ্ত ব্যালেন্স নেই (আপনার বর্তমান ব্যালেন্স ৳' + currentBalance.toFixed(2) + ')');
             return false;
@@ -1349,7 +1319,6 @@ function mwHide(){window.__mwDone=1}
           }
         }
 
-        // Cancel an active bet during countdown and refund it exactly once
         async function executeCancelTransaction(panel, round) {
           const st = panels[panel];
           const refund = st.betAmount || st.amount;
@@ -1460,7 +1429,6 @@ function mwHide(){window.__mwDone=1}
               aSpan.innerText = '৳' + state.amount.toFixed(2);
             }
           } else {
-            // WAITING
             if (state.placed) {
               btn.className = 'btn-bet-action btn-bet-red';
               tSpan.innerText = 'CANCEL';
@@ -1494,15 +1462,12 @@ function mwHide(){window.__mwDone=1}
             countdownSeconds = srv.countdownSeconds;
           }
 
-          // New round started
           if (currentRoundId !== prevRoundId) {
             flewAwayOffset = 0;
             populateTableBets();
 
-            // Refresh user balance at round transition
             if (currentUid) fetchUserBalance(currentUid);
 
-            // Trigger auto-bets if set and balance loaded
             [1, 2].forEach((p) => {
               const st = panels[p];
               st.cashedOut = false;
@@ -1519,7 +1484,6 @@ function mwHide(){window.__mwDone=1}
             });
           }
 
-          // Flight started
           if (prevStatus === 'WAITING' && gameState === 'FLYING') {
             audio.startEngine();
             [1, 2].forEach((p) => {
@@ -1527,7 +1491,6 @@ function mwHide(){window.__mwDone=1}
             });
           }
 
-          // Round crashed
           if (prevStatus === 'FLYING' && gameState === 'CRASHED') {
             audio.crash();
             addHistoryPill(currentMultiplier);
@@ -1540,7 +1503,6 @@ function mwHide(){window.__mwDone=1}
             });
           }
 
-          // In flight: pitch audio & auto-cashout check
           if (gameState === 'FLYING') {
             audio.pitch(currentMultiplier);
             [1, 2].forEach((p) => {
@@ -1562,7 +1524,6 @@ function mwHide(){window.__mwDone=1}
           }
         }
 
-        // Connect to Server SSE with auto-recovery polling fallback
         let pollTimer = null;
         function startPolling() {
           if (pollTimer) return;
@@ -1610,9 +1571,10 @@ function mwHide(){window.__mwDone=1}
 
         connectServerEvents();
 
-        // 6. 60FPS Flight Canvas Arena (Exact Visuals Preserved)
+        // 6. 60FPS Flight Canvas Arena (Exact Visuals Preserved + Evenly Spaced Scrolling Axis Dots)
         const canvas = document.getElementById('flightCanvas');
         const ctx = canvas.getContext('2d', { alpha: false });
+        const playerCounterEl = document.querySelector('.player-counter');
 
         function resizeCanvas() {
           const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -1753,6 +1715,9 @@ function mwHide(){window.__mwDone=1}
         let bgX = 0, bgY = 0;
         let climb = 0;
         let planeTilt = -0.32;
+        let dotScrollY = 0;
+        let dotScrollX = 0;
+        let lastFrameTs = 0;
         const mod = (a, m) => ((a % m) + m) % m;
         const bgStreaks = Array.from({ length: 30 }, () => ({
           x: Math.random(), y: Math.random(),
@@ -1760,12 +1725,125 @@ function mwHide(){window.__mwDone=1}
           layer: 1.0 + Math.random() * 0.8
         }));
 
-        function renderLoop() {
+        function isDotOverlappingPlane(sx, sy, dotRadius, pose) {
+          const s = 1.15;
+          const wx = sx / pose.camZoom;
+          const wy = pose.canvasHeight + (sy - pose.canvasHeight) / pose.camZoom;
+          const dx = wx - pose.planeX;
+          const dy = wy - pose.planeY;
+          const cos = Math.cos(pose.tilt);
+          const sin = Math.sin(pose.tilt);
+          const rx = (dx * cos + dy * sin) / s;
+          const ry = (-dx * sin + dy * cos) / s;
+          const p = (dotRadius + 5) / (s * pose.camZoom);
+
+          if (rx >= -44 - p && rx <= -22 + p && ry >= -23 - p && ry <= 3 + p) return true;
+          if (rx >= -35 - p && rx <= 30 + p && ry >= -14 - p && ry <= 7 + p) return true;
+          if (rx >= -32 - p && rx <= 5 + p && ry >= -3 - p && ry <= 16 + p) return true;
+          if (rx >= 27 - p && rx <= 36 + p && ry >= -17 - p && ry <= 17 + p) return true;
+
+          const sp = (dotRadius + 2) / (s * pose.camZoom);
+          const ex = (rx + 4) / (22 + sp);
+          const ey = (ry - 18) / (6 + sp);
+          return (ex * ex + ey * ey) <= 1;
+        }
+
+        function isDotInsideAnyRect(x, y, radius, rects) {
+          for (let i = 0; i < rects.length; i++) {
+            const r = rects[i];
+            if (x + radius >= r.left && x - radius <= r.right && y + radius >= r.top && y - radius <= r.bottom) {
+              return true;
+            }
+          }
+          return false;
+        }
+
+        function getPlayerCounterExclusion(w, h) {
+          if (playerCounterEl) {
+            const cRect = canvas.getBoundingClientRect();
+            const pRect = playerCounterEl.getBoundingClientRect();
+            if (cRect.width > 0 && pRect.width > 0) {
+              return {
+                left: pRect.left - cRect.left - 10,
+                top: pRect.top - cRect.top - 8,
+                right: pRect.right - cRect.left + 8,
+                bottom: pRect.bottom - cRect.top + 8
+              };
+            }
+          }
+          return { left: w - 105, top: h - 34, right: w, bottom: h };
+        }
+
+        function drawAxisDots(w, h, exclusions, planePose) {
+          const spacing = 24;
+          const dotRadius = 2.3;
+          const leftX = 12;
+          const bottomY = h - 9;
+          const yStart = 12;
+          const yEnd = bottomY - 16;
+          const xStart = leftX + 16;
+          const xEnd = w - 14;
+          const baseAlpha = 0.9;
+          const fadeMargin = 5;
+
+          ctx.save();
+
+          // Left vertical dots: scroll downward from top to bottom while flying
+          if (yEnd > yStart) {
+            const phaseY = mod(dotScrollY, spacing);
+            for (let y = yStart + phaseY; y <= yEnd; y += spacing) {
+              if (isDotInsideAnyRect(leftX, y, dotRadius, exclusions)) continue;
+              if (planePose && isDotOverlappingPlane(leftX, y, dotRadius, planePose)) continue;
+              const distFromStart = y - yStart;
+              const distFromEnd = yEnd - y;
+              let alpha = baseAlpha;
+              if (distFromStart > 0 && distFromStart < fadeMargin) {
+                alpha = baseAlpha * Math.max(0.35, distFromStart / fadeMargin);
+              } else if (distFromEnd < fadeMargin) {
+                alpha = baseAlpha * Math.max(0.35, distFromEnd / fadeMargin);
+              }
+              ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(3)})`;
+              ctx.beginPath();
+              ctx.arc(leftX, y, dotRadius, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+
+          // Bottom horizontal dots: scroll leftward from right to left while flying
+          if (xEnd > xStart) {
+            const phaseX = mod(-dotScrollX, spacing);
+            for (let x = xStart + phaseX; x <= xEnd; x += spacing) {
+              if (isDotInsideAnyRect(x, bottomY, dotRadius, exclusions)) continue;
+              if (planePose && isDotOverlappingPlane(x, bottomY, dotRadius, planePose)) continue;
+              const distFromStart = x - xStart;
+              const distFromEnd = xEnd - x;
+              let alpha = baseAlpha;
+              if (distFromStart > 0 && distFromStart < fadeMargin) {
+                alpha = baseAlpha * Math.max(0.35, distFromStart / fadeMargin);
+              } else if (distFromEnd < fadeMargin) {
+                alpha = baseAlpha * Math.max(0.35, distFromEnd / fadeMargin);
+              }
+              ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(3)})`;
+              ctx.beginPath();
+              ctx.arc(x, bottomY, dotRadius, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+
+          ctx.restore();
+        }
+
+        function renderLoop(now) {
+          const rawDt = lastFrameTs ? (now - lastFrameTs) / 1000 : 0.016;
+          lastFrameTs = now;
+
           resizeCanvas();
           const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
           const w = canvas.width / dpr;
           const h = canvas.height / dpr;
           angleTick += 0.85;
+
+          document.body.dataset.state = gameState.toLowerCase();
 
           ctx.save();
           ctx.scale(dpr, dpr);
@@ -1793,12 +1871,20 @@ function mwHide(){window.__mwDone=1}
           bgSpeed += (spdTarget - bgSpeed) * 0.06;
           bgX += bgSpeed;
           bgY += bgSpeed * 0.35;
+
+          if (gameState === 'FLYING') {
+            const dt = Math.max(0, Math.min(rawDt, 0.05));
+            const speedBoost = Math.min(1.8, 1 + Math.log(Math.max(1, currentMultiplier)) * 0.25);
+            dotScrollY += 58 * speedBoost * dt;
+            dotScrollX += 68 * speedBoost * dt;
+          }
+
           const camBegin = () => { ctx.save(); ctx.translate(0, h); ctx.scale(camZoom, camZoom); ctx.translate(0, -h); };
           const camEnd = () => ctx.restore();
 
           camBegin();
 
-          // Perspective Rays (Much lighter & faint)
+          // Perspective Rays
           ctx.save();
           ctx.fillStyle = 'rgba(255, 255, 255, 0.007)';
           const rayOff = mod(bgX * 0.003, 1);
@@ -1814,7 +1900,7 @@ function mwHide(){window.__mwDone=1}
           }
           ctx.restore();
 
-          // Speed streaks (Much lighter, softer, and subtle)
+          // Speed streaks
           const spanX = w + 160, spanY = h + 120;
           ctx.save();
           const streakA = Math.max(0, Math.min(0.08, (bgSpeed - 0.3) * 0.035));
@@ -1837,6 +1923,40 @@ function mwHide(){window.__mwDone=1}
           const runwayY = h - 44;
           if (gameState === 'WAITING') planeTilt += (-0.32 - planeTilt) * 0.1;
 
+          const hover = gameState === 'FLYING' ? Math.sin(angleTick * 0.06) * 3 : 0;
+          const wantX = Math.min(w - 55, 52 + climb * (w * 0.6 - 52)) + hover * 0.6;
+          const wantY = runwayY - climb * (runwayY - h / 3) + hover;
+          const planeX = wantX / camZoom;
+          const planeY = h + (wantY - h) / camZoom;
+          const ctrlX = planeX * 0.52;
+
+          if (gameState === 'FLYING' || gameState === 'CRASHED') {
+            const tanAng = Math.atan2(planeY - h, planeX - ctrlX);
+            const levelOut = Math.max(0, Math.min(1, (climb - 0.8) / 0.2));
+            const tiltTarget = (Math.max(-0.7, Math.min(-0.12, tanAng))) * (1 - levelOut) + (-0.14) * levelOut;
+            planeTilt += (tiltTarget - planeTilt) * 0.08;
+          }
+
+          const showConnectingNotice = Date.now() - Math.max(lastServerMsg, pageLoadedAt) > 4000;
+          const exclusions = [getPlayerCounterExclusion(w, h)];
+          if (showConnectingNotice) {
+            exclusions.push({ left: w / 2 - 110, top: h - 34, right: w / 2 + 110, bottom: h - 18 });
+          }
+
+          let planePose;
+          if (gameState === 'WAITING') {
+            planePose = { planeX: 52, planeY: runwayY, tilt: planeTilt, camZoom, canvasHeight: h };
+          } else if (gameState === 'FLYING') {
+            planePose = { planeX, planeY, tilt: planeTilt, camZoom, canvasHeight: h };
+          } else {
+            const nextFlew = flewAwayOffset + 0.04;
+            const fx = planeX + Math.cos(planeTilt) * nextFlew * 240;
+            const fy = planeY + Math.sin(planeTilt) * nextFlew * 240;
+            planePose = { planeX: fx, planeY: fy, tilt: planeTilt, camZoom, canvasHeight: h };
+          }
+
+          drawAxisDots(w, h, exclusions, planePose);
+
           if (gameState === 'WAITING') {
             camBegin();
             drawAirplane(ctx, 52, runwayY, planeTilt, angleTick * 0.7);
@@ -1846,7 +1966,6 @@ function mwHide(){window.__mwDone=1}
             ctx.save();
             const cx = w / 2;
             const spaced = (txt, x, y, gap) => {
-              // manual letter-spacing (works in every browser), centered on x
               const chars = Array.from(txt);
               const widths = chars.map((c) => ctx.measureText(c).width);
               const total = widths.reduce((a, b) => a + b, 0) + gap * (chars.length - 1);
@@ -1857,7 +1976,6 @@ function mwHide(){window.__mwDone=1}
             };
             ctx.textBaseline = 'alphabetic';
 
-            // Title: MOSTWIN88 (gold gradient + soft glow)
             const titleSize = Math.max(15, Math.min(22, w * 0.055));
             ctx.font = `900 ${titleSize}px 'Segoe UI', system-ui, -apple-system, sans-serif`;
             const tg = ctx.createLinearGradient(0, 18, 0, 18 + titleSize);
@@ -1870,7 +1988,6 @@ function mwHide(){window.__mwDone=1}
             spaced('MOSTWIN88', cx, 18 + titleSize * 0.85, 2.4);
             ctx.shadowBlur = 0;
 
-            // Subtitle: OFFICIAL GAME EXPERIENCE with decorative lines
             const subY = 18 + titleSize * 0.85 + 16;
             ctx.font = "600 7.5px 'Segoe UI', system-ui, -apple-system, sans-serif";
             ctx.fillStyle = 'rgba(255,255,255,0.82)';
@@ -1886,7 +2003,6 @@ function mwHide(){window.__mwDone=1}
               ctx.strokeStyle = lg;
               ctx.lineWidth = 1;
               ctx.beginPath(); ctx.moveTo(x0, lineY); ctx.lineTo(x1, lineY); ctx.stroke();
-              // small diamond next to the text
               const dx = cx + dir * (subW / 2 + 5);
               ctx.fillStyle = '#fbbf24';
               ctx.beginPath();
@@ -1923,18 +2039,6 @@ function mwHide(){window.__mwDone=1}
             ctx.fillText(`Starting in ${countdownSeconds.toFixed(1)}s`, w / 2, barY + 22);
 
           } else if (gameState === 'FLYING' || gameState === 'CRASHED') {
-            const hover = gameState === 'FLYING' ? Math.sin(angleTick * 0.06) * 3 : 0;
-            const wantX = Math.min(w - 55, 52 + climb * (w * 0.6 - 52)) + hover * 0.6;
-            const wantY = runwayY - climb * (runwayY - h / 3) + hover;
-            const planeX = wantX / camZoom;
-            const planeY = h + (wantY - h) / camZoom;
-            const ctrlX = planeX * 0.52;
-
-            const tanAng = Math.atan2(planeY - h, planeX - ctrlX);
-            const levelOut = Math.max(0, Math.min(1, (climb - 0.8) / 0.2));
-            const tiltTarget = (Math.max(-0.7, Math.min(-0.12, tanAng))) * (1 - levelOut) + (-0.14) * levelOut;
-            planeTilt += (tiltTarget - planeTilt) * 0.08;
-
             camBegin();
             ctx.save();
             ctx.beginPath();
@@ -1998,12 +2102,12 @@ function mwHide(){window.__mwDone=1}
             ctx.restore();
           }
 
-          if (Date.now() - Math.max(lastServerMsg, pageLoadedAt) > 4000) {
+          if (showConnectingNotice) {
             ctx.save();
             ctx.textAlign = 'center';
             ctx.fillStyle = 'rgba(245,158,11,0.95)';
             ctx.font = 'bold 12px system-ui, sans-serif';
-            ctx.fillText('Connecting to game server…', w / 2, h - 14);
+            ctx.fillText('Connecting to game server…', w / 2, h - 24);
             ctx.restore();
           }
 
@@ -2011,6 +2115,17 @@ function mwHide(){window.__mwDone=1}
           requestAnimationFrame(renderLoop);
         }
         requestAnimationFrame(renderLoop);
+
+        if (new URLSearchParams(window.location.search).get('previewFlight') === '1') {
+          gameState = 'FLYING';
+          currentMultiplier = 1.05;
+          lastServerMsg = Date.now();
+          setInterval(() => {
+            lastServerMsg = Date.now();
+            currentMultiplier = Number((currentMultiplier + 0.03).toFixed(2));
+            if (currentMultiplier > 3.2) currentMultiplier = 1.05;
+          }, 100);
+        }
 
         // 7. Live Table Bot Generation
         const bots = ['d***5', 'r***8', 's***2', 'k***9', 'm***7', 'a***4', 't***1', 'b***3', 'z***0', 'h***6', 'p***9', 'n***2'];
@@ -2029,7 +2144,6 @@ function mwHide(){window.__mwDone=1}
           const style = Math.floor(Math.random() * 3);
           const glasses = Math.random() < 0.18;
 
-          // hair behind the head
           let back = '';
           if (girl) {
             if (style === 0) back = '<path d="M7 41V20C7 8 13 3.5 20 3.5S33 8 33 20v21z" fill="' + hair + '"/>';
@@ -2037,7 +2151,6 @@ function mwHide(){window.__mwDone=1}
             else back = '<circle cx="20" cy="4.5" r="4.6" fill="' + hair + '"/>';
           }
 
-          // hair on top (fringe)
           let top;
           if (girl) {
             top = style === 1
@@ -2069,23 +2182,17 @@ function mwHide(){window.__mwDone=1}
 
           return '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">'
             + back
-            // shoulders + collar
             + '<path d="M2 41c0-9 7-13.500 18-13.500S38 32 38 41z" fill="' + shirt + '"/>'
             + '<path d="M14.500 28.500q5.500 5.500 11 0l-1.500-1.200h-8z" fill="' + skinDk + '"/>'
             + '<path d="M14.500 28.500q5.500 5.500 11 0" stroke="rgba(255,255,255,.35)" stroke-width=".8" fill="none"/>'
-            // neck
             + '<rect x="16.500" y="23" width="7" height="6" rx="2.500" fill="' + skinDk + '"/>'
-            // ears
             + '<circle cx="10.200" cy="19.500" r="2.400" fill="' + skin + '"/><circle cx="29.800" cy="19.500" r="2.400" fill="' + skin + '"/>'
             + '<circle cx="10.300" cy="19.600" r="1.100" fill="' + skinDk + '" opacity=".55"/><circle cx="29.700" cy="19.600" r="1.100" fill="' + skinDk + '" opacity=".55"/>'
-            // face
             + '<ellipse cx="20" cy="18.300" rx="9.800" ry="10.600" fill="' + skin + '"/>'
             + '<ellipse cx="20" cy="26" rx="6.500" ry="2.600" fill="' + skinDk + '" opacity=".25"/>'
-            // cheeks
             + '<circle cx="13.200" cy="22.300" r="2.200" fill="#ff7a8a" opacity=".32"/><circle cx="26.800" cy="22.300" r="2.200" fill="#ff7a8a" opacity=".32"/>'
             + top
             + brow + eyes + specs
-            // nose + smile
             + '<path d="M19.200 21.300q.8.800 1.600 0" stroke="' + skinDk + '" stroke-width=".9" fill="none" stroke-linecap="round"/>'
             + '<path d="M16.200 23.800q3.800 3.600 7.600 0z" fill="#8b2c3a"/>'
             + '<path d="M17.200 24.200h5.600q-1 1.100-2.800 1.100t-2.800-1.100z" fill="#fff"/>'
@@ -2096,7 +2203,7 @@ function mwHide(){window.__mwDone=1}
           const rows = document.getElementById('tableRows');
           if (!rows) return;
           rows.innerHTML = '';
-          activeBotBets = bots.map((name, i) => {
+          activeBotBets = bots.map((name) => {
             const betAmt = [500, 500, 1000, 1000, 2000, 5000, 10000, 25000][Math.floor(Math.random() * 8)];
             const targetM = Number((1.1 + Math.random() * 4.5).toFixed(2));
             const avColors = ['#e11d48', '#2563eb', '#16a34a', '#d97706', '#7c3aed', '#0891b2', '#db2777', '#65a30d', '#ea580c', '#475569'];
@@ -2137,7 +2244,7 @@ function mwHide(){window.__mwDone=1}
           });
         }
 
-        // Live players counter: climbs randomly (1 -> 100~250) during countdown
+        // Live players counter
         (function () {
           const countEl = document.getElementById('playerCount');
           const av1 = document.getElementById('pcAv1');
@@ -2175,7 +2282,6 @@ function mwHide(){window.__mwDone=1}
               else { target = rnd(250, 320); count = target; }
             }
             if (gameState === 'WAITING') {
-              // Countdown: climb 10 -> 20 -> 50 -> 100 ... -> 250+ (never goes down)
               const p = Math.max(0, Math.min(1, countdownProgress));
               const ease = Math.pow(p, 1.15);
               let want = startCount + (target - startCount) * ease;
@@ -2185,15 +2291,13 @@ function mwHide(){window.__mwDone=1}
               count = want;
             } else {
               if (gameState === 'FLYING') {
-                // Plane flying: count never increases, it slowly decreases
                 if (count < target * 0.9 && !flightStarted) count = target;
                 flightStarted = true;
-                const floor = 150; // never drops below 150
+                const floor = 150;
                 if (count > floor && Math.random() < 0.3) {
                   count = Math.max(floor, count - rnd(1, 3));
                 }
               }
-              // CRASHED: count stays as it is until the next round
             }
             countEl.textContent = count;
           }, 250);
