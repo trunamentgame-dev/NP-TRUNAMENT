@@ -190,6 +190,15 @@
       @media (min-width: 400px) {
         .arena-box { height: 260px; }
       }
+      .pb-logo { display: inline-flex; align-items: baseline; gap: 4px; }
+      .pb-by { color: #f59e0b; font-weight: 700; letter-spacing: 0.5px; }
+      .pb-lm { display: inline-block; white-space: nowrap; font-weight: 900; letter-spacing: 0.5px; color: #ffd23f; font-size: 1.25em; line-height: 1; }
+      .pb-w { color: #fff; }
+      .pb-o { display: inline-block; position: relative; width: .76em; height: .76em; margin: 0 .035em; vertical-align: baseline; overflow: visible; }
+      .pb-o svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; overflow: visible; transform: scale(1.12); transform-origin: 50% 50%; }
+      .pb-r { transform-box: view-box; transform-origin: 50px 50px; animation: pbSpin 6s cubic-bezier(.2,.7,.2,1) infinite; }
+      @keyframes pbSpin { 0%, 25% { transform: rotate(0deg); } 70%, 100% { transform: rotate(1440deg); } }
+      @media (prefers-reduced-motion: reduce) { .pb-r { animation: none; } }
       #flightCanvas {
         width: 100%;
         height: 100%;
@@ -703,7 +712,7 @@ function mwHide(){window.__mwDone=1}
         <div class="table-rows" id="tableRows"></div>
         <div class="provably-fair-tag">
           <span style="color:#10b981;">🛡️ Provably Fair Game</span>
-          <span style="color:#f59e0b; font-weight:800; letter-spacing: 0.5px;">Powered by MostWin88</span>
+          <span class="pb-logo"><span class="pb-by">Powered by</span> <span class="pb-lm"><span class="pb-w">M</span><span class="pb-o"><svg viewBox="0 0 100 100" aria-hidden="true"><g class="pb-r"><circle cx="50" cy="50" r="43" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="14"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="7.4 3.86"/></g><circle cx="50" cy="50" r="18" fill="#ffd23f"/><circle cx="50" cy="50" r="18" fill="none" stroke="#fff2b3" stroke-width="3"/></svg></span><span class="pb-w">ST</span>WIN<span class="pb-w">88</span></span></span>
         </div>
       </div>
     </div>
@@ -1952,10 +1961,13 @@ function mwHide(){window.__mwDone=1}
           const wantY = runwayY - climb * (runwayY - h / 3) + hover;
           const planeX = wantX / camZoom;
           const planeY = h + (wantY - h) / camZoom;
-          const ctrlX = planeX * 0.52;
+          // Flight trail starts from the corner of the white axis lines (not from the canvas corner)
+          const trailSX = 22 / camZoom;
+          const trailSY = h - 19 / camZoom;
+          const ctrlX = trailSX + (planeX - trailSX) * 0.52;
 
           if (gameState === 'FLYING' || gameState === 'CRASHED') {
-            const tanAng = Math.atan2(planeY - h, planeX - ctrlX);
+            const tanAng = Math.atan2(planeY - trailSY, planeX - ctrlX);
             const levelOut = Math.max(0, Math.min(1, (climb - 0.8) / 0.2));
             const tiltTarget = (Math.max(-0.7, Math.min(-0.12, tanAng))) * (1 - levelOut) + (-0.14) * levelOut;
             planeTilt += (tiltTarget - planeTilt) * 0.08;
@@ -2107,13 +2119,13 @@ function mwHide(){window.__mwDone=1}
             camBegin();
             ctx.save();
             ctx.beginPath();
-            ctx.moveTo(0, h);
-            ctx.quadraticCurveTo(ctrlX, h, planeX, planeY);
-            ctx.lineTo(planeX, h);
-            ctx.lineTo(0, h);
+            ctx.moveTo(trailSX, trailSY);
+            ctx.quadraticCurveTo(ctrlX, trailSY, planeX, planeY);
+            ctx.lineTo(planeX, trailSY);
+            ctx.lineTo(trailSX, trailSY);
             ctx.closePath();
 
-            const trailGrad = ctx.createLinearGradient(0, planeY, 0, h);
+            const trailGrad = ctx.createLinearGradient(0, planeY, 0, trailSY);
             trailGrad.addColorStop(0, 'rgba(255, 0, 56, 0.78)');
             trailGrad.addColorStop(0.5, 'rgba(200, 0, 40, 0.45)');
             trailGrad.addColorStop(1, 'rgba(100, 0, 20, 0.15)');
@@ -2121,8 +2133,8 @@ function mwHide(){window.__mwDone=1}
             ctx.fill();
 
             ctx.beginPath();
-            ctx.moveTo(0, h);
-            ctx.quadraticCurveTo(ctrlX, h, planeX, planeY);
+            ctx.moveTo(trailSX, trailSY);
+            ctx.quadraticCurveTo(ctrlX, trailSY, planeX, planeY);
             ctx.strokeStyle = '#ff0038';
             ctx.lineWidth = 4.5;
             ctx.shadowColor = 'rgba(255,0,56,0.8)';
