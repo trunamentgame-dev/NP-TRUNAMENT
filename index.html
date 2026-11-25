@@ -2674,75 +2674,25 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 </head>
 <body data-theme="dark">
 
-  <!-- ==================== MOSTWIN88 - INTRO ANIMATION ==================== -->
+  <!-- ==================== MOSTWIN88 - LIGHT INTRO ==================== -->
 <style>
-#np-intro{position:fixed;inset:0;z-index:999999;display:grid;place-items:center;overflow:hidden;isolation:isolate;color:#fff;
+#np-intro{position:fixed;inset:0;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#fff;
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
-  background:radial-gradient(ellipse at 50% 48%,#1a2b58 0%,#0c1530 34%,#050816 75%);
-  opacity:1;visibility:visible;transition:opacity .45s ease,visibility .45s ease}
-#pageLoadingScreen{display:none!important}
+  background:#070d1f;opacity:1;visibility:visible;transition:opacity .25s ease,visibility .25s ease}
 #np-intro.np-intro-hide{opacity:0;visibility:hidden;pointer-events:none}
-#np-intro *{box-sizing:border-box;margin:0;padding:0}
-#np-intro:before,#np-intro:after{content:"";position:absolute;inset:-40%;pointer-events:none;z-index:-1}
-#np-intro:before{background:conic-gradient(from 0deg,transparent 0 18%,#ffd34d0b 22%,transparent 30% 58%,#6b8dff0b 65%,transparent 75%);animation:niSlowSpin 24s linear infinite}
-#np-intro:after{inset:0;background-image:linear-gradient(#ffffff05 1px,transparent 1px),linear-gradient(90deg,#ffffff05 1px,transparent 1px);background-size:42px 42px;-webkit-mask-image:radial-gradient(ellipse at center,#000 0%,transparent 72%);mask-image:radial-gradient(ellipse at center,#000 0%,transparent 72%);opacity:.3}
-#np-intro .ni-scene{position:relative;width:100%;height:100%;display:grid;place-items:center;padding:24px}
-#np-intro .ni-glow{position:absolute;width:min(72vw,520px);aspect-ratio:1;border-radius:50%;background:#2865ff;filter:blur(100px);opacity:.12;animation:niBreathe 3.8s ease-in-out infinite}
-#np-intro .ni-ring{position:absolute;width:min(78vw,490px);aspect-ratio:1;border-radius:50%;border:1px solid #ffffff16;transform:rotateX(68deg) rotate(-20deg);box-shadow:0 0 35px #4d77ff12,inset 0 0 30px #ffffff08;animation:niRingFloat 5s ease-in-out infinite}
-#np-intro .ni-ring:before,#np-intro .ni-ring:after{content:"";position:absolute;border-radius:50%;inset:12%;border:1px dashed #ffd34d35;transform:rotate(30deg)}
-#np-intro .ni-ring:after{inset:25%;border-style:solid;border-color:#ffffff12;transform:rotate(-40deg)}
-#np-intro .ni-orbit{position:absolute;width:min(78vw,490px);aspect-ratio:1;border-radius:50%;animation:niOrbit 7s linear infinite}
-#np-intro .ni-orbit:before{content:"";position:absolute;left:8%;top:17%;width:7px;height:7px;border-radius:50%;background:#ffe28a;box-shadow:0 0 8px 3px #ffd34d99,0 0 24px #ffd34d}
-#np-intro .ni-brand{position:relative;display:flex;flex-direction:column;align-items:center;transform:translateY(-1vh);animation:niBrandReveal 1.2s cubic-bezier(.16,1,.3,1) both}
-#np-intro .ni-logo{position:relative;width:max-content;max-width:100%;text-align:left}
-#np-intro .ni-lm{display:block;white-space:nowrap;font-size:clamp(36px,min(13vw,17vh),145px);font-weight:900;letter-spacing:.5px;line-height:1;color:#fff;text-shadow:0 0 18px #ffffff35,0 0 42px #ffffff12}
-#np-intro .ni-w,#np-intro .ni-r{color:#fff;text-shadow:0 0 18px #ffffff45}
-#np-intro .ni-win{color:#ffd23f;text-shadow:0 0 16px #ffd34d88,0 0 34px #ffd34d35}
-#np-intro .ni-lm .ni-letter{display:inline-block;opacity:0;transform:translateX(calc(var(--from) * 1em)) scale(.08);transform-origin:center;animation:niLetterFromO .48s cubic-bezier(.16,1,.3,1) forwards;animation-delay:var(--d)}
-#np-intro .ni-lo{display:inline-block;position:relative;width:.76em;height:.76em;margin:0 .035em;vertical-align:baseline;filter:drop-shadow(0 0 8px #fff9);animation:niBigOtoSmall 2.45s cubic-bezier(.16,1,.3,1) both}
-#np-intro .ni-lo svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transform:scale(1.12)}
-#np-intro .ni-lo-r{transform-box:view-box;transform-origin:50px 50px;animation:niLogoSpin 2.45s cubic-bezier(.18,.7,.2,1) both}
-#np-intro .ni-tag{display:block;text-align:center;white-space:nowrap;margin-top:.8em;color:#ffe08a;font-size:clamp(9px,2.2vw,18px);font-weight:800;letter-spacing:.34em;padding-left:.34em;opacity:0;text-shadow:0 0 15px #ffd34d55;animation:niTagReveal .8s ease-out 1s forwards}
-#np-intro .ni-line{height:1px;width:min(62vw,300px);margin:24px auto 0;position:relative;overflow:hidden;background:linear-gradient(90deg,transparent,#ffd34d70,transparent);opacity:0;animation:niFade .5s ease 1.25s forwards}
-#np-intro .ni-line:after{content:"";position:absolute;inset:0;width:35%;background:linear-gradient(90deg,transparent,#fff,transparent);animation:niShine 1.8s ease-in-out 1.3s infinite}
-#np-intro .ni-loading{margin-top:18px;display:flex;align-items:center;gap:9px;color:#aab6d4;font-size:10px;font-weight:700;letter-spacing:.28em;opacity:0;animation:niFade .6s ease 1.35s forwards}
-#np-intro .ni-dots{display:flex;gap:4px}
-#np-intro .ni-dots i{width:4px;height:4px;border-radius:50%;background:#ffd34d;animation:niDot .9s ease-in-out infinite}
-#np-intro .ni-dots i:nth-child(2){animation-delay:.15s}
-#np-intro .ni-dots i:nth-child(3){animation-delay:.3s}
-#np-intro .ni-spark{position:absolute;width:3px;height:3px;border-radius:50%;background:#ffe9a3;box-shadow:0 0 10px 2px #ffd34d;opacity:0;animation:niSparkle 2.8s ease-in-out infinite}
-#np-intro .ni-s1{top:25%;left:22%;animation-delay:.1s}
-#np-intro .ni-s2{top:32%;right:20%;animation-delay:.8s}
-#np-intro .ni-s3{bottom:27%;left:27%;animation-delay:1.4s}
-#np-intro .ni-s4{bottom:30%;right:25%;animation-delay:2s}
-@keyframes niBrandReveal{0%{opacity:0;transform:translateY(22px) scale(.78);filter:blur(12px)}65%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translateY(-1vh) scale(1);filter:blur(0)}}
-@keyframes niLogoSpin{0%{transform:rotate(-360deg) scale(.65)}65%{transform:rotate(900deg) scale(1.08)}100%{transform:rotate(1440deg) scale(1)}}
-@keyframes niBigOtoSmall{0%{transform:scale(2.8) rotate(-180deg);filter:drop-shadow(0 0 28px #fff)}55%{transform:scale(2.15) rotate(720deg);filter:drop-shadow(0 0 22px #fff)}100%{transform:scale(1) rotate(1440deg);filter:drop-shadow(0 0 8px #fff9)}}
-@keyframes niLetterFromO{0%{opacity:0;transform:translateX(calc(var(--from) * 1em)) scale(.08)}65%{opacity:1;transform:translateX(0) scale(1.12)}100%{opacity:1;transform:translateX(0) scale(1)}}
-@keyframes niTagReveal{from{opacity:0;transform:translateY(10px);letter-spacing:.6em}to{opacity:1;transform:translateY(0);letter-spacing:.34em}}
-@keyframes niBreathe{0%,100%{transform:scale(.82);opacity:.08}50%{transform:scale(1.15);opacity:.2}}
-@keyframes niRingFloat{0%,100%{transform:rotateX(68deg) rotate(-20deg) scale(.94)}50%{transform:rotateX(68deg) rotate(0deg) scale(1.04)}}
-@keyframes niOrbit{to{transform:rotate(360deg)}}
-@keyframes niSlowSpin{to{transform:rotate(360deg)}}
-@keyframes niShine{0%{transform:translateX(-120%)}100%{transform:translateX(400%)}}
-@keyframes niFade{to{opacity:1}}
-@keyframes niDot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
-@keyframes niSparkle{0%,100%{opacity:0;transform:scale(.4)}40%{opacity:1;transform:scale(1.2)}70%{opacity:.35;transform:scale(.7)}}
-@media(prefers-reduced-motion:reduce){#np-intro *,#np-intro:before,#np-intro:after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+#np-intro .ni-lm{font-size:clamp(30px,10vw,56px);font-weight:900;letter-spacing:1px;line-height:1;white-space:nowrap;color:#fff;opacity:0;animation:niIn .35s ease-out .05s forwards}
+#np-intro .ni-lm b{color:#ffd23f;font-weight:900}
+#np-intro .ni-tag{font-size:clamp(9px,2.4vw,12px);font-weight:700;letter-spacing:.3em;color:#ffe08a;opacity:0;animation:niIn .35s ease-out .2s forwards}
+#np-intro .ni-bar{width:min(150px,40vw);height:2px;border-radius:2px;background:#ffffff1f;overflow:hidden;opacity:0;animation:niIn .3s ease-out .25s forwards}
+#np-intro .ni-bar i{display:block;width:40%;height:100%;border-radius:2px;background:#ffd23f;transform:translate3d(-110%,0,0);animation:niBar 1s ease-in-out infinite}
+@keyframes niIn{to{opacity:1}}
+@keyframes niBar{to{transform:translate3d(280%,0,0)}}
+@media(prefers-reduced-motion:reduce){#np-intro .ni-bar i{animation:none;width:100%;transform:none}}
 </style>
 <div id="np-intro" aria-label="MOSTWIN88 intro">
-<main class="ni-scene">
-  <div class="ni-glow"></div><div class="ni-ring"></div><div class="ni-orbit"></div>
-  <i class="ni-spark ni-s1"></i><i class="ni-spark ni-s2"></i><i class="ni-spark ni-s3"></i><i class="ni-spark ni-s4"></i>
-  <section class="ni-brand">
-    <div class="ni-logo">
-      <span class="ni-lm"><span class="ni-letter ni-w" style="--from:1.1;--d:.62s">M</span><span class="ni-lo"><svg viewBox="0 0 100 100" aria-hidden="true"><g class="ni-lo-r"><circle cx="50" cy="50" r="43" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="14"/><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="7.4 3.86"/></g><circle cx="50" cy="50" r="18" fill="#ffd23f"/><circle cx="50" cy="50" r="18" fill="none" stroke="#fff2b3" stroke-width="3"/></svg></span><span class="ni-letter ni-w" style="--from:-1.0;--d:.82s">S</span><span class="ni-letter ni-w" style="--from:-1.7;--d:1.02s">T</span><span class="ni-letter ni-win" style="--from:-2.4;--d:1.22s">W</span><span class="ni-letter ni-win" style="--from:-3.1;--d:1.42s">I</span><span class="ni-letter ni-win" style="--from:-3.8;--d:1.62s">N</span><span class="ni-letter ni-r" style="--from:-4.5;--d:1.82s">8</span><span class="ni-letter ni-r" style="--from:-5.2;--d:2.02s">8</span></span></span>
-      <span class="ni-tag">PLAY BIG, WIN BIGGER</span>
-    </div>
-    <div class="ni-line"></div>
-    <div class="ni-loading">LOADING <span class="ni-dots"><i></i><i></i><i></i></span></div>
-  </section>
-</main>
+  <div class="ni-lm">MOST<b>WIN</b>88</div>
+  <div class="ni-tag">PLAY BIG, WIN BIGGER</div>
+  <div class="ni-bar"><i></i></div>
 </div>
 <script>
 (function () {
@@ -2751,7 +2701,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
 
   window.isPageFullyLoaded = false;
   window.isIntroFinished = false;
-  var timerDone = false, hidden = false;
+  var minDone = false, hidden = false;
 
   window.tryRevealPage = function () {};   // আলাদা দ্বিতীয় লোডিং স্ক্রিন আর দেখানো হয় না
 
@@ -2762,10 +2712,10 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     window.setTimeout(function () {
       intro.remove();
       window.isIntroFinished = true;
-    }, 450);
+    }, 280);
   }
   function maybeHide() {
-    if (timerDone && window.isPageFullyLoaded) hideIntro();
+    if (minDone && window.isPageFullyLoaded) hideIntro();
   }
 
   window.markPageLoaded = function () {
@@ -2773,13 +2723,14 @@ body[data-theme="light"] .pp-howto div{color:#475569}
     maybeHide();
   };
 
-  // পুরো অ্যানিমেশন (≈৩.৫ সেকেন্ড) শেষ হলে এবং পেজ রেডি হলে সরাসরি হোম পেজ
-  window.setTimeout(function () { timerDone = true; maybeHide(); }, 4200);
-  // নিরাপত্তা: পেজ রেডি সংকেত না এলেও সর্বোচ্চ ১০ সেকেন্ডে ইন্ট্রো সরে যাবে
-  window.setTimeout(hideIntro, 10000);
+  // হালকা ইন্ট্রো: কমপক্ষে ০.৮ সেকেন্ড দেখায়, পেজ রেডি হলেই সরে যায়
+  window.setTimeout(function () { minDone = true; maybeHide(); }, 800);
+  // নিরাপত্তা: পেজ রেডি সংকেত না এলেও সর্বোচ্চ ৪ সেকেন্ডে ইন্ট্রো সরে যাবে
+  window.setTimeout(hideIntro, 4000);
 })();
 </script>
 <!-- End MOSTWIN88 Intro -->
+<style>#pageLoadingScreen{display:none!important}</style>
 <!-- ==================== PAGE LOADING SCREEN (ইনট্রোর পর পেজ লোড না হওয়া পর্যন্ত দৃশ্যমান) ==================== -->
 <div id="pageLoadingScreen" class="npld npld-on" role="status" aria-label="Loading">
   <div class="npld-txt" aria-hidden="true">
@@ -3318,7 +3269,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
         <!-- Primary Input: Username / Email (Matches photo 1 & 2 light blue/white filled rounded bar) -->
         <div class="form-group" style="margin-bottom: 14px;">
           <label class="form-label" id="lblFormEmail" style="font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; display: block;">ইউজারনেম বা ইমেইল *</label>
-          <input type="text" class="form-input" id="authEmail" required placeholder="mijanbabu2015@gmail.com" autocomplete="username" style="width: 100%; height: 48px; background: #e8f0fe; border: 1.5px solid transparent; border-radius: 14px; padding: 0 16px; color: #0f172a; font-size: 14px; font-weight: 500; outline: none; box-sizing: border-box; transition: all 0.2s ease;">
+          <input type="text" class="form-input" id="authEmail" required placeholder="yourmail@gmail.com" autocomplete="username" style="width: 100%; height: 48px; background: #e8f0fe; border: 1.5px solid transparent; border-radius: 14px; padding: 0 16px; color: #0f172a; font-size: 14px; font-weight: 500; outline: none; box-sizing: border-box; transition: all 0.2s ease;">
         </div>
 
         <!-- Password Input (Matches photo 1 & 2 light blue/white filled rounded bar) -->
@@ -5037,6 +4988,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
             status: data.status || 'ACTIVE',
             dpUrl: data.dpUrl || '',
             dpWidth: data.dpWidth || '75px',
+            adminUid: data.adminUid || '',
             joinedMatches: data.joinedMatches || {}
           };
           updateAuthStateUI();
@@ -6148,7 +6100,7 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       if (btn) btn.innerText = isLogin ? 'লগইন করুন' : 'লগইন করুন';
       if (emailLbl) emailLbl.innerText = isLogin ? 'ইউজারনেম বা ইমেইল *' : 'ইমেইল অ্যাড্রেস *';
       if (emailInput && !emailInput.value) {
-        emailInput.placeholder = 'mijanbabu2015@gmail.com';
+        emailInput.placeholder = 'yourmail@gmail.com';
       }
     }
 
@@ -6846,10 +6798,15 @@ body[data-theme="light"] .pp-howto div{color:#475569}
       if (db) {
         try {
           const reqId = db.ref('depositRequests').push().key;
+          let _depAdminUid = state.userData.adminUid || '';
+          try {
+            const _au = await db.ref('users/' + state.currentUser.uid + '/adminUid').once('value');
+            _depAdminUid = _au.val() || '';
+          } catch (e) {}
           await db.ref(`depositRequests/${reqId}`).set({
             id: reqId,
             uid: state.currentUser.uid,
-            adminUid: state.userData.adminUid || null,
+            adminUid: _depAdminUid || null,
             userName: state.userData.name || 'Player',
             userEmail: state.userData.email || '',
             method,
