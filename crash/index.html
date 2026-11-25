@@ -2129,17 +2129,45 @@ function mwHide(){window.__mwDone=1}
             trailGrad.addColorStop(0, 'rgba(255, 0, 56, 0.78)');
             trailGrad.addColorStop(0.5, 'rgba(200, 0, 40, 0.45)');
             trailGrad.addColorStop(1, 'rgba(100, 0, 20, 0.15)');
+            // Trail fill fades out toward the start (smoke-like), full strength near the plane
+            ctx.restore();
+            ctx.save();
+            const TR_N = 56;
+            const trPts = [];
+            for (let i = 0; i <= TR_N; i++) {
+              const u = i / TR_N, iu = 1 - u;
+              trPts.push({
+                x: iu * iu * trailSX + 2 * iu * u * ctrlX + u * u * planeX,
+                y: trailSY + (planeY - trailSY) * u * u
+              });
+            }
             ctx.fillStyle = trailGrad;
-            ctx.fill();
+            for (let i = 1; i <= TR_N; i++) {
+              const f = i / TR_N;
+              ctx.globalAlpha = Math.pow(f, 1.4);
+              ctx.beginPath();
+              ctx.moveTo(trPts[i - 1].x, trPts[i - 1].y);
+              ctx.lineTo(trPts[i].x + 0.6, trPts[i].y);
+              ctx.lineTo(trPts[i].x + 0.6, trailSY);
+              ctx.lineTo(trPts[i - 1].x, trailSY);
+              ctx.closePath();
+              ctx.fill();
+            }
+            ctx.globalAlpha = 1;
 
-            ctx.beginPath();
-            ctx.moveTo(trailSX, trailSY);
-            ctx.quadraticCurveTo(ctrlX, trailSY, planeX, planeY);
-            ctx.strokeStyle = '#ff0038';
-            ctx.lineWidth = 4.5;
+            // Trail line: thin and faint at the start, thick and bright near the plane
+            ctx.lineCap = 'butt';
             ctx.shadowColor = 'rgba(255,0,56,0.8)';
-            ctx.shadowBlur = 10;
-            ctx.stroke();
+            ctx.shadowBlur = 8;
+            for (let i = 1; i <= TR_N; i++) {
+              const f = i / TR_N;
+              ctx.strokeStyle = 'rgba(255,0,56,' + Math.pow(f, 1.2).toFixed(3) + ')';
+              ctx.lineWidth = 1 + 5 * Math.pow(f, 1.6);
+              ctx.beginPath();
+              ctx.moveTo(trPts[i - 1].x, trPts[i - 1].y);
+              ctx.lineTo(trPts[i].x, trPts[i].y);
+              ctx.stroke();
+            }
             ctx.shadowBlur = 0;
             ctx.restore();
 
